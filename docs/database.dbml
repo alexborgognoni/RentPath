@@ -1,0 +1,112 @@
+Table property_managers ***REMOVED***
+  id uuid [pk]
+  email varchar [unique, not null]
+  password_hash varchar [not null]
+  first_name varchar
+  last_name varchar
+  phone_number varchar
+  type enum('private', 'business') [not null, default: 'private']
+  is_verified boolean [default: false]
+  created_at timestamp [default: `now()`]
+***REMOVED***
+
+Table renters ***REMOVED***
+  id uuid [pk]
+  email varchar [unique, not null]
+  password_hash varchar [not null]
+  first_name varchar
+  last_name varchar
+  phone_number varchar
+  is_verified boolean [default: false]
+  created_at timestamp [default: `now()`]
+***REMOVED***
+
+Table properties ***REMOVED***
+  id uuid [pk]
+  title varchar
+  address varchar
+  description text
+  rent_amount decimal
+  is_invite_only boolean [default: false]
+  created_at timestamp [default: `now()`]
+***REMOVED***
+
+Table property_manager_verifications ***REMOVED***
+  id uuid [pk]
+  property_manager_id uuid [ref: > property_managers.id]
+  company_name varchar
+  registration_number varchar
+  business_address text
+  identity_document varchar
+  proof_of_authority varchar
+  address_proof varchar
+  additional_document_1 varchar
+  additional_document_2 varchar
+  status varchar [default: 'pending', note: 'pending, verified, rejected']
+  submitted_at timestamp
+  verified_at timestamp
+  verified_by uuid [ref: > property_managers.id, note: 'Internal verifier if applicable']
+***REMOVED***
+
+Table property_manager_property ***REMOVED***
+  property_id uuid [ref: > properties.id]
+  property_manager_id uuid [ref: > property_managers.id]
+  role varchar [note: 'e.g., owner, agent, admin']
+  added_at timestamp [default: `now()`]
+  Note: 'Join table for many-to-many relationship'
+***REMOVED***
+
+Table rental_invitations ***REMOVED***
+  id uuid [pk]
+  property_id uuid [ref: > properties.id]
+  invitation_token varchar [not null, unique]
+  type varchar [default: 'general', note: 'general or direct']
+  email varchar [note: 'Only used for direct invites']
+  usage_limit int
+  usage_count int [default: 0]
+  status varchar [default: 'active']
+  expires_at timestamp
+  created_at timestamp [default: `now()`]
+***REMOVED***
+
+Table rental_applications ***REMOVED***
+  id uuid [pk]
+  renter_id uuid [ref: > renters.id]
+  property_id uuid [ref: > properties.id]
+  status varchar [default: 'submitted']
+  message text
+  created_at timestamp [default: `now()`]
+***REMOVED***
+
+Table renter_verifications ***REMOVED***
+  id uuid [pk]
+  renter_id uuid [ref: > renters.id]
+  date_of_birth date
+  nationality varchar
+  address text
+  postal_code varchar
+  city varchar
+  country varchar
+  picture varchar
+
+  profession_type varchar [note: 'employee, student, etc.']
+  employment_certificate varchar
+  work_contract_start_date date
+  work_contract_end_date date
+
+  income_proof_1 varchar
+  income_proof_2 varchar
+  income_proof_3 varchar
+
+  proof_of_other_subsidiaries varchar
+  proof_of_accommodation varchar
+
+  other_document_1 varchar
+  other_document_2 varchar
+  other_document_3 varchar
+
+  status varchar [default: 'pending', note: 'pending, verified, rejected']
+  submitted_at timestamp
+  verified_at timestamp
+  verified_by uuid [ref: > property_managers.id]
+***REMOVED***
