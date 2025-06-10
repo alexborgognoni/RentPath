@@ -9,7 +9,16 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp(***REMOVED***
     title: (title) => `$***REMOVED***title***REMOVED*** - $***REMOVED***appName***REMOVED***`,
-    resolve: (name) => resolvePageComponent(`./pages/$***REMOVED***name***REMOVED***.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    resolve: (name) => ***REMOVED***
+        const pages = import.meta.glob(['./pages/**/*.tsx', './pages/**/page.tsx'], ***REMOVED*** eager: true ***REMOVED***);
+        return (
+            pages[`./pages/$***REMOVED***name***REMOVED***.tsx`] ||
+            pages[`./pages/$***REMOVED***name***REMOVED***/page.tsx`] ||
+            (() => ***REMOVED***
+                throw new Error(`Page not found: $***REMOVED***name***REMOVED***`);
+        ***REMOVED***)()
+        );
+***REMOVED***,
     setup(***REMOVED*** el, App, props ***REMOVED***) ***REMOVED***
         const root = createRoot(el);
 
