@@ -1,0 +1,25 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %***REMOVED***HTTP:Authorization***REMOVED*** .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%***REMOVED***HTTP:Authorization***REMOVED***]
+
+    # Handle X-XSRF-Token Header
+    RewriteCond %***REMOVED***HTTP:x-xsrf-token***REMOVED*** .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%***REMOVED***HTTP:X-XSRF-Token***REMOVED***]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %***REMOVED***REQUEST_FILENAME***REMOVED*** !-d
+    RewriteCond %***REMOVED***REQUEST_URI***REMOVED*** (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %***REMOVED***REQUEST_FILENAME***REMOVED*** !-d
+    RewriteCond %***REMOVED***REQUEST_FILENAME***REMOVED*** !-f
+    RewriteRule ^ index.php [L]
+</IfModule>

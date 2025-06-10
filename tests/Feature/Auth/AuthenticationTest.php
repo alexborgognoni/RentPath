@@ -1,0 +1,43 @@
+***REMOVED***
+
+***REMOVED***
+
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+test('login screen can be rendered', function () ***REMOVED***
+    $response = $this->get('/login');
+
+    $response->assertStatus(200);
+***REMOVED***);
+
+test('users can authenticate using the login screen', function () ***REMOVED***
+    $user = User::factory()->create();
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('dashboard', absolute: false));
+***REMOVED***);
+
+test('users can not authenticate with invalid password', function () ***REMOVED***
+    $user = User::factory()->create();
+
+    $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'wrong-password',
+    ]);
+
+    $this->assertGuest();
+***REMOVED***);
+
+test('users can logout', function () ***REMOVED***
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('/logout');
+
+    $this->assertGuest();
+    $response->assertRedirect('/');
+***REMOVED***);
