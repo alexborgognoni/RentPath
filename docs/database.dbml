@@ -23,12 +23,58 @@ Table renters ***REMOVED***
 
 Table properties ***REMOVED***
   id uuid [pk]
+
+  // Core Info
   title varchar
-  address varchar
   description text
+  address varchar
+  city varchar
+  postal_code varchar
+  country varchar
+
+  // Location (for maps & filters)
+  latitude decimal
+  longitude decimal
+
+  // Rent & Availability
   rent_amount decimal
+  security_deposit decimal
+  available_from date
+  lease_term_months int
+
+  // Property Details
+  property_type varchar [note: 'House, Detached house, Semi-detached house, Apartment, Studio, Penthouse, Duplex, Triplex, Loft, Garage, Office']
+  bedrooms int
+  bathrooms int
+  square_meters int
+  floor_number int
+  total_floors int
+  year_built int
+  furnished boolean
+  pets_allowed boolean
+  smoking_allowed boolean
+  indoor_parking_spots int
+  outdoor_parking_spots int
+  heating_type varchar [note: 'electric, gas, oil, district_heating, heat_pump, wood, pellet_stove, solar, hybrid']
+  energy_class varchar [note: 'A++, A, B, C, D, E, F, G']
+
+  // Media
+  cover_image_url varchar
+  photo_gallery jsonb          [note: 'array of image urls']
+  virtual_tour_url varchar
+
+  // Visibility & Access
+  is_visible boolean [default: true]
+  is_active boolean [default: true]
   is_invite_only boolean [default: false]
+  access_code varchar
+
+  // Timestamps & Auditing
   created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp
+  created_by uuid              [ref: > property_managers.id]
+  updated_by uuid              [ref: > property_managers.id]
 ***REMOVED***
 
 Table property_manager_verifications ***REMOVED***
