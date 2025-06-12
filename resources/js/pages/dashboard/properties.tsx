@@ -15,7 +15,8 @@ import ***REMOVED*** Select, SelectContent, SelectItem, SelectTrigger, SelectVal
 import ***REMOVED*** Table, TableBody, TableCell, TableHead, TableHeader, TableRow ***REMOVED*** from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
-import ***REMOVED*** Head, Link ***REMOVED*** from '@inertiajs/react';
+import type ***REMOVED*** Property ***REMOVED*** from '@/types/property';
+import ***REMOVED*** Head, Link, usePage ***REMOVED*** from '@inertiajs/react';
 import ***REMOVED***
     ArrowDown,
     ArrowUp,
@@ -42,110 +43,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ***REMOVED***,
 ];
 
-type OccupancyStatus = 'Occupied' | 'Vacant' | 'Under Maintenance';
-type PropertyType = 'Apartment' | 'House' | 'Condo' | 'Townhouse';
-
-interface Property ***REMOVED***
-    id: string;
-    address: string;
-    city: string;
-    propertyType: PropertyType;
-    sizeSqm: number;
-    rentAmount: number;
-    currency: string;
-    bedrooms: number;
-    bathrooms: number;
-    parkingDetails?: string; // New: Parking information
-    occupancyStatus: OccupancyStatus;
-    tenantName?: string;
-    leaseEndDate?: string;
-    imageUrl?: string;
-    openMaintenanceTicketsCount: number;
+interface PageProps extends InertiaPageProps ***REMOVED***
+    properties: Property[];
 ***REMOVED***
 
-const mockProperties: Property[] = [
-    ***REMOVED***
-        id: 'prop1',
-        address: '123 Main St, Unit 4B',
-        city: 'Springfield',
-        propertyType: 'Apartment',
-        sizeSqm: 75,
-        rentAmount: 1200,
-        currency: 'USD',
-        bedrooms: 2,
-        bathrooms: 1,
-        parkingDetails: '1 Garage Spot',
-        occupancyStatus: 'Occupied',
-        tenantName: 'Alice Johnson',
-        leaseEndDate: '2025-12-31',
-        imageUrl:
-            'https://res.cloudinary.com/g5-assets-cld/image/upload/x_192,y_192,h_3061,w_4591,c_crop/q_auto,f_auto,fl_lossy,g_center,h_700,w_1050/g5/g5-c-i7yxybw5-mission-rock-single/g5-cl-1jw7kh4fmj-springfield-apartments/uploads/Springfield-8_no0u4u.jpg',
-        openMaintenanceTicketsCount: 1,
-***REMOVED***,
-    ***REMOVED***
-        id: 'prop2',
-        address: '456 Oak Avenue',
-        city: 'Shelbyville',
-        propertyType: 'House',
-        sizeSqm: 150,
-        rentAmount: 2200,
-        currency: 'USD',
-        bedrooms: 3,
-        bathrooms: 2.5,
-        parkingDetails: 'Driveway (2 cars)',
-        occupancyStatus: 'Vacant',
-        imageUrl: 'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?auto=compress&cs=tinysrgb&w=100&h=70&dpr=2',
-        openMaintenanceTicketsCount: 0,
-***REMOVED***,
-    ***REMOVED***
-        id: 'prop3',
-        address: '789 Pine Ln, Apt 12',
-        city: 'Capital City',
-        propertyType: 'Condo',
-        sizeSqm: 90,
-        rentAmount: 1650,
-        currency: 'USD',
-        bedrooms: 2,
-        bathrooms: 2,
-        parkingDetails: 'Underground Parking',
-        occupancyStatus: 'Under Maintenance',
-        imageUrl: 'https://www.thegraystone.com/wp-content/uploads/2020/09/20200902-GRA-2440-15.jpg',
-        openMaintenanceTicketsCount: 3,
-***REMOVED***,
-    ***REMOVED***
-        id: 'prop4',
-        address: '101 Maple Drive',
-        city: 'Springfield',
-        propertyType: 'Townhouse',
-        sizeSqm: 110,
-        rentAmount: 1800,
-        currency: 'USD',
-        bedrooms: 3,
-        bathrooms: 2,
-        parkingDetails: 'Street Parking Only',
-        occupancyStatus: 'Occupied',
-        tenantName: 'Bob Williams',
-        leaseEndDate: '2026-06-30',
-        imageUrl: 'https://media.newhomeinc.com/348/2024/2/7/DJI_0471.jpg?width=1920&height=1080&fit=bounds&ois=bdcc9ef',
-        openMaintenanceTicketsCount: 0,
-***REMOVED***,
-    ***REMOVED***
-        id: 'prop5',
-        address: '22 Sky High Tower, Apt 30C',
-        city: 'Capital City',
-        propertyType: 'Apartment',
-        sizeSqm: 120,
-        rentAmount: 3500,
-        currency: 'USD',
-        bedrooms: 3,
-        bathrooms: 2,
-        parkingDetails: 'Valet Parking Spot',
-        occupancyStatus: 'Vacant',
-        imageUrl:
-            'https://cf.bstatic.com/xdata/images/hotel/max1024x768/412296394.jpg?k=a27a96f9094d83d2db1187942aaa7892931e5405a4804f4132001767bfee4ab6&o=',
-        openMaintenanceTicketsCount: 0,
-***REMOVED***,
-];
+const ***REMOVED*** properties ***REMOVED*** = usePage().props as ***REMOVED*** properties: Property[] ***REMOVED***;
 
 const getOccupancyStatusBadgeVariant = (status: OccupancyStatus) => ***REMOVED***
     switch (status) ***REMOVED***
@@ -215,7 +117,7 @@ export default function PropertiesPage() ***REMOVED***
 ***REMOVED***;
 
     const filteredAndSortedProperties = useMemo(() => ***REMOVED***
-        let items = [...mockProperties];
+        let items = [...properties];
 
         // Filtering
         if (filters.searchTerm) ***REMOVED***
@@ -248,7 +150,7 @@ export default function PropertiesPage() ***REMOVED***
         ***REMOVED***);
     ***REMOVED***
         return items;
-***REMOVED***, [mockProperties, filters, sortConfig]);
+***REMOVED***, [properties, filters, sortConfig]);
 
     const SortIcon = (***REMOVED*** columnKey ***REMOVED***: ***REMOVED*** columnKey: SortablePropertyKeys ***REMOVED***) => ***REMOVED***
         if (sortConfig.key !== columnKey) ***REMOVED***
@@ -348,7 +250,7 @@ export default function PropertiesPage() ***REMOVED***
                                     </TableHead>
                                     <TableHead onClick=***REMOVED***() => handleSort('rentAmount')***REMOVED*** className="cursor-pointer text-right hover:bg-muted/50">
                                         <div className="flex items-center justify-end">
-                                            Rent (***REMOVED***mockProperties[0]?.currency || 'USD'***REMOVED***) <SortIcon columnKey="rentAmount" />
+                                            Rent (***REMOVED***properties[0]?.currency || 'USD'***REMOVED***) <SortIcon columnKey="rentAmount" />
                                         </div>
                                     </TableHead>
                                     <TableHead onClick=***REMOVED***() => handleSort('occupancyStatus')***REMOVED*** className="cursor-pointer text-center hover:bg-muted/50">
