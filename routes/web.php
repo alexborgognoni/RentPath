@@ -1,6 +1,7 @@
 ***REMOVED***
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -11,7 +12,11 @@ Route::get('/', function () ***REMOVED***
 Route::middleware(['auth', 'verified'])->group(function () ***REMOVED***
     Route::prefix('dashboard')->group(function () ***REMOVED***
         Route::get('/', [DashboardController::class, 'index'])->name("dashboard");
-        Route::get('/properties', [DashboardController::class, 'properties']);
+        Route::prefix('properties')->group(function () ***REMOVED***
+            Route::get('/', [DashboardController::class, 'properties']);
+            Route::post('/', [PropertyController::class, 'store']);
+            Route::get('/create', [PropertyController::class, 'create']);
+    ***REMOVED***);
         Route::get('/applications', [DashboardController::class, 'applications']);
         Route::get('/tenants', [DashboardController::class, 'tenants']);
 ***REMOVED***);

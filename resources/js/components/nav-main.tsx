@@ -6,7 +6,7 @@ export function NavMain(***REMOVED*** items = [] ***REMOVED***: ***REMOVED*** it
     const page = usePage();
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
             <SidebarMenu>
                 ***REMOVED***items.map((item) => (
                     <SidebarMenuItem key=***REMOVED***item.title***REMOVED***>
