@@ -15,8 +15,9 @@ import ***REMOVED*** Select, SelectContent, SelectItem, SelectTrigger, SelectVal
 import ***REMOVED*** Table, TableBody, TableCell, TableHead, TableHeader, TableRow ***REMOVED*** from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
-import type ***REMOVED*** Property ***REMOVED*** from '@/types/property';
-import ***REMOVED*** Head, Link, usePage ***REMOVED*** from '@inertiajs/react';
+import ***REMOVED*** OccupancyStatus, Property, PropertyType ***REMOVED*** from '@/types/property';
+import ***REMOVED*** PageProps as InertiaPageProps ***REMOVED*** from '@inertiajs/core';
+import ***REMOVED*** Head, usePage ***REMOVED*** from '@inertiajs/react';
 import ***REMOVED***
     ArrowDown,
     ArrowUp,
@@ -31,7 +32,6 @@ import ***REMOVED***
     MoreHorizontal,
     PlusCircle,
     Trash2,
-    Wrench,
     X,
 ***REMOVED*** from 'lucide-react';
 import ***REMOVED*** useMemo, useState ***REMOVED*** from 'react';
@@ -46,8 +46,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface PageProps extends InertiaPageProps ***REMOVED***
     properties: Property[];
 ***REMOVED***
-
-const ***REMOVED*** properties ***REMOVED*** = usePage().props as ***REMOVED*** properties: Property[] ***REMOVED***;
 
 const getOccupancyStatusBadgeVariant = (status: OccupancyStatus) => ***REMOVED***
     switch (status) ***REMOVED***
@@ -68,16 +66,12 @@ const PropertyTypeIcon = (***REMOVED*** type ***REMOVED***: ***REMOVED*** type: 
             return <Building className="mr-2 h-4 w-4 text-muted-foreground" />;
         case 'House':
             return <Home className="mr-2 h-4 w-4 text-muted-foreground" />;
-        case 'Condo':
-            return <Building className="mr-2 h-4 w-4 text-muted-foreground" />;
-        case 'Townhouse':
-            return <Home className="mr-2 h-4 w-4 text-muted-foreground" />;
         default:
             return <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />;
 ***REMOVED***
 ***REMOVED***;
 
-type SortablePropertyKeys = keyof Pick<Property, 'address' | 'propertyType' | 'sizeSqm' | 'rentAmount' | 'occupancyStatus'>;
+type SortablePropertyKeys = keyof Pick<Property, 'address' | 'property_type' | 'size_sqm' | 'rent_amount' | 'occupancy_status'>;
 
 interface SortConfig ***REMOVED***
     key: SortablePropertyKeys | null;
@@ -90,10 +84,25 @@ interface Filters ***REMOVED***
     occupancyStatus: string; // "all" or specific status
 ***REMOVED***
 
-const propertyTypes: PropertyType[] = ['Apartment', 'House', 'Condo', 'Townhouse'];
-const occupancyStatuses: OccupancyStatus[] = ['Occupied', 'Vacant', 'Under Maintenance'];
-
 export default function PropertiesPage() ***REMOVED***
+    const ***REMOVED*** properties ***REMOVED*** = usePage<PageProps>().props;
+
+    const occupancyStatuses: OccupancyStatus[] = ['Occupied', 'Vacant', 'Under Maintenance'];
+
+    const propertyTypes: PropertyType[] = [
+        'House',
+        'Detached House',
+        'Semi‑detached House',
+        'Apartment',
+        'Studio',
+        'Penthouse',
+        'Duplex',
+        'Triplex',
+        'Loft',
+        'Garage',
+        'Office',
+    ] as const;
+
     const [filters, setFilters] = useState<Filters>(***REMOVED***
         searchTerm: '',
         propertyType: 'all',
@@ -236,26 +245,29 @@ export default function PropertiesPage() ***REMOVED***
                                         </div>
                                     </TableHead>
                                     <TableHead
-                                        onClick=***REMOVED***() => handleSort('propertyType')***REMOVED***
+                                        onClick=***REMOVED***() => handleSort('property_type')***REMOVED***
                                         className="hidden cursor-pointer hover:bg-muted/50 md:table-cell"
                                     >
                                         <div className="flex items-center">
-                                            Type <SortIcon columnKey="propertyType" />
+                                            Type <SortIcon columnKey="property_type" />
                                         </div>
                                     </TableHead>
-                                    <TableHead onClick=***REMOVED***() => handleSort('sizeSqm')***REMOVED*** className="cursor-pointer text-right hover:bg-muted/50">
+                                    <TableHead onClick=***REMOVED***() => handleSort('size_sqm')***REMOVED*** className="cursor-pointer text-right hover:bg-muted/50">
                                         <div className="flex items-center justify-end">
-                                            Size (sqm) <SortIcon columnKey="sizeSqm" />
+                                            Size (sqm) <SortIcon columnKey="size_sqm" />
                                         </div>
                                     </TableHead>
-                                    <TableHead onClick=***REMOVED***() => handleSort('rentAmount')***REMOVED*** className="cursor-pointer text-right hover:bg-muted/50">
+                                    <TableHead onClick=***REMOVED***() => handleSort('rent_amount')***REMOVED*** className="cursor-pointer text-right hover:bg-muted/50">
                                         <div className="flex items-center justify-end">
-                                            Rent (***REMOVED***properties[0]?.currency || 'USD'***REMOVED***) <SortIcon columnKey="rentAmount" />
+                                            Rent <SortIcon columnKey="rent_amount" />
                                         </div>
                                     </TableHead>
-                                    <TableHead onClick=***REMOVED***() => handleSort('occupancyStatus')***REMOVED*** className="cursor-pointer text-center hover:bg-muted/50">
+                                    <TableHead
+                                        onClick=***REMOVED***() => handleSort('occupancy_status')***REMOVED***
+                                        className="cursor-pointer text-center hover:bg-muted/50"
+                                    >
                                         <div className="flex items-center justify-center">
-                                            Status <SortIcon columnKey="occupancyStatus" />
+                                            Status <SortIcon columnKey="occupancy_status" />
                                         </div>
                                     </TableHead>
                                     <TableHead className="hidden text-center md:table-cell">Maintenance</TableHead>
@@ -268,7 +280,7 @@ export default function PropertiesPage() ***REMOVED***
                                     <TableRow key=***REMOVED***property.id***REMOVED***>
                                         <TableCell>
                                             <img
-                                                src=***REMOVED***property.imageUrl***REMOVED***
+                                                src=***REMOVED***property.cover_image_url || ''***REMOVED***
                                                 alt=***REMOVED***property.address***REMOVED***
                                                 width=***REMOVED***100***REMOVED***
                                                 height=***REMOVED***70***REMOVED***
@@ -281,48 +293,28 @@ export default function PropertiesPage() ***REMOVED***
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             <div className="flex items-center">
-                                                <PropertyTypeIcon type=***REMOVED***property.propertyType***REMOVED*** />
-                                                ***REMOVED***property.propertyType***REMOVED***
+                                                <PropertyTypeIcon type=***REMOVED***property.property_type***REMOVED*** />
+                                                ***REMOVED***property.property_type***REMOVED***
                                             </div>
                                             <div className="text-xs text-muted-foreground">
                                                 ***REMOVED***property.bedrooms***REMOVED*** bed / ***REMOVED***property.bathrooms***REMOVED*** bath
                                             </div>
-                                            ***REMOVED***property.parkingDetails && (
-                                                <div className="mt-1 flex items-center text-xs text-muted-foreground">
-                                                    <Car className="mr-1 h-3 w-3" /> ***REMOVED***property.parkingDetails***REMOVED***
-                                                </div>
-                                            )***REMOVED***
+                                            <div className="mt-1 flex items-center text-xs text-muted-foreground">
+                                                <Car className="mr-1 h-3 w-3" /> ***REMOVED***property.indoor_parking_spots + property.outdoor_parking_spots***REMOVED***
+                                            </div>
                                         </TableCell>
-                                        <TableCell className="text-right">***REMOVED***property.sizeSqm***REMOVED***</TableCell>
-                                        <TableCell className="text-right">***REMOVED***property.rentAmount.toLocaleString()***REMOVED***</TableCell>
+                                        <TableCell className="text-right">***REMOVED***property.square_meters***REMOVED***</TableCell>
+                                        <TableCell className="text-right">***REMOVED***property.rent_amount.toLocaleString()***REMOVED***</TableCell>
                                         <TableCell className="text-center">
-                                            <Badge variant=***REMOVED***getOccupancyStatusBadgeVariant(property.occupancyStatus)***REMOVED***>
-                                                ***REMOVED***property.occupancyStatus***REMOVED***
+                                            <Badge variant=***REMOVED***getOccupancyStatusBadgeVariant(property.occupancy_status)***REMOVED***>
+                                                ***REMOVED***property.occupancy_status***REMOVED***
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="hidden text-center md:table-cell">
-                                            ***REMOVED***property.openMaintenanceTicketsCount > 0 ? (
-                                                <Link
-                                                    href=***REMOVED***`/dashboard/maintenance?propertyId=$***REMOVED***property.id***REMOVED***`***REMOVED***
-                                                    className="inline-flex items-center text-orange-600 hover:underline"
-                                                >
-                                                    <Wrench className="mr-1 h-4 w-4" /> ***REMOVED***property.openMaintenanceTicketsCount***REMOVED*** Open
-                                                </Link>
-                                            ) : (
-                                                <span className="text-xs text-muted-foreground">-</span>
-                                            )***REMOVED***
+                                            <span className="text-xs text-muted-foreground">-</span>
                                         </TableCell>
                                         <TableCell className="hidden lg:table-cell">
-                                            ***REMOVED***property.occupancyStatus === 'Occupied' ? (
-                                                <div>
-                                                    <div>***REMOVED***property.tenantName***REMOVED***</div>
-                                                    ***REMOVED***property.leaseEndDate && (
-                                                        <div className="text-xs text-muted-foreground">Lease ends: ***REMOVED***property.leaseEndDate***REMOVED***</div>
-                                                    )***REMOVED***
-                                                </div>
-                                            ) : (
-                                                <span className="text-muted-foreground">-</span>
-                                            )***REMOVED***
+                                            <span className="text-muted-foreground">-</span>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <DropdownMenu>

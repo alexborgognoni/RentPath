@@ -15,8 +15,8 @@ class PropertyFactory extends Factory
     ***REMOVED***
         $propertyTypes = [
             'House',
-            'Detached house',
-            'Semi-detached house',
+            'Detached House',
+            'Semi-detached House',
             'Apartment',
             'Studio',
             'Penthouse',
@@ -25,6 +25,12 @@ class PropertyFactory extends Factory
             'Loft',
             'Garage',
             'Office'
+        ];
+
+        $occupancyStatuses = [
+            'Vacant',
+            'Occupied',
+            'Under Maintenance'
         ];
 
         $heatingTypes = [
@@ -51,6 +57,7 @@ class PropertyFactory extends Factory
             'country' => 'Luxembourg',
             'latitude' => $this->faker->latitude(49.5, 50),
             'longitude' => $this->faker->longitude(5.7, 6.5),
+            'occupancy_status' => $this->faker->randomElement($occupancyStatuses),
             'rent_amount' => $this->faker->randomFloat(2, 800, 3500),
             'security_deposit' => $this->faker->randomFloat(2, 1000, 7000),
             'available_from' => $this->faker->dateTimeBetween('now', '+3 months'),

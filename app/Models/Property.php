@@ -22,6 +22,7 @@ class Property extends Model
         'country',
         'latitude',
         'longitude',
+        'occupancy_status',
         'rent_amount',
         'security_deposit',
         'available_from',

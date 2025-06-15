@@ -1,10 +1,22 @@
-// type OccupancyStatus = 'Occupied' | 'Vacant' | 'Under Maintenance';
-// type PropertyType = 'Apartment' | 'House' | 'Condo' | 'Townhouse';
+// property-globals.d.ts (or any name, as long as it's included in tsconfig)
+
+export type OccupancyStatus = 'Occupied' | 'Vacant' | 'Under Maintenance';
+
+export type PropertyType =
+    | 'House'
+    | 'Detached House'
+    | 'Semi‑detached House'
+    | 'Apartment'
+    | 'Studio'
+    | 'Penthouse'
+    | 'Duplex'
+    | 'Triplex'
+    | 'Loft'
+    | 'Garage'
+    | 'Office';
 
 export interface Property ***REMOVED***
     id: string;
-
-    // Core Info
     title: string;
     description: string;
     address: string;
@@ -12,18 +24,16 @@ export interface Property ***REMOVED***
     postal_code: string;
     country: string;
 
-    // Location
     latitude: number | null;
     longitude: number | null;
 
-    // Rent & Availability
+    occupancy_status: OccupancyStatus;
     rent_amount: number;
     security_deposit: number | null;
-    available_from: string; // ISO date string (e.g. '2025-07-01')
+    available_from: string;
     lease_term_months: number | null;
 
-    // Property Details
-    property_type: string;
+    property_type: PropertyType;
     bedrooms: number;
     bathrooms: number;
     square_meters: number;
@@ -38,21 +48,20 @@ export interface Property ***REMOVED***
     heating_type: string;
     energy_class: string;
 
-    // Media
     cover_image_url: string | null;
-    photo_gallery: string[] | null; // JSON field (array of image URLs)
+    photo_gallery: string[] | null;
     virtual_tour_url: string | null;
 
-    // Visibility & Access
     is_visible: boolean;
     is_active: boolean;
     is_invite_only: boolean;
     access_code: string | null;
 
-    // Timestamps & Auditing
-    created_at: string; // ISO timestamp
-    updated_at: string; // ISO timestamp
+    created_at: string;
+    updated_at: string;
     deleted_at: string | null;
     created_by: string;
     updated_by: string;
+
+    [key: string]: unknown;
 ***REMOVED***

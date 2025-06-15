@@ -23,13 +23,14 @@ return new class extends Migration ***REMOVED***
             $table->decimal('longitude', 10, 7)->nullable();
 
             // Rent & Availability
+            $table->enum('occupancy_status', ['Occupied', 'Vacant', 'Under Maintenance'])->default('Vacant');
             $table->decimal('rent_amount', 10, 2);
             $table->decimal('security_deposit', 10, 2)->nullable();
             $table->date('available_from');
             $table->integer('lease_term_months')->nullable();
 
             // Property Details
-            $table->string('property_type');
+            $table->enum('property_type', ['House', 'Detached House', 'Semi-detached House', 'Apartment', 'Studio', 'Penthouse', 'Duplex', 'Triplex', 'Loft', 'Garage', 'Office']);
             $table->integer('bedrooms')->default(0);
             $table->integer('bathrooms')->default(0);
             $table->integer('square_meters');
@@ -61,8 +62,8 @@ return new class extends Migration ***REMOVED***
             $table->uuid('created_by');
             $table->uuid('updated_by');
 
-            $table->foreign('created_by')->references('id')->on('users');
-            $table->foreign('updated_by')->references('id')->on('users');
+            // $table->foreign('created_by')->references('id')->on('users');
+            // $table->foreign('updated_by')->references('id')->on('users');
     ***REMOVED***);
 ***REMOVED***
 
