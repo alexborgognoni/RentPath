@@ -17,11 +17,14 @@ import AppLayout from '@/layouts/app-layout';
 import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
 import ***REMOVED*** OccupancyStatus, Property, PropertyType ***REMOVED*** from '@/types/property';
 import ***REMOVED*** PageProps as InertiaPageProps ***REMOVED*** from '@inertiajs/core';
-import ***REMOVED*** Head, usePage ***REMOVED*** from '@inertiajs/react';
+import ***REMOVED*** Head, router, usePage ***REMOVED*** from '@inertiajs/react';
 import ***REMOVED***
     ArrowDown,
     ArrowUp,
+    Bath,
+    BedDouble,
     Building,
+    Building2,
     Car,
     ChevronsUpDown,
     Edit3,
@@ -30,8 +33,11 @@ import ***REMOVED***
     Home,
     MapPin,
     MoreHorizontal,
+    PanelTopClose,
+    PanelTopOpen,
     PlusCircle,
     Trash2,
+    Warehouse,
     X,
 ***REMOVED*** from 'lucide-react';
 import ***REMOVED*** useMemo, useState ***REMOVED*** from 'react';
@@ -62,10 +68,21 @@ const getOccupancyStatusBadgeVariant = (status: OccupancyStatus) => ***REMOVED**
 
 const PropertyTypeIcon = (***REMOVED*** type ***REMOVED***: ***REMOVED*** type: PropertyType ***REMOVED***) => ***REMOVED***
     switch (type) ***REMOVED***
-        case 'Apartment':
-            return <Building className="mr-2 h-4 w-4 text-muted-foreground" />;
         case 'House':
+        case 'Detached House':
+        case 'Semi‑detached House':
             return <Home className="mr-2 h-4 w-4 text-muted-foreground" />;
+        case 'Apartment':
+        case 'Studio':
+        case 'Penthouse':
+        case 'Loft':
+        case 'Duplex':
+        case 'Triplex':
+            return <Building className="mr-2 h-4 w-4 text-muted-foreground" />;
+        case 'Garage':
+            return <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />;
+        case 'Office':
+            return <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />;
         default:
             return <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />;
 ***REMOVED***
@@ -80,8 +97,8 @@ interface SortConfig ***REMOVED***
 
 interface Filters ***REMOVED***
     searchTerm: string;
-    propertyType: string; // "all" or specific type
-    occupancyStatus: string; // "all" or specific status
+    propertyType: 'all' | PropertyType;
+    occupancyStatus: 'all' | OccupancyStatus;
 ***REMOVED***
 
 export default function PropertiesPage() ***REMOVED***
@@ -124,6 +141,8 @@ export default function PropertiesPage() ***REMOVED***
             direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     ***REMOVED***));
 ***REMOVED***;
+
+    const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
     const filteredAndSortedProperties = useMemo(() => ***REMOVED***
         let items = [...properties];
@@ -172,8 +191,6 @@ export default function PropertiesPage() ***REMOVED***
         );
 ***REMOVED***;
 
-    const handleAddNewProperty = () => console.log('Navigate to add new property page');
-
     return (
         <AppLayout breadcrumbs=***REMOVED***breadcrumbs***REMOVED***>
             <Head title="Dashboard" />
@@ -183,55 +200,66 @@ export default function PropertiesPage() ***REMOVED***
                     title="Manage Properties"
                     actionButton=***REMOVED******REMOVED***
                         label: 'Add New Property',
-                        onClick: handleAddNewProperty,
+                        onClick: () => router.visit('/dashboard/properties/create'),
                         icon: <PlusCircle className="h-4 w-4" />,
                 ***REMOVED******REMOVED***
                 />
                 <div className="flex-1 space-y-6 p-4 sm:p-6">
                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center">
-                                <Filter className="mr-2 h-5 w-5" /> Filters
+                        <CardHeader className="cursor-pointer" onClick=***REMOVED***() => setIsFiltersOpen(!isFiltersOpen)***REMOVED***>
+                            <CardTitle className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <Filter className="mr-2 h-4 w-4" />
+                                    Filters
+                                </div>
+                                ***REMOVED***isFiltersOpen ? (
+                                    <PanelTopClose className=***REMOVED***'h-4 w-4 transition-transform'***REMOVED*** />
+                                ) : (
+                                    <PanelTopOpen className=***REMOVED***'h-4 w-4 transition-transform'***REMOVED*** />
+                                )***REMOVED***
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                <Input
-                                    placeholder="Search by address or city..."
-                                    value=***REMOVED***filters.searchTerm***REMOVED***
-                                    onChange=***REMOVED***(e) => handleFilterChange('searchTerm', e.target.value)***REMOVED***
-                                />
-                                <Select value=***REMOVED***filters.propertyType***REMOVED*** onValueChange=***REMOVED***(value) => handleFilterChange('propertyType', value)***REMOVED***>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Filter by Type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Types</SelectItem>
-                                        ***REMOVED***propertyTypes.map((type) => (
-                                            <SelectItem key=***REMOVED***type***REMOVED*** value=***REMOVED***type***REMOVED***>
-                                                ***REMOVED***type***REMOVED***
-                                            </SelectItem>
-                                        ))***REMOVED***
-                                    </SelectContent>
-                                </Select>
-                                <Select value=***REMOVED***filters.occupancyStatus***REMOVED*** onValueChange=***REMOVED***(value) => handleFilterChange('occupancyStatus', value)***REMOVED***>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Filter by Status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Statuses</SelectItem>
-                                        ***REMOVED***occupancyStatuses.map((status) => (
-                                            <SelectItem key=***REMOVED***status***REMOVED*** value=***REMOVED***status***REMOVED***>
-                                                ***REMOVED***status***REMOVED***
-                                            </SelectItem>
-                                        ))***REMOVED***
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <Button onClick=***REMOVED***clearFilters***REMOVED*** variant="outline" size="sm">
-                                <X className="mr-2 h-4 w-4" /> Clear Filters
-                            </Button>
-                        </CardContent>
+
+                        ***REMOVED***isFiltersOpen && (
+                            <CardContent className="space-y-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                    <Input
+                                        placeholder="Search by address or city..."
+                                        value=***REMOVED***filters.searchTerm***REMOVED***
+                                        onChange=***REMOVED***(e) => handleFilterChange('searchTerm', e.target.value)***REMOVED***
+                                    />
+                                    <Select value=***REMOVED***filters.propertyType***REMOVED*** onValueChange=***REMOVED***(value) => handleFilterChange('propertyType', value)***REMOVED***>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Filter by Type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Types</SelectItem>
+                                            ***REMOVED***propertyTypes.map((type) => (
+                                                <SelectItem key=***REMOVED***type***REMOVED*** value=***REMOVED***type***REMOVED***>
+                                                    ***REMOVED***type***REMOVED***
+                                                </SelectItem>
+                                            ))***REMOVED***
+                                        </SelectContent>
+                                    </Select>
+                                    <Select value=***REMOVED***filters.occupancyStatus***REMOVED*** onValueChange=***REMOVED***(value) => handleFilterChange('occupancyStatus', value)***REMOVED***>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Filter by Status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Statuses</SelectItem>
+                                            ***REMOVED***occupancyStatuses.map((status) => (
+                                                <SelectItem key=***REMOVED***status***REMOVED*** value=***REMOVED***status***REMOVED***>
+                                                    ***REMOVED***status***REMOVED***
+                                                </SelectItem>
+                                            ))***REMOVED***
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Button onClick=***REMOVED***clearFilters***REMOVED*** variant="outline" size="sm">
+                                    <X className="mr-2 h-4 w-4" /> Clear Filters
+                                </Button>
+                            </CardContent>
+                        )***REMOVED***
                     </Card>
 
                     <div className="overflow-x-auto">
@@ -241,7 +269,7 @@ export default function PropertiesPage() ***REMOVED***
                                     <TableHead className="w-[100px]">Image</TableHead>
                                     <TableHead onClick=***REMOVED***() => handleSort('address')***REMOVED*** className="cursor-pointer hover:bg-muted/50">
                                         <div className="flex items-center">
-                                            Property Details <SortIcon columnKey="address" />
+                                            Address <SortIcon columnKey="address" />
                                         </div>
                                     </TableHead>
                                     <TableHead
@@ -254,7 +282,7 @@ export default function PropertiesPage() ***REMOVED***
                                     </TableHead>
                                     <TableHead onClick=***REMOVED***() => handleSort('size_sqm')***REMOVED*** className="cursor-pointer text-right hover:bg-muted/50">
                                         <div className="flex items-center justify-end">
-                                            Size (sqm) <SortIcon columnKey="size_sqm" />
+                                            Size (m²) <SortIcon columnKey="size_sqm" />
                                         </div>
                                     </TableHead>
                                     <TableHead onClick=***REMOVED***() => handleSort('rent_amount')***REMOVED*** className="cursor-pointer text-right hover:bg-muted/50">
@@ -270,8 +298,6 @@ export default function PropertiesPage() ***REMOVED***
                                             Status <SortIcon columnKey="occupancy_status" />
                                         </div>
                                     </TableHead>
-                                    <TableHead className="hidden text-center md:table-cell">Maintenance</TableHead>
-                                    <TableHead className="hidden lg:table-cell">Tenant</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -281,7 +307,7 @@ export default function PropertiesPage() ***REMOVED***
                                         <TableCell>
                                             <img
                                                 src=***REMOVED***property.cover_image_url || ''***REMOVED***
-                                                alt=***REMOVED***property.address***REMOVED***
+                                                alt="<img>"
                                                 width=***REMOVED***100***REMOVED***
                                                 height=***REMOVED***70***REMOVED***
                                                 className="rounded-md object-cover"
@@ -296,11 +322,10 @@ export default function PropertiesPage() ***REMOVED***
                                                 <PropertyTypeIcon type=***REMOVED***property.property_type***REMOVED*** />
                                                 ***REMOVED***property.property_type***REMOVED***
                                             </div>
-                                            <div className="text-xs text-muted-foreground">
-                                                ***REMOVED***property.bedrooms***REMOVED*** bed / ***REMOVED***property.bathrooms***REMOVED*** bath
-                                            </div>
                                             <div className="mt-1 flex items-center text-xs text-muted-foreground">
-                                                <Car className="mr-1 h-3 w-3" /> ***REMOVED***property.indoor_parking_spots + property.outdoor_parking_spots***REMOVED***
+                                                <BedDouble className="mr-1 h-3 w-3" /> ***REMOVED***property.bedrooms***REMOVED***
+                                                <Bath className="mr-1 ml-1 h-3 w-3" /> ***REMOVED***property.bathrooms***REMOVED***
+                                                <Car className="mr-1 ml-1 h-4 w-4" /> ***REMOVED***property.indoor_parking_spots + property.outdoor_parking_spots***REMOVED***
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">***REMOVED***property.square_meters***REMOVED***</TableCell>
@@ -309,12 +334,6 @@ export default function PropertiesPage() ***REMOVED***
                                             <Badge variant=***REMOVED***getOccupancyStatusBadgeVariant(property.occupancy_status)***REMOVED***>
                                                 ***REMOVED***property.occupancy_status***REMOVED***
                                             </Badge>
-                                        </TableCell>
-                                        <TableCell className="hidden text-center md:table-cell">
-                                            <span className="text-xs text-muted-foreground">-</span>
-                                        </TableCell>
-                                        <TableCell className="hidden lg:table-cell">
-                                            <span className="text-muted-foreground">-</span>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <DropdownMenu>
