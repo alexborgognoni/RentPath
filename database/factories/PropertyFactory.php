@@ -76,12 +76,6 @@ class PropertyFactory extends Factory
             'outdoor_parking_spots' => $this->faker->numberBetween(0, 2),
             'heating_type' => $this->faker->randomElement($heatingTypes),
             'energy_class' => $this->faker->randomElement($energyClasses),
-            'cover_image_url' => $this->faker->imageUrl(640, 480, 'house'),
-            'photo_gallery' => json_encode([
-                $this->faker->imageUrl(),
-                $this->faker->imageUrl(),
-                $this->faker->imageUrl()
-            ]),
             'virtual_tour_url' => $this->faker->url(),
             'is_visible' => true,
             'is_active' => true,
@@ -90,5 +84,39 @@ class PropertyFactory extends Factory
             'created_by' => User::inRandomOrder()->first()?->id ?? Str::uuid(),
             'updated_by' => User::inRandomOrder()->first()?->id ?? Str::uuid(),
         ];
+***REMOVED***
+
+    public function configure()
+    ***REMOVED***
+        return $this->afterMaking(function (Property $property) ***REMOVED***
+            // This runs BEFORE creation
+    ***REMOVED***)->afterCreating(function (Property $property) ***REMOVED***
+            $this->seedMediaForProperty($property);
+            // Refresh to ensure accessors see the media
+            $property->refresh();
+    ***REMOVED***);
+***REMOVED***
+
+    protected function seedMediaForProperty(Property $property)
+    ***REMOVED***
+        $type = strtolower(str_replace(' ', '_', $property->property_type));
+        $imageDir = database_path("seeders/images/***REMOVED***$type***REMOVED***");
+
+        // Add cover image if exists
+        $coverPath = "***REMOVED***$imageDir***REMOVED***/***REMOVED***$type***REMOVED***_cover.jpg";
+        if (file_exists($coverPath)) ***REMOVED***
+            $property->addMedia($coverPath)
+                ->preservingOriginal()
+                ->toMediaCollection('cover');
+    ***REMOVED***
+
+        // Add gallery images
+        $i = 1;
+        while (file_exists("***REMOVED***$imageDir***REMOVED***/***REMOVED***$type***REMOVED***_***REMOVED***$i***REMOVED***.jpg")) ***REMOVED***
+            $property->addMedia("***REMOVED***$imageDir***REMOVED***/***REMOVED***$type***REMOVED***_***REMOVED***$i***REMOVED***.jpg")
+                ->preservingOriginal()
+                ->toMediaCollection('gallery');
+            $i++;
+    ***REMOVED***
 ***REMOVED***
 ***REMOVED***

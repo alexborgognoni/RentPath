@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Property extends Model
+class Property extends Model implements HasMedia
 ***REMOVED***
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $keyType = 'string';
     public $incrementing = false;
@@ -41,8 +44,6 @@ class Property extends Model
         'outdoor_parking_spots',
         'heating_type',
         'energy_class',
-        'cover_image_url',
-        'photo_gallery',
         'virtual_tour_url',
         'is_visible',
         'is_active',
@@ -75,5 +76,13 @@ class Property extends Model
     public function updatedBy()
     ***REMOVED***
         return $this->belongsTo(User::class, 'updated_by');
+***REMOVED***
+
+    public function registerMediaCollections(): void
+    ***REMOVED***
+        $this->addMediaCollection('cover')
+            ->singleFile();
+
+        $this->addMediaCollection('gallery');
 ***REMOVED***
 ***REMOVED***

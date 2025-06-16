@@ -15,7 +15,9 @@ class DashboardController extends Controller
     public function properties()
     ***REMOVED***
         return Inertia::render('dashboard/properties', [
-            'properties' => Property::all()->toArray(),
+            'properties' => \App\Http\Resources\PropertyResource::collection(
+                dd(Property::with('media')->first()->toArray())
+            ),
 ***REMOVED***
 ***REMOVED***
 

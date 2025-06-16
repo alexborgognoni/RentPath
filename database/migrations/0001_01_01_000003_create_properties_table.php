@@ -46,8 +46,6 @@ return new class extends Migration ***REMOVED***
             $table->string('energy_class');
 
             // Media
-            $table->string('cover_image_url')->nullable();
-            $table->json('photo_gallery')->nullable();
             $table->string('virtual_tour_url')->nullable();
 
             // Visibility & Access
