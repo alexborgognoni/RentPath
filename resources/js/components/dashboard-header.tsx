@@ -17,7 +17,7 @@ export function DashboardHeader(***REMOVED*** title, actionButton ***REMOVED***:
             <h1 className="text-xl font-semibold md:text-2xl">***REMOVED***title***REMOVED***</h1>
             ***REMOVED***actionButton && (
                 <div className="ml-auto flex items-center gap-2">
-                    <Button onClick=***REMOVED***actionButton.onClick***REMOVED***>
+                    <Button className="cursor-pointer" onClick=***REMOVED***actionButton.onClick***REMOVED***>
                         ***REMOVED***actionButton.icon && <span className="mr-2">***REMOVED***actionButton.icon***REMOVED***</span>***REMOVED***
                         ***REMOVED***actionButton.label***REMOVED***
                     </Button>

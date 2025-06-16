@@ -1,15 +1,8 @@
 import ***REMOVED*** DashboardHeader ***REMOVED*** from '@/components/dashboard-header';
+import ***REMOVED*** PropertyTypeIcon ***REMOVED*** from '@/components/property-type-icon';
 import ***REMOVED*** Badge ***REMOVED*** from '@/components/ui/badge';
 import ***REMOVED*** Button ***REMOVED*** from '@/components/ui/button';
 import ***REMOVED*** Card, CardContent, CardHeader, CardTitle ***REMOVED*** from '@/components/ui/card';
-import ***REMOVED***
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-***REMOVED*** from '@/components/ui/dropdown-menu';
 import ***REMOVED*** Input ***REMOVED*** from '@/components/ui/input';
 import ***REMOVED*** Select, SelectContent, SelectItem, SelectTrigger, SelectValue ***REMOVED*** from '@/components/ui/select';
 import ***REMOVED*** Table, TableBody, TableCell, TableHead, TableHeader, TableRow ***REMOVED*** from '@/components/ui/table';
@@ -18,28 +11,7 @@ import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
 import ***REMOVED*** OccupancyStatus, Property, PropertyType ***REMOVED*** from '@/types/property';
 import ***REMOVED*** PageProps as InertiaPageProps ***REMOVED*** from '@inertiajs/core';
 import ***REMOVED*** Head, router, usePage ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED***
-    ArrowDown,
-    ArrowUp,
-    Bath,
-    BedDouble,
-    Building,
-    Building2,
-    Car,
-    ChevronsUpDown,
-    Edit3,
-    Eye,
-    Filter,
-    Home,
-    MapPin,
-    MoreHorizontal,
-    PanelTopClose,
-    PanelTopOpen,
-    PlusCircle,
-    Trash2,
-    Warehouse,
-    X,
-***REMOVED*** from 'lucide-react';
+import ***REMOVED*** ArrowDown, ArrowUp, Bath, BedDouble, Car, ChevronsUpDown, Filter, PanelTopClose, PanelTopOpen, PlusCircle, X ***REMOVED*** from 'lucide-react';
 import ***REMOVED*** useMemo, useState ***REMOVED*** from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -63,28 +35,6 @@ const getOccupancyStatusBadgeVariant = (status: OccupancyStatus) => ***REMOVED**
             return 'destructive';
         default:
             return 'outline';
-***REMOVED***
-***REMOVED***;
-
-const PropertyTypeIcon = (***REMOVED*** type ***REMOVED***: ***REMOVED*** type: PropertyType ***REMOVED***) => ***REMOVED***
-    switch (type) ***REMOVED***
-        case 'House':
-        case 'Detached House':
-        case 'Semi‑detached House':
-            return <Home className="mr-2 h-4 w-4 text-muted-foreground" />;
-        case 'Apartment':
-        case 'Studio':
-        case 'Penthouse':
-        case 'Loft':
-        case 'Duplex':
-        case 'Triplex':
-            return <Building className="mr-2 h-4 w-4 text-muted-foreground" />;
-        case 'Garage':
-            return <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />;
-        case 'Office':
-            return <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />;
-        default:
-            return <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />;
 ***REMOVED***
 ***REMOVED***;
 
@@ -298,16 +248,19 @@ export default function PropertiesPage() ***REMOVED***
                                             Status <SortIcon columnKey="occupancy_status" />
                                         </div>
                                     </TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 ***REMOVED***filteredAndSortedProperties.map((property) => (
-                                    <TableRow key=***REMOVED***property.id***REMOVED***>
+                                    <TableRow
+                                        key=***REMOVED***property.id***REMOVED***
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick=***REMOVED***() => router.visit(`/dashboard/properties/$***REMOVED***property.id***REMOVED***`)***REMOVED***
+                                    >
                                         <TableCell>
                                             <img
                                                 src=***REMOVED***property.cover_image_url || ''***REMOVED***
-                                                alt="<img>"
+                                                alt="Property"
                                                 width=***REMOVED***100***REMOVED***
                                                 height=***REMOVED***70***REMOVED***
                                                 className="rounded-md object-cover"
@@ -334,29 +287,6 @@ export default function PropertiesPage() ***REMOVED***
                                             <Badge variant=***REMOVED***getOccupancyStatusBadgeVariant(property.occupancy_status)***REMOVED***>
                                                 ***REMOVED***property.occupancy_status***REMOVED***
                                             </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                        <span className="sr-only">Actions</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem>
-                                                        <Eye className="mr-2 h-4 w-4" /> View Details
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem>
-                                                        <Edit3 className="mr-2 h-4 w-4" /> Edit Property
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                                                        <Trash2 className="mr-2 h-4 w-4" /> Delete Property
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 ))***REMOVED***

@@ -1,4 +1,5 @@
 import ***REMOVED*** DashboardHeader ***REMOVED*** from '@/components/dashboard-header';
+import ***REMOVED*** PropertyTypeIcon ***REMOVED*** from '@/components/property-type-icon';
 import ***REMOVED*** Button ***REMOVED*** from '@/components/ui/button';
 import ***REMOVED*** Card, CardContent ***REMOVED*** from '@/components/ui/card';
 import ***REMOVED*** Checkbox ***REMOVED*** from '@/components/ui/checkbox';
@@ -10,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
 import ***REMOVED*** OccupancyStatus, PropertyType ***REMOVED*** from '@/types/property';
 import ***REMOVED*** Head, useForm ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED*** Building, Building2, Calendar, Home, Key, MapPin, PlusCircle, ScanEye, Warehouse ***REMOVED*** from 'lucide-react';
+import ***REMOVED*** Calendar, Home, Key, PlusCircle, ScanEye ***REMOVED*** from 'lucide-react';
 import ***REMOVED*** FormEvent ***REMOVED*** from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,28 +24,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard/properties/create',
 ***REMOVED***,
 ];
-
-const PropertyTypeIcon = (***REMOVED*** type ***REMOVED***: ***REMOVED*** type: PropertyType ***REMOVED***) => ***REMOVED***
-    switch (type) ***REMOVED***
-        case 'House':
-        case 'Detached House':
-        case 'Semi‑detached House':
-            return <Home className="mr-2 h-4 w-4 text-muted-foreground" />;
-        case 'Apartment':
-        case 'Studio':
-        case 'Penthouse':
-        case 'Loft':
-        case 'Duplex':
-        case 'Triplex':
-            return <Building className="mr-2 h-4 w-4 text-muted-foreground" />;
-        case 'Garage':
-            return <Warehouse className="mr-2 h-4 w-4 text-muted-foreground" />;
-        case 'Office':
-            return <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />;
-        default:
-            return <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />;
-***REMOVED***
-***REMOVED***;
 
 const propertyTypes: PropertyType[] = [
     'House',

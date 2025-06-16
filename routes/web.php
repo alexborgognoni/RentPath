@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () ***REMOVED***
             Route::get('/', [DashboardController::class, 'properties']);
             Route::post('/', [PropertyController::class, 'store']);
             Route::get('/create', [PropertyController::class, 'create']);
+            Route::get('/***REMOVED***property***REMOVED***', [PropertyController::class, 'show'])->name('properties.show');
     ***REMOVED***);
         Route::get('/applications', [DashboardController::class, 'applications']);
         Route::get('/tenants', [DashboardController::class, 'tenants']);
