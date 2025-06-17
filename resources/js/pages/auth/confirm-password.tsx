@@ -1,26 +1,26 @@
 // Components
-import ***REMOVED*** Head, useForm ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED*** LoaderCircle ***REMOVED*** from 'lucide-react';
-import ***REMOVED*** FormEventHandler ***REMOVED*** from 'react';
+import { Head, useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+import { FormEventHandler } from 'react';
 
 import InputError from '@/components/input-error';
-import ***REMOVED*** Button ***REMOVED*** from '@/components/ui/button';
-import ***REMOVED*** Input ***REMOVED*** from '@/components/ui/input';
-import ***REMOVED*** Label ***REMOVED*** from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
-export default function ConfirmPassword() ***REMOVED***
-    const ***REMOVED*** data, setData, post, processing, errors, reset ***REMOVED*** = useForm<Required<***REMOVED*** password: string ***REMOVED***>>(***REMOVED***
+export default function ConfirmPassword() {
+    const { data, setData, post, processing, errors, reset } = useForm<Required<{ password: string }>>({
         password: '',
-***REMOVED***);
+    });
 
-    const submit: FormEventHandler = (e) => ***REMOVED***
+    const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('password.confirm'), ***REMOVED***
+        post(route('password.confirm'), {
             onFinish: () => reset('password'),
-    ***REMOVED***);
-***REMOVED***;
+        });
+    };
 
     return (
         <AuthLayout
@@ -29,7 +29,7 @@ export default function ConfirmPassword() ***REMOVED***
         >
             <Head title="Confirm password" />
 
-            <form onSubmit=***REMOVED***submit***REMOVED***>
+            <form onSubmit={submit}>
                 <div className="space-y-6">
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
@@ -39,17 +39,17 @@ export default function ConfirmPassword() ***REMOVED***
                             name="password"
                             placeholder="Password"
                             autoComplete="current-password"
-                            value=***REMOVED***data.password***REMOVED***
+                            value={data.password}
                             autoFocus
-                            onChange=***REMOVED***(e) => setData('password', e.target.value)***REMOVED***
+                            onChange={(e) => setData('password', e.target.value)}
                         />
 
-                        <InputError message=***REMOVED***errors.password***REMOVED*** />
+                        <InputError message={errors.password} />
                     </div>
 
                     <div className="flex items-center">
-                        <Button className="w-full" disabled=***REMOVED***processing***REMOVED***>
-                            ***REMOVED***processing && <LoaderCircle className="h-4 w-4 animate-spin" />***REMOVED***
+                        <Button className="w-full" disabled={processing}>
+                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                             Confirm password
                         </Button>
                     </div>
@@ -57,4 +57,4 @@ export default function ConfirmPassword() ***REMOVED***
             </form>
         </AuthLayout>
     );
-***REMOVED***
+}

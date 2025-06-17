@@ -1,26 +1,26 @@
-***REMOVED***
+<?php
 
-***REMOVED***
+namespace Database\Seeders;
 
-***REMOVED***
-***REMOVED***
-***REMOVED***
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-    ***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        User::factory()->create([
+            'name' => 'Dev User',
+            'email' => 'dev@user.com',
+            'password' => Hash::make('password123')
+        ]);
 
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
+        $this->call([
+            PropertySeeder::class,
+        ]);
+    }
+}

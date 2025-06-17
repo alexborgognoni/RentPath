@@ -1,36 +1,36 @@
 <!DOCTYPE html>
-<html lang="***REMOVED******REMOVED*** str_replace('_', '-', app()->getLocale()) ***REMOVED******REMOVED***" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        ***REMOVED******REMOVED***-- Inline script to detect system dark mode preference and apply it immediately --***REMOVED******REMOVED***
+        {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
-            (function() ***REMOVED***
-                const appearance = '***REMOVED******REMOVED*** $appearance ?? "system" ***REMOVED******REMOVED***';
+            (function() {
+                const appearance = '{{ $appearance ?? "system" }}';
 
-                if (appearance === 'system') ***REMOVED***
+                if (appearance === 'system') {
                     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-                    if (prefersDark) ***REMOVED***
+                    if (prefersDark) {
                         document.documentElement.classList.add('dark');
-                ***REMOVED***
-            ***REMOVED***
-        ***REMOVED***)();
+                    }
+                }
+            })();
         </script>
 
-        ***REMOVED******REMOVED***-- Inline style to set the HTML background color based on our theme in app.css --***REMOVED******REMOVED***
+        {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
-            html ***REMOVED***
+            html {
                 background-color: oklch(1 0 0);
-        ***REMOVED***
+            }
 
-            html.dark ***REMOVED***
+            html.dark {
                 background-color: oklch(0.145 0 0);
-        ***REMOVED***
+            }
         </style>
 
-        <title inertia>***REMOVED******REMOVED*** config('app.name', 'Laravel') ***REMOVED******REMOVED***</title>
+        <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -41,7 +41,7 @@
 
         @routes
         @viteReactRefresh
-        @vite(['resources/js/app.tsx', "resources/js/pages/***REMOVED***$page['component']***REMOVED***.tsx"])
+        @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @inertiaHead
     </head>
     <body class="font-sans antialiased">

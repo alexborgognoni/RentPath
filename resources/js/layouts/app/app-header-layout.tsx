@@ -1,14 +1,14 @@
-import ***REMOVED*** AppContent ***REMOVED*** from '@/components/app-content';
-import ***REMOVED*** AppHeader ***REMOVED*** from '@/components/app-header';
-import ***REMOVED*** AppShell ***REMOVED*** from '@/components/app-shell';
-import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
-import type ***REMOVED*** PropsWithChildren ***REMOVED*** from 'react';
+import { AppContent } from '@/components/app-content';
+import { AppHeader } from '@/components/app-header';
+import { AppShell } from '@/components/app-shell';
+import { type BreadcrumbItem } from '@/types';
+import type { PropsWithChildren } from 'react';
 
-export default function AppHeaderLayout(***REMOVED*** children, breadcrumbs ***REMOVED***: PropsWithChildren<***REMOVED*** breadcrumbs?: BreadcrumbItem[] ***REMOVED***>) ***REMOVED***
+export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     return (
         <AppShell>
-            <AppHeader breadcrumbs=***REMOVED***breadcrumbs***REMOVED*** />
-            <AppContent>***REMOVED***children***REMOVED***</AppContent>
+            <AppHeader breadcrumbs={breadcrumbs} />
+            <AppContent>{children}</AppContent>
         </AppShell>
     );
-***REMOVED***
+}

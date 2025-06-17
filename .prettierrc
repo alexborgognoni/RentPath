@@ -1,4 +1,4 @@
-***REMOVED***
+{
     "semi": true,
     "singleQuote": true,
     "singleAttributePerLine": false,
@@ -9,11 +9,11 @@
     "tailwindStylesheet": "resources/css/app.css",
     "tabWidth": 4,
     "overrides": [
-        ***REMOVED***
+        {
             "files": "**/*.yml",
-            "options": ***REMOVED***
+            "options": {
                 "tabWidth": 2
-        ***REMOVED***
-    ***REMOVED***
+            }
+        }
     ]
-***REMOVED***
+}

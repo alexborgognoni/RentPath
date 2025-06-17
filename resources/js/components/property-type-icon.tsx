@@ -1,8 +1,8 @@
-import ***REMOVED*** PropertyType ***REMOVED*** from '@/types/property';
-import ***REMOVED*** Building, Building2, Home, MapPin, Warehouse ***REMOVED*** from 'lucide-react';
+import { PropertyType } from '@/types/property';
+import { Building, Building2, Home, MapPin, Warehouse } from 'lucide-react';
 
-export const PropertyTypeIcon = (***REMOVED*** type ***REMOVED***: ***REMOVED*** type: PropertyType ***REMOVED***) => ***REMOVED***
-    switch (type) ***REMOVED***
+export const PropertyTypeIcon = ({ type }: { type: PropertyType }) => {
+    switch (type) {
         case 'House':
         case 'Detached House':
         case 'Semi‑detached House':
@@ -20,5 +20,5 @@ export const PropertyTypeIcon = (***REMOVED*** type ***REMOVED***: ***REMOVED***
             return <Building2 className="h-4 w-4 text-muted-foreground" />;
         default:
             return <MapPin className="h-4 w-4 text-muted-foreground" />;
-***REMOVED***
-***REMOVED***;
+    }
+};

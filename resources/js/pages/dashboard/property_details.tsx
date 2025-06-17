@@ -1,15 +1,16 @@
-import ***REMOVED*** DashboardHeader ***REMOVED*** from '@/components/dashboard-header';
-import ***REMOVED*** PropertyTypeIcon ***REMOVED*** from '@/components/property-type-icon';
-import ***REMOVED*** Badge ***REMOVED*** from '@/components/ui/badge';
-import ***REMOVED*** Button ***REMOVED*** from '@/components/ui/button';
-import ***REMOVED*** Card, CardContent, CardHeader, CardTitle ***REMOVED*** from '@/components/ui/card';
-import ***REMOVED*** Separator ***REMOVED*** from '@/components/ui/separator';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { PropertyTypeIcon } from '@/components/property-type-icon';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
-import ***REMOVED*** OccupancyStatus, Property ***REMOVED*** from '@/types/property';
-import ***REMOVED*** PageProps as InertiaPageProps ***REMOVED*** from '@inertiajs/core';
-import ***REMOVED*** Head, Link, usePage ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED***
+import { type BreadcrumbItem } from '@/types';
+import { OccupancyStatus, Property } from '@/types/property';
+import { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { Head, Link, usePage } from '@inertiajs/react';
+import {
     Bath,
     BedDouble,
     Calendar,
@@ -29,14 +30,14 @@ import ***REMOVED***
     Thermometer,
     Trash2,
     Users,
-***REMOVED*** from 'lucide-react';
+} from 'lucide-react';
 
-interface PageProps extends InertiaPageProps ***REMOVED***
+interface PageProps extends InertiaPageProps {
     property: Property;
-***REMOVED***
+}
 
-const getOccupancyStatusBadgeVariant = (status: OccupancyStatus) => ***REMOVED***
-    switch (status) ***REMOVED***
+const getOccupancyStatusBadgeVariant = (status: OccupancyStatus) => {
+    switch (status) {
         case 'Occupied':
             return 'default';
         case 'Vacant':
@@ -45,47 +46,47 @@ const getOccupancyStatusBadgeVariant = (status: OccupancyStatus) => ***REMOVED**
             return 'destructive';
         default:
             return 'outline';
-***REMOVED***
-***REMOVED***;
+    }
+};
 
-const PropertyDetailsPage = () => ***REMOVED***
-    const ***REMOVED*** property ***REMOVED*** = usePage<PageProps>().props;
+const PropertyDetailsPage = () => {
+    const { property } = usePage<PageProps>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        ***REMOVED***
+        {
             title: 'Properties',
             href: '/dashboard/properties',
-    ***REMOVED***,
-        ***REMOVED***
+        },
+        {
             title: property.address,
-            href: `/dashboard/properties/$***REMOVED***property.id***REMOVED***`,
-    ***REMOVED***,
+            href: `/dashboard/properties/${property.id}`,
+        },
     ];
 
     const propertyFeatures = [
-        ***REMOVED*** icon: <BedDouble className="h-4 w-4" />, label: `$***REMOVED***property.bedrooms***REMOVED*** Bed(s)` ***REMOVED***,
-        ***REMOVED*** icon: <Bath className="h-4 w-4" />, label: `$***REMOVED***property.bathrooms***REMOVED*** Bath(s)` ***REMOVED***,
-        ***REMOVED*** icon: <Ruler className="h-4 w-4" />, label: `$***REMOVED***property.square_meters***REMOVED*** m²` ***REMOVED***,
-        ***REMOVED*** icon: <Car className="h-4 w-4" />, label: `$***REMOVED***property.indoor_parking_spots***REMOVED*** Indoor` ***REMOVED***,
-        ***REMOVED*** icon: <Car className="h-4 w-4" />, label: `$***REMOVED***property.outdoor_parking_spots***REMOVED*** Outdoor` ***REMOVED***,
-        ...(property.furnished ? [***REMOVED*** icon: <Home className="h-4 w-4" />, label: 'Furnished' ***REMOVED***] : []),
-        ...(property.pets_allowed ? [***REMOVED*** icon: <Dog className="h-4 w-4" />, label: 'Pets allowed' ***REMOVED***] : []),
-        ...(property.smoking_allowed ? [***REMOVED*** icon: <Cigarette className="h-4 w-4" />, label: 'Smoking allowed' ***REMOVED***] : []),
-        ...(property.heating_type ? [***REMOVED*** icon: <Thermometer className="h-4 w-4" />, label: property.heating_type ***REMOVED***] : []),
-        ...(property.energy_class ? [***REMOVED*** icon: <HousePlug className="h-4 w-4" />, label: `Energy class: $***REMOVED***property.energy_class***REMOVED***` ***REMOVED***] : []),
+        { icon: <BedDouble className="h-4 w-4" />, label: `${property.bedrooms} Bed(s)` },
+        { icon: <Bath className="h-4 w-4" />, label: `${property.bathrooms} Bath(s)` },
+        { icon: <Ruler className="h-4 w-4" />, label: `${property.square_meters} m²` },
+        { icon: <Car className="h-4 w-4" />, label: `${property.indoor_parking_spots} Indoor` },
+        { icon: <Car className="h-4 w-4" />, label: `${property.outdoor_parking_spots} Outdoor` },
+        ...(property.furnished ? [{ icon: <Home className="h-4 w-4" />, label: 'Furnished' }] : []),
+        ...(property.pets_allowed ? [{ icon: <Dog className="h-4 w-4" />, label: 'Pets allowed' }] : []),
+        ...(property.smoking_allowed ? [{ icon: <Cigarette className="h-4 w-4" />, label: 'Smoking allowed' }] : []),
+        ...(property.heating_type ? [{ icon: <Thermometer className="h-4 w-4" />, label: property.heating_type }] : []),
+        ...(property.energy_class ? [{ icon: <HousePlug className="h-4 w-4" />, label: `Energy class: ${property.energy_class}` }] : []),
     ];
 
     return (
-        <AppLayout breadcrumbs=***REMOVED***breadcrumbs***REMOVED***>
-            <Head title=***REMOVED***`Property - $***REMOVED***property.address***REMOVED***`***REMOVED*** />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={`Property - ${property.address}`} />
 
             <div className="flex flex-1 flex-col">
-                <DashboardHeader title=***REMOVED***property.title***REMOVED*** />
+                <DashboardHeader title={property.title} />
                 <div className="flex-1 space-y-6 p-4 sm:p-6">
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                        ***REMOVED***/* Main content */***REMOVED***
+                        {/* Main content */}
                         <div className="space-y-6 lg:col-span-2">
-                            ***REMOVED***/* Property images */***REMOVED***
+                            {/* Property images */}
                             <Card>
                                 <CardHeader>
                                     <div>
@@ -93,60 +94,69 @@ const PropertyDetailsPage = () => ***REMOVED***
                                     </div>
                                 </CardHeader>
                                 <CardContent>
-                                    ***REMOVED***/* ***REMOVED***property.photo_gallery && property.photo_gallery.length > 0 ? ( */***REMOVED***
-                                    ***REMOVED***/*     <Carousel> */***REMOVED***
-                                    ***REMOVED***/*         ***REMOVED***property.photo_gallery.map((image, index) => ( */***REMOVED***
-                                    ***REMOVED***/*             <div key=***REMOVED***index***REMOVED*** className="h-80 w-full"> */***REMOVED***
-                                    ***REMOVED***/*                 <img */***REMOVED***
-                                    ***REMOVED***/*                     src=***REMOVED***image***REMOVED*** */***REMOVED***
-                                    ***REMOVED***/*                     alt=***REMOVED***`Property $***REMOVED*** index + 1***REMOVED***`***REMOVED*** */***REMOVED***
-                                    ***REMOVED***/*                     className="h-full w-full rounded-lg object-cover" */***REMOVED***
-                                    ***REMOVED***/*                 /> */***REMOVED***
-                                    ***REMOVED***/*             </div> */***REMOVED***
-                                    ***REMOVED***/*         ))***REMOVED*** */***REMOVED***
-                                    ***REMOVED***/*     </Carousel> */***REMOVED***
-                                    ***REMOVED***/* ) : ( */***REMOVED***
-                                    ***REMOVED***
+                                    {property.photo_gallery && property.photo_gallery.length > 0 ? (
+                                        <div className="relative">
+                                            {' '}
+                                            <Carousel>
+                                                <CarouselContent>
+                                                    {[property.cover_image_url || '', ...property.photo_gallery].map((image, index) => (
+                                                        <CarouselItem key={index}>
+                                                            {' '}
+                                                            <div className="h-80 w-full">
+                                                                <img
+                                                                    src={image}
+                                                                    alt={`Property ${index + 1}`}
+                                                                    className="h-full w-full rounded-lg object-cover"
+                                                                />
+                                                            </div>
+                                                        </CarouselItem>
+                                                    ))}
+                                                </CarouselContent>
+                                                <CarouselPrevious className="left-2" /> {/* Position buttons */}
+                                                <CarouselNext className="right-2" />
+                                            </Carousel>
+                                        </div>
+                                    ) : (
                                         <div className="flex h-60 items-center justify-center rounded-lg bg-muted">
                                             <div className="flex flex-col items-center text-muted-foreground">
                                                 <ImageIcon className="h-10 w-10" />
                                                 <p className="mt-2">No photos available</p>
                                             </div>
                                         </div>
-                                ***REMOVED***
+                                    )}
                                 </CardContent>
                             </Card>
 
-                            ***REMOVED***/* Property details */***REMOVED***
+                            {/* Property details */}
                             <Card>
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
                                         <CardTitle>Details</CardTitle>
-                                        <Badge variant=***REMOVED***getOccupancyStatusBadgeVariant(property.occupancy_status)***REMOVED***>***REMOVED***property.occupancy_status***REMOVED***</Badge>
+                                        <Badge variant={getOccupancyStatusBadgeVariant(property.occupancy_status)}>{property.occupancy_status}</Badge>
                                     </div>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="flex items-start">
                                         <div className="flex-1">
-                                            <p className="text-muted-foreground">***REMOVED***property.description***REMOVED***</p>
+                                            <p className="text-muted-foreground">{property.description}</p>
                                         </div>
                                         <div className="ml-7.5 text-right">
-                                            <p className="text-2xl font-bold">$***REMOVED***property.rent_amount.toLocaleString()***REMOVED***/mo</p>
-                                            ***REMOVED***property.security_deposit && (
-                                                <p className="text-sm text-muted-foreground">$***REMOVED***property.security_deposit.toLocaleString()***REMOVED*** deposit</p>
-                                            )***REMOVED***
+                                            <p className="text-2xl font-bold">${property.rent_amount.toLocaleString()}/mo</p>
+                                            {property.security_deposit && (
+                                                <p className="text-sm text-muted-foreground">${property.security_deposit.toLocaleString()} deposit</p>
+                                            )}
                                         </div>
                                     </div>
 
                                     <Separator />
 
                                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                                        ***REMOVED***propertyFeatures.map((feature, index) => (
-                                            <div key=***REMOVED***index***REMOVED*** className="flex items-center space-x-2">
-                                                ***REMOVED***feature.icon***REMOVED***
-                                                <span className="text-sm">***REMOVED***feature.label***REMOVED***</span>
+                                        {propertyFeatures.map((feature, index) => (
+                                            <div key={index} className="flex items-center space-x-2">
+                                                {feature.icon}
+                                                <span className="text-sm">{feature.label}</span>
                                             </div>
-                                        ))***REMOVED***
+                                        ))}
                                     </div>
 
                                     <Separator />
@@ -155,62 +165,62 @@ const PropertyDetailsPage = () => ***REMOVED***
                                         <h4 className="font-medium">Additional Information</h4>
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                             <div className="flex items-center space-x-2">
-                                                <PropertyTypeIcon type=***REMOVED***property.property_type***REMOVED*** />
-                                                <span>***REMOVED***property.property_type***REMOVED***</span>
+                                                <PropertyTypeIcon type={property.property_type} />
+                                                <span>{property.property_type}</span>
                                             </div>
-                                            ***REMOVED***property.floor_number && (
+                                            {property.floor_number && (
                                                 <div className="flex items-center space-x-2">
                                                     <Users className="h-4 w-4" />
                                                     <span>
-                                                        Floor ***REMOVED***property.floor_number***REMOVED***
-                                                        ***REMOVED***property.total_floors && ` of $***REMOVED***property.total_floors***REMOVED*** `***REMOVED***
+                                                        Floor {property.floor_number}
+                                                        {property.total_floors && ` of ${property.total_floors} `}
                                                     </span>
                                                 </div>
-                                            )***REMOVED***
-                                            ***REMOVED***property.year_built && (
+                                            )}
+                                            {property.year_built && (
                                                 <div className="flex items-center space-x-2">
                                                     <Calendar className="h-4 w-4" />
-                                                    <span>Built in ***REMOVED***property.year_built***REMOVED***</span>
+                                                    <span>Built in {property.year_built}</span>
                                                 </div>
-                                            )***REMOVED***
-                                            ***REMOVED***property.available_from && (
+                                            )}
+                                            {property.available_from && (
                                                 <div className="flex items-center space-x-2">
                                                     <Calendar className="h-4 w-4" />
-                                                    <span>Available from ***REMOVED***new Date(property.available_from).toLocaleDateString()***REMOVED***</span>
+                                                    <span>Available from {new Date(property.available_from).toLocaleDateString()}</span>
                                                 </div>
-                                            )***REMOVED***
-                                            ***REMOVED***property.lease_term_months && (
+                                            )}
+                                            {property.lease_term_months && (
                                                 <div className="flex items-center space-x-2">
                                                     <Calendar className="h-4 w-4" />
-                                                    <span>***REMOVED***property.lease_term_months***REMOVED*** months lease</span>
+                                                    <span>{property.lease_term_months} months lease</span>
                                                 </div>
-                                            )***REMOVED***
-                                            ***REMOVED***property.is_invite_only && (
+                                            )}
+                                            {property.is_invite_only && (
                                                 <div className="flex items-center space-x-2">
                                                     <Key className="h-4 w-4" />
                                                     <span>Invite only</span>
                                                 </div>
-                                            )***REMOVED***
-                                            ***REMOVED***property.access_code && (
+                                            )}
+                                            {property.access_code && (
                                                 <div className="flex items-center space-x-2">
                                                     <Shield className="h-4 w-4" />
-                                                    <span>Access code: ***REMOVED***property.access_code***REMOVED***</span>
+                                                    <span>Access code: {property.access_code}</span>
                                                 </div>
-                                            )***REMOVED***
+                                            )}
                                         </div>
                                     </div>
                                 </CardContent>
                             </Card>
 
-                            ***REMOVED***/* Virtual tour */***REMOVED***
-                            ***REMOVED***property.virtual_tour_url && (
+                            {/* Virtual tour */}
+                            {property.virtual_tour_url && (
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Virtual Tour</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="aspect-video rounded-lg bg-muted">
-                                            ***REMOVED***/* Virtual tour embed would go here */***REMOVED***
+                                            {/* Virtual tour embed would go here */}
                                             <div className="flex h-full items-center justify-center">
                                                 <div className="text-center text-muted-foreground">
                                                     <Eye className="mx-auto h-8 w-8" />
@@ -220,9 +230,9 @@ const PropertyDetailsPage = () => ***REMOVED***
                                         </div>
                                     </CardContent>
                                 </Card>
-                            )***REMOVED***
+                            )}
 
-                            ***REMOVED***/* Location */***REMOVED***
+                            {/* Location */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Location</CardTitle>
@@ -232,16 +242,16 @@ const PropertyDetailsPage = () => ***REMOVED***
                                         <div className="flex items-start space-x-2">
                                             <MapPin className="mt-0.5 h-5 w-5" />
                                             <div>
-                                                <p>***REMOVED***property.address***REMOVED***</p>
+                                                <p>{property.address}</p>
                                                 <p className="text-muted-foreground">
-                                                    ***REMOVED***property.city***REMOVED***, ***REMOVED***property.postal_code***REMOVED***, ***REMOVED***property.country***REMOVED***
+                                                    {property.city}, {property.postal_code}, {property.country}
                                                 </p>
                                             </div>
                                         </div>
 
-                                        ***REMOVED***property.latitude && property.longitude && (
+                                        {property.latitude && property.longitude && (
                                             <div className="mt-4 h-64 rounded-lg bg-muted">
-                                                ***REMOVED***/* Map integration would go here */***REMOVED***
+                                                {/* Map integration would go here */}
                                                 <div className="flex h-full items-center justify-center">
                                                     <div className="text-center text-muted-foreground">
                                                         <Globe className="mx-auto h-8 w-8" />
@@ -249,22 +259,22 @@ const PropertyDetailsPage = () => ***REMOVED***
                                                     </div>
                                                 </div>
                                             </div>
-                                        )***REMOVED***
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
 
-                        ***REMOVED***/* Sidebar - Removed virtual tour from here */***REMOVED***
+                        {/* Sidebar - Removed virtual tour from here */}
                         <div className="space-y-6">
-                            ***REMOVED***/* Actions */***REMOVED***
+                            {/* Actions */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Actions</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     <Button className="w-full" asChild>
-                                        <Link href=***REMOVED***`/dashboard/properties/$***REMOVED***property.id***REMOVED***/edit`***REMOVED***>
+                                        <Link href={`/dashboard/properties/${property.id}/edit`}>
                                             <Edit3 className="mr-2 h-4 w-4" />
                                             Edit Property
                                         </Link>
@@ -276,7 +286,7 @@ const PropertyDetailsPage = () => ***REMOVED***
                                 </CardContent>
                             </Card>
 
-                            ***REMOVED***/* Status */***REMOVED***
+                            {/* Status */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Status</CardTitle>
@@ -285,23 +295,23 @@ const PropertyDetailsPage = () => ***REMOVED***
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm text-muted-foreground">Visibility</span>
-                                            <Badge variant=***REMOVED***property.is_visible ? 'default' : 'secondary'***REMOVED***>
-                                                ***REMOVED***property.is_visible ? 'Visible' : 'Hidden'***REMOVED***
+                                            <Badge variant={property.is_visible ? 'default' : 'secondary'}>
+                                                {property.is_visible ? 'Visible' : 'Hidden'}
                                             </Badge>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm text-muted-foreground">Active</span>
-                                            <Badge variant=***REMOVED***property.is_active ? 'default' : 'secondary'***REMOVED***>
-                                                ***REMOVED***property.is_active ? 'Active' : 'Inactive'***REMOVED***
+                                            <Badge variant={property.is_active ? 'default' : 'secondary'}>
+                                                {property.is_active ? 'Active' : 'Inactive'}
                                             </Badge>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm text-muted-foreground">Created</span>
-                                            <span className="text-sm">***REMOVED***new Date(property.created_at).toLocaleDateString()***REMOVED***</span>
+                                            <span className="text-sm">{new Date(property.created_at).toLocaleDateString()}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm text-muted-foreground">Last Updated</span>
-                                            <span className="text-sm">***REMOVED***new Date(property.updated_at).toLocaleDateString()***REMOVED***</span>
+                                            <span className="text-sm">{new Date(property.updated_at).toLocaleDateString()}</span>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -312,6 +322,6 @@ const PropertyDetailsPage = () => ***REMOVED***
             </div>
         </AppLayout>
     );
-***REMOVED***;
+};
 
 export default PropertyDetailsPage;

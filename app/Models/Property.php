@@ -1,4 +1,4 @@
-***REMOVED***
+<?php
 
 namespace App\Models;
 
@@ -10,11 +10,12 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Property extends Model implements HasMedia
-***REMOVED***
+{
     use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $keyType = 'string';
     public $incrementing = false;
+    protected $appends = ['cover_image_url', 'photo_gallery'];
 
     protected $fillable = [
         'title',
@@ -69,20 +70,32 @@ class Property extends Model implements HasMedia
     ];
 
     public function createdBy()
-    ***REMOVED***
+    {
         return $this->belongsTo(User::class, 'created_by');
-***REMOVED***
+    }
 
     public function updatedBy()
-    ***REMOVED***
+    {
         return $this->belongsTo(User::class, 'updated_by');
-***REMOVED***
+    }
 
     public function registerMediaCollections(): void
-    ***REMOVED***
+    {
         $this->addMediaCollection('cover')
             ->singleFile();
 
         $this->addMediaCollection('gallery');
-***REMOVED***
-***REMOVED***
+    }
+
+    public function getCoverImageUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('cover') ?: null;
+    }
+
+    public function getPhotoGalleryAttribute(): array
+    {
+        return $this->getMedia('gallery')->map(function ($media) {
+            return $media->getUrl();
+        })->toArray();
+    }
+}

@@ -1,10 +1,10 @@
-***REMOVED***
+<?php
 
-***REMOVED***
+use App\Models\User;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-test('profile page is displayed', function () ***REMOVED***
+test('profile page is displayed', function () {
     $user = User::factory()->create();
 
     $response = $this
@@ -12,9 +12,9 @@ test('profile page is displayed', function () ***REMOVED***
         ->get('/settings/profile');
 
     $response->assertOk();
-***REMOVED***);
+});
 
-test('profile information can be updated', function () ***REMOVED***
+test('profile information can be updated', function () {
     $user = User::factory()->create();
 
     $response = $this
@@ -22,7 +22,7 @@ test('profile information can be updated', function () ***REMOVED***
         ->patch('/settings/profile', [
             'name' => 'Test User',
             'email' => 'test@example.com',
-***REMOVED***
+        ]);
 
     $response
         ->assertSessionHasNoErrors()
@@ -33,9 +33,9 @@ test('profile information can be updated', function () ***REMOVED***
     expect($user->name)->toBe('Test User');
     expect($user->email)->toBe('test@example.com');
     expect($user->email_verified_at)->toBeNull();
-***REMOVED***);
+});
 
-test('email verification status is unchanged when the email address is unchanged', function () ***REMOVED***
+test('email verification status is unchanged when the email address is unchanged', function () {
     $user = User::factory()->create();
 
     $response = $this
@@ -43,23 +43,23 @@ test('email verification status is unchanged when the email address is unchanged
         ->patch('/settings/profile', [
             'name' => 'Test User',
             'email' => $user->email,
-***REMOVED***
+        ]);
 
     $response
         ->assertSessionHasNoErrors()
         ->assertRedirect('/settings/profile');
 
     expect($user->refresh()->email_verified_at)->not->toBeNull();
-***REMOVED***);
+});
 
-test('user can delete their account', function () ***REMOVED***
+test('user can delete their account', function () {
     $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
         ->delete('/settings/profile', [
             'password' => 'password',
-***REMOVED***
+        ]);
 
     $response
         ->assertSessionHasNoErrors()
@@ -67,9 +67,9 @@ test('user can delete their account', function () ***REMOVED***
 
     $this->assertGuest();
     expect($user->fresh())->toBeNull();
-***REMOVED***);
+});
 
-test('correct password must be provided to delete account', function () ***REMOVED***
+test('correct password must be provided to delete account', function () {
     $user = User::factory()->create();
 
     $response = $this
@@ -77,11 +77,11 @@ test('correct password must be provided to delete account', function () ***REMOV
         ->from('/settings/profile')
         ->delete('/settings/profile', [
             'password' => 'wrong-password',
-***REMOVED***
+        ]);
 
     $response
         ->assertSessionHasErrors('password')
         ->assertRedirect('/settings/profile');
 
     expect($user->fresh())->not->toBeNull();
-***REMOVED***);
+});

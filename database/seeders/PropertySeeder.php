@@ -1,14 +1,14 @@
-***REMOVED***
+<?php
 
-***REMOVED***
+namespace Database\Seeders;
 
 use App\Models\Property;
-***REMOVED***
+use Illuminate\Database\Seeder;
 
 class PropertySeeder extends Seeder
-***REMOVED***
+{
     public function run()
-    ***REMOVED***
+    {
         // Clear existing media if reseeding
         Property::all()->each->clearMediaCollection();
 
@@ -16,5 +16,5 @@ class PropertySeeder extends Seeder
         Property::factory()
             ->count(20)
             ->create();
-***REMOVED***
-***REMOVED***
+    }
+}

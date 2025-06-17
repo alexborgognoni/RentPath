@@ -1,14 +1,14 @@
-***REMOVED***
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
-***REMOVED***
+{
     public function up(): void
-    ***REMOVED***
-        Schema::create('media', function (Blueprint $table) ***REMOVED***
+    {
+        Schema::create('media', function (Blueprint $table) {
             $table->id();
 
             $table->morphs('model');
@@ -27,6 +27,6 @@ return new class extends Migration
             $table->unsignedInteger('order_column')->nullable()->index();
 
             $table->nullableTimestamps();
-    ***REMOVED***);
-***REMOVED***
-***REMOVED***;
+        });
+    }
+};

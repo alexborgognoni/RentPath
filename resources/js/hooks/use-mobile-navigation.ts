@@ -1,8 +1,8 @@
-import ***REMOVED*** useCallback ***REMOVED*** from 'react';
+import { useCallback } from 'react';
 
-export function useMobileNavigation() ***REMOVED***
-    return useCallback(() => ***REMOVED***
+export function useMobileNavigation() {
+    return useCallback(() => {
         // Remove pointer-events style from body...
         document.body.style.removeProperty('pointer-events');
-***REMOVED***, []);
-***REMOVED***
+    }, []);
+}

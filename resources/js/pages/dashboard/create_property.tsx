@@ -1,28 +1,28 @@
-import ***REMOVED*** DashboardHeader ***REMOVED*** from '@/components/dashboard-header';
-import ***REMOVED*** PropertyTypeIcon ***REMOVED*** from '@/components/property-type-icon';
-import ***REMOVED*** Button ***REMOVED*** from '@/components/ui/button';
-import ***REMOVED*** Card, CardContent ***REMOVED*** from '@/components/ui/card';
-import ***REMOVED*** Checkbox ***REMOVED*** from '@/components/ui/checkbox';
-import ***REMOVED*** Input ***REMOVED*** from '@/components/ui/input';
-import ***REMOVED*** Label ***REMOVED*** from '@/components/ui/label';
-import ***REMOVED*** Select, SelectContent, SelectItem, SelectTrigger, SelectValue ***REMOVED*** from '@/components/ui/select';
-import ***REMOVED*** Textarea ***REMOVED*** from '@/components/ui/textarea';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { PropertyTypeIcon } from '@/components/property-type-icon';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
-import ***REMOVED*** OccupancyStatus, PropertyType ***REMOVED*** from '@/types/property';
-import ***REMOVED*** Head, useForm ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED*** Calendar, Home, Key, PlusCircle, ScanEye ***REMOVED*** from 'lucide-react';
-import ***REMOVED*** FormEvent ***REMOVED*** from 'react';
+import { type BreadcrumbItem } from '@/types';
+import { OccupancyStatus, PropertyType } from '@/types/property';
+import { Head, useForm } from '@inertiajs/react';
+import { Calendar, Home, Key, PlusCircle, ScanEye } from 'lucide-react';
+import { FormEvent } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    ***REMOVED***
+    {
         title: 'Properties',
         href: '/dashboard/properties',
-***REMOVED***,
-    ***REMOVED***
+    },
+    {
         title: 'Add New Property',
         href: '/dashboard/properties/create',
-***REMOVED***,
+    },
 ];
 
 const propertyTypes: PropertyType[] = [
@@ -43,8 +43,8 @@ const occupancyStatuses: OccupancyStatus[] = ['Occupied', 'Vacant', 'Under Maint
 const heatingTypes = ['Central', 'Electric', 'Gas', 'Oil', 'Solar', 'None'];
 const energyClasses = ['A+++', 'A++', 'A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
-export default function AddPropertyPage() ***REMOVED***
-    const ***REMOVED*** data, setData, post, processing, errors ***REMOVED*** = useForm(***REMOVED***
+export default function AddPropertyPage() {
+    const { data, setData, post, processing, errors } = useForm({
         // Core Info
         title: '',
         description: '',
@@ -90,15 +90,15 @@ export default function AddPropertyPage() ***REMOVED***
         is_active: true,
         is_invite_only: false,
         access_code: '',
-***REMOVED***);
+    });
 
-    const handleSubmit = (e: FormEvent) => ***REMOVED***
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         post('/dashboard/properties');
-***REMOVED***;
+    };
 
     return (
-        <AppLayout breadcrumbs=***REMOVED***breadcrumbs***REMOVED***>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Add New Property" />
 
             <div className="flex flex-1 flex-col">
@@ -107,8 +107,8 @@ export default function AddPropertyPage() ***REMOVED***
                 <div className="flex-1 p-4 sm:p-6">
                     <Card>
                         <CardContent>
-                            <form onSubmit=***REMOVED***handleSubmit***REMOVED*** className="space-y-6">
-                                ***REMOVED***/* Core Information Section */***REMOVED***
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Core Information Section */}
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         <div className="grid">
@@ -117,12 +117,12 @@ export default function AddPropertyPage() ***REMOVED***
                                             </Label>
                                             <Input
                                                 id="title"
-                                                value=***REMOVED***data.title***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('title', e.target.value)***REMOVED***
+                                                value={data.title}
+                                                onChange={(e) => setData('title', e.target.value)}
                                                 placeholder="Beautiful Downtown Apartment"
                                                 required
                                             />
-                                            ***REMOVED***errors.title && <p className="text-sm text-red-500">***REMOVED***errors.title***REMOVED***</p>***REMOVED***
+                                            {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
                                         </div>
 
                                         <div className="grid">
@@ -131,12 +131,12 @@ export default function AddPropertyPage() ***REMOVED***
                                             </Label>
                                             <Input
                                                 id="address"
-                                                value=***REMOVED***data.address***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('address', e.target.value)***REMOVED***
+                                                value={data.address}
+                                                onChange={(e) => setData('address', e.target.value)}
                                                 placeholder="123 Main St"
                                                 required
                                             />
-                                            ***REMOVED***errors.address && <p className="text-sm text-red-500">***REMOVED***errors.address***REMOVED***</p>***REMOVED***
+                                            {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
                                         </div>
 
                                         <div className="grid">
@@ -145,12 +145,12 @@ export default function AddPropertyPage() ***REMOVED***
                                             </Label>
                                             <Input
                                                 id="city"
-                                                value=***REMOVED***data.city***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('city', e.target.value)***REMOVED***
+                                                value={data.city}
+                                                onChange={(e) => setData('city', e.target.value)}
                                                 placeholder="New York"
                                                 required
                                             />
-                                            ***REMOVED***errors.city && <p className="text-sm text-red-500">***REMOVED***errors.city***REMOVED***</p>***REMOVED***
+                                            {errors.city && <p className="text-sm text-red-500">{errors.city}</p>}
                                         </div>
 
                                         <div className="grid">
@@ -159,11 +159,11 @@ export default function AddPropertyPage() ***REMOVED***
                                             </Label>
                                             <Input
                                                 id="postal_code"
-                                                value=***REMOVED***data.postal_code***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('postal_code', e.target.value)***REMOVED***
+                                                value={data.postal_code}
+                                                onChange={(e) => setData('postal_code', e.target.value)}
                                                 placeholder="10001"
                                             />
-                                            ***REMOVED***errors.postal_code && <p className="text-sm text-red-500">***REMOVED***errors.postal_code***REMOVED***</p>***REMOVED***
+                                            {errors.postal_code && <p className="text-sm text-red-500">{errors.postal_code}</p>}
                                         </div>
 
                                         <div className="grid self-start">
@@ -172,11 +172,11 @@ export default function AddPropertyPage() ***REMOVED***
                                             </Label>
                                             <Input
                                                 id="country"
-                                                value=***REMOVED***data.country***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('country', e.target.value)***REMOVED***
+                                                value={data.country}
+                                                onChange={(e) => setData('country', e.target.value)}
                                                 placeholder="United States"
                                             />
-                                            ***REMOVED***errors.country && <p className="text-sm text-red-500">***REMOVED***errors.country***REMOVED***</p>***REMOVED***
+                                            {errors.country && <p className="text-sm text-red-500">{errors.country}</p>}
                                         </div>
 
                                         <div className="grid">
@@ -185,17 +185,17 @@ export default function AddPropertyPage() ***REMOVED***
                                             </Label>
                                             <Textarea
                                                 id="description"
-                                                value=***REMOVED***data.description***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('description', e.target.value)***REMOVED***
+                                                value={data.description}
+                                                onChange={(e) => setData('description', e.target.value)}
                                                 placeholder="Describe the property..."
-                                                rows=***REMOVED***4***REMOVED***
+                                                rows={4}
                                             />
-                                            ***REMOVED***errors.description && <p className="text-sm text-red-500">***REMOVED***errors.description***REMOVED***</p>***REMOVED***
+                                            {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
                                         </div>
                                     </div>
                                 </div>
 
-                                ***REMOVED***/* Rent & Availability Section */***REMOVED***
+                                {/* Rent & Availability Section */}
                                 <div className="space-y-4">
                                     <h3 className="flex items-center text-lg font-medium">
                                         <Calendar className="mr-2 h-5 w-5" />
@@ -205,21 +205,21 @@ export default function AddPropertyPage() ***REMOVED***
                                         <div className="space-y-2">
                                             <Label htmlFor="occupancy_status">Occupancy Status</Label>
                                             <Select
-                                                value=***REMOVED***data.occupancy_status***REMOVED***
-                                                onValueChange=***REMOVED***(value) => setData('occupancy_status', value as OccupancyStatus)***REMOVED***
+                                                value={data.occupancy_status}
+                                                onValueChange={(value) => setData('occupancy_status', value as OccupancyStatus)}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    ***REMOVED***occupancyStatuses.map((status) => (
-                                                        <SelectItem key=***REMOVED***status***REMOVED*** value=***REMOVED***status***REMOVED***>
-                                                            ***REMOVED***status***REMOVED***
+                                                    {occupancyStatuses.map((status) => (
+                                                        <SelectItem key={status} value={status}>
+                                                            {status}
                                                         </SelectItem>
-                                                    ))***REMOVED***
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
-                                            ***REMOVED***errors.occupancy_status && <p className="text-sm text-red-500">***REMOVED***errors.occupancy_status***REMOVED***</p>***REMOVED***
+                                            {errors.occupancy_status && <p className="text-sm text-red-500">{errors.occupancy_status}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -227,12 +227,12 @@ export default function AddPropertyPage() ***REMOVED***
                                             <Input
                                                 id="rent_amount"
                                                 type="number"
-                                                value=***REMOVED***data.rent_amount***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('rent_amount', e.target.value)***REMOVED***
+                                                value={data.rent_amount}
+                                                onChange={(e) => setData('rent_amount', e.target.value)}
                                                 placeholder="1500"
                                                 required
                                             />
-                                            ***REMOVED***errors.rent_amount && <p className="text-sm text-red-500">***REMOVED***errors.rent_amount***REMOVED***</p>***REMOVED***
+                                            {errors.rent_amount && <p className="text-sm text-red-500">{errors.rent_amount}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -240,11 +240,11 @@ export default function AddPropertyPage() ***REMOVED***
                                             <Input
                                                 id="security_deposit"
                                                 type="number"
-                                                value=***REMOVED***data.security_deposit***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('security_deposit', e.target.value)***REMOVED***
+                                                value={data.security_deposit}
+                                                onChange={(e) => setData('security_deposit', e.target.value)}
                                                 placeholder="1500"
                                             />
-                                            ***REMOVED***errors.security_deposit && <p className="text-sm text-red-500">***REMOVED***errors.security_deposit***REMOVED***</p>***REMOVED***
+                                            {errors.security_deposit && <p className="text-sm text-red-500">{errors.security_deposit}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -252,11 +252,11 @@ export default function AddPropertyPage() ***REMOVED***
                                             <Input
                                                 id="available_from"
                                                 type="date"
-                                                value=***REMOVED***data.available_from***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('available_from', e.target.value)***REMOVED***
+                                                value={data.available_from}
+                                                onChange={(e) => setData('available_from', e.target.value)}
                                                 required
                                             />
-                                            ***REMOVED***errors.available_from && <p className="text-sm text-red-500">***REMOVED***errors.available_from***REMOVED***</p>***REMOVED***
+                                            {errors.available_from && <p className="text-sm text-red-500">{errors.available_from}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -264,16 +264,16 @@ export default function AddPropertyPage() ***REMOVED***
                                             <Input
                                                 id="lease_term_months"
                                                 type="number"
-                                                value=***REMOVED***data.lease_term_months***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('lease_term_months', e.target.value)***REMOVED***
+                                                value={data.lease_term_months}
+                                                onChange={(e) => setData('lease_term_months', e.target.value)}
                                                 placeholder="12"
                                             />
-                                            ***REMOVED***errors.lease_term_months && <p className="text-sm text-red-500">***REMOVED***errors.lease_term_months***REMOVED***</p>***REMOVED***
+                                            {errors.lease_term_months && <p className="text-sm text-red-500">{errors.lease_term_months}</p>}
                                         </div>
                                     </div>
                                 </div>
 
-                                ***REMOVED***/* Property Details Section */***REMOVED***
+                                {/* Property Details Section */}
                                 <div className="space-y-4">
                                     <h3 className="flex items-center text-lg font-medium">
                                         <Home className="mr-2 h-5 w-5" />
@@ -283,24 +283,24 @@ export default function AddPropertyPage() ***REMOVED***
                                         <div className="space-y-2">
                                             <Label htmlFor="property_type">Property Type</Label>
                                             <Select
-                                                value=***REMOVED***data.property_type***REMOVED***
-                                                onValueChange=***REMOVED***(value) => setData('property_type', value as PropertyType)***REMOVED***
+                                                value={data.property_type}
+                                                onValueChange={(value) => setData('property_type', value as PropertyType)}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    ***REMOVED***propertyTypes.map((type) => (
-                                                        <SelectItem key=***REMOVED***type***REMOVED*** value=***REMOVED***type***REMOVED***>
+                                                    {propertyTypes.map((type) => (
+                                                        <SelectItem key={type} value={type}>
                                                             <div className="flex items-center">
-                                                                <PropertyTypeIcon type=***REMOVED***type***REMOVED*** />
-                                                                ***REMOVED***type***REMOVED***
+                                                                <PropertyTypeIcon type={type} />
+                                                                {type}
                                                             </div>
                                                         </SelectItem>
-                                                    ))***REMOVED***
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
-                                            ***REMOVED***errors.property_type && <p className="text-sm text-red-500">***REMOVED***errors.property_type***REMOVED***</p>***REMOVED***
+                                            {errors.property_type && <p className="text-sm text-red-500">{errors.property_type}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -308,12 +308,12 @@ export default function AddPropertyPage() ***REMOVED***
                                             <Input
                                                 id="square_meters"
                                                 type="number"
-                                                value=***REMOVED***data.square_meters***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('square_meters', e.target.value)***REMOVED***
+                                                value={data.square_meters}
+                                                onChange={(e) => setData('square_meters', e.target.value)}
                                                 placeholder="85"
                                                 required
                                             />
-                                            ***REMOVED***errors.square_meters && <p className="text-sm text-red-500">***REMOVED***errors.square_meters***REMOVED***</p>***REMOVED***
+                                            {errors.square_meters && <p className="text-sm text-red-500">{errors.square_meters}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -322,10 +322,10 @@ export default function AddPropertyPage() ***REMOVED***
                                                 id="bedrooms"
                                                 type="number"
                                                 min="0"
-                                                value=***REMOVED***data.bedrooms***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('bedrooms', parseInt(e.target.value))***REMOVED***
+                                                value={data.bedrooms}
+                                                onChange={(e) => setData('bedrooms', parseInt(e.target.value))}
                                             />
-                                            ***REMOVED***errors.bedrooms && <p className="text-sm text-red-500">***REMOVED***errors.bedrooms***REMOVED***</p>***REMOVED***
+                                            {errors.bedrooms && <p className="text-sm text-red-500">{errors.bedrooms}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -334,10 +334,10 @@ export default function AddPropertyPage() ***REMOVED***
                                                 id="bathrooms"
                                                 type="number"
                                                 min="0"
-                                                value=***REMOVED***data.bathrooms***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('bathrooms', parseInt(e.target.value))***REMOVED***
+                                                value={data.bathrooms}
+                                                onChange={(e) => setData('bathrooms', parseInt(e.target.value))}
                                             />
-                                            ***REMOVED***errors.bathrooms && <p className="text-sm text-red-500">***REMOVED***errors.bathrooms***REMOVED***</p>***REMOVED***
+                                            {errors.bathrooms && <p className="text-sm text-red-500">{errors.bathrooms}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -346,10 +346,10 @@ export default function AddPropertyPage() ***REMOVED***
                                                 id="floor_number"
                                                 type="number"
                                                 min="0"
-                                                value=***REMOVED***data.floor_number***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('floor_number', e.target.value)***REMOVED***
+                                                value={data.floor_number}
+                                                onChange={(e) => setData('floor_number', e.target.value)}
                                             />
-                                            ***REMOVED***errors.floor_number && <p className="text-sm text-red-500">***REMOVED***errors.floor_number***REMOVED***</p>***REMOVED***
+                                            {errors.floor_number && <p className="text-sm text-red-500">{errors.floor_number}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -358,10 +358,10 @@ export default function AddPropertyPage() ***REMOVED***
                                                 id="total_floors"
                                                 type="number"
                                                 min="0"
-                                                value=***REMOVED***data.total_floors***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('total_floors', e.target.value)***REMOVED***
+                                                value={data.total_floors}
+                                                onChange={(e) => setData('total_floors', e.target.value)}
                                             />
-                                            ***REMOVED***errors.total_floors && <p className="text-sm text-red-500">***REMOVED***errors.total_floors***REMOVED***</p>***REMOVED***
+                                            {errors.total_floors && <p className="text-sm text-red-500">{errors.total_floors}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -370,45 +370,45 @@ export default function AddPropertyPage() ***REMOVED***
                                                 id="year_built"
                                                 type="number"
                                                 min="1800"
-                                                max=***REMOVED***new Date().getFullYear()***REMOVED***
-                                                value=***REMOVED***data.year_built***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('year_built', e.target.value)***REMOVED***
+                                                max={new Date().getFullYear()}
+                                                value={data.year_built}
+                                                onChange={(e) => setData('year_built', e.target.value)}
                                             />
-                                            ***REMOVED***errors.year_built && <p className="text-sm text-red-500">***REMOVED***errors.year_built***REMOVED***</p>***REMOVED***
+                                            {errors.year_built && <p className="text-sm text-red-500">{errors.year_built}</p>}
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="heating_type">Heating Type</Label>
-                                            <Select value=***REMOVED***data.heating_type***REMOVED*** onValueChange=***REMOVED***(value) => setData('heating_type', value)***REMOVED***>
+                                            <Select value={data.heating_type} onValueChange={(value) => setData('heating_type', value)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select heating type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    ***REMOVED***heatingTypes.map((type) => (
-                                                        <SelectItem key=***REMOVED***type***REMOVED*** value=***REMOVED***type***REMOVED***>
-                                                            ***REMOVED***type***REMOVED***
+                                                    {heatingTypes.map((type) => (
+                                                        <SelectItem key={type} value={type}>
+                                                            {type}
                                                         </SelectItem>
-                                                    ))***REMOVED***
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
-                                            ***REMOVED***errors.heating_type && <p className="text-sm text-red-500">***REMOVED***errors.heating_type***REMOVED***</p>***REMOVED***
+                                            {errors.heating_type && <p className="text-sm text-red-500">{errors.heating_type}</p>}
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="energy_class">Energy Class</Label>
-                                            <Select value=***REMOVED***data.energy_class***REMOVED*** onValueChange=***REMOVED***(value) => setData('energy_class', value)***REMOVED***>
+                                            <Select value={data.energy_class} onValueChange={(value) => setData('energy_class', value)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select energy class" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    ***REMOVED***energyClasses.map((cls) => (
-                                                        <SelectItem key=***REMOVED***cls***REMOVED*** value=***REMOVED***cls***REMOVED***>
-                                                            ***REMOVED***cls***REMOVED***
+                                                    {energyClasses.map((cls) => (
+                                                        <SelectItem key={cls} value={cls}>
+                                                            {cls}
                                                         </SelectItem>
-                                                    ))***REMOVED***
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
-                                            ***REMOVED***errors.energy_class && <p className="text-sm text-red-500">***REMOVED***errors.energy_class***REMOVED***</p>***REMOVED***
+                                            {errors.energy_class && <p className="text-sm text-red-500">{errors.energy_class}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -417,10 +417,10 @@ export default function AddPropertyPage() ***REMOVED***
                                                 id="indoor_parking_spots"
                                                 type="number"
                                                 min="0"
-                                                value=***REMOVED***data.indoor_parking_spots***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('indoor_parking_spots', parseInt(e.target.value))***REMOVED***
+                                                value={data.indoor_parking_spots}
+                                                onChange={(e) => setData('indoor_parking_spots', parseInt(e.target.value))}
                                             />
-                                            ***REMOVED***errors.indoor_parking_spots && <p className="text-sm text-red-500">***REMOVED***errors.indoor_parking_spots***REMOVED***</p>***REMOVED***
+                                            {errors.indoor_parking_spots && <p className="text-sm text-red-500">{errors.indoor_parking_spots}</p>}
                                         </div>
 
                                         <div className="space-y-2">
@@ -429,17 +429,17 @@ export default function AddPropertyPage() ***REMOVED***
                                                 id="outdoor_parking_spots"
                                                 type="number"
                                                 min="0"
-                                                value=***REMOVED***data.outdoor_parking_spots***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('outdoor_parking_spots', parseInt(e.target.value))***REMOVED***
+                                                value={data.outdoor_parking_spots}
+                                                onChange={(e) => setData('outdoor_parking_spots', parseInt(e.target.value))}
                                             />
-                                            ***REMOVED***errors.outdoor_parking_spots && <p className="text-sm text-red-500">***REMOVED***errors.outdoor_parking_spots***REMOVED***</p>***REMOVED***
+                                            {errors.outdoor_parking_spots && <p className="text-sm text-red-500">{errors.outdoor_parking_spots}</p>}
                                         </div>
 
                                         <div className="flex items-center space-x-2">
                                             <Checkbox
                                                 id="furnished"
-                                                checked=***REMOVED***data.furnished***REMOVED***
-                                                onCheckedChange=***REMOVED***(checked) => setData('furnished', Boolean(checked))***REMOVED***
+                                                checked={data.furnished}
+                                                onCheckedChange={(checked) => setData('furnished', Boolean(checked))}
                                             />
                                             <Label htmlFor="furnished">Furnished</Label>
                                         </div>
@@ -447,8 +447,8 @@ export default function AddPropertyPage() ***REMOVED***
                                         <div className="flex items-center space-x-2">
                                             <Checkbox
                                                 id="pets_allowed"
-                                                checked=***REMOVED***data.pets_allowed***REMOVED***
-                                                onCheckedChange=***REMOVED***(checked) => setData('pets_allowed', Boolean(checked))***REMOVED***
+                                                checked={data.pets_allowed}
+                                                onCheckedChange={(checked) => setData('pets_allowed', Boolean(checked))}
                                             />
                                             <Label htmlFor="pets_allowed">Pets Allowed</Label>
                                         </div>
@@ -456,15 +456,15 @@ export default function AddPropertyPage() ***REMOVED***
                                         <div className="flex items-center space-x-2">
                                             <Checkbox
                                                 id="smoking_allowed"
-                                                checked=***REMOVED***data.smoking_allowed***REMOVED***
-                                                onCheckedChange=***REMOVED***(checked) => setData('smoking_allowed', Boolean(checked))***REMOVED***
+                                                checked={data.smoking_allowed}
+                                                onCheckedChange={(checked) => setData('smoking_allowed', Boolean(checked))}
                                             />
                                             <Label htmlFor="smoking_allowed">Smoking Allowed</Label>
                                         </div>
                                     </div>
                                 </div>
 
-                                ***REMOVED***/* Media Section */***REMOVED***
+                                {/* Media Section */}
                                 <div className="space-y-4">
                                     <h3 className="flex items-center text-lg font-medium">
                                         <ScanEye className="mr-2 h-5 w-5" />
@@ -475,46 +475,46 @@ export default function AddPropertyPage() ***REMOVED***
                                             <Label htmlFor="cover_image_url">Cover Image URL</Label>
                                             <Input
                                                 id="cover_image_url"
-                                                value=***REMOVED***data.cover_image_url***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('cover_image_url', e.target.value)***REMOVED***
+                                                value={data.cover_image_url}
+                                                onChange={(e) => setData('cover_image_url', e.target.value)}
                                                 placeholder="https://example.com/image.jpg"
                                             />
-                                            ***REMOVED***errors.cover_image_url && <p className="text-sm text-red-500">***REMOVED***errors.cover_image_url***REMOVED***</p>***REMOVED***
+                                            {errors.cover_image_url && <p className="text-sm text-red-500">{errors.cover_image_url}</p>}
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="virtual_tour_url">Virtual Tour URL</Label>
                                             <Input
                                                 id="virtual_tour_url"
-                                                value=***REMOVED***data.virtual_tour_url***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('virtual_tour_url', e.target.value)***REMOVED***
+                                                value={data.virtual_tour_url}
+                                                onChange={(e) => setData('virtual_tour_url', e.target.value)}
                                                 placeholder="https://example.com/virtual-tour"
                                             />
-                                            ***REMOVED***errors.virtual_tour_url && <p className="text-sm text-red-500">***REMOVED***errors.virtual_tour_url***REMOVED***</p>***REMOVED***
+                                            {errors.virtual_tour_url && <p className="text-sm text-red-500">{errors.virtual_tour_url}</p>}
                                         </div>
 
-                                        ***REMOVED***/* Note: For photo_gallery, you might want a more sophisticated file upload component */***REMOVED***
+                                        {/* Note: For photo_gallery, you might want a more sophisticated file upload component */}
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="photo_gallery">Photo Gallery (JSON array of URLs)</Label>
                                             <Textarea
                                                 id="photo_gallery"
-                                                value=***REMOVED***JSON.stringify(data.photo_gallery)***REMOVED***
-                                                onChange=***REMOVED***(e) => ***REMOVED***
-                                                    try ***REMOVED***
+                                                value={JSON.stringify(data.photo_gallery)}
+                                                onChange={(e) => {
+                                                    try {
                                                         setData('photo_gallery', JSON.parse(e.target.value));
-                                                ***REMOVED*** catch ***REMOVED***
+                                                    } catch {
                                                         setData('photo_gallery', []);
-                                                ***REMOVED***
-                                            ***REMOVED******REMOVED***
+                                                    }
+                                                }}
                                                 placeholder='["https://example.com/photo1.jpg", "https://example.com/photo2.jpg"]'
-                                                rows=***REMOVED***3***REMOVED***
+                                                rows={3}
                                             />
-                                            ***REMOVED***errors.photo_gallery && <p className="text-sm text-red-500">***REMOVED***errors.photo_gallery***REMOVED***</p>***REMOVED***
+                                            {errors.photo_gallery && <p className="text-sm text-red-500">{errors.photo_gallery}</p>}
                                         </div>
                                     </div>
                                 </div>
 
-                                ***REMOVED***/* Visibility & Access Section */***REMOVED***
+                                {/* Visibility & Access Section */}
                                 <div className="space-y-4">
                                     <h3 className="flex items-center text-lg font-medium">
                                         <Key className="mr-2 h-5 w-5" />
@@ -524,8 +524,8 @@ export default function AddPropertyPage() ***REMOVED***
                                         <div className="flex items-center space-x-2">
                                             <Checkbox
                                                 id="is_visible"
-                                                checked=***REMOVED***data.is_visible***REMOVED***
-                                                onCheckedChange=***REMOVED***(checked) => setData('is_visible', Boolean(checked))***REMOVED***
+                                                checked={data.is_visible}
+                                                onCheckedChange={(checked) => setData('is_visible', Boolean(checked))}
                                             />
                                             <Label htmlFor="is_visible">Visible to Public</Label>
                                         </div>
@@ -533,8 +533,8 @@ export default function AddPropertyPage() ***REMOVED***
                                         <div className="flex items-center space-x-2">
                                             <Checkbox
                                                 id="is_active"
-                                                checked=***REMOVED***data.is_active***REMOVED***
-                                                onCheckedChange=***REMOVED***(checked) => setData('is_active', Boolean(checked))***REMOVED***
+                                                checked={data.is_active}
+                                                onCheckedChange={(checked) => setData('is_active', Boolean(checked))}
                                             />
                                             <Label htmlFor="is_active">Active Listing</Label>
                                         </div>
@@ -542,8 +542,8 @@ export default function AddPropertyPage() ***REMOVED***
                                         <div className="flex items-center space-x-2">
                                             <Checkbox
                                                 id="is_invite_only"
-                                                checked=***REMOVED***data.is_invite_only***REMOVED***
-                                                onCheckedChange=***REMOVED***(checked) => setData('is_invite_only', Boolean(checked))***REMOVED***
+                                                checked={data.is_invite_only}
+                                                onCheckedChange={(checked) => setData('is_invite_only', Boolean(checked))}
                                             />
                                             <Label htmlFor="is_invite_only">Invite Only</Label>
                                         </div>
@@ -552,22 +552,22 @@ export default function AddPropertyPage() ***REMOVED***
                                             <Label htmlFor="access_code">Access Code</Label>
                                             <Input
                                                 id="access_code"
-                                                value=***REMOVED***data.access_code***REMOVED***
-                                                onChange=***REMOVED***(e) => setData('access_code', e.target.value)***REMOVED***
+                                                value={data.access_code}
+                                                onChange={(e) => setData('access_code', e.target.value)}
                                                 placeholder="Optional access code"
                                             />
-                                            ***REMOVED***errors.access_code && <p className="text-sm text-red-500">***REMOVED***errors.access_code***REMOVED***</p>***REMOVED***
+                                            {errors.access_code && <p className="text-sm text-red-500">{errors.access_code}</p>}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="flex justify-end gap-4">
-                                    <Button type="button" variant="outline" onClick=***REMOVED***() => window.history.back()***REMOVED***>
+                                    <Button type="button" variant="outline" onClick={() => window.history.back()}>
                                         Cancel
                                     </Button>
-                                    <Button type="submit" disabled=***REMOVED***processing***REMOVED***>
+                                    <Button type="submit" disabled={processing}>
                                         <PlusCircle className="mr-2 h-4 w-4" />
-                                        ***REMOVED***processing ? 'Creating...' : 'Create Property'***REMOVED***
+                                        {processing ? 'Creating...' : 'Create Property'}
                                     </Button>
                                 </div>
                             </form>
@@ -577,4 +577,4 @@ export default function AddPropertyPage() ***REMOVED***
             </div>
         </AppLayout>
     );
-***REMOVED***
+}

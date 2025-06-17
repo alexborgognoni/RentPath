@@ -1,11 +1,11 @@
-import ***REMOVED*** cn ***REMOVED*** from '@/lib/utils';
-import ***REMOVED*** type LucideProps ***REMOVED*** from 'lucide-react';
-import ***REMOVED*** type ComponentType ***REMOVED*** from 'react';
+import { cn } from '@/lib/utils';
+import { type LucideProps } from 'lucide-react';
+import { type ComponentType } from 'react';
 
-interface IconProps extends Omit<LucideProps, 'ref'> ***REMOVED***
+interface IconProps extends Omit<LucideProps, 'ref'> {
     iconNode: ComponentType<LucideProps>;
-***REMOVED***
+}
 
-export function Icon(***REMOVED*** iconNode: IconComponent, className, ...props ***REMOVED***: IconProps) ***REMOVED***
-    return <IconComponent className=***REMOVED***cn('h-4 w-4', className)***REMOVED*** ***REMOVED***...props***REMOVED*** />;
-***REMOVED***
+export function Icon({ iconNode: IconComponent, className, ...props }: IconProps) {
+    return <IconComponent className={cn('h-4 w-4', className)} {...props} />;
+}

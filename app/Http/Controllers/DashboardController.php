@@ -1,33 +1,33 @@
-***REMOVED***
+<?php
 
 namespace App\Http\Controllers;
 
 use App\Models\Property;
+use App\Http\Resources\PropertyResource;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
-***REMOVED***
+{
     public function index()
-    ***REMOVED***
+    {
         return Inertia::render('dashboard/index');
-***REMOVED***
+    }
 
-    public function properties()
-    ***REMOVED***
+    public function properties(Request $request)
+    {
         return Inertia::render('dashboard/properties', [
-            'properties' => \App\Http\Resources\PropertyResource::collection(
-                dd(Property::with('media')->first()->toArray())
-            ),
-***REMOVED***
-***REMOVED***
+            'properties' => PropertyResource::collection(Property::all())->toArray($request)
+        ]);
+    }
 
     public function applications()
-    ***REMOVED***
+    {
         return Inertia::render('dashboard/applications');
-***REMOVED***
+    }
 
     public function tenants()
-    ***REMOVED***
+    {
         return Inertia::render('dashboard/tenants');
-***REMOVED***
-***REMOVED***
+    }
+}

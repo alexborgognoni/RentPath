@@ -5,40 +5,40 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import typescript from 'typescript-eslint';
 
-/** @type ***REMOVED***import('eslint').Linter.Config[]***REMOVED*** */
+/** @type {import('eslint').Linter.Config[]} */
 export default [
     js.configs.recommended,
     ...typescript.configs.recommended,
-    ***REMOVED***
+    {
         ...react.configs.flat.recommended,
         ...react.configs.flat['jsx-runtime'], // Required for React 17+
-        languageOptions: ***REMOVED***
-            globals: ***REMOVED***
+        languageOptions: {
+            globals: {
                 ...globals.browser,
-        ***REMOVED***,
-    ***REMOVED***,
-        rules: ***REMOVED***
+            },
+        },
+        rules: {
             'react/react-in-jsx-scope': 'off',
             'react/prop-types': 'off',
             'react/no-unescaped-entities': 'off',
-    ***REMOVED***,
-        settings: ***REMOVED***
-            react: ***REMOVED***
+        },
+        settings: {
+            react: {
                 version: 'detect',
-        ***REMOVED***,
-    ***REMOVED***,
-***REMOVED***,
-    ***REMOVED***
-        plugins: ***REMOVED***
+            },
+        },
+    },
+    {
+        plugins: {
             'react-hooks': reactHooks,
-    ***REMOVED***,
-        rules: ***REMOVED***
+        },
+        rules: {
             'react-hooks/rules-of-hooks': 'error',
             'react-hooks/exhaustive-deps': 'warn',
-    ***REMOVED***,
-***REMOVED***,
-    ***REMOVED***
+        },
+    },
+    {
         ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
-***REMOVED***,
+    },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

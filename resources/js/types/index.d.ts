@@ -1,37 +1,37 @@
-import ***REMOVED*** LucideIcon ***REMOVED*** from 'lucide-react';
-import type ***REMOVED*** Config ***REMOVED*** from 'ziggy-js';
+import { LucideIcon } from 'lucide-react';
+import type { Config } from 'ziggy-js';
 
-export interface Auth ***REMOVED***
+export interface Auth {
     user: User;
-***REMOVED***
+}
 
-export interface BreadcrumbItem ***REMOVED***
+export interface BreadcrumbItem {
     title: string;
     href: string;
-***REMOVED***
+}
 
-export interface NavGroup ***REMOVED***
+export interface NavGroup {
     title: string;
     items: NavItem[];
-***REMOVED***
+}
 
-export interface NavItem ***REMOVED***
+export interface NavItem {
     title: string;
     href: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
-***REMOVED***
+}
 
-export interface SharedData ***REMOVED***
+export interface SharedData {
     name: string;
-    quote: ***REMOVED*** message: string; author: string ***REMOVED***;
+    quote: { message: string; author: string };
     auth: Auth;
-    ziggy: Config & ***REMOVED*** location: string ***REMOVED***;
+    ziggy: Config & { location: string };
     sidebarOpen: boolean;
     [key: string]: unknown;
-***REMOVED***
+}
 
-export interface User ***REMOVED***
+export interface User {
     id: number;
     name: string;
     email: string;
@@ -40,4 +40,4 @@ export interface User ***REMOVED***
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
-***REMOVED***
+}

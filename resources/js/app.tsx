@@ -1,33 +1,33 @@
 import '../css/app.css';
 
-import ***REMOVED*** createInertiaApp ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED*** resolvePageComponent ***REMOVED*** from 'laravel-vite-plugin/inertia-helpers';
-import ***REMOVED*** createRoot ***REMOVED*** from 'react-dom/client';
-import ***REMOVED*** initializeTheme ***REMOVED*** from './hooks/use-appearance';
+import { createInertiaApp } from '@inertiajs/react';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { createRoot } from 'react-dom/client';
+import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-createInertiaApp(***REMOVED***
-    title: (title) => `$***REMOVED***title***REMOVED*** - $***REMOVED***appName***REMOVED***`,
-    resolve: (name) => ***REMOVED***
-        const pages = import.meta.glob(['./pages/**/*.tsx', './pages/**/page.tsx'], ***REMOVED*** eager: true ***REMOVED***);
+createInertiaApp({
+    title: (title) => `${title} - ${appName}`,
+    resolve: (name) => {
+        const pages = import.meta.glob(['./pages/**/*.tsx', './pages/**/page.tsx'], { eager: true });
         return (
-            pages[`./pages/$***REMOVED***name***REMOVED***.tsx`] ||
-            pages[`./pages/$***REMOVED***name***REMOVED***/page.tsx`] ||
-            (() => ***REMOVED***
-                throw new Error(`Page not found: $***REMOVED***name***REMOVED***`);
-        ***REMOVED***)()
+            pages[`./pages/${name}.tsx`] ||
+            pages[`./pages/${name}/page.tsx`] ||
+            (() => {
+                throw new Error(`Page not found: ${name}`);
+            })()
         );
-***REMOVED***,
-    setup(***REMOVED*** el, App, props ***REMOVED***) ***REMOVED***
+    },
+    setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<App ***REMOVED***...props***REMOVED*** />);
-***REMOVED***,
-    progress: ***REMOVED***
+        root.render(<App {...props} />);
+    },
+    progress: {
         color: '#4B5563',
-***REMOVED***,
-***REMOVED***);
+    },
+});
 
 // This will set light / dark mode on load...
 initializeTheme();

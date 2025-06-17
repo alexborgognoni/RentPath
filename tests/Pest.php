@@ -1,4 +1,4 @@
-***REMOVED***
+<?php
 
 /*
 |--------------------------------------------------------------------------
@@ -26,9 +26,9 @@ pest()->extend(Tests\TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', function () ***REMOVED***
+expect()->extend('toBeOne', function () {
     return $this->toBe(1);
-***REMOVED***);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +42,6 @@ expect()->extend('toBeOne', function () ***REMOVED***
 */
 
 function something()
-***REMOVED***
+{
     // ..
-***REMOVED***
+}

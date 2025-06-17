@@ -1,51 +1,51 @@
 import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
-import ***REMOVED*** cn ***REMOVED*** from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
-function Avatar(***REMOVED***
+function Avatar({
   className,
   ...props
-***REMOVED***: React.ComponentProps<typeof AvatarPrimitive.Root>) ***REMOVED***
+}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
-      className=***REMOVED***cn(
+      className={cn(
         "relative flex size-8 shrink-0 overflow-hidden rounded-full",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function AvatarImage(***REMOVED***
+function AvatarImage({
   className,
   ...props
-***REMOVED***: React.ComponentProps<typeof AvatarPrimitive.Image>) ***REMOVED***
+}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className=***REMOVED***cn("aspect-square size-full", className)***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      className={cn("aspect-square size-full", className)}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function AvatarFallback(***REMOVED***
+function AvatarFallback({
   className,
   ...props
-***REMOVED***: React.ComponentProps<typeof AvatarPrimitive.Fallback>) ***REMOVED***
+}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
-      className=***REMOVED***cn(
+      className={cn(
         "bg-muted flex size-full items-center justify-center rounded-full",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-export ***REMOVED*** Avatar, AvatarImage, AvatarFallback ***REMOVED***
+export { Avatar, AvatarImage, AvatarFallback }

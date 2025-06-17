@@ -1,5 +1,5 @@
-***REMOVED***
+<?php
 
-test('that true is true', function () ***REMOVED***
+test('that true is true', function () {
     expect(true)->toBeTrue();
-***REMOVED***);
+});

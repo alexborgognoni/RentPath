@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-***REMOVED***
+<?php
 
 use Illuminate\Foundation\Application;
 use Symfony\Component\Console\Input\ArgvInput;

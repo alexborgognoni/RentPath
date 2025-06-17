@@ -1,5 +1,5 @@
-import type ***REMOVED*** route as routeFn ***REMOVED*** from 'ziggy-js';
+import type { route as routeFn } from 'ziggy-js';
 
-declare global ***REMOVED***
+declare global {
     const route: typeof routeFn;
-***REMOVED***
+}

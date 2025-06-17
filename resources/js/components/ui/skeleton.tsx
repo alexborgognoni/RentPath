@@ -1,13 +1,13 @@
-import ***REMOVED*** cn ***REMOVED*** from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
-function Skeleton(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"div">) ***REMOVED***
+function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="skeleton"
-      className=***REMOVED***cn("bg-primary/10 animate-pulse rounded-md", className)***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      className={cn("bg-primary/10 animate-pulse rounded-md", className)}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-export ***REMOVED*** Skeleton ***REMOVED***
+export { Skeleton }

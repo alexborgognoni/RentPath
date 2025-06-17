@@ -1,46 +1,46 @@
 import * as React from "react"
-import useEmblaCarousel, ***REMOVED***
+import useEmblaCarousel, {
   type UseEmblaCarouselType,
-***REMOVED*** from "embla-carousel-react"
-import ***REMOVED*** ArrowLeft, ArrowRight ***REMOVED*** from "lucide-react"
+} from "embla-carousel-react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 
-import ***REMOVED*** cn ***REMOVED*** from "@/lib/utils"
-import ***REMOVED*** Button ***REMOVED*** from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
 type CarouselOptions = UseCarouselParameters[0]
 type CarouselPlugin = UseCarouselParameters[1]
 
-type CarouselProps = ***REMOVED***
+type CarouselProps = {
   opts?: CarouselOptions
   plugins?: CarouselPlugin
   orientation?: "horizontal" | "vertical"
   setApi?: (api: CarouselApi) => void
-***REMOVED***
+}
 
-type CarouselContextProps = ***REMOVED***
+type CarouselContextProps = {
   carouselRef: ReturnType<typeof useEmblaCarousel>[0]
   api: ReturnType<typeof useEmblaCarousel>[1]
   scrollPrev: () => void
   scrollNext: () => void
   canScrollPrev: boolean
   canScrollNext: boolean
-***REMOVED*** & CarouselProps
+} & CarouselProps
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null)
 
-function useCarousel() ***REMOVED***
+function useCarousel() {
   const context = React.useContext(CarouselContext)
 
-  if (!context) ***REMOVED***
+  if (!context) {
     throw new Error("useCarousel must be used within a <Carousel />")
-  ***REMOVED***
+  }
 
   return context
-***REMOVED***
+}
 
-function Carousel(***REMOVED***
+function Carousel({
   orientation = "horizontal",
   opts,
   setApi,
@@ -48,63 +48,63 @@ function Carousel(***REMOVED***
   className,
   children,
   ...props
-***REMOVED***: React.ComponentProps<"div"> & CarouselProps) ***REMOVED***
+}: React.ComponentProps<"div"> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(
-    ***REMOVED***
+    {
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
-***REMOVED***,
+    },
     plugins
   )
   const [canScrollPrev, setCanScrollPrev] = React.useState(false)
   const [canScrollNext, setCanScrollNext] = React.useState(false)
 
-  const onSelect = React.useCallback((api: CarouselApi) => ***REMOVED***
+  const onSelect = React.useCallback((api: CarouselApi) => {
     if (!api) return
     setCanScrollPrev(api.canScrollPrev())
     setCanScrollNext(api.canScrollNext())
-  ***REMOVED***, [])
+  }, [])
 
-  const scrollPrev = React.useCallback(() => ***REMOVED***
+  const scrollPrev = React.useCallback(() => {
     api?.scrollPrev()
-  ***REMOVED***, [api])
+  }, [api])
 
-  const scrollNext = React.useCallback(() => ***REMOVED***
+  const scrollNext = React.useCallback(() => {
     api?.scrollNext()
-  ***REMOVED***, [api])
+  }, [api])
 
   const handleKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => ***REMOVED***
-      if (event.key === "ArrowLeft") ***REMOVED***
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === "ArrowLeft") {
         event.preventDefault()
         scrollPrev()
-  ***REMOVED*** else if (event.key === "ArrowRight") ***REMOVED***
+      } else if (event.key === "ArrowRight") {
         event.preventDefault()
         scrollNext()
-  ***REMOVED***
-***REMOVED***,
+      }
+    },
     [scrollPrev, scrollNext]
   )
 
-  React.useEffect(() => ***REMOVED***
+  React.useEffect(() => {
     if (!api || !setApi) return
     setApi(api)
-  ***REMOVED***, [api, setApi])
+  }, [api, setApi])
 
-  React.useEffect(() => ***REMOVED***
+  React.useEffect(() => {
     if (!api) return
     onSelect(api)
     api.on("reInit", onSelect)
     api.on("select", onSelect)
 
-    return () => ***REMOVED***
+    return () => {
       api?.off("select", onSelect)
-***REMOVED***
-  ***REMOVED***, [api, onSelect])
+    }
+  }, [api, onSelect])
 
   return (
     <CarouselContext.Provider
-      value=***REMOVED******REMOVED***
+      value={{
         carouselRef,
         api: api,
         opts,
@@ -114,126 +114,126 @@ function Carousel(***REMOVED***
         scrollNext,
         canScrollPrev,
         canScrollNext,
-  ***REMOVED******REMOVED***
+      }}
     >
       <div
-        onKeyDownCapture=***REMOVED***handleKeyDown***REMOVED***
-        className=***REMOVED***cn("relative", className)***REMOVED***
+        onKeyDownCapture={handleKeyDown}
+        className={cn("relative", className)}
         role="region"
         aria-roledescription="carousel"
         data-slot="carousel"
-        ***REMOVED***...props***REMOVED***
+        {...props}
       >
-        ***REMOVED***children***REMOVED***
+        {children}
       </div>
     </CarouselContext.Provider>
   )
-***REMOVED***
+}
 
-function CarouselContent(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"div">) ***REMOVED***
-  const ***REMOVED*** carouselRef, orientation ***REMOVED*** = useCarousel()
+function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
+  const { carouselRef, orientation } = useCarousel()
 
   return (
     <div
-      ref=***REMOVED***carouselRef***REMOVED***
+      ref={carouselRef}
       className="overflow-hidden"
       data-slot="carousel-content"
     >
       <div
-        className=***REMOVED***cn(
+        className={cn(
           "flex",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className
-        )***REMOVED***
-        ***REMOVED***...props***REMOVED***
+        )}
+        {...props}
       />
     </div>
   )
-***REMOVED***
+}
 
-function CarouselItem(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"div">) ***REMOVED***
-  const ***REMOVED*** orientation ***REMOVED*** = useCarousel()
+function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
+  const { orientation } = useCarousel()
 
   return (
     <div
       role="group"
       aria-roledescription="slide"
       data-slot="carousel-item"
-      className=***REMOVED***cn(
+      className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function CarouselPrevious(***REMOVED***
+function CarouselPrevious({
   className,
   variant = "outline",
   size = "icon",
   ...props
-***REMOVED***: React.ComponentProps<typeof Button>) ***REMOVED***
-  const ***REMOVED*** orientation, scrollPrev, canScrollPrev ***REMOVED*** = useCarousel()
+}: React.ComponentProps<typeof Button>) {
+  const { orientation, scrollPrev, canScrollPrev } = useCarousel()
 
   return (
     <Button
       data-slot="carousel-previous"
-      variant=***REMOVED***variant***REMOVED***
-      size=***REMOVED***size***REMOVED***
-      className=***REMOVED***cn(
+      variant={variant}
+      size={size}
+      className={cn(
         "absolute size-8 rounded-full",
         orientation === "horizontal"
           ? "top-1/2 -left-12 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
         className
-      )***REMOVED***
-      disabled=***REMOVED***!canScrollPrev***REMOVED***
-      onClick=***REMOVED***scrollPrev***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      disabled={!canScrollPrev}
+      onClick={scrollPrev}
+      {...props}
     >
       <ArrowLeft />
       <span className="sr-only">Previous slide</span>
     </Button>
   )
-***REMOVED***
+}
 
-function CarouselNext(***REMOVED***
+function CarouselNext({
   className,
   variant = "outline",
   size = "icon",
   ...props
-***REMOVED***: React.ComponentProps<typeof Button>) ***REMOVED***
-  const ***REMOVED*** orientation, scrollNext, canScrollNext ***REMOVED*** = useCarousel()
+}: React.ComponentProps<typeof Button>) {
+  const { orientation, scrollNext, canScrollNext } = useCarousel()
 
   return (
     <Button
       data-slot="carousel-next"
-      variant=***REMOVED***variant***REMOVED***
-      size=***REMOVED***size***REMOVED***
-      className=***REMOVED***cn(
+      variant={variant}
+      size={size}
+      className={cn(
         "absolute size-8 rounded-full",
         orientation === "horizontal"
           ? "top-1/2 -right-12 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
         className
-      )***REMOVED***
-      disabled=***REMOVED***!canScrollNext***REMOVED***
-      onClick=***REMOVED***scrollNext***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      disabled={!canScrollNext}
+      onClick={scrollNext}
+      {...props}
     >
       <ArrowRight />
       <span className="sr-only">Next slide</span>
     </Button>
   )
-***REMOVED***
+}
 
-export ***REMOVED***
+export {
   type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-***REMOVED***
+}

@@ -1,13 +1,13 @@
-***REMOVED***
+<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration ***REMOVED***
+return new class extends Migration {
     public function up(): void
-    ***REMOVED***
-        Schema::create('properties', function (Blueprint $table) ***REMOVED***
+    {
+        Schema::create('properties', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
             // Core Info
@@ -62,11 +62,11 @@ return new class extends Migration ***REMOVED***
 
             // $table->foreign('created_by')->references('id')->on('users');
             // $table->foreign('updated_by')->references('id')->on('users');
-    ***REMOVED***);
-***REMOVED***
+        });
+    }
 
     public function down(): void
-    ***REMOVED***
+    {
         Schema::dropIfExists('properties');
-***REMOVED***
-***REMOVED***;
+    }
+};

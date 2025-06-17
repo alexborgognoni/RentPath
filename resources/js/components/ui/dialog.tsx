@@ -1,66 +1,66 @@
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import ***REMOVED*** XIcon ***REMOVED*** from "lucide-react"
+import { XIcon } from "lucide-react"
 
-import ***REMOVED*** cn ***REMOVED*** from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
-function Dialog(***REMOVED***
+function Dialog({
   ...props
-***REMOVED***: React.ComponentProps<typeof DialogPrimitive.Root>) ***REMOVED***
-  return <DialogPrimitive.Root data-slot="dialog" ***REMOVED***...props***REMOVED*** />
-***REMOVED***
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+}
 
-function DialogTrigger(***REMOVED***
+function DialogTrigger({
   ...props
-***REMOVED***: React.ComponentProps<typeof DialogPrimitive.Trigger>) ***REMOVED***
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" ***REMOVED***...props***REMOVED*** />
-***REMOVED***
+}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+}
 
-function DialogPortal(***REMOVED***
+function DialogPortal({
   ...props
-***REMOVED***: React.ComponentProps<typeof DialogPrimitive.Portal>) ***REMOVED***
-  return <DialogPrimitive.Portal data-slot="dialog-portal" ***REMOVED***...props***REMOVED*** />
-***REMOVED***
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+}
 
-function DialogClose(***REMOVED***
+function DialogClose({
   ...props
-***REMOVED***: React.ComponentProps<typeof DialogPrimitive.Close>) ***REMOVED***
-  return <DialogPrimitive.Close data-slot="dialog-close" ***REMOVED***...props***REMOVED*** />
-***REMOVED***
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+}
 
-function DialogOverlay(***REMOVED***
+function DialogOverlay({
   className,
   ...props
-***REMOVED***: React.ComponentProps<typeof DialogPrimitive.Overlay>) ***REMOVED***
+}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
-      className=***REMOVED***cn(
+      className={cn(
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function DialogContent(***REMOVED***
+function DialogContent({
   className,
   children,
   ...props
-***REMOVED***: React.ComponentProps<typeof DialogPrimitive.Content>) ***REMOVED***
+}: React.ComponentProps<typeof DialogPrimitive.Content>) {
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
-        className=***REMOVED***cn(
+        className={cn(
           "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
           className
-        )***REMOVED***
-        ***REMOVED***...props***REMOVED***
+        )}
+        {...props}
       >
-        ***REMOVED***children***REMOVED***
+        {children}
         <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
           <XIcon />
           <span className="sr-only">Close</span>
@@ -68,58 +68,58 @@ function DialogContent(***REMOVED***
       </DialogPrimitive.Content>
     </DialogPortal>
   )
-***REMOVED***
+}
 
-function DialogHeader(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"div">) ***REMOVED***
+function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className=***REMOVED***cn("flex flex-col gap-2 text-center sm:text-left", className)***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function DialogFooter(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"div">) ***REMOVED***
+function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-footer"
-      className=***REMOVED***cn(
+      className={cn(
         "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function DialogTitle(***REMOVED***
+function DialogTitle({
   className,
   ...props
-***REMOVED***: React.ComponentProps<typeof DialogPrimitive.Title>) ***REMOVED***
+}: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className=***REMOVED***cn("text-lg leading-none font-semibold", className)***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      className={cn("text-lg leading-none font-semibold", className)}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function DialogDescription(***REMOVED***
+function DialogDescription({
   className,
   ...props
-***REMOVED***: React.ComponentProps<typeof DialogPrimitive.Description>) ***REMOVED***
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className=***REMOVED***cn("text-muted-foreground text-sm", className)***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-export ***REMOVED***
+export {
   Dialog,
   DialogClose,
   DialogContent,
@@ -130,4 +130,4 @@ export ***REMOVED***
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-***REMOVED***
+}

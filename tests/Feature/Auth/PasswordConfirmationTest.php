@@ -1,18 +1,18 @@
-***REMOVED***
+<?php
 
-***REMOVED***
+use App\Models\User;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-test('confirm password screen can be rendered', function () ***REMOVED***
+test('confirm password screen can be rendered', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get('/confirm-password');
 
     $response->assertStatus(200);
-***REMOVED***);
+});
 
-test('password can be confirmed', function () ***REMOVED***
+test('password can be confirmed', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/confirm-password', [
@@ -21,9 +21,9 @@ test('password can be confirmed', function () ***REMOVED***
 
     $response->assertRedirect();
     $response->assertSessionHasNoErrors();
-***REMOVED***);
+});
 
-test('password is not confirmed with invalid password', function () ***REMOVED***
+test('password is not confirmed with invalid password', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/confirm-password', [
@@ -31,4 +31,4 @@ test('password is not confirmed with invalid password', function () ***REMOVED**
     ]);
 
     $response->assertSessionHasErrors();
-***REMOVED***);
+});

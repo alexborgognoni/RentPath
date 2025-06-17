@@ -1,4 +1,4 @@
-Table property_managers ***REMOVED***
+Table property_managers {
   id uuid [pk]
   email varchar [unique, not null]
   password_hash varchar [not null]
@@ -8,9 +8,9 @@ Table property_managers ***REMOVED***
   type enum('private', 'business') [not null, default: 'private']
   is_verified boolean [default: false]
   created_at timestamp [default: `now()`]
-***REMOVED***
+}
 
-Table renters ***REMOVED***
+Table renters {
   id uuid [pk]
   email varchar [unique, not null]
   password_hash varchar [not null]
@@ -19,9 +19,9 @@ Table renters ***REMOVED***
   phone_number varchar
   is_verified boolean [default: false]
   created_at timestamp [default: `now()`]
-***REMOVED***
+}
 
-Table properties ***REMOVED***
+Table properties {
   id uuid [pk]
 
   // Core Info
@@ -75,9 +75,9 @@ Table properties ***REMOVED***
   deleted_at timestamp
   created_by uuid              [ref: > property_managers.id]
   updated_by uuid              [ref: > property_managers.id]
-***REMOVED***
+}
 
-Table property_manager_verifications ***REMOVED***
+Table property_manager_verifications {
   id uuid [pk]
   property_manager_id uuid [ref: > property_managers.id]
   company_name varchar
@@ -92,17 +92,17 @@ Table property_manager_verifications ***REMOVED***
   submitted_at timestamp
   verified_at timestamp
   verified_by uuid [ref: > property_managers.id, note: 'Internal verifier if applicable']
-***REMOVED***
+}
 
-Table property_manager_property ***REMOVED***
+Table property_manager_property {
   property_id uuid [ref: > properties.id]
   property_manager_id uuid [ref: > property_managers.id]
   role varchar [note: 'e.g., owner, agent, admin']
   added_at timestamp [default: `now()`]
   Note: 'Join table for many-to-many relationship'
-***REMOVED***
+}
 
-Table rental_invitations ***REMOVED***
+Table rental_invitations {
   id uuid [pk]
   property_id uuid [ref: > properties.id]
   invitation_token varchar [not null, unique]
@@ -113,18 +113,18 @@ Table rental_invitations ***REMOVED***
   status varchar [default: 'active']
   expires_at timestamp
   created_at timestamp [default: `now()`]
-***REMOVED***
+}
 
-Table rental_applications ***REMOVED***
+Table rental_applications {
   id uuid [pk]
   renter_id uuid [ref: > renters.id]
   property_id uuid [ref: > properties.id]
   status varchar [default: 'submitted']
   message text
   created_at timestamp [default: `now()`]
-***REMOVED***
+}
 
-Table renter_verifications ***REMOVED***
+Table renter_verifications {
   id uuid [pk]
   renter_id uuid [ref: > renters.id]
   date_of_birth date
@@ -155,4 +155,4 @@ Table renter_verifications ***REMOVED***
   submitted_at timestamp
   verified_at timestamp
   verified_by uuid [ref: > property_managers.id]
-***REMOVED***
+}

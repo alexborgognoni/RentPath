@@ -1,34 +1,34 @@
-import ***REMOVED*** useForm ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED*** FormEventHandler, useRef ***REMOVED*** from 'react';
+import { useForm } from '@inertiajs/react';
+import { FormEventHandler, useRef } from 'react';
 
 import InputError from '@/components/input-error';
-import ***REMOVED*** Button ***REMOVED*** from '@/components/ui/button';
-import ***REMOVED*** Input ***REMOVED*** from '@/components/ui/input';
-import ***REMOVED*** Label ***REMOVED*** from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 import HeadingSmall from '@/components/heading-small';
 
-import ***REMOVED*** Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger ***REMOVED*** from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-export default function DeleteUser() ***REMOVED***
+export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
-    const ***REMOVED*** data, setData, delete: destroy, processing, reset, errors, clearErrors ***REMOVED*** = useForm<Required<***REMOVED*** password: string ***REMOVED***>>(***REMOVED*** password: '' ***REMOVED***);
+    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
 
-    const deleteUser: FormEventHandler = (e) => ***REMOVED***
+    const deleteUser: FormEventHandler = (e) => {
         e.preventDefault();
 
-        destroy(route('profile.destroy'), ***REMOVED***
+        destroy(route('profile.destroy'), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
             onError: () => passwordInput.current?.focus(),
             onFinish: () => reset(),
-    ***REMOVED***);
-***REMOVED***;
+        });
+    };
 
-    const closeModal = () => ***REMOVED***
+    const closeModal = () => {
         clearErrors();
         reset();
-***REMOVED***;
+    };
 
     return (
         <div className="space-y-6">
@@ -49,7 +49,7 @@ export default function DeleteUser() ***REMOVED***
                             Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password
                             to confirm you would like to permanently delete your account.
                         </DialogDescription>
-                        <form className="space-y-6" onSubmit=***REMOVED***deleteUser***REMOVED***>
+                        <form className="space-y-6" onSubmit={deleteUser}>
                             <div className="grid gap-2">
                                 <Label htmlFor="password" className="sr-only">
                                     Password
@@ -59,24 +59,24 @@ export default function DeleteUser() ***REMOVED***
                                     id="password"
                                     type="password"
                                     name="password"
-                                    ref=***REMOVED***passwordInput***REMOVED***
-                                    value=***REMOVED***data.password***REMOVED***
-                                    onChange=***REMOVED***(e) => setData('password', e.target.value)***REMOVED***
+                                    ref={passwordInput}
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
                                     placeholder="Password"
                                     autoComplete="current-password"
                                 />
 
-                                <InputError message=***REMOVED***errors.password***REMOVED*** />
+                                <InputError message={errors.password} />
                             </div>
 
                             <DialogFooter className="gap-2">
                                 <DialogClose asChild>
-                                    <Button variant="secondary" onClick=***REMOVED***closeModal***REMOVED***>
+                                    <Button variant="secondary" onClick={closeModal}>
                                         Cancel
                                     </Button>
                                 </DialogClose>
 
-                                <Button variant="destructive" disabled=***REMOVED***processing***REMOVED*** asChild>
+                                <Button variant="destructive" disabled={processing} asChild>
                                     <button type="submit">Delete account</button>
                                 </Button>
                             </DialogFooter>
@@ -86,4 +86,4 @@ export default function DeleteUser() ***REMOVED***
             </div>
         </div>
     );
-***REMOVED***
+}

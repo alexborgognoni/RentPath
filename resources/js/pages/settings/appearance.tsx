@@ -1,22 +1,22 @@
-import ***REMOVED*** Head ***REMOVED*** from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 
 import AppearanceTabs from '@/components/appearance-tabs';
 import HeadingSmall from '@/components/heading-small';
-import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
+import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    ***REMOVED***
+    {
         title: 'Appearance settings',
         href: '/settings/appearance',
-***REMOVED***,
+    },
 ];
 
-export default function Appearance() ***REMOVED***
+export default function Appearance() {
     return (
-        <AppLayout breadcrumbs=***REMOVED***breadcrumbs***REMOVED***>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Appearance settings" />
 
             <SettingsLayout>
@@ -27,4 +27,4 @@ export default function Appearance() ***REMOVED***
             </SettingsLayout>
         </AppLayout>
     );
-***REMOVED***
+}

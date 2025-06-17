@@ -1,18 +1,18 @@
-import ***REMOVED*** SidebarProvider ***REMOVED*** from '@/components/ui/sidebar';
-import ***REMOVED*** SharedData ***REMOVED*** from '@/types';
-import ***REMOVED*** usePage ***REMOVED*** from '@inertiajs/react';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { SharedData } from '@/types';
+import { usePage } from '@inertiajs/react';
 
-interface AppShellProps ***REMOVED***
+interface AppShellProps {
     children: React.ReactNode;
     variant?: 'header' | 'sidebar';
-***REMOVED***
+}
 
-export function AppShell(***REMOVED*** children, variant = 'header' ***REMOVED***: AppShellProps) ***REMOVED***
+export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const isOpen = usePage<SharedData>().props.sidebarOpen;
 
-    if (variant === 'header') ***REMOVED***
-        return <div className="flex min-h-screen w-full flex-col">***REMOVED***children***REMOVED***</div>;
-***REMOVED***
+    if (variant === 'header') {
+        return <div className="flex min-h-screen w-full flex-col">{children}</div>;
+    }
 
-    return <SidebarProvider defaultOpen=***REMOVED***isOpen***REMOVED***>***REMOVED***children***REMOVED***</SidebarProvider>;
-***REMOVED***
+    return <SidebarProvider defaultOpen={isOpen}>{children}</SidebarProvider>;
+}

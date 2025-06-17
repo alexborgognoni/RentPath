@@ -1,34 +1,34 @@
-import ***REMOVED*** Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator ***REMOVED*** from '@/components/ui/breadcrumb';
-import ***REMOVED*** type BreadcrumbItem as BreadcrumbItemType ***REMOVED*** from '@/types';
-import ***REMOVED*** Link ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED*** Fragment ***REMOVED*** from 'react';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { Link } from '@inertiajs/react';
+import { Fragment } from 'react';
 
-export function Breadcrumbs(***REMOVED*** breadcrumbs ***REMOVED***: ***REMOVED*** breadcrumbs: BreadcrumbItemType[] ***REMOVED***) ***REMOVED***
+export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[] }) {
     return (
         <>
-            ***REMOVED***breadcrumbs.length > 0 && (
+            {breadcrumbs.length > 0 && (
                 <Breadcrumb>
                     <BreadcrumbList>
-                        ***REMOVED***breadcrumbs.map((item, index) => ***REMOVED***
+                        {breadcrumbs.map((item, index) => {
                             const isLast = index === breadcrumbs.length - 1;
                             return (
-                                <Fragment key=***REMOVED***index***REMOVED***>
+                                <Fragment key={index}>
                                     <BreadcrumbItem>
-                                        ***REMOVED***isLast ? (
-                                            <BreadcrumbPage>***REMOVED***item.title***REMOVED***</BreadcrumbPage>
+                                        {isLast ? (
+                                            <BreadcrumbPage>{item.title}</BreadcrumbPage>
                                         ) : (
                                             <BreadcrumbLink asChild>
-                                                <Link href=***REMOVED***item.href***REMOVED***>***REMOVED***item.title***REMOVED***</Link>
+                                                <Link href={item.href}>{item.title}</Link>
                                             </BreadcrumbLink>
-                                        )***REMOVED***
+                                        )}
                                     </BreadcrumbItem>
-                                    ***REMOVED***!isLast && <BreadcrumbSeparator />***REMOVED***
+                                    {!isLast && <BreadcrumbSeparator />}
                                 </Fragment>
                             );
-                    ***REMOVED***)***REMOVED***
+                        })}
                     </BreadcrumbList>
                 </Breadcrumb>
-            )***REMOVED***
+            )}
         </>
     );
-***REMOVED***
+}

@@ -1,21 +1,21 @@
-***REMOVED***
+<?php
 
-***REMOVED***
+use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-test('email verification screen can be rendered', function () ***REMOVED***
+test('email verification screen can be rendered', function () {
     $user = User::factory()->unverified()->create();
 
     $response = $this->actingAs($user)->get('/verify-email');
 
     $response->assertStatus(200);
-***REMOVED***);
+});
 
-test('email can be verified', function () ***REMOVED***
+test('email can be verified', function () {
     $user = User::factory()->unverified()->create();
 
     Event::fake();
@@ -31,9 +31,9 @@ test('email can be verified', function () ***REMOVED***
     Event::assertDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
     $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
-***REMOVED***);
+});
 
-test('email is not verified with invalid hash', function () ***REMOVED***
+test('email is not verified with invalid hash', function () {
     $user = User::factory()->unverified()->create();
 
     $verificationUrl = URL::temporarySignedRoute(
@@ -45,4 +45,4 @@ test('email is not verified with invalid hash', function () ***REMOVED***
     $this->actingAs($user)->get($verificationUrl);
 
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
-***REMOVED***);
+});

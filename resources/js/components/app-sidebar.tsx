@@ -1,49 +1,49 @@
-import ***REMOVED*** NavFooter ***REMOVED*** from '@/components/nav-footer';
-import ***REMOVED*** NavMain ***REMOVED*** from '@/components/nav-main';
-import ***REMOVED*** NavUser ***REMOVED*** from '@/components/nav-user';
-import ***REMOVED*** Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem ***REMOVED*** from '@/components/ui/sidebar';
-import ***REMOVED*** type NavItem ***REMOVED*** from '@/types';
-import ***REMOVED*** Link ***REMOVED*** from '@inertiajs/react';
-import ***REMOVED*** ClipboardPen, House, LayoutGrid, Users ***REMOVED*** from 'lucide-react';
+import { NavFooter } from '@/components/nav-footer';
+import { NavMain } from '@/components/nav-main';
+import { NavUser } from '@/components/nav-user';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { type NavItem } from '@/types';
+import { Link } from '@inertiajs/react';
+import { ClipboardPen, House, LayoutGrid, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
-    ***REMOVED***
+    {
         title: 'Overview',
         href: '/dashboard',
         icon: LayoutGrid,
-***REMOVED***,
-    ***REMOVED***
+    },
+    {
         title: 'Properties',
         href: '/dashboard/properties',
         icon: House,
-***REMOVED***,
-    ***REMOVED***
+    },
+    {
         title: 'Applications',
         href: '/dashboard/applications',
         icon: ClipboardPen,
-***REMOVED***,
-    ***REMOVED***
+    },
+    {
         title: 'Tenants',
         href: '/dashboard/tenants',
         icon: Users,
-***REMOVED***,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
-    // ***REMOVED***
+    // {
     //     title: 'Repository',
     //     href: 'https://github.com/laravel/react-starter-kit',
     //     icon: Folder,
-    // ***REMOVED***,
-    // ***REMOVED***
+    // },
+    // {
     //     title: 'Documentation',
     //     href: 'https://laravel.com/docs/starter-kits#react',
     //     icon: BookOpen,
-    // ***REMOVED***,
+    // },
 ];
 
-export function AppSidebar() ***REMOVED***
+export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -59,13 +59,13 @@ export function AppSidebar() ***REMOVED***
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items=***REMOVED***mainNavItems***REMOVED*** />
+                <NavMain items={mainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items=***REMOVED***footerNavItems***REMOVED*** className="mt-auto" />
+                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
     );
-***REMOVED***
+}

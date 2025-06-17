@@ -1,14 +1,14 @@
-import ***REMOVED*** LucideIcon ***REMOVED*** from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
-interface IconProps ***REMOVED***
+interface IconProps {
     iconNode?: LucideIcon | null;
     className?: string;
-***REMOVED***
+}
 
-export function Icon(***REMOVED*** iconNode: IconComponent, className ***REMOVED***: IconProps) ***REMOVED***
-    if (!IconComponent) ***REMOVED***
+export function Icon({ iconNode: IconComponent, className }: IconProps) {
+    if (!IconComponent) {
         return null;
-***REMOVED***
+    }
 
-    return <IconComponent className=***REMOVED***className***REMOVED*** />;
-***REMOVED***
+    return <IconComponent className={className} />;
+}

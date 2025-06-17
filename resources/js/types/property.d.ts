@@ -15,7 +15,7 @@ export type PropertyType =
     | 'Garage'
     | 'Office';
 
-export interface Property ***REMOVED***
+export interface Property {
     id: string;
     title: string;
     description: string;
@@ -64,4 +64,4 @@ export interface Property ***REMOVED***
     updated_by: string;
 
     [key: string]: unknown;
-***REMOVED***
+}

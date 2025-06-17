@@ -1,18 +1,18 @@
-***REMOVED***
+<?php
 
 namespace Database\Factories;
 
 use App\Models\Property;
-***REMOVED***
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 class PropertyFactory extends Factory
-***REMOVED***
+{
     protected $model = Property::class;
 
     public function definition(): array
-    ***REMOVED***
+    {
         $propertyTypes = [
             'House',
             'Detached House',
@@ -84,39 +84,40 @@ class PropertyFactory extends Factory
             'created_by' => User::inRandomOrder()->first()?->id ?? Str::uuid(),
             'updated_by' => User::inRandomOrder()->first()?->id ?? Str::uuid(),
         ];
-***REMOVED***
+    }
 
     public function configure()
-    ***REMOVED***
-        return $this->afterMaking(function (Property $property) ***REMOVED***
+    {
+        return $this->afterMaking(function (Property $property) {
             // This runs BEFORE creation
-    ***REMOVED***)->afterCreating(function (Property $property) ***REMOVED***
+        })->afterCreating(function (Property $property) {
             $this->seedMediaForProperty($property);
             // Refresh to ensure accessors see the media
             $property->refresh();
-    ***REMOVED***);
-***REMOVED***
+        });
+    }
 
     protected function seedMediaForProperty(Property $property)
-    ***REMOVED***
+    {
         $type = strtolower(str_replace(' ', '_', $property->property_type));
-        $imageDir = database_path("seeders/images/***REMOVED***$type***REMOVED***");
+        $imageDir = database_path("factories/images/{$type}");
+        info($imageDir);
 
         // Add cover image if exists
-        $coverPath = "***REMOVED***$imageDir***REMOVED***/***REMOVED***$type***REMOVED***_cover.jpg";
-        if (file_exists($coverPath)) ***REMOVED***
+        $coverPath = "{$imageDir}/{$type}_cover.jpg";
+        if (file_exists($coverPath)) {
             $property->addMedia($coverPath)
                 ->preservingOriginal()
                 ->toMediaCollection('cover');
-    ***REMOVED***
+        }
 
         // Add gallery images
         $i = 1;
-        while (file_exists("***REMOVED***$imageDir***REMOVED***/***REMOVED***$type***REMOVED***_***REMOVED***$i***REMOVED***.jpg")) ***REMOVED***
-            $property->addMedia("***REMOVED***$imageDir***REMOVED***/***REMOVED***$type***REMOVED***_***REMOVED***$i***REMOVED***.jpg")
+        while (file_exists("{$imageDir}/{$type}_{$i}.jpg")) {
+            $property->addMedia("{$imageDir}/{$type}_{$i}.jpg")
                 ->preservingOriginal()
                 ->toMediaCollection('gallery');
             $i++;
-    ***REMOVED***
-***REMOVED***
-***REMOVED***
+        }
+    }
+}

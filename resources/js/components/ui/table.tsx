@@ -1,8 +1,8 @@
 import * as React from "react"
 
-import ***REMOVED*** cn ***REMOVED*** from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
-function Table(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"table">) ***REMOVED***
+function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
@@ -10,99 +10,99 @@ function Table(***REMOVED*** className, ...props ***REMOVED***: React.ComponentP
     >
       <table
         data-slot="table"
-        className=***REMOVED***cn("w-full caption-bottom text-sm", className)***REMOVED***
-        ***REMOVED***...props***REMOVED***
+        className={cn("w-full caption-bottom text-sm", className)}
+        {...props}
       />
     </div>
   )
-***REMOVED***
+}
 
-function TableHeader(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"thead">) ***REMOVED***
+function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className=***REMOVED***cn("[&_tr]:border-b", className)***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      className={cn("[&_tr]:border-b", className)}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function TableBody(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"tbody">) ***REMOVED***
+function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
   return (
     <tbody
       data-slot="table-body"
-      className=***REMOVED***cn("[&_tr:last-child]:border-0", className)***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      className={cn("[&_tr:last-child]:border-0", className)}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function TableFooter(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"tfoot">) ***REMOVED***
+function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   return (
     <tfoot
       data-slot="table-footer"
-      className=***REMOVED***cn(
+      className={cn(
         "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function TableRow(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"tr">) ***REMOVED***
+function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   return (
     <tr
       data-slot="table-row"
-      className=***REMOVED***cn(
+      className={cn(
         "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function TableHead(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"th">) ***REMOVED***
+function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   return (
     <th
       data-slot="table-head"
-      className=***REMOVED***cn(
+      className={cn(
         "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function TableCell(***REMOVED*** className, ...props ***REMOVED***: React.ComponentProps<"td">) ***REMOVED***
+function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   return (
     <td
       data-slot="table-cell"
-      className=***REMOVED***cn(
+      className={cn(
         "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
-      )***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      )}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-function TableCaption(***REMOVED***
+function TableCaption({
   className,
   ...props
-***REMOVED***: React.ComponentProps<"caption">) ***REMOVED***
+}: React.ComponentProps<"caption">) {
   return (
     <caption
       data-slot="table-caption"
-      className=***REMOVED***cn("text-muted-foreground mt-4 text-sm", className)***REMOVED***
-      ***REMOVED***...props***REMOVED***
+      className={cn("text-muted-foreground mt-4 text-sm", className)}
+      {...props}
     />
   )
-***REMOVED***
+}
 
-export ***REMOVED***
+export {
   Table,
   TableHeader,
   TableBody,
@@ -111,4 +111,4 @@ export ***REMOVED***
   TableRow,
   TableCell,
   TableCaption,
-***REMOVED***
+}

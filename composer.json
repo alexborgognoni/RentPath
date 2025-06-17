@@ -1,4 +1,4 @@
-***REMOVED***
+{
     "$schema": "https://getcomposer.org/schema.json",
     "name": "laravel/react-starter-kit",
     "type": "project",
@@ -8,15 +8,15 @@
         "framework"
     ],
     "license": "MIT",
-    "require": ***REMOVED***
+    "require": {
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "spatie/laravel-medialibrary": "^11.13",
         "tightenco/ziggy": "^2.4"
-***REMOVED***,
-    "require-dev": ***REMOVED***
+    },
+    "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.18",
@@ -25,20 +25,20 @@
         "nunomaduro/collision": "^8.6",
         "pestphp/pest": "^3.8",
         "pestphp/pest-plugin-laravel": "^3.2"
-***REMOVED***,
-    "autoload": ***REMOVED***
-        "psr-4": ***REMOVED***
+    },
+    "autoload": {
+        "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-    ***REMOVED***
-***REMOVED***,
-    "autoload-dev": ***REMOVED***
-        "psr-4": ***REMOVED***
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Tests\\": "tests/"
-    ***REMOVED***
-***REMOVED***,
-    "scripts": ***REMOVED***
+        }
+    },
+    "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -67,21 +67,21 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ]
-***REMOVED***,
-    "extra": ***REMOVED***
-        "laravel": ***REMOVED***
+    },
+    "extra": {
+        "laravel": {
             "dont-discover": []
-    ***REMOVED***
-***REMOVED***,
-    "config": ***REMOVED***
+        }
+    },
+    "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
-        "allow-plugins": ***REMOVED***
+        "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-    ***REMOVED***
-***REMOVED***,
+        }
+    },
     "minimum-stability": "stable",
     "prefer-stable": true
-***REMOVED***
+}

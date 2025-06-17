@@ -1,7 +1,7 @@
-import ***REMOVED*** useCallback ***REMOVED*** from 'react';
+import { useCallback } from 'react';
 
-export function useInitials() ***REMOVED***
-    return useCallback((fullName: string): string => ***REMOVED***
+export function useInitials() {
+    return useCallback((fullName: string): string => {
         const names = fullName.trim().split(' ');
 
         if (names.length === 0) return '';
@@ -10,6 +10,6 @@ export function useInitials() ***REMOVED***
         const firstInitial = names[0].charAt(0);
         const lastInitial = names[names.length - 1].charAt(0);
 
-        return `$***REMOVED***firstInitial***REMOVED***$***REMOVED***lastInitial***REMOVED***`.toUpperCase();
-***REMOVED***, []);
-***REMOVED***
+        return `${firstInitial}${lastInitial}`.toUpperCase();
+    }, []);
+}

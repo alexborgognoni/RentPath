@@ -1,24 +1,24 @@
 import AppLayout from '@/layouts/app-layout';
-import ***REMOVED*** type BreadcrumbItem ***REMOVED*** from '@/types';
-import ***REMOVED*** Head, Link ***REMOVED*** from '@inertiajs/react';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link } from '@inertiajs/react';
 
-import ***REMOVED*** DashboardHeader ***REMOVED*** from '@/components/dashboard-header';
-import ***REMOVED*** Avatar, AvatarFallback, AvatarImage ***REMOVED*** from '@/components/ui/avatar';
-import ***REMOVED*** Badge ***REMOVED*** from '@/components/ui/badge';
-import ***REMOVED*** Button ***REMOVED*** from '@/components/ui/button';
-import ***REMOVED*** Card, CardContent, CardHeader, CardTitle ***REMOVED*** from '@/components/ui/card';
-import ***REMOVED***
+import { DashboardHeader } from '@/components/dashboard-header';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-***REMOVED*** from '@/components/ui/dropdown-menu';
-import ***REMOVED*** Input ***REMOVED*** from '@/components/ui/input';
-import ***REMOVED*** Select, SelectContent, SelectItem, SelectTrigger, SelectValue ***REMOVED*** from '@/components/ui/select';
-import ***REMOVED*** Table, TableBody, TableCell, TableHead, TableHeader, TableRow ***REMOVED*** from '@/components/ui/table';
-import ***REMOVED***
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
     ArrowDown,
     ArrowUp,
     CheckCircle,
@@ -33,14 +33,14 @@ import ***REMOVED***
     UserX,
     X,
     XCircle,
-***REMOVED*** from 'lucide-react';
-import ***REMOVED*** useMemo, useState ***REMOVED*** from 'react';
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    ***REMOVED***
+    {
         title: 'Applications',
         href: '/applications',
-***REMOVED***,
+    },
 ];
 
 type RentalApplicationStatus =
@@ -53,7 +53,7 @@ type RentalApplicationStatus =
     | 'Lease Signed'
     | 'Withdrawn';
 
-interface RentalApplication ***REMOVED***
+interface RentalApplication {
     id: string;
     applicantName: string;
     applicantId: string;
@@ -64,10 +64,10 @@ interface RentalApplication ***REMOVED***
     applicationDate: string;
     status: RentalApplicationStatus;
     lastUpdated: string;
-***REMOVED***
+}
 
 const mockRentalApplications: RentalApplication[] = [
-    ***REMOVED***
+    {
         id: 'app1',
         applicantName: 'Lucy van Pelt',
         applicantId: 'tenant2',
@@ -78,8 +78,8 @@ const mockRentalApplications: RentalApplication[] = [
         applicationDate: '2024-05-20',
         status: 'Under Review',
         lastUpdated: '2024-05-21',
-***REMOVED***,
-    ***REMOVED***
+    },
+    {
         id: 'app2',
         applicantName: 'Sally Brown',
         applicantId: 'tenant4',
@@ -90,8 +90,8 @@ const mockRentalApplications: RentalApplication[] = [
         applicationDate: '2024-06-01',
         status: 'Awaiting Documents',
         lastUpdated: '2024-06-02',
-***REMOVED***,
-    ***REMOVED***
+    },
+    {
         id: 'app3',
         applicantName: 'Schroeder Piano',
         applicantId: 'tenant_new1',
@@ -102,8 +102,8 @@ const mockRentalApplications: RentalApplication[] = [
         applicationDate: '2024-05-15',
         status: 'Approved',
         lastUpdated: '2024-05-18',
-***REMOVED***,
-    ***REMOVED***
+    },
+    {
         id: 'app4',
         applicantName: 'Marcie Carlin',
         applicantId: 'tenant_new2',
@@ -114,8 +114,8 @@ const mockRentalApplications: RentalApplication[] = [
         applicationDate: '2024-05-25',
         status: 'Rejected',
         lastUpdated: '2024-05-28',
-***REMOVED***,
-    ***REMOVED***
+    },
+    {
         id: 'app5',
         applicantName: 'Charlie Brown',
         applicantId: 'tenant1',
@@ -126,7 +126,7 @@ const mockRentalApplications: RentalApplication[] = [
         applicationDate: '2024-06-03',
         status: 'Submitted',
         lastUpdated: '2024-06-03',
-***REMOVED***,
+    },
 ];
 
 const applicationStatuses: RentalApplicationStatus[] = [
@@ -140,8 +140,8 @@ const applicationStatuses: RentalApplicationStatus[] = [
     'Withdrawn',
 ];
 
-const getRentalApplicationStatusBadgeVariant = (status: RentalApplicationStatus): 'default' | 'secondary' | 'outline' | 'destructive' => ***REMOVED***
-    switch (status) ***REMOVED***
+const getRentalApplicationStatusBadgeVariant = (status: RentalApplicationStatus): 'default' | 'secondary' | 'outline' | 'destructive' => {
+    switch (status) {
         case 'Approved':
         case 'Lease Signed':
             return 'default';
@@ -156,11 +156,11 @@ const getRentalApplicationStatusBadgeVariant = (status: RentalApplicationStatus)
             return 'destructive';
         default:
             return 'outline';
-***REMOVED***
-***REMOVED***;
+    }
+};
 
-const RentalApplicationStatusIcon = (***REMOVED*** status ***REMOVED***: ***REMOVED*** status: RentalApplicationStatus ***REMOVED***) => ***REMOVED***
-    switch (status) ***REMOVED***
+const RentalApplicationStatusIcon = ({ status }: { status: RentalApplicationStatus }) => {
+    switch (status) {
         case 'Approved':
             return <CheckCircle className="mr-2 h-4 w-4 text-green-600" />;
         case 'Lease Signed':
@@ -173,46 +173,46 @@ const RentalApplicationStatusIcon = (***REMOVED*** status ***REMOVED***: ***REMO
             return <UserX className="mr-2 h-4 w-4 text-red-700" />;
         default:
             return <FileSignature className="mr-2 h-4 w-4 text-gray-500" />;
-***REMOVED***
-***REMOVED***;
+    }
+};
 
 type SortableRentalApplicationKeys = keyof Pick<
     RentalApplication,
     'applicantName' | 'propertyAddress' | 'applicationDate' | 'status' | 'lastUpdated'
 >;
 
-interface SortConfig ***REMOVED***
+interface SortConfig {
     key: SortableRentalApplicationKeys | null;
     direction: 'asc' | 'desc';
-***REMOVED***
+}
 
-interface Filters ***REMOVED***
+interface Filters {
     searchTerm: string; // Search by applicant name, email, or property address
     status: string; // "all" or specific status
-***REMOVED***
+}
 
-export default function RentalApplicationsPage() ***REMOVED***
-    const [filters, setFilters] = useState<Filters>(***REMOVED*** searchTerm: '', status: 'all' ***REMOVED***);
-    const [sortConfig, setSortConfig] = useState<SortConfig>(***REMOVED*** key: null, direction: 'asc' ***REMOVED***);
+export default function RentalApplicationsPage() {
+    const [filters, setFilters] = useState<Filters>({ searchTerm: '', status: 'all' });
+    const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'asc' });
 
-    const handleFilterChange = (filterName: keyof Filters, value: string) => ***REMOVED***
-        setFilters((prev) => (***REMOVED*** ...prev, [filterName]: value ***REMOVED***));
-***REMOVED***;
+    const handleFilterChange = (filterName: keyof Filters, value: string) => {
+        setFilters((prev) => ({ ...prev, [filterName]: value }));
+    };
 
-    const clearFilters = () => ***REMOVED***
-        setFilters(***REMOVED*** searchTerm: '', status: 'all' ***REMOVED***);
-***REMOVED***;
+    const clearFilters = () => {
+        setFilters({ searchTerm: '', status: 'all' });
+    };
 
-    const handleSort = (key: SortableRentalApplicationKeys) => ***REMOVED***
-        setSortConfig((prev) => (***REMOVED***
+    const handleSort = (key: SortableRentalApplicationKeys) => {
+        setSortConfig((prev) => ({
             key,
             direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
-    ***REMOVED***));
-***REMOVED***;
+        }));
+    };
 
-    const filteredAndSortedRentalApplications = useMemo(() => ***REMOVED***
+    const filteredAndSortedRentalApplications = useMemo(() => {
         let items = [...mockRentalApplications];
-        if (filters.searchTerm) ***REMOVED***
+        if (filters.searchTerm) {
             const term = filters.searchTerm.toLowerCase();
             items = items.filter(
                 (app) =>
@@ -220,51 +220,51 @@ export default function RentalApplicationsPage() ***REMOVED***
                     app.applicantEmail.toLowerCase().includes(term) ||
                     app.propertyAddress.toLowerCase().includes(term),
             );
-    ***REMOVED***
-        if (filters.status !== 'all') ***REMOVED***
+        }
+        if (filters.status !== 'all') {
             items = items.filter((app) => app.status === filters.status);
-    ***REMOVED***
+        }
 
-        if (sortConfig.key) ***REMOVED***
-            items.sort((a, b) => ***REMOVED***
+        if (sortConfig.key) {
+            items.sort((a, b) => {
                 const aValue = a[sortConfig.key!];
                 const bValue = b[sortConfig.key!];
-                if (sortConfig.key === 'applicationDate' || sortConfig.key === 'lastUpdated') ***REMOVED***
+                if (sortConfig.key === 'applicationDate' || sortConfig.key === 'lastUpdated') {
                     return sortConfig.direction === 'asc'
                         ? new Date(aValue).getTime() - new Date(bValue).getTime()
                         : new Date(bValue).getTime() - new Date(aValue).getTime();
-            ***REMOVED***
-                if (typeof aValue === 'string' && typeof bValue === 'string') ***REMOVED***
+                }
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
                     return sortConfig.direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-            ***REMOVED***
+                }
                 return 0;
-        ***REMOVED***);
-    ***REMOVED***
+            });
+        }
         return items;
-***REMOVED***, [mockRentalApplications, filters, sortConfig]);
+    }, [mockRentalApplications, filters, sortConfig]);
 
-    const SortIcon = (***REMOVED*** columnKey ***REMOVED***: ***REMOVED*** columnKey: SortableRentalApplicationKeys ***REMOVED***) => ***REMOVED***
+    const SortIcon = ({ columnKey }: { columnKey: SortableRentalApplicationKeys }) => {
         if (sortConfig.key !== columnKey) return <ChevronsUpDown className="ml-2 h-4 w-4" />;
         return sortConfig.direction === 'asc' ? (
             <ArrowUp className="ml-2 h-4 w-4 text-primary" />
         ) : (
             <ArrowDown className="ml-2 h-4 w-4 text-primary" />
         );
-***REMOVED***;
+    };
 
     const handleManualAddRentalApplication = () => console.log('Open modal or navigate to add new application form');
 
     return (
-        <AppLayout breadcrumbs=***REMOVED***breadcrumbs***REMOVED***>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Applications" />
             <div className="flex flex-1 flex-col">
                 <DashboardHeader
                     title="Manage Rental Applications"
-                    actionButton=***REMOVED******REMOVED***
+                    actionButton={{
                         label: 'Add Application',
                         onClick: handleManualAddRentalApplication,
                         icon: <PlusCircle className="h-4 w-4" />,
-                ***REMOVED******REMOVED***
+                    }}
                 />
                 <div className="flex-1 space-y-6 p-4 sm:p-6">
                     <Card>
@@ -277,24 +277,24 @@ export default function RentalApplicationsPage() ***REMOVED***
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <Input
                                     placeholder="Search applicant or property..."
-                                    value=***REMOVED***filters.searchTerm***REMOVED***
-                                    onChange=***REMOVED***(e) => handleFilterChange('searchTerm', e.target.value)***REMOVED***
+                                    value={filters.searchTerm}
+                                    onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
                                 />
-                                <Select value=***REMOVED***filters.status***REMOVED*** onValueChange=***REMOVED***(value) => handleFilterChange('status', value)***REMOVED***>
+                                <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Filter by Status" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All Statuses</SelectItem>
-                                        ***REMOVED***applicationStatuses.map((status) => (
-                                            <SelectItem key=***REMOVED***status***REMOVED*** value=***REMOVED***status***REMOVED***>
-                                                ***REMOVED***status***REMOVED***
+                                        {applicationStatuses.map((status) => (
+                                            <SelectItem key={status} value={status}>
+                                                {status}
                                             </SelectItem>
-                                        ))***REMOVED***
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <Button onClick=***REMOVED***clearFilters***REMOVED*** variant="outline" size="sm">
+                            <Button onClick={clearFilters} variant="outline" size="sm">
                                 <X className="mr-2 h-4 w-4" /> Clear Filters
                             </Button>
                         </CardContent>
@@ -304,31 +304,31 @@ export default function RentalApplicationsPage() ***REMOVED***
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead onClick=***REMOVED***() => handleSort('applicantName')***REMOVED*** className="w-[250px] cursor-pointer hover:bg-muted/50">
+                                    <TableHead onClick={() => handleSort('applicantName')} className="w-[250px] cursor-pointer hover:bg-muted/50">
                                         <div className="flex items-center">
                                             Applicant <SortIcon columnKey="applicantName" />
                                         </div>
                                     </TableHead>
-                                    <TableHead onClick=***REMOVED***() => handleSort('propertyAddress')***REMOVED*** className="cursor-pointer hover:bg-muted/50">
+                                    <TableHead onClick={() => handleSort('propertyAddress')} className="cursor-pointer hover:bg-muted/50">
                                         <div className="flex items-center">
                                             Property <SortIcon columnKey="propertyAddress" />
                                         </div>
                                     </TableHead>
                                     <TableHead
-                                        onClick=***REMOVED***() => handleSort('applicationDate')***REMOVED***
+                                        onClick={() => handleSort('applicationDate')}
                                         className="hidden cursor-pointer hover:bg-muted/50 md:table-cell"
                                     >
                                         <div className="flex items-center">
                                             Application Date <SortIcon columnKey="applicationDate" />
                                         </div>
                                     </TableHead>
-                                    <TableHead onClick=***REMOVED***() => handleSort('status')***REMOVED*** className="cursor-pointer hover:bg-muted/50">
+                                    <TableHead onClick={() => handleSort('status')} className="cursor-pointer hover:bg-muted/50">
                                         <div className="flex items-center">
                                             Status <SortIcon columnKey="status" />
                                         </div>
                                     </TableHead>
                                     <TableHead
-                                        onClick=***REMOVED***() => handleSort('lastUpdated')***REMOVED***
+                                        onClick={() => handleSort('lastUpdated')}
                                         className="hidden cursor-pointer text-right hover:bg-muted/50 sm:table-cell"
                                     >
                                         <div className="flex items-center justify-end">
@@ -339,40 +339,40 @@ export default function RentalApplicationsPage() ***REMOVED***
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                ***REMOVED***filteredAndSortedRentalApplications.map((app) => (
-                                    <TableRow key=***REMOVED***app.id***REMOVED***>
+                                {filteredAndSortedRentalApplications.map((app) => (
+                                    <TableRow key={app.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="h-10 w-10">
-                                                    <AvatarImage src=***REMOVED***app.applicantAvatar || '/placeholder.svg'***REMOVED*** alt=***REMOVED***app.applicantName***REMOVED*** />
+                                                    <AvatarImage src={app.applicantAvatar || '/placeholder.svg'} alt={app.applicantName} />
                                                     <AvatarFallback>
-                                                        ***REMOVED***app.applicantName
+                                                        {app.applicantName
                                                             .split(' ')
                                                             .map((n) => n[0])
-                                                            .join('')***REMOVED***
+                                                            .join('')}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div>
-                                                    <Link href=***REMOVED***`/dashboard/tenants/$***REMOVED***app.applicantId***REMOVED***`***REMOVED*** className="font-medium hover:underline">
-                                                        ***REMOVED***app.applicantName***REMOVED***
+                                                    <Link href={`/dashboard/tenants/${app.applicantId}`} className="font-medium hover:underline">
+                                                        {app.applicantName}
                                                     </Link>
-                                                    <div className="text-xs text-muted-foreground">***REMOVED***app.applicantEmail***REMOVED***</div>
+                                                    <div className="text-xs text-muted-foreground">{app.applicantEmail}</div>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Link href=***REMOVED***`/dashboard/properties/$***REMOVED***app.propertyId***REMOVED***`***REMOVED*** className="hover:underline">
-                                                ***REMOVED***app.propertyAddress***REMOVED***
+                                            <Link href={`/dashboard/properties/${app.propertyId}`} className="hover:underline">
+                                                {app.propertyAddress}
                                             </Link>
                                         </TableCell>
-                                        <TableCell className="hidden md:table-cell">***REMOVED***app.applicationDate***REMOVED***</TableCell>
+                                        <TableCell className="hidden md:table-cell">{app.applicationDate}</TableCell>
                                         <TableCell>
-                                            <Badge variant=***REMOVED***getRentalApplicationStatusBadgeVariant(app.status)***REMOVED*** className="flex w-fit items-center">
-                                                <RentalApplicationStatusIcon status=***REMOVED***app.status***REMOVED*** />
-                                                ***REMOVED***app.status***REMOVED***
+                                            <Badge variant={getRentalApplicationStatusBadgeVariant(app.status)} className="flex w-fit items-center">
+                                                <RentalApplicationStatusIcon status={app.status} />
+                                                {app.status}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="hidden text-right sm:table-cell">***REMOVED***app.lastUpdated***REMOVED***</TableCell>
+                                        <TableCell className="hidden text-right sm:table-cell">{app.lastUpdated}</TableCell>
                                         <TableCell className="text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
@@ -386,7 +386,7 @@ export default function RentalApplicationsPage() ***REMOVED***
                                                     <DropdownMenuItem>
                                                         <Eye className="mr-2 h-4 w-4" /> View Full RentalApplication
                                                     </DropdownMenuItem>
-                                                    ***REMOVED***app.status === 'Under Review' || app.status === 'Submitted' ? (
+                                                    {app.status === 'Under Review' || app.status === 'Submitted' ? (
                                                         <>
                                                             <DropdownMenuItem>
                                                                 <CheckCircle className="mr-2 h-4 w-4" /> Approve RentalApplication
@@ -395,12 +395,12 @@ export default function RentalApplicationsPage() ***REMOVED***
                                                                 <XCircle className="mr-2 h-4 w-4" /> Reject RentalApplication
                                                             </DropdownMenuItem>
                                                         </>
-                                                    ) : null***REMOVED***
-                                                    ***REMOVED***app.status === 'Approved' && (
+                                                    ) : null}
+                                                    {app.status === 'Approved' && (
                                                         <DropdownMenuItem>
                                                             <Send className="mr-2 h-4 w-4" /> Send Lease Agreement
                                                         </DropdownMenuItem>
-                                                    )***REMOVED***
+                                                    )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem>
                                                         <Edit3 className="mr-2 h-4 w-4" /> Edit RentalApplication Notes
@@ -409,20 +409,20 @@ export default function RentalApplicationsPage() ***REMOVED***
                                             </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
-                                ))***REMOVED***
+                                ))}
                             </TableBody>
                         </Table>
                     </div>
-                    ***REMOVED***filteredAndSortedRentalApplications.length === 0 && (
+                    {filteredAndSortedRentalApplications.length === 0 && (
                         <div className="py-10 text-center">
                             <p className="text-lg text-muted-foreground">No applications match your filters.</p>
-                            <Button onClick=***REMOVED***clearFilters***REMOVED*** variant="link">
+                            <Button onClick={clearFilters} variant="link">
                                 Clear all filters
                             </Button>
                         </div>
-                    )***REMOVED***
+                    )}
                 </div>
             </div>
         </AppLayout>
     );
-***REMOVED***
+}

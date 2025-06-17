@@ -1,10 +1,10 @@
-import ***REMOVED*** cn ***REMOVED*** from '@/lib/utils';
-import ***REMOVED*** type HTMLAttributes ***REMOVED*** from 'react';
+import { cn } from '@/lib/utils';
+import { type HTMLAttributes } from 'react';
 
-export default function InputError(***REMOVED*** message, className = '', ...props ***REMOVED***: HTMLAttributes<HTMLParagraphElement> & ***REMOVED*** message?: string ***REMOVED***) ***REMOVED***
+export default function InputError({ message, className = '', ...props }: HTMLAttributes<HTMLParagraphElement> & { message?: string }) {
     return message ? (
-        <p ***REMOVED***...props***REMOVED*** className=***REMOVED***cn('text-sm text-red-600 dark:text-red-400', className)***REMOVED***>
-            ***REMOVED***message***REMOVED***
+        <p {...props} className={cn('text-sm text-red-600 dark:text-red-400', className)}>
+            {message}
         </p>
     ) : null;
-***REMOVED***
+}
