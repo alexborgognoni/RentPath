@@ -8,22 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { OccupancyStatus, PropertyType } from '@/types/property';
-import { Head, useForm } from '@inertiajs/react';
+import { BreadcrumbItem } from '@/types';
+import { OccupancyStatus, Property, PropertyType } from '@/types/property';
+import { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { Calendar, Home, Image as ImageIcon, Key, PlusCircle, ScanEye, Upload, X } from 'lucide-react';
 import { FormEvent, useRef, useState } from 'react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Properties',
-        href: '/dashboard/properties',
-    },
-    {
-        title: 'Add New Property',
-        href: '/dashboard/properties/create',
-    },
-];
 
 const propertyTypes: PropertyType[] = [
     'House',
@@ -43,7 +33,28 @@ const occupancyStatuses: OccupancyStatus[] = ['Occupied', 'Vacant', 'Under Maint
 const heatingTypes = ['Central', 'Electric', 'Gas', 'Oil', 'Solar', 'None'];
 const energyClasses = ['A+++', 'A++', 'A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
-export default function AddPropertyPage() {
+interface PageProps extends InertiaPageProps {
+    property: Property;
+}
+
+export default function EditPropertyPage() {
+    const { property } = usePage<PageProps>().props;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Properties',
+            href: '/dashboard/properties',
+        },
+        {
+            title: property.address,
+            href: `/dashboard/properties/${property.id}`,
+        },
+        {
+            title: 'Edit',
+            href: `/dashboard/properties/${property.id}/edit`,
+        },
+    ];
+
     const { data, setData, post, processing, errors } = useForm({
         // Core Info
         title: '',
@@ -112,7 +123,7 @@ export default function AddPropertyPage() {
         const newGalleryImages = [...data.gallery_images, ...files];
         setData('gallery_images', newGalleryImages);
 
-        // Create previews for new images
+        // edit previews for new images
         files.forEach((file) => {
             const reader = new FileReader();
             reader.onload = () => {
@@ -140,7 +151,7 @@ export default function AddPropertyPage() {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-        // Create FormData for file uploads
+        // edit FormData for file uploads
         const formData = new FormData();
 
         // Add all form fields
@@ -713,7 +724,7 @@ export default function AddPropertyPage() {
                                     </Button>
                                     <Button type="submit" disabled={processing}>
                                         <PlusCircle className="mr-2 h-4 w-4" />
-                                        {processing ? 'Creating...' : 'Create Property'}
+                                        {processing ? 'Creating...' : 'edit Property'}
                                     </Button>
                                 </div>
                             </form>

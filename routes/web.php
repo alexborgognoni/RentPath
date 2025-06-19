@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/', [PropertyController::class, 'store']);
             Route::get('/create', [PropertyController::class, 'create']);
             Route::get('/{property}', [PropertyController::class, 'show'])->name('properties.show');
+            Route::get('/{property}/edit', [PropertyController::class, 'edit'])->name('properties.edit');
         });
         Route::get('/applications', [DashboardController::class, 'applications']);
         Route::get('/tenants', [DashboardController::class, 'tenants']);

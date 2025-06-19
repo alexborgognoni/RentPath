@@ -15,6 +15,8 @@ class Property extends Model implements HasMedia
 
     protected $keyType = 'string';
     public $incrementing = false;
+
+    protected $guarded = ['latitude', 'longitude'];
     protected $appends = ['cover_image_url', 'photo_gallery'];
 
     protected $fillable = [
@@ -24,8 +26,6 @@ class Property extends Model implements HasMedia
         'city',
         'postal_code',
         'country',
-        'latitude',
-        'longitude',
         'occupancy_status',
         'rent_amount',
         'security_deposit',
