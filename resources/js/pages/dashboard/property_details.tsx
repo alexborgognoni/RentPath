@@ -30,7 +30,9 @@ import {
     Thermometer,
     Trash2,
     Users,
+    X,
 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface PageProps extends InertiaPageProps {
     property: Property;
@@ -51,6 +53,12 @@ const getOccupancyStatusBadgeVariant = (status: OccupancyStatus) => {
 
 const PropertyDetailsPage = () => {
     const { property } = usePage<PageProps>().props;
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [maxVisibleThumbs, setMaxVisibleThumbs] = useState(6);
+    const thumbsContainerRef = useRef<HTMLDivElement>(null);
+    const thumbWidth = 64; // 16 (w-16) * 4 = 64px
+    const [api, setApi] = useState<any>();
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -76,9 +84,108 @@ const PropertyDetailsPage = () => {
         ...(property.energy_class ? [{ icon: <HousePlug className="h-4 w-4" />, label: `Energy class: ${property.energy_class}` }] : []),
     ];
 
+    const images = [property.cover_image_url || '', ...property.photo_gallery];
+    const extraImagesCount = images.length > maxVisibleThumbs ? images.length - maxVisibleThumbs : 0;
+
+    const openFullscreen = (index: number) => {
+        setCurrentImageIndex(index);
+        setIsFullscreen(true);
+    };
+
+    const closeFullscreen = () => {
+        setIsFullscreen(false);
+    };
+
+    useEffect(() => {
+        const calculateVisibleThumbs = () => {
+            if (thumbsContainerRef.current) {
+                const containerWidth = thumbsContainerRef.current.offsetWidth;
+                const gap = 8; // gap-2 = 8px
+                const calculatedMax = Math.floor((containerWidth + gap) / (thumbWidth + gap));
+                setMaxVisibleThumbs(Math.max(1, calculatedMax)); // Ensure at least 1 thumbnail is shown
+            }
+        };
+
+        calculateVisibleThumbs();
+        window.addEventListener('resize', calculateVisibleThumbs);
+        return () => window.removeEventListener('resize', calculateVisibleThumbs);
+    }, []);
+
+    useEffect(() => {
+        if (!api) return;
+
+        api.on('select', () => {
+            setCurrentImageIndex(api.selectedScrollSnap());
+        });
+    }, [api]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Property - ${property.address}`} />
+
+            {/* Fullscreen Carousel Modal */}
+            {isFullscreen && (
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-4 backdrop-blur-sm">
+                    <button
+                        onClick={closeFullscreen}
+                        className="absolute top-4 right-4 z-50 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+                    >
+                        <X className="h-6 w-6" />
+                    </button>
+
+                    <div className="relative mb-4 flex h-[80vh] w-full max-w-6xl items-center justify-center">
+                        <Carousel
+                            opts={{
+                                startIndex: currentImageIndex,
+                            }}
+                            setApi={setApi}
+                            className="h-full w-full"
+                        >
+                            <CarouselContent className="h-full">
+                                {images.map((image, index) => (
+                                    <CarouselItem key={index} className="flex h-full items-center justify-center">
+                                        <div className="flex h-full w-full items-center justify-center">
+                                            {' '}
+                                            <img
+                                                src={image}
+                                                alt={`Property ${index + 1}`}
+                                                className="h-full w-full object-contain"
+                                                style={{
+                                                    width: 'auto',
+                                                    height: 'auto',
+                                                    maxHeight: '100%',
+                                                    maxWidth: '100%',
+                                                    aspectRatio: '16/9',
+                                                }}
+                                            />
+                                        </div>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious className="left-2 text-white hover:text-white/80" />
+                            <CarouselNext className="right-2 text-white hover:text-white/80" />
+                        </Carousel>
+                    </div>
+
+                    {/* Fullscreen Thumbnail Slider - Shows all images */}
+                    <div className="w-full max-w-4xl">
+                        <div className="flex flex-wrap justify-center gap-2">
+                            {images.map((image, index) => (
+                                <div
+                                    key={index}
+                                    className={`relative h-16 w-16 flex-shrink-0 cursor-pointer overflow-hidden rounded-md border-2 ${currentImageIndex === index ? 'border-white' : 'border-transparent'}`}
+                                    onClick={() => {
+                                        setCurrentImageIndex(index);
+                                        api?.scrollTo(index);
+                                    }}
+                                >
+                                    <img src={image} alt={`Thumbnail ${index + 1}`} className="h-full w-full object-cover" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="flex flex-1 flex-col">
                 <DashboardHeader title={property.title} />
@@ -96,13 +203,11 @@ const PropertyDetailsPage = () => {
                                 <CardContent>
                                     {property.photo_gallery && property.photo_gallery.length > 0 ? (
                                         <div className="relative">
-                                            {' '}
                                             <Carousel>
                                                 <CarouselContent>
-                                                    {[property.cover_image_url || '', ...property.photo_gallery].map((image, index) => (
+                                                    {images.map((image, index) => (
                                                         <CarouselItem key={index}>
-                                                            {' '}
-                                                            <div className="h-80 w-full">
+                                                            <div className="h-80 w-full cursor-pointer" onClick={() => openFullscreen(index)}>
                                                                 <img
                                                                     src={image}
                                                                     alt={`Property ${index + 1}`}
@@ -112,9 +217,27 @@ const PropertyDetailsPage = () => {
                                                         </CarouselItem>
                                                     ))}
                                                 </CarouselContent>
-                                                <CarouselPrevious className="left-2" /> {/* Position buttons */}
+                                                <CarouselPrevious className="left-2" />
                                                 <CarouselNext className="right-2" />
                                             </Carousel>
+
+                                            {/* Thumbnail Preview with +X count */}
+                                            <div className="mt-4 flex flex-wrap gap-2" ref={thumbsContainerRef}>
+                                                {images.slice(0, maxVisibleThumbs).map((image, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className={`relative h-16 w-16 flex-shrink-0 cursor-pointer overflow-hidden rounded-md ${index === maxVisibleThumbs - 1 && extraImagesCount > 0 ? 'opacity-70' : ''}`}
+                                                        onClick={() => openFullscreen(index)}
+                                                    >
+                                                        <img src={image} alt={`Thumbnail ${index + 1}`} className="h-full w-full object-cover" />
+                                                        {index === maxVisibleThumbs - 1 && extraImagesCount > 0 && (
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 font-bold text-white">
+                                                                +{extraImagesCount}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     ) : (
                                         <div className="flex h-60 items-center justify-center rounded-lg bg-muted">
@@ -127,7 +250,7 @@ const PropertyDetailsPage = () => {
                                 </CardContent>
                             </Card>
 
-                            {/* Property details */}
+                            {/* Rest of your existing content remains exactly the same */}
                             <Card>
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
@@ -212,7 +335,6 @@ const PropertyDetailsPage = () => {
                                 </CardContent>
                             </Card>
 
-                            {/* Virtual tour */}
                             {property.virtual_tour_url && (
                                 <Card>
                                     <CardHeader>
@@ -220,7 +342,6 @@ const PropertyDetailsPage = () => {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="aspect-video rounded-lg bg-muted">
-                                            {/* Virtual tour embed would go here */}
                                             <div className="flex h-full items-center justify-center">
                                                 <div className="text-center text-muted-foreground">
                                                     <Eye className="mx-auto h-8 w-8" />
@@ -232,7 +353,6 @@ const PropertyDetailsPage = () => {
                                 </Card>
                             )}
 
-                            {/* Location */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Location</CardTitle>
@@ -251,7 +371,6 @@ const PropertyDetailsPage = () => {
 
                                         {property.latitude && property.longitude && (
                                             <div className="mt-4 h-64 rounded-lg bg-muted">
-                                                {/* Map integration would go here */}
                                                 <div className="flex h-full items-center justify-center">
                                                     <div className="text-center text-muted-foreground">
                                                         <Globe className="mx-auto h-8 w-8" />
@@ -265,9 +384,8 @@ const PropertyDetailsPage = () => {
                             </Card>
                         </div>
 
-                        {/* Sidebar - Removed virtual tour from here */}
+                        {/* Sidebar */}
                         <div className="space-y-6">
-                            {/* Actions */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Actions</CardTitle>
@@ -286,7 +404,6 @@ const PropertyDetailsPage = () => {
                                 </CardContent>
                             </Card>
 
-                            {/* Status */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Status</CardTitle>

@@ -49,7 +49,7 @@ export interface Property {
     energy_class: string;
 
     cover_image_url: string | null;
-    photo_gallery: string[] | null;
+    photo_gallery: string[];
     virtual_tour_url: string | null;
 
     is_visible: boolean;
