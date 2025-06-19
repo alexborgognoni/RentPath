@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Property;
-use App\Http\Resources\PropertyResource;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
@@ -17,7 +16,7 @@ class DashboardController extends Controller
     public function properties(Request $request)
     {
         return Inertia::render('dashboard/properties', [
-            'properties' => PropertyResource::collection(Property::all())->toArray($request)
+            'properties' => Property::all()->toArray($request)
         ]);
     }
 
