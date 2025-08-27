@@ -1,5 +1,6 @@
 import { AppHeader } from '@/components/app-header';
 import { translate as t } from '@/utils/translate-utils';
+import { motion } from 'framer-motion';
 import { ArrowRight, FileText, Home, Users } from 'lucide-react';
 
 export default function WelcomePage() {
@@ -9,6 +10,7 @@ export default function WelcomePage() {
 
             {/* Hero Section */}
             <section className="relative py-24 lg:py-32">
+                {/* Background blobs */}
                 <div className="absolute inset-0">
                     <div className="absolute top-20 right-20 h-64 w-64 rounded-full bg-gradient-to-br from-secondary/10 to-primary/10 blur-3xl dark:from-secondary/20 dark:to-primary/20" />
                     <div className="absolute bottom-20 left-20 h-48 w-48 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 blur-2xl dark:from-primary/20 dark:to-secondary/20" />
@@ -16,17 +18,47 @@ export default function WelcomePage() {
                 </div>
 
                 <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-                    <h1 className="text-text-primary dark:text-text-primary mb-8 text-5xl leading-tight font-bold lg:text-7xl">
-                        {t('landingTitle')}
-                        <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                            {' '}
+                    {/* Animated headline */}
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                        viewport={{ once: false, amount: 0.6 }}
+                        className="text-text-primary dark:text-text-primary mb-8 text-5xl leading-tight font-bold lg:text-7xl"
+                    >
+                        {t('landingTitle') + ' '}
+                        <motion.span
+                            initial={{ backgroundPosition: '200% 0' }}
+                            whileInView={{ backgroundPosition: '0% 0' }}
+                            transition={{ duration: 1.5, ease: 'easeOut' }}
+                            viewport={{ once: false }}
+                            className="inline-block bg-gradient-to-r from-primary to-secondary bg-[length:200%_100%] bg-clip-text text-transparent"
+                        >
                             {t('rentalPropertiesWorkflow')}
-                        </span>
+                        </motion.span>
                         <br />
                         {t('singleAutomatedWorkflow')}
-                    </h1>
-                    <p className="text-text-secondary dark:text-text-secondary mx-auto mb-12 max-w-3xl text-xl lg:text-2xl">{t('landingSubtitle')}</p>
-                    <div className="flex flex-col justify-center gap-6 sm:flex-row">
+                    </motion.h1>
+
+                    {/* Animated subtitle */}
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 1 }}
+                        viewport={{ once: false, amount: 0.6 }}
+                        className="text-text-secondary dark:text-text-secondary mx-auto mb-12 max-w-3xl text-xl lg:text-2xl"
+                    >
+                        {t('landingSubtitle')}
+                    </motion.p>
+
+                    {/* Animated buttons */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5, duration: 0.6 }}
+                        viewport={{ once: false, amount: 0.6 }}
+                        className="flex flex-col justify-center gap-6 sm:flex-row"
+                    >
                         <a
                             href="/register"
                             className="text-text-primary rounded-lg bg-gradient-to-r from-primary to-secondary px-8 py-4 text-lg font-semibold shadow-lg transition-all hover:scale-105"
@@ -35,11 +67,11 @@ export default function WelcomePage() {
                         </a>
                         <a
                             href="#features"
-                            className="text-text-primary dark:text-text-primary hover:bg-surface dark:hover:bg-surface rounded-lg border border-border px-8 py-4 text-lg font-semibold transition-all dark:border-border"
+                            className="text-text-primary dark:text-text-primary rounded-lg border border-border px-8 py-4 text-lg font-semibold transition-all hover:bg-surface dark:border-border dark:hover:bg-surface"
                         >
                             {t('learnMore')}
                         </a>
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -65,7 +97,7 @@ export default function WelcomePage() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                        <div className="group bg-surface dark:bg-surface rounded-2xl border border-border p-8 transition-all hover:scale-105 hover:border-primary/50 dark:border-border">
+                        <div className="group rounded-2xl border border-border bg-surface p-8 transition-all hover:scale-105 hover:border-primary/50 dark:border-border dark:bg-surface">
                             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-primary shadow-lg">
                                 <Home className="text-text-primary h-8 w-8" />
                             </div>
@@ -75,7 +107,7 @@ export default function WelcomePage() {
                             <p className="text-text-secondary dark:text-text-secondary text-center leading-relaxed">{t('propertyManagementDesc')}</p>
                         </div>
 
-                        <div className="group bg-surface dark:bg-surface rounded-2xl border border-border p-8 transition-all hover:scale-105 hover:border-secondary/50 dark:border-border">
+                        <div className="group rounded-2xl border border-border bg-surface p-8 transition-all hover:scale-105 hover:border-secondary/50 dark:border-border dark:bg-surface">
                             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-secondary shadow-lg">
                                 <Users className="text-text-primary h-8 w-8" />
                             </div>
@@ -85,7 +117,7 @@ export default function WelcomePage() {
                             <p className="text-text-secondary dark:text-text-secondary text-center leading-relaxed">{t('tenantApplicationsDesc')}</p>
                         </div>
 
-                        <div className="group bg-surface dark:bg-surface rounded-2xl border border-border p-8 transition-all hover:scale-105 hover:border-primary/50 dark:border-border">
+                        <div className="group rounded-2xl border border-border bg-surface p-8 transition-all hover:scale-105 hover:border-primary/50 dark:border-border dark:bg-surface">
                             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-secondary shadow-lg">
                                 <FileText className="text-text-primary h-8 w-8" />
                             </div>
@@ -112,7 +144,7 @@ export default function WelcomePage() {
             </section>
 
             {/* Footer */}
-            <footer className="bg-surface border-t border-border py-16 dark:border-border">
+            <footer className="border-t border-border bg-surface py-16 dark:border-border">
                 <div className="text-text-secondary mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
                         <div className="md:col-span-2">
