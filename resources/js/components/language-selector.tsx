@@ -1,8 +1,8 @@
+import { SharedData } from '@/types';
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { usePage } from '@inertiajs/react';
-import { SharedData } from '@/types';
 
 const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -36,7 +36,7 @@ export function LanguageSelector({ currentLanguage }: LanguageSelectorProps) {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center space-x-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-gray-300 transition-all duration-200 hover:bg-white/20 hover:text-white"
+                className="text-text-secondary hover:text-text-primary bg-surface flex items-center space-x-2 rounded-lg border border-border px-3 py-2 text-sm font-medium transition-all duration-200 hover:bg-background"
             >
                 <span>{currentLang?.flag}</span>
                 <span className="hidden sm:block">{currentLang?.name}</span>
@@ -46,14 +46,14 @@ export function LanguageSelector({ currentLanguage }: LanguageSelectorProps) {
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
-                    <div className="absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
+                    <div className="bg-surface absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-lg border border-border shadow-xl">
                         <div className="py-1">
                             {languages.map((lang) => (
                                 <button
                                     key={lang.code}
                                     onClick={() => handleLanguageChange(lang.code)}
-                                    className={`flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-gray-700 ${
-                                        locale === lang.code ? 'bg-gray-700 text-cyan-400' : 'text-gray-300'
+                                    className={`flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background ${
+                                        locale === lang.code ? 'bg-background text-primary' : 'text-text-secondary'
                                     }`}
                                 >
                                     <span>{lang.flag}</span>
