@@ -31,7 +31,7 @@ export function CurrencySelector() {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center space-x-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-gray-300 transition-all duration-200 hover:bg-white/20 hover:text-white"
+                className="bg-surface text-text-secondary hover:text-text-primary flex items-center space-x-2 rounded-lg border border-border px-3 py-2 text-sm font-medium transition-all duration-200 hover:bg-background"
             >
                 <span>{currentCurrencyData?.flag}</span>
                 <span className="hidden sm:block">{currentCurrencyData?.code}</span>
@@ -41,14 +41,14 @@ export function CurrencySelector() {
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
-                    <div className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
+                    <div className="bg-surface absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-lg border border-border shadow-xl">
                         <div className="py-1">
                             {currencies.map((currency: Currency) => (
                                 <button
                                     key={currency.code}
                                     onClick={() => handleCurrencyChange(currency.code)}
-                                    className={`flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-gray-700 ${
-                                        currentCurrency === currency.code ? 'bg-gray-700 text-cyan-400' : 'text-gray-300'
+                                    className={`flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background ${
+                                        currentCurrency === currency.code ? 'bg-background text-primary' : 'text-text-secondary'
                                     }`}
                                 >
                                     <span className="text-base">{currency.flag}</span>

@@ -34,13 +34,13 @@ export function AppHeader({ title }: AppHeaderProps) {
     };
 
     return (
-        <header className="bg-surface/90 dark:bg-surface/90 sticky top-0 z-40 border-b border-border backdrop-blur-md">
+        <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
             <div ref={containerRef} className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Left: Logo + Title */}
                 <div className="flex items-center space-x-3">
                     <button
                         onClick={handleLogoClick}
-                        className="hover:bg-surface dark:bg-surface flex items-center space-x-2 rounded-lg border border-border bg-background px-3 py-2 transition-all duration-200 dark:border-border dark:hover:bg-background"
+                        className="flex items-center space-x-2 rounded-lg border border-border bg-background px-3 py-2 transition-all duration-200 hover:bg-surface dark:border-border dark:bg-surface dark:hover:bg-background"
                     >
                         <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-r from-primary to-secondary">
                             <Home className="h-4 w-4 text-white" />
@@ -60,7 +60,7 @@ export function AppHeader({ title }: AppHeaderProps) {
                 <div className="flex items-center space-x-4">
                     {/* Theme toggle */}
                     <button
-                        className="hover:bg-surface dark:hover:bg-surface rounded-lg p-2 transition-colors"
+                        className="rounded-lg p-2 transition-colors hover:bg-surface dark:hover:bg-surface"
                         onClick={() => document.documentElement.classList.toggle('dark')}
                         title="Toggle dark mode"
                     >
@@ -70,12 +70,22 @@ export function AppHeader({ title }: AppHeaderProps) {
                     <CurrencySelector />
                     <LanguageSelector />
 
+                    {/* Login Button - only show when not authenticated */}
+                    {!auth.user && (
+                        <a
+                            href="/login"
+                            className="rounded-lg bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-105"
+                        >
+                            Login
+                        </a>
+                    )}
+
                     {/* User Menu */}
                     {auth.user && (
                         <div className="relative">
                             <button
                                 onClick={() => setShowUserMenu(!showUserMenu)}
-                                className="hover:bg-surface dark:bg-surface flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-background dark:border-border dark:hover:bg-background"
+                                className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-background hover:bg-surface dark:border-border dark:bg-surface dark:hover:bg-background"
                             >
                                 {auth.user.avatar ? (
                                     <img src={auth.user.avatar} alt={auth.user.name} className="h-full w-full object-cover" />
@@ -87,7 +97,7 @@ export function AppHeader({ title }: AppHeaderProps) {
                             {showUserMenu && (
                                 <>
                                     <div className="fixed inset-0 z-30" onClick={() => setShowUserMenu(false)} />
-                                    <div className="bg-surface dark:bg-surface absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-lg border border-border shadow-lg dark:border-border">
+                                    <div className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-lg border border-border bg-surface shadow-lg dark:border-border dark:bg-surface">
                                         <div className="flex items-center space-x-3 border-b border-border px-4 py-3 dark:border-border">
                                             {auth.user.avatar ? (
                                                 <img src={auth.user.avatar} alt={auth.user.name} className="h-8 w-8 rounded-full object-cover" />

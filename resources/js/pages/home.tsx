@@ -28,7 +28,7 @@ export default function WelcomePage() {
                     <p className="text-text-secondary dark:text-text-secondary mx-auto mb-12 max-w-3xl text-xl lg:text-2xl">{t('landingSubtitle')}</p>
                     <div className="flex flex-col justify-center gap-6 sm:flex-row">
                         <a
-                            href="/account/signup"
+                            href="/register"
                             className="text-text-primary rounded-lg bg-gradient-to-r from-primary to-secondary px-8 py-4 text-lg font-semibold shadow-lg transition-all hover:scale-105"
                         >
                             {t('getStarted')}
@@ -103,7 +103,7 @@ export default function WelcomePage() {
                 <h2 className="text-text-primary mb-6 text-4xl font-bold lg:text-5xl">{t('readyToTransform')}</h2>
                 <p className="text-text-secondary mx-auto mb-10 max-w-3xl text-xl">{t('ctaSubtitle')}</p>
                 <a
-                    href="/account/signup"
+                    href="/register"
                     className="text-text-primary inline-flex items-center rounded-lg bg-gradient-to-r from-primary to-secondary px-10 py-4 text-lg font-bold shadow-lg transition-all hover:scale-105 hover:from-primary hover:to-secondary"
                 >
                     {t('startYourFreeTrial')}
@@ -128,12 +128,12 @@ export default function WelcomePage() {
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/account/signup" className="hover:text-primary">
+                                    <a href="/register" className="hover:text-primary">
                                         {t('pricing')}
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/account/signup" className="hover:text-primary">
+                                    <a href="/register" className="hover:text-primary">
                                         {t('freeTrial')}
                                     </a>
                                 </li>
