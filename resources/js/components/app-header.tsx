@@ -1,9 +1,10 @@
 import { CurrencySelector } from '@/components/currency-selector';
 import { LanguageSelector } from '@/components/language-selector';
+import { LogoHomeButton } from '@/components/logo-home-button';
 import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { Home, LogOut, Moon, Sun, User } from 'lucide-react';
+import { LogOut, Moon, Sun, User } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 interface AppHeaderProps {
@@ -29,24 +30,12 @@ export function AppHeader({ title }: AppHeaderProps) {
         return 'U';
     };
 
-    const handleLogoClick = () => {
-        window.location.href = '/';
-    };
-
     return (
         <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
             <div ref={containerRef} className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Left: Logo + Title */}
                 <div className="flex items-center space-x-3">
-                    <button
-                        onClick={handleLogoClick}
-                        className="flex items-center space-x-2 rounded-lg border border-border bg-background px-3 py-2 transition-all duration-200 hover:bg-surface dark:border-border dark:bg-surface dark:hover:bg-background"
-                    >
-                        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-r from-primary to-secondary">
-                            <Home className="h-4 w-4 text-white" />
-                        </div>
-                        <span className="text-text-primary dark:text-text-primary text-lg font-bold">RentPath</span>
-                    </button>
+                    <LogoHomeButton />
 
                     {title && (
                         <>
