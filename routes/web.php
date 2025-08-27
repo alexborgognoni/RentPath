@@ -1,11 +1,18 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('home');
+
+Route::post('/locale', function (Request $request) {
+    $locale = $request->input('locale');
+    if (in_array($locale, ['en', 'fr', 'de', 'nl'])) {
+        session(['locale' => $locale]);
+    }
+    return response()->json(['locale' => session('locale')]);
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
