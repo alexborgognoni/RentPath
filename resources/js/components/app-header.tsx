@@ -1,17 +1,18 @@
 import { CurrencySelector } from '@/components/currency-selector';
 import { LanguageSelector } from '@/components/language-selector';
 import { LogoHomeButton } from '@/components/logo-home-button';
-import { SharedData } from '@/types';
+import { SharedData, type BreadcrumbItem } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { LogOut, Moon, Sun, User } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 interface AppHeaderProps {
     title?: string;
+    breadcrumbs?: BreadcrumbItem[];
 }
 
-export function AppHeader({ title }: AppHeaderProps) {
+export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const [showUserMenu, setShowUserMenu] = useState(false);
@@ -37,25 +38,33 @@ export function AppHeader({ title }: AppHeaderProps) {
                 <div className="flex items-center space-x-3">
                     <LogoHomeButton />
 
-                    {title && (
+                    {(breadcrumbs?.length || title) && (
                         <>
                             <div className="hidden h-6 w-px bg-border sm:block dark:bg-border" />
-                            <h1 className="text-text-primary dark:text-text-primary hidden text-xl font-semibold sm:block">{title}</h1>
+                            {breadcrumbs?.length ? (
+                                <nav className="hidden items-center space-x-2 text-sm sm:flex">
+                                    {breadcrumbs.map((crumb, index) => (
+                                        <div key={crumb.href} className="flex items-center space-x-2">
+                                            {index > 0 && <span className="text-muted-foreground">/</span>}
+                                            {index === breadcrumbs.length - 1 ? (
+                                                <span className="font-semibold text-foreground">{crumb.title}</span>
+                                            ) : (
+                                                <a href={crumb.href} className="text-muted-foreground transition-colors hover:text-foreground">
+                                                    {crumb.title}
+                                                </a>
+                                            )}
+                                        </div>
+                                    ))}
+                                </nav>
+                            ) : (
+                                <h1 className="hidden text-xl font-semibold text-foreground sm:block">{title}</h1>
+                            )}
                         </>
                     )}
                 </div>
 
-                {/* Right: Theme toggle + Currency + Language + User */}
+                {/* Right: Currency + Language + User */}
                 <div className="flex items-center space-x-4">
-                    {/* Theme toggle */}
-                    <button
-                        className="rounded-lg p-2 transition-colors hover:bg-surface dark:hover:bg-surface"
-                        onClick={() => document.documentElement.classList.toggle('dark')}
-                        title="Toggle dark mode"
-                    >
-                        {document.documentElement.classList.contains('dark') ? <Sun size={20} /> : <Moon size={20} />}
-                    </button>
-
                     <CurrencySelector />
                     <LanguageSelector />
 
@@ -74,42 +83,41 @@ export function AppHeader({ title }: AppHeaderProps) {
                         <div className="relative">
                             <button
                                 onClick={() => setShowUserMenu(!showUserMenu)}
-                                className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-background hover:bg-surface dark:border-border dark:bg-surface dark:hover:bg-background"
+                                className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white/20 bg-gradient-to-br from-primary to-secondary shadow-lg transition-all hover:scale-105 hover:shadow-xl"
                             >
                                 {auth.user.avatar ? (
                                     <img src={auth.user.avatar} alt={auth.user.name} className="h-full w-full object-cover" />
                                 ) : (
-                                    <span className="text-text-primary dark:text-text-primary text-sm font-medium">{getUserInitials(auth.user)}</span>
+                                    <span className="text-sm font-semibold text-white">{getUserInitials(auth.user)}</span>
                                 )}
                             </button>
 
                             {showUserMenu && (
                                 <>
                                     <div className="fixed inset-0 z-30" onClick={() => setShowUserMenu(false)} />
-                                    <div className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-lg border border-border bg-surface shadow-lg dark:border-border dark:bg-surface">
-                                        <div className="flex items-center space-x-3 border-b border-border px-4 py-3 dark:border-border">
-                                            {auth.user.avatar ? (
-                                                <img src={auth.user.avatar} alt={auth.user.name} className="h-8 w-8 rounded-full object-cover" />
-                                            ) : (
-                                                <User size={14} className="text-text-secondary dark:text-text-secondary" />
-                                            )}
-                                            <div className="min-w-0 flex-1">
-                                                {auth.user.name && (
-                                                    <p className="text-text-primary dark:text-text-primary truncate text-sm font-medium">
-                                                        {auth.user.name}
-                                                    </p>
-                                                )}
-                                                <p className="text-text-secondary dark:text-text-secondary truncate text-xs">{auth.user.email}</p>
+                                    <div className="absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
+                                        <div className="border-b border-border px-4 py-3">
+                                            <div className="min-w-0">
+                                                {auth.user.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
+                                                <p className="truncate text-xs text-muted-foreground">{auth.user.email}</p>
                                             </div>
                                         </div>
 
                                         <div className="py-1">
                                             <a
+                                                href="/settings"
+                                                className="text-text-secondary flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background"
+                                            >
+                                                <Settings size={16} />
+                                                <span>Settings</span>
+                                            </a>
+                                            <div className="mb-1 border-t border-border"></div>
+                                            <a
                                                 href="/account/logout"
-                                                className="text-error hover:bg-error/10 dark:text-error dark:hover:bg-error/20 flex w-full items-center space-x-3 px-4 py-3 text-left text-sm transition-colors"
+                                                className="flex w-full items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10"
                                             >
                                                 <LogOut size={16} />
-                                                <span className="font-medium">{t('signOut')}</span>
+                                                <span>{t('signOut')}</span>
                                             </a>
                                         </div>
                                     </div>
