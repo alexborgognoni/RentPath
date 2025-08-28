@@ -14,18 +14,28 @@ export interface Agent {
 
 export interface Property {
     id: number;
+    user_id: number;
     title: string;
     address: string;
-    city: string;
+    description?: string;
+    image_url?: string;
+    type: 'apartment' | 'house' | 'condo' | 'townhouse' | 'studio' | 'loft' | 'room' | 'office' | 'garage' | 'storage' | 'warehouse' | 'retail' | 'commercial';
+    bedrooms: number;
+    bathrooms: number;
+    parking_spots: number;
+    size?: number;
+    size_unit: 'square_meters' | 'square_feet';
+    available_date?: string;
     rent_amount: number;
-    bedrooms?: number;
-    bathrooms?: number;
-    square_meters?: number;
-    apartment_image?: string;
+    rent_currency: 'eur' | 'usd' | 'gbp' | 'chf';
     invite_token: string;
-    tenant_count: number;
+    is_active: boolean;
+    tenant_count?: number; // This will be computed/added by backend
     created_at: string;
     updated_at: string;
+    // Computed attributes
+    formatted_rent?: string;
+    formatted_size?: string;
 }
 
 export interface DashboardData {
@@ -47,12 +57,18 @@ export interface AgentFormData {
 export interface PropertyFormData {
     title: string;
     address: string;
-    city: string;
+    description?: string;
+    image_url?: string;
+    type: Property['type'];
+    bedrooms: number;
+    bathrooms: number;
+    parking_spots: number;
+    size?: number;
+    size_unit: Property['size_unit'];
+    available_date?: string;
     rent_amount: number;
-    bedrooms?: number;
-    bathrooms?: number;
-    square_meters?: number;
-    apartment_image?: string;
+    rent_currency: Property['rent_currency'];
+    is_active?: boolean;
 }
 
 export interface TenantApplication {
