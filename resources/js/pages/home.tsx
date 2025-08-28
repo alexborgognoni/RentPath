@@ -1,21 +1,22 @@
 import { AppHeader } from '@/components/app-header';
+import { ParallaxBackground } from '@/components/parallax-background';
+import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ArrowRight, FileText, Home, Users } from 'lucide-react';
+import { ArrowRight, Codesandbox, FileText, Home, Users } from 'lucide-react';
 
 export default function WelcomePage() {
+    const page = usePage<SharedData>();
+    const { auth } = page.props;
     return (
-        <div className="min-h-screen bg-background dark:bg-background">
+        <div className="min-h-screen">
             <AppHeader />
 
             {/* Hero Section */}
-            <section className="relative py-24 lg:py-32">
-                {/* Background blobs */}
-                <div className="absolute inset-0">
-                    <div className="absolute top-20 right-20 h-64 w-64 rounded-full bg-gradient-to-br from-secondary/10 to-primary/10 blur-3xl dark:from-secondary/20 dark:to-primary/20" />
-                    <div className="absolute bottom-20 left-20 h-48 w-48 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 blur-2xl dark:from-primary/20 dark:to-secondary/20" />
-                    <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-secondary/5 to-primary/5 blur-3xl dark:from-secondary/10 dark:to-primary/10" />
-                </div>
+            <section className="relative overflow-hidden border-b py-24 lg:py-32">
+                {/* Background blobs contained to this section */}
+                <ParallaxBackground containToSection />
 
                 <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
                     {/* Animated headline */}
@@ -63,7 +64,7 @@ export default function WelcomePage() {
                             href="/register"
                             className="text-text-primary rounded-lg bg-gradient-to-r from-primary to-secondary px-8 py-4 text-lg font-semibold shadow-lg transition-all hover:scale-105"
                         >
-                            {t('getStarted')}
+                            {auth.user ? t('dashboard') : t('getStarted')}
                         </a>
                         <a
                             href="#features"
@@ -80,10 +81,22 @@ export default function WelcomePage() {
                 <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
                     <p className="text-text-secondary dark:text-text-secondary mb-8 text-sm">{t('trustedBy')}</p>
                     <div className="flex items-center justify-center space-x-12 opacity-50">
-                        <div className="text-text-secondary dark:text-text-secondary text-lg font-bold">PropertyCorp</div>
-                        <div className="text-text-secondary dark:text-text-secondary text-lg font-bold">RealEstate Plus</div>
-                        <div className="text-text-secondary dark:text-text-secondary text-lg font-bold">HomeTech</div>
-                        <div className="text-text-secondary dark:text-text-secondary text-lg font-bold">PropManage</div>
+                        <div className="text-text-secondary dark:text-text-secondary flex items-center rounded-md border border-border bg-surface p-4 text-lg font-bold">
+                            <Codesandbox className="mr-2" />
+                            PropertyCorp
+                        </div>
+                        <div className="text-text-secondary dark:text-text-secondary flex items-center rounded-md border border-border bg-surface p-4 text-lg font-bold">
+                            <Codesandbox className="mr-2" />
+                            RealEstate Plus
+                        </div>
+                        <div className="text-text-secondary dark:text-text-secondary flex items-center rounded-md border border-border bg-surface p-4 text-lg font-bold">
+                            <Codesandbox className="mr-2" />
+                            Hometech
+                        </div>
+                        <div className="text-text-secondary dark:text-text-secondary flex items-center rounded-md border border-border bg-surface p-4 text-lg font-bold">
+                            <Codesandbox className="mr-2" />
+                            PropManage
+                        </div>
                     </div>
                 </div>
             </section>
