@@ -18,6 +18,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+    
+    Route::get('property/{id}', function ($id) {
+        return Inertia::render('property', ['propertyId' => $id]);
+    })->name('property.show');
 });
 
 require __DIR__.'/settings.php';

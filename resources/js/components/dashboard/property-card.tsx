@@ -1,6 +1,6 @@
 import type { Property } from '@/types/dashboard';
 import { translate as t } from '@/utils/translate-utils';
-import { Copy, Users } from 'lucide-react';
+import { Copy, ExternalLink, Users } from 'lucide-react';
 
 interface PropertyCardProps {
     property: Property;
@@ -20,6 +20,12 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
     };
 
     const handleCardClick = () => {
+        // Navigate to property detail page
+        window.location.href = `/property/${property.id}`;
+    };
+
+    const handleEditClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (onEdit) {
             onEdit(property);
         }
@@ -59,13 +65,24 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             </div>
 
             <div className="space-y-3">
-                <button
-                    onClick={copyApplicationLink}
-                    className="flex w-full items-center justify-center space-x-2 rounded-xl border border-border bg-muted py-3 font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/80"
-                >
-                    <Copy size={16} />
-                    <span>{t('copyApplicationLink')}</span>
-                </button>
+                <div className="flex items-center space-x-2">
+                    <button
+                        onClick={copyApplicationLink}
+                        className="flex flex-1 items-center justify-center space-x-2 rounded-xl border border-border bg-muted py-3 font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/80"
+                    >
+                        <Copy size={16} />
+                        <span>{t('copyApplicationLink')}</span>
+                    </button>
+                    {onEdit && (
+                        <button
+                            onClick={handleEditClick}
+                            className="flex items-center justify-center rounded-xl border border-border bg-muted p-3 text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/80"
+                            title="Edit Property"
+                        >
+                            <ExternalLink size={16} />
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -54,3 +54,20 @@ export interface PropertyFormData {
     square_meters?: number;
     apartment_image?: string;
 }
+
+export interface TenantApplication {
+    id: number;
+    property_id: number;
+    applicant_name: string;
+    applicant_email: string;
+    applicant_phone: string;
+    monthly_income: number;
+    employment_status: string;
+    employer: string;
+    move_in_date: string;
+    application_status: 'pending' | 'approved' | 'rejected' | 'under_review';
+    documents_uploaded: string[];
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+}
