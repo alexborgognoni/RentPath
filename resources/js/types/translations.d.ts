@@ -1,9 +1,21 @@
 interface Translations {
+    addProperty: string;
+    agencyWebsite: string;
+    agentManager: string;
     allRightsReserved: string;
+    appearance: string;
+    bathrooms: string;
+    bedrooms: string;
+    company: string;
     contactUs: string;
+    copyApplicationLink: string;
     ctaSubtitle: string;
+    customizeYourExperience: string;
+    dashboard: string;
     documentManagement: string;
     documentManagementDesc: string;
+    editProfile: string;
+    email: string;
     everythingYouNeed: string;
     features: string;
     featuresSubtitle: string;
@@ -14,13 +26,29 @@ interface Translations {
     landingSubtitle: string;
     landingTitle: string;
     learnMore: string;
+    manageYourAccountPreferences: string;
+    manageYourAccountSettings: string;
+    month: string;
+    name: string;
+    nationalAgencyId: string;
+    noPropertiesDesc: string;
+    noPropertiesYet: string;
+    notProvided: string;
+    password: string;
+    phone: string;
     pricing: string;
     privacyPolicy: string;
+    privateOwner: string;
     product: string;
+    profile: string;
+    properties: string;
     propertyManagement: string;
     propertyManagementDesc: string;
     readyToTransform: string;
     rentalPropertiesWorkflow: string;
+    role: string;
+    settings: string;
+    setupAgentProfile: string;
     signOut: string;
     singleAutomatedWorkflow: string;
     startYourFreeTrial: string;
@@ -28,4 +56,6 @@ interface Translations {
     tenantApplicationsDesc: string;
     tenantApplicationsFeature: string;
     trustedBy: string;
+    updateYourPassword: string;
+    welcomeToDashboard: string;
 }
