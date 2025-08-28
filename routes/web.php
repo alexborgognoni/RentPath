@@ -22,6 +22,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('property/{id}', function ($id) {
         return Inertia::render('property', ['propertyId' => $id]);
     })->name('property.show');
+    
+    // Property resource routes
+    Route::resource('properties', App\Http\Controllers\PropertyController::class);
+    
+    // API routes for properties
+    Route::get('api/properties/token/{token}', [App\Http\Controllers\PropertyController::class, 'findByToken'])
+         ->name('properties.findByToken');
 });
 
 require __DIR__.'/settings.php';

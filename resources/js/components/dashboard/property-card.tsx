@@ -37,15 +37,15 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             onClick={handleCardClick}
         >
             {/* Property Image */}
-            {property.apartment_image && (
+            {property.image_url && (
                 <div className="mb-4 overflow-hidden rounded-xl border border-border">
-                    <img src={property.apartment_image} alt={property.title} className="h-48 w-full object-cover" />
+                    <img src={property.image_url} alt={property.title} className="h-48 w-full object-cover" />
                 </div>
             )}
 
             <h3 className="mb-2 text-xl font-bold text-foreground">{property.title}</h3>
             <p className="mb-3 text-muted-foreground">
-                {property.address}, {property.city}
+                {property.address}
             </p>
             <p className="mb-4 text-lg font-bold text-primary">
                 {formatCurrency(property.rent_amount)}/{t('month')}
@@ -56,7 +56,11 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
                     <span className="font-medium">
                         {property.bedrooms || 'N/A'} {t('bedrooms')} • {property.bathrooms || 'N/A'} {t('bathrooms')}
                     </span>
-                    {property.square_meters && <span className="font-medium text-muted-foreground/70">{property.square_meters} m²</span>}
+                    {property.size && (
+                        <span className="font-medium text-muted-foreground/70">
+                            {property.size} {property.size_unit === 'square_meters' ? 'm²' : 'ft²'}
+                        </span>
+                    )}
                 </div>
                 <span className="flex items-center rounded-full border border-border bg-muted px-3 py-1 text-muted-foreground">
                     <Users size={16} className="mr-1" />

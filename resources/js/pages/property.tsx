@@ -17,23 +17,13 @@ interface PropertyPageProps {
 }
 
 // Mock property data based on dashboard mock
-const getMockProperty = (id: string): Property & { description?: string; available_date?: string; property_type?: string; charges_amount?: number; state?: string; zip_code?: string } => {
+const getMockProperty = (id: string): Property => {
     const properties = [
         {
             id: 1,
+            user_id: 1,
             title: 'Modern Downtown Apartment',
-            address: '123 Main Street',
-            city: 'Amsterdam',
-            state: 'North Holland',
-            zip_code: '1012 AB',
-            rent_amount: 1800,
-            charges_amount: 150,
-            bedrooms: 2,
-            bathrooms: 1,
-            square_meters: 75,
-            property_type: 'apartment',
-            apartment_image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800',
-            available_date: '2024-03-15',
+            address: '123 Main Street, Amsterdam',
             description: `# Modern Living in the Heart of Amsterdam
 
 This **stunning apartment** offers the perfect blend of contemporary design and urban convenience. Located in Amsterdam's vibrant downtown area, you'll be steps away from:
@@ -52,26 +42,27 @@ This **stunning apartment** offers the perfect blend of contemporary design and 
 - Bike storage available
 
 *Perfect for professionals or couples looking for a premium city experience.*`,
+            image_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800',
+            type: 'apartment' as const,
+            bedrooms: 2,
+            bathrooms: 1,
+            parking_spots: 0,
+            size: 75,
+            size_unit: 'square_meters' as const,
+            available_date: '2024-03-15',
+            rent_amount: 1800,
+            rent_currency: 'eur' as const,
             invite_token: 'abc123def',
+            is_active: true,
             tenant_count: 2,
             created_at: '2024-01-01T00:00:00Z',
             updated_at: '2024-01-01T00:00:00Z',
         },
         {
             id: 2,
+            user_id: 1,
             title: 'Cozy Studio Near Park',
-            address: '456 Park Avenue',
-            city: 'Rotterdam',
-            state: 'South Holland',
-            zip_code: '3012 CD',
-            rent_amount: 1200,
-            charges_amount: 100,
-            bedrooms: 1,
-            bathrooms: 1,
-            square_meters: 45,
-            property_type: 'studio',
-            apartment_image: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800',
-            available_date: '2024-04-01',
+            address: '456 Park Avenue, Rotterdam',
             description: `# Charming Studio Apartment
 
 A **beautiful studio** apartment located near Rotterdam's most popular park. This cozy space is perfect for students or young professionals.
@@ -84,26 +75,27 @@ A **beautiful studio** apartment located near Rotterdam's most popular park. Thi
 - Utilities included in rent
 
 *Quiet neighborhood with easy access to city center.*`,
+            image_url: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800',
+            type: 'studio' as const,
+            bedrooms: 0,
+            bathrooms: 1,
+            parking_spots: 0,
+            size: 45,
+            size_unit: 'square_meters' as const,
+            available_date: '2024-04-01',
+            rent_amount: 1200,
+            rent_currency: 'eur' as const,
             invite_token: 'def456ghi',
+            is_active: true,
             tenant_count: 1,
             created_at: '2024-01-01T00:00:00Z',
             updated_at: '2024-01-01T00:00:00Z',
         },
         {
             id: 3,
+            user_id: 1,
             title: 'Luxury Canal House',
-            address: '789 Canal Street',
-            city: 'Utrecht',
-            state: 'Utrecht',
-            zip_code: '3511 EF',
-            rent_amount: 2500,
-            charges_amount: 200,
-            bedrooms: 3,
-            bathrooms: 2,
-            square_meters: 120,
-            property_type: 'house',
-            apartment_image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800',
-            available_date: '2024-05-01',
+            address: '789 Canal Street, Utrecht',
             description: `# Historic Canal House
 
 Experience luxury living in this **beautifully restored** 17th-century canal house. This unique property combines historic charm with modern amenities.
@@ -123,7 +115,18 @@ Experience luxury living in this **beautifully restored** 17th-century canal hou
 - Secure parking space included
 
 *A rare opportunity to live in Utrecht's historic city center.*`,
+            image_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800',
+            type: 'house' as const,
+            bedrooms: 3,
+            bathrooms: 2,
+            parking_spots: 1,
+            size: 120,
+            size_unit: 'square_meters' as const,
+            available_date: '2024-05-01',
+            rent_amount: 2500,
+            rent_currency: 'eur' as const,
             invite_token: 'ghi789jkl',
+            is_active: true,
             tenant_count: 3,
             created_at: '2024-01-01T00:00:00Z',
             updated_at: '2024-01-01T00:00:00Z',

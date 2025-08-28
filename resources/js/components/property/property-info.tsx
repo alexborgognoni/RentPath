@@ -4,14 +4,7 @@ import { Bath, Bed, Calendar, FileText, Grid2X2, Home, Maximize, X } from 'lucid
 import { useEffect, useState } from 'react';
 
 interface PropertyInfoProps {
-    property: Property & {
-        description?: string;
-        available_date?: string;
-        property_type?: string;
-        charges_amount?: number;
-        state?: string;
-        zip_code?: string;
-    };
+    property: Property;
 }
 
 export function PropertyInfo({ property }: PropertyInfoProps) {
@@ -46,7 +39,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
         }).format(amount);
     };
 
-    const totalRent = property.rent_amount + (property.charges_amount || 0);
+    const totalRent = property.rent_amount; // No separate charges in new structure
 
     return (
         <motion.div 
@@ -56,10 +49,10 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
             className="space-y-8"
         >
             {/* Hero Image */}
-            {property.apartment_image && (
+            {property.image_url && (
                 <div className="relative overflow-hidden rounded-2xl shadow-xl">
                     <img
-                        src={property.apartment_image}
+                        src={property.image_url}
                         alt={property.title}
                         className="h-[480px] w-full object-cover"
                     />
@@ -84,9 +77,6 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         </h1>
                         <p className="text-muted-foreground">
                             {property.address}
-                            {property.city && `, ${property.city}`}
-                            {property.state && `, ${property.state}`}
-                            {property.zip_code && ` ${property.zip_code}`}
                         </p>
                     </div>
 
@@ -110,7 +100,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <Home size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground capitalize">
-                                    {property.property_type || 'N/A'}
+                                    {property.type || 'N/A'}
                                 </p>
                                 <p className="text-xs text-muted-foreground">Type</p>
                             </div>
@@ -146,7 +136,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <Grid2X2 size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground">
-                                    {property.square_meters ? `${property.square_meters} m²` : 'N/A'}
+                                    {property.size ? `${property.size} ${property.size_unit === 'square_meters' ? 'm²' : 'ft²'}` : 'N/A'}
                                 </p>
                                 <p className="text-xs text-muted-foreground">Size</p>
                             </div>
@@ -206,14 +196,14 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
             )}
 
             {/* Fullscreen Modal */}
-            {isFullscreen && property.apartment_image && (
+            {isFullscreen && property.image_url && (
                 <div
                     className="fixed inset-0 z-[99999] flex items-center justify-center bg-background/95 backdrop-blur-md"
                     onClick={toggleFullscreen}
                 >
                     <div className="relative flex h-full w-full items-center justify-center">
                         <img
-                            src={property.apartment_image}
+                            src={property.image_url}
                             alt={property.title}
                             className="max-h-full max-w-full object-contain"
                             onClick={(e) => e.stopPropagation()}
