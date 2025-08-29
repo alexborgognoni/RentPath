@@ -13,10 +13,11 @@ import { TenantApplicationsTable } from '@/components/property/tenant-applicatio
 import { TenantDetailsModal } from '@/components/property/tenant-details-modal';
 
 interface PropertyPageProps {
+    property: Property;
     propertyId: string;
 }
 
-// Mock property data based on dashboard mock
+// This function is no longer needed as we'll use real data from Inertia props
 const getMockProperty = (id: string): Property => {
     const properties = [
         {
@@ -175,13 +176,13 @@ const getMockTenantApplications = (propertyId: string): TenantApplication[] => {
 };
 
 export default function PropertyPage() {
-    const page = usePage<{ propertyId: string }>();
-    const propertyId = page.props.propertyId || '1'; // Default to first property
+    const page = usePage<PropertyPageProps>();
+    const { property: initialProperty } = page.props;
     
-    const [property, setProperty] = useState<Property | null>(null);
+    const [property] = useState<Property | null>(initialProperty);
     const [tenantApplications, setTenantApplications] = useState<TenantApplication[]>([]);
     const [selectedTenant, setSelectedTenant] = useState<TenantApplication | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading] = useState(false); // No loading needed since data comes from Inertia
     const [error, setError] = useState<string | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -190,27 +191,9 @@ export default function PropertyPage() {
     ];
 
     useEffect(() => {
-        const fetchPropertyData = async () => {
-            try {
-                setLoading(true);
-                // Simulate network delay
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-
-                const mockProperty = getMockProperty(propertyId);
-                const mockTenants = getMockTenantApplications(propertyId);
-                
-                setProperty(mockProperty);
-                setTenantApplications(mockTenants);
-            } catch (err) {
-                console.error('Error fetching property data:', err);
-                setError('Failed to load property data');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchPropertyData();
-    }, [propertyId]);
+        // For now, set empty tenant applications since that system isn't implemented yet
+        setTenantApplications([]);
+    }, []);
 
     const handleUpdateTenantStatus = async (tenantId: number, status: string, notes?: string) => {
         // Mock implementation

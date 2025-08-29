@@ -23,6 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        // Exclude image upload routes from CSRF protection
+        $middleware->validateCsrfTokens(except: [
+            'api/images/upload',
+            'api/images/delete',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

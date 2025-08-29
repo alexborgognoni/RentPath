@@ -62,7 +62,7 @@ class PropertyFactory extends Factory
             'apartment' => "Beautiful apartment in prime location with modern amenities. Features include:\n\n• Spacious living area with large windows\n• Modern kitchen with **premium appliances**\n• High-speed internet ready\n• Close to public transportation\n\n*Perfect for professionals or small families.*",
             'house' => "Charming house offering comfort and privacy. This property includes:\n\n• Private garden and outdoor space\n• Multiple bedrooms and bathrooms  \n• **Parking space** included\n• Quiet residential neighborhood\n\n*Ideal for families seeking a peaceful home.*",
             'studio' => "Cozy studio apartment perfect for singles or couples. Features:\n\n• Efficient layout maximizing space\n• Modern kitchenette\n• **All utilities included**\n• Great location with easy access to city center\n\n*Perfect for young professionals.*",
-            default => "Excellent property in desirable location. Well-maintained and ready for immediate occupancy.\n\n• Modern facilities and amenities\n• **Great value** for the area\n• Convenient access to shops and transport\n\n*Don't miss this opportunity.*"
+            'default' => "Excellent property in desirable location. Well-maintained and ready for immediate occupancy.\n\n• Modern facilities and amenities\n• **Great value** for the area\n• Convenient access to shops and transport\n\n*Don't miss this opportunity.*"
         ];
 
         return [
