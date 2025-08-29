@@ -1,7 +1,7 @@
 import { PropertyCard } from '@/components/dashboard/property-card';
 import type { Property } from '@/types/dashboard';
 import { translate as t } from '@/utils/translate-utils';
-import { Building, Home, Plus } from 'lucide-react';
+import { Building, Home, HousePlus } from 'lucide-react';
 
 interface PropertiesSectionProps {
     properties: Property[];
@@ -20,9 +20,9 @@ export function PropertiesSection({ properties, onAddProperty, onEditProperty }:
                     </h2>
                     <button
                         onClick={onAddProperty}
-                        className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105"
+                        className="flex cursor-pointer items-center space-x-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105"
                     >
-                        <Plus size={20} />
+                        <HousePlus size={20} />
                         <span>{t('addProperty')}</span>
                     </button>
                 </div>
