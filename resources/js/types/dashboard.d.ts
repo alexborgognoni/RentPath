@@ -1,24 +1,46 @@
-export interface Agent {
+export interface User {
     id: number;
-    name: string;
+    first_name: string;
+    middle_name?: string;
+    last_name: string;
     email: string;
-    phone?: string;
-    profile_picture?: string;
-    user_role: 'private_owner' | 'agent';
-    company?: string;
-    national_agency_id_number?: string;
-    agency_website?: string;
+    email_verified_at?: string;
     created_at: string;
     updated_at: string;
+    full_name: string; // Computed attribute
+}
+
+export interface PropertyManager {
+    id: number;
+    user_id: number;
+    type: 'individual' | 'professional';
+    company_name?: string;
+    company_website?: string;
+    license_number?: string;
+    phone_number?: string;
+    profile_picture_path?: string;
+    id_document_path?: string;
+    license_document_path?: string;
+    profile_verified_at?: string;
+    created_at: string;
+    updated_at: string;
+    user?: User;
 }
 
 export interface Property {
     id: number;
-    user_id: number;
+    property_manager_id: number;
     title: string;
-    address: string;
+    house_number: string;
+    street_name: string;
+    street_line2?: string;
+    city: string;
+    state?: string;
+    postal_code: string;
+    country: string;
     description?: string;
     image_url?: string;
+    image_path?: string;
     type: 'apartment' | 'house' | 'condo' | 'townhouse' | 'studio' | 'loft' | 'room' | 'office' | 'garage' | 'storage' | 'warehouse' | 'retail' | 'commercial';
     bedrooms: number;
     bathrooms: number;
@@ -36,29 +58,39 @@ export interface Property {
     // Computed attributes
     formatted_rent?: string;
     formatted_size?: string;
+    // Relationships
+    property_manager?: PropertyManager;
 }
 
 export interface DashboardData {
-    agent: Agent | null;
+    user: User;
+    propertyManager: PropertyManager | null;
     properties: Property[];
 }
 
-export interface AgentFormData {
-    name: string;
-    email: string;
-    phone?: string;
-    profile_picture?: string;
-    user_role: 'private_owner' | 'agent';
-    company?: string;
-    national_agency_id_number?: string;
-    agency_website?: string;
+export interface PropertyManagerFormData {
+    type: 'individual' | 'professional';
+    company_name?: string;
+    company_website?: string;
+    license_number?: string;
+    phone_number: string;
+    profile_picture?: File;
+    id_document?: File;
+    license_document?: File;
 }
 
 export interface PropertyFormData {
     title: string;
-    address: string;
+    house_number: string;
+    street_name: string;
+    street_line2?: string;
+    city: string;
+    state?: string;
+    postal_code: string;
+    country: string;
     description?: string;
     image_url?: string;
+    image_path?: string;
     type: Property['type'];
     bedrooms: number;
     bathrooms: number;

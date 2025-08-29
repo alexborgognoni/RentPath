@@ -11,6 +11,21 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
     // Mock currency formatting for now (since backend doesn't exist yet)
     const formatCurrency = (amount: number) => `€${amount.toLocaleString()}`;
 
+    // Format address from separate fields
+    const formatAddress = (property: Property): string => {
+        const parts = [
+            property.house_number,
+            property.street_name,
+            property.street_line2,
+        ].filter(Boolean);
+        
+        const streetAddress = parts.join(' ');
+        const cityPart = [property.city, property.state].filter(Boolean).join(', ');
+        const fullAddress = [streetAddress, cityPart, property.postal_code].filter(Boolean).join(', ');
+        
+        return fullAddress;
+    };
+
     const applicationUrl = `${window.location.origin}/invite/${property.invite_token}`;
 
     const copyApplicationLink = (e: React.MouseEvent) => {
@@ -37,15 +52,19 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             onClick={handleCardClick}
         >
             {/* Property Image */}
-            {property.image_url && (
+            {(property.image_path || property.image_url) && (
                 <div className="mb-4 overflow-hidden rounded-xl border border-border">
-                    <img src={property.image_url} alt={property.title} className="h-48 w-full object-cover" />
+                    <img 
+                        src={property.image_path ? `/properties/${property.id}/image` : property.image_url} 
+                        alt={property.title} 
+                        className="h-48 w-full object-cover" 
+                    />
                 </div>
             )}
 
             <h3 className="mb-2 text-xl font-bold text-foreground">{property.title}</h3>
             <p className="mb-3 text-muted-foreground">
-                {property.address}
+                {formatAddress(property)}
             </p>
             <p className="mb-4 text-lg font-bold text-primary">
                 {formatCurrency(property.rent_amount)}/{t('month')}

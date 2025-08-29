@@ -131,3 +131,9 @@
         @apply bg-background text-foreground;
     }
 }
+
+@keyframes drawUnderline {
+    to {
+        stroke-dashoffset: 0;
+    }
+}

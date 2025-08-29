@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Property extends Model
@@ -18,11 +17,10 @@ class Property extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
+        'property_manager_id',
         'title',
-        'address',
         'description',
-        'image_url',
+        'image_path',
         'type',
         'bedrooms',
         'bathrooms',
@@ -33,6 +31,16 @@ class Property extends Model
         'rent_amount',
         'rent_currency',
         'is_active',
+        'invite_token',
+
+        // Address fields
+        'house_number',
+        'street_name',
+        'street_line2',
+        'city',
+        'state',
+        'postal_code',
+        'country',
     ];
 
     /**
@@ -74,11 +82,11 @@ class Property extends Model
     }
 
     /**
-     * Get the user that owns the property.
+     * Get the property manager that owns the property.
      */
-    public function user(): BelongsTo
+    public function propertyManager(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(PropertyManager::class);
     }
 
     /**
@@ -140,11 +148,7 @@ class Property extends Model
         ];
 
         $symbol = $symbols[$this->rent_currency] ?? $this->rent_currency;
-        
-        if ($this->rent_currency === 'chf') {
-            return $symbol . number_format($this->rent_amount, 2);
-        }
-        
+
         return $symbol . number_format($this->rent_amount, 2);
     }
 
@@ -159,6 +163,34 @@ class Property extends Model
 
         $unit = $this->size_unit === 'square_meters' ? 'm²' : 'ft²';
         return number_format($this->size, 0) . ' ' . $unit;
+    }
+
+    /**
+     * Get secure image URL for property owner.
+     */
+    public function getSecureImageUrlAttribute(): ?string
+    {
+        if (!$this->image_path) {
+            return null;
+        }
+
+        return route('properties.image', ['property' => $this->id]);
+    }
+
+    /**
+     * Get temporary signed URL for sharing.
+     */
+    public function getSignedImageUrl(?int $expiresInMinutes = 60): ?string
+    {
+        if (!$this->image_path) {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'properties.image.signed',
+            now()->addMinutes($expiresInMinutes),
+            ['property' => $this->id]
+        );
     }
 
     /**
@@ -183,15 +215,5 @@ class Property extends Model
     public function scopeOfType($query, $type)
     {
         return $query->where('type', $type);
-    }
-
-    /**
-     * Get the tenant applications for the property.
-     * Note: TenantApplication model will be created later
-     */
-    public function tenantApplications(): HasMany
-    {
-        // This will work when TenantApplication model is created
-        return $this->hasMany('App\Models\TenantApplication');
     }
 }
