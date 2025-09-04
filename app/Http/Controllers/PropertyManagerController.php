@@ -72,7 +72,7 @@ class PropertyManagerController extends Controller
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
             $validated['profile_picture_path'] = $request->file('profile_picture')
-                ->store('property-managers/profile-pictures', 'private');
+                ->store('property-managers/profile-pictures', 'public');
         }
 
         if ($request->hasFile('id_document')) {
@@ -166,7 +166,7 @@ class PropertyManagerController extends Controller
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
             $validated['profile_picture_path'] = $request->file('profile_picture')
-                ->store('property-managers/profile-pictures', 'private');
+                ->store('property-managers/profile-pictures', 'public');
         } elseif ($request->input('remove_profile_picture')) {
             $validated['profile_picture_path'] = null;
         }

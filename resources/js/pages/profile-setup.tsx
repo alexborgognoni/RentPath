@@ -1,4 +1,5 @@
 import { AppHeader } from '@/components/app-header';
+import { ParallaxBackground } from '@/components/parallax-background';
 import type { PropertyManager, User } from '@/types/dashboard';
 import { Head, useForm, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -258,25 +259,29 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
     };
 
     return (
-        <div className="min-h-screen bg-background">
-            <AppHeader />
-            <Head title={isEditing ? 'Edit Profile' : 'Setup Profile'} />
+        <div className="relative flex min-h-screen w-full flex-col bg-background lg:h-screen lg:overflow-hidden">
+            <div className="absolute inset-0 min-h-full w-full lg:h-screen">
+                <ParallaxBackground />
+            </div>
+            <div className="relative z-10 flex flex-col min-h-screen lg:h-full">
+                <AppHeader />
+                <Head title={isEditing ? 'Edit Profile' : 'Setup Profile'} />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-2xl px-6">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="rounded-2xl border border-border bg-card p-8 shadow-lg"
-                    >
-                        <div className="mb-8 text-center">
-                            <h1 className="mb-4 text-3xl font-bold text-foreground">{isEditing ? 'Edit Your Profile' : 'Setup Your Profile'}</h1>
-                            <p className="text-muted-foreground">
-                                {isEditing
-                                    ? 'Update your property manager profile information'
-                                    : 'Complete your property manager profile to get started'}
-                            </p>
+                <div className="flex-1 py-12 overflow-y-auto">
+                    <div className="mx-auto max-w-2xl px-6">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="rounded-2xl border border-border bg-card p-8 shadow-lg"
+                        >
+                            <div className="mb-8 text-center">
+                                <h1 className="mb-2 text-3xl font-bold text-foreground">{isEditing ? 'Edit Your Profile' : 'Setup Your Profile'}</h1>
+                                <p className="text-muted-foreground">
+                                    {isEditing
+                                        ? 'Update your property manager profile information'
+                                        : 'Complete your property manager profile to get started'}
+                                </p>
                             {!isEditing && (
                                 <p className="mt-2 text-sm text-muted-foreground">Your profile will be sent for verification after submission.</p>
                             )}
@@ -293,7 +298,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                 src={
                                                     data.profile_picture
                                                         ? URL.createObjectURL(data.profile_picture)
-                                                        : '/property-manager/document/profile_picture'
+                                                        : propertyManager?.profile_picture_url
                                                 }
                                                 alt="Profile"
                                                 className="h-full w-full object-cover"
@@ -336,7 +341,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         <button
                                             type="button"
                                             onClick={() => setData('profile_picture', 'removed')}
-                                            className="absolute bottom-0 left-0 cursor-pointer rounded-full bg-destructive p-2 shadow-lg transition-colors hover:bg-destructive/90"
+                                            className="absolute bottom-0 left-0 rounded-full bg-destructive p-2 shadow-lg transition-colors hover:bg-destructive/90 cursor-pointer"
                                         >
                                             <Trash2 className="h-4 w-4 text-white" />
                                         </button>
@@ -402,7 +407,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     <button
                                         type="button"
                                         onClick={() => handleTypeChange('individual')}
-                                        className={`flex items-center rounded-lg border-2 p-4 transition-all ${
+                                        className={`flex items-center rounded-lg border-2 p-4 transition-all cursor-pointer ${
                                             selectedType === 'individual'
                                                 ? 'border-primary bg-primary/10'
                                                 : 'border-border bg-background hover:bg-muted/50'
@@ -418,7 +423,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     <button
                                         type="button"
                                         onClick={() => handleTypeChange('professional')}
-                                        className={`flex items-center rounded-lg border-2 p-4 transition-all ${
+                                        className={`flex items-center rounded-lg border-2 p-4 transition-all cursor-pointer ${
                                             selectedType === 'professional'
                                                 ? 'border-primary bg-primary/10'
                                                 : 'border-border bg-background hover:bg-muted/50'
@@ -444,7 +449,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         <select
                                             value={data.phone_prefix}
                                             onChange={(e) => setData('phone_prefix', e.target.value)}
-                                            className={`w-full appearance-none overflow-hidden rounded-md border py-2 pr-10 pl-3 text-ellipsis whitespace-nowrap shadow-sm focus:ring-2 focus:ring-primary/20 focus:outline-none ${getFieldClassName('phone_number')}`}
+                                            className={`w-full appearance-none overflow-hidden rounded-md border py-2 pr-10 pl-3 text-ellipsis whitespace-nowrap shadow-sm focus:ring-2 focus:ring-primary/20 focus:outline-none cursor-pointer ${getFieldClassName('phone_number')} [&>option]:cursor-pointer`}
                                             style={{
                                                 maxHeight: '120px',
                                                 overflowY: 'auto',
@@ -695,7 +700,9 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             <option value="+260">🇿🇲 Zambia +260</option>
                                             <option value="+263">🇿🇼 Zimbabwe +263</option>
                                         </select>
-                                        <ChevronDown className="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                                        <div className="pointer-events-none absolute top-2 bottom-0 right-0 flex items-center pr-2">
+                                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                        </div>
                                     </div>
                                     <input
                                         type="tel"
@@ -854,7 +861,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         <button
                                                             type="button"
                                                             onClick={() => setData('id_document', 'removed')}
-                                                            className="ml-2 text-destructive hover:text-destructive/80"
+                                                            className="ml-2 text-destructive hover:text-destructive/80 cursor-pointer"
                                                             title="Remove file"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -944,7 +951,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setData('license_document', 'removed')}
-                                                                className="ml-2 text-destructive hover:text-destructive/80"
+                                                                className="ml-2 text-destructive hover:text-destructive/80 cursor-pointer"
                                                                 title="Remove file"
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
@@ -968,7 +975,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                 <button
                                     type="submit"
                                     disabled={processing || (isEditing && !hasFormChanged())}
-                                    className="w-full rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105 disabled:opacity-50"
+                                    className="w-full rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                                 >
                                     {processing ? (isEditing ? 'Updating...' : 'Submitting...') : isEditing ? 'Update Profile' : 'Submit Profile'}
                                 </button>
@@ -976,7 +983,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     <button
                                         type="button"
                                         onClick={() => window.history.back()}
-                                        className="w-full rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground shadow-lg transition-all hover:bg-muted"
+                                        className="w-full rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground shadow-lg transition-all hover:bg-muted cursor-pointer"
                                     >
                                         Cancel
                                     </button>
@@ -994,6 +1001,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                             )}
                         </form>
                     </motion.div>
+                </div>
                 </div>
             </div>
         </div>

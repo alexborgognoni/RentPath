@@ -45,6 +45,15 @@ class PropertyManager extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'profile_picture_url',
+    ];
+
+    /**
      * The user this property manager belongs to.
      */
     public function user(): BelongsTo
@@ -100,8 +109,8 @@ class PropertyManager extends Model
         if (!$this->profile_picture_path) {
             return null;
         }
-
-        return \Illuminate\Support\Facades\Storage::disk('private')->url($this->profile_picture_path);
+        
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->profile_picture_path);
     }
 
     /**
