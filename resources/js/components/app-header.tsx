@@ -3,9 +3,10 @@ import { LanguageSelector } from '@/components/language-selector';
 import { LogoHomeButton } from '@/components/logo-home-button';
 import { SharedData, type BreadcrumbItem } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
-import { usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import { LogOut, Settings } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { logout } from '@/routes';
 
 interface AppHeaderProps {
     title?: string;
@@ -16,7 +17,8 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const [showUserMenu, setShowUserMenu] = useState(false);
-    const containerRef = useRef(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const userMenuRef = useRef<HTMLDivElement>(null);
 
     const getUserInitials = (user: { name?: string; email?: string }) => {
         if (user?.name) {
@@ -30,6 +32,28 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
         if (user?.email) return user.email[0].toUpperCase();
         return 'U';
     };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+                setShowUserMenu(false);
+            }
+        };
+
+        const handleScroll = () => {
+            setShowUserMenu(false);
+        };
+
+        if (showUserMenu) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('scroll', handleScroll, true);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('scroll', handleScroll, true);
+        };
+    }, [showUserMenu]);
 
     return (
         <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
@@ -80,48 +104,51 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
 
                     {/* User Menu */}
                     {auth.user && (
-                        <div className="relative">
+                        <div ref={userMenuRef} className="relative">
                             <button
                                 onClick={() => setShowUserMenu(!showUserMenu)}
-                                className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white/20 bg-gradient-to-br from-primary to-secondary shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+                                className="flex h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary border border-border shadow-lg transition-all hover:scale-105 hover:shadow-xl cursor-pointer"
                             >
-                                {auth.user.avatar ? (
-                                    <img src={auth.user.avatar} alt={auth.user.name} className="h-full w-full object-cover" />
+                                {(auth.user.property_manager?.profile_picture_url || auth.user.avatar) ? (
+                                    <img 
+                                        src={auth.user.property_manager?.profile_picture_url || auth.user.avatar} 
+                                        alt={auth.user.name} 
+                                        className="h-full w-full object-cover" 
+                                    />
                                 ) : (
                                     <span className="text-sm font-semibold text-white">{getUserInitials(auth.user)}</span>
                                 )}
                             </button>
 
                             {showUserMenu && (
-                                <>
-                                    <div className="fixed inset-0 z-30" onClick={() => setShowUserMenu(false)} />
-                                    <div className="absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
-                                        <div className="border-b border-border px-4 py-3">
-                                            <div className="min-w-0">
-                                                {auth.user.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
-                                                <p className="truncate text-xs text-muted-foreground">{auth.user.email}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="py-1">
-                                            <a
-                                                href="/settings"
-                                                className="text-text-secondary flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background"
-                                            >
-                                                <Settings size={16} />
-                                                <span>Settings</span>
-                                            </a>
-                                            <div className="mb-1 border-t border-border"></div>
-                                            <a
-                                                href="/account/logout"
-                                                className="flex w-full items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10"
-                                            >
-                                                <LogOut size={16} />
-                                                <span>{t('signOut')}</span>
-                                            </a>
+                                <div className="absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
+                                    <div className="border-b border-border px-4 py-3">
+                                        <div className="min-w-0">
+                                            {auth.user.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
+                                            <p className="truncate text-xs text-muted-foreground">{auth.user.email}</p>
                                         </div>
                                     </div>
-                                </>
+
+                                    <div className="py-1">
+                                        <a
+                                            href="/settings"
+                                            className="text-text-secondary flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background cursor-pointer"
+                                        >
+                                            <Settings size={16} />
+                                            <span>Settings</span>
+                                        </a>
+                                        <div className="mb-1 border-t border-border"></div>
+                                        <Link
+                                            href={logout().url}
+                                            method="post"
+                                            as="button"
+                                            className="flex w-full items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10 cursor-pointer"
+                                        >
+                                            <LogOut size={16} />
+                                            <span>{t('signOut')}</span>
+                                        </Link>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     )}

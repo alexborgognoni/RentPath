@@ -9,7 +9,7 @@ import AppearanceContent from '@/pages/settings/appearance-content';
 import PasswordContent from '@/pages/settings/password-content';
 import ProfileContent from '@/pages/settings/profile-content';
 
-type SettingsPage = 'profile' | 'password' | 'appearance';
+type SettingsPage = 'account' | 'password' | 'appearance';
 
 export default function Settings({ mustVerifyEmail = false, status }: { mustVerifyEmail?: boolean; status?: string }) {
     const getInitialPage = (): SettingsPage => {
@@ -17,15 +17,15 @@ export default function Settings({ mustVerifyEmail = false, status }: { mustVeri
         const pageFromUrl = urlParams.get('initialPage') as SettingsPage | null;
 
         const path = window.location.pathname;
-        if (path.includes('/profile')) return 'profile';
+        if (path.includes('/account')) return 'account';
         if (path.includes('/password')) return 'password';
         if (path.includes('/appearance')) return 'appearance';
 
-        return pageFromUrl || 'profile';
+        return pageFromUrl || 'account';
     };
 
     const getPageOrder = (page: SettingsPage): number => {
-        const order = { profile: 0, password: 1, appearance: 2 };
+        const order = { account: 0, password: 1, appearance: 2 };
         return order[page];
     };
 
@@ -68,8 +68,8 @@ export default function Settings({ mustVerifyEmail = false, status }: { mustVeri
         );
 
         switch (currentPage) {
-            case 'profile':
-                return renderPage('profile', <ProfileContent mustVerifyEmail={mustVerifyEmail} status={status} />);
+            case 'account':
+                return renderPage('account', <ProfileContent mustVerifyEmail={mustVerifyEmail} status={status} />);
             case 'password':
                 return renderPage('password', <PasswordContent />);
             case 'appearance':

@@ -1,4 +1,5 @@
 import { AppHeader } from '@/components/app-header';
+import { ParallaxBackground } from '@/components/parallax-background';
 import { Head, Link } from '@inertiajs/react';
 import { AlertCircle, Clock, RefreshCw, Shield, XCircle } from 'lucide-react';
 
@@ -9,11 +10,15 @@ interface ProfileUnverifiedProps {
 
 export default function ProfileUnverified({ isRejected = false, rejectionReason }: ProfileUnverifiedProps) {
     return (
-        <div className="min-h-screen bg-background">
-            <AppHeader />
-            <Head title="Profile Under Review" />
+        <div className="relative flex min-h-screen w-full flex-col bg-background lg:h-screen lg:overflow-hidden">
+            <div className="absolute inset-0 min-h-full w-full lg:h-screen">
+                <ParallaxBackground />
+            </div>
+            <div className="relative z-10 flex flex-col min-h-screen lg:h-full">
+                <AppHeader />
+                <Head title="Profile Under Review" />
 
-            <div className="flex min-h-screen items-center justify-center py-12">
+                <div className="flex-1 flex items-center justify-center p-4 py-8 lg:py-4">
                 <div className="mx-auto max-w-md px-6 text-center">
                     <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
                         {isRejected ? (
@@ -37,11 +42,11 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
                             </>
                         ) : (
                             <>
-                                <div className="bg-warning/10 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full">
-                                    <Clock className="text-warning h-8 w-8" />
+                                <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                                    <Clock className="text-primary h-8 w-8" />
                                 </div>
 
-                                <h1 className="mb-4 text-2xl font-bold text-foreground">Profile Under Review</h1>
+                                <h1 className="mb-2 text-3xl font-bold text-foreground">Profile Under Review</h1>
 
                                 <p className="mb-6 text-muted-foreground">
                                     Thank you for submitting your property manager profile. Our team is currently reviewing your information and
@@ -100,6 +105,7 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
                             </Link>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
         </div>

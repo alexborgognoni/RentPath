@@ -1,16 +1,16 @@
 import { Lock, Palette, User } from 'lucide-react';
 
 interface SettingsNavigationProps {
-    currentPage: 'profile' | 'password' | 'appearance';
-    onNavigate?: (page: 'profile' | 'password' | 'appearance') => void;
+    currentPage: 'account' | 'password' | 'appearance';
+    onNavigate?: (page: 'account' | 'password' | 'appearance') => void;
 }
 
 export function SettingsNavigation({ currentPage, onNavigate }: SettingsNavigationProps) {
     const navItems = [
         {
-            key: 'profile' as const,
-            title: 'Profile',
-            href: '/settings/profile',
+            key: 'account' as const,
+            title: 'Account',
+            href: '/settings/account',
             icon: User,
         },
         {

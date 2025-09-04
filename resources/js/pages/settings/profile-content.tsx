@@ -23,17 +23,14 @@ export default function ProfileContent({ mustVerifyEmail, status }: ProfileConte
             <div className="mb-8">
                 <h1 className="mb-2 flex items-center text-3xl font-bold text-foreground">
                     <User className="mr-3 text-primary" size={32} />
-                    Profile
+                    Account
                 </h1>
-                <p className="text-muted-foreground">Manage your account information and public profile</p>
+                <p className="text-muted-foreground">Manage your account information and settings</p>
             </div>
 
-            {/* Personal Information Card */}
+            {/* Email Address Card */}
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="mb-4 text-xl font-semibold text-foreground">Personal Information</h2>
-                <p className="mb-6 text-sm text-muted-foreground">
-                    Update your personal details and profile information.
-                </p>
+                <h2 className="mb-4 text-xl font-semibold text-foreground">Email Address</h2>
 
                 <Form
                     {...ProfileController.update.form()}
@@ -44,26 +41,8 @@ export default function ProfileContent({ mustVerifyEmail, status }: ProfileConte
                 >
                     {({ processing, recentlySuccessful, errors }) => (
                         <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="name" className="text-sm font-medium text-foreground">
-                                    Full Name
-                                </Label>
-                                <Input
-                                    id="name"
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                    defaultValue={auth.user.name}
-                                    name="name"
-                                    required
-                                    autoComplete="name"
-                                    placeholder="Enter your full name"
-                                />
-                                <InputError className="mt-2" message={errors.name} />
-                            </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                                    Email Address
-                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -98,7 +77,7 @@ export default function ProfileContent({ mustVerifyEmail, status }: ProfileConte
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-4 pt-4">
+                            <div className="flex items-center gap-4">
                                 <button 
                                     type="submit"
                                     disabled={processing}

@@ -13,8 +13,10 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
 
     if (variant === 'header') {
         return (
-            <div className="relative flex min-h-screen w-full flex-col bg-background">
-                <ParallaxBackground />
+            <div className="relative flex min-h-screen w-full flex-col bg-background lg:h-screen lg:overflow-hidden">
+                <div className="absolute inset-0 min-h-full w-full lg:h-screen">
+                    <ParallaxBackground />
+                </div>
                 <div className="relative z-10">{children}</div>
             </div>
         );
