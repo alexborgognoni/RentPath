@@ -259,8 +259,7 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
             router.post('/properties', submitData, {
                 onSuccess: (page) => {
                     onClose();
-                    // Refresh the page to show the new property
-                    window.location.reload();
+                    // The server redirects to dashboard automatically
                 },
                 onError: (errors) => {
                     setErrors(errors);
