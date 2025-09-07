@@ -104,7 +104,7 @@ class PropertyController extends Controller
 
         $property = $propertyManager->properties()->create($validated);
 
-        return redirect()->route('property.show', $property)
+        return redirect()->route('dashboard')
             ->with('success', 'Property created successfully.');
     }
 

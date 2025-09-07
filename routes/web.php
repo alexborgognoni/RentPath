@@ -54,7 +54,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('profile.setup');
         }
         
-        // If profile exists and is submitted, redirect to unverified
+        // If profile is verified, redirect to dashboard
+        if ($propertyManager->isVerified()) {
+            return redirect()->route('dashboard');
+        }
+        
+        // If profile exists but not verified, redirect to unverified
         return redirect()->route('profile.unverified');
     })->name('profile');
     
@@ -69,6 +74,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // If no profile exists, redirect to setup
         if (!$propertyManager) {
             return redirect()->route('profile.setup');
+        }
+        
+        // If profile is verified, redirect to dashboard
+        if ($propertyManager->isVerified()) {
+            return redirect()->route('dashboard');
         }
         
         // If editing is requested, show the edit form
