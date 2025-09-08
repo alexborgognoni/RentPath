@@ -47,57 +47,59 @@
 }
 
 :root {
-    /* Backgrounds */
-    --background: #f9fafb;
-    --surface: #ffffff;
-    --card: var(--surface);
-    --popover: var(--surface);
+    /* Backgrounds / Surfaces */
+    --background: #f9fafb; /* main page background */
+    --surface: #ffffff; /* primary surface */
+    --card: #fefefe; /* slightly different from surface for depth */
+    --popover: #fdfdfd; /* subtle distinction for popovers */
 
     /* Text */
-    --text-primary: #1f2937;
-    --text-secondary: #4b5563;
+    --text-primary: #1f2937; /* main text, high contrast */
+    --text-secondary: #374151; /* slightly darker for readability */
     --foreground: var(--text-primary);
     --card-foreground: var(--text-primary);
     --popover-foreground: var(--text-primary);
+    --muted-foreground: #6b7280; /* softer than text-secondary */
 
     /* Brand colors */
     --primary: #06b6d4;
     --primary-foreground: #ffffff;
     --secondary: #8b5cf6;
     --secondary-foreground: #ffffff;
-    --accent: #7c3aed;
+    --accent: #7c3aed; /* reserved for highlights / links */
     --accent-foreground: #ffffff;
 
     /* States */
     --success: #10b981;
     --warning: #f59e0b;
     --error: #ef4444;
-    --destructive: var(--error);
+    --destructive: #dc2626; /* slightly darker than error for buttons */
     --destructive-foreground: #ffffff;
     --muted: #e5e7eb;
-    --muted-foreground: #4b5563;
 
-    /* Borders & inputs */
-    --border: #e5e7eb;
-    --input: #e5e7eb;
+    /* Borders & Inputs */
+    --border: #d1d5db; /* slightly darker for better definition */
+    --input: #d1d5db;
     --ring: #06b6d4;
 
+    /* Misc */
     --radius: 0.625rem;
 }
 
 .dark {
-    /* Backgrounds */
-    --background: #0f172a;
-    --surface: #1e293b;
-    --card: var(--surface);
-    --popover: var(--surface);
+    /* Backgrounds / Surfaces */
+    --background: #0f172a; /* main page background */
+    --surface: #1e293b; /* primary surface */
+    --card: #1c2536; /* subtle differentiation for depth */
+    --popover: #1b2634; /* slightly lighter/darker for layering */
 
     /* Text */
-    --text-primary: #f0f9ff;
-    --text-secondary: #94a3b8;
+    --text-primary: #f0f9ff; /* main text, high contrast */
+    --text-secondary: #cbd5e1; /* softer, but readable */
     --foreground: var(--text-primary);
     --card-foreground: var(--text-primary);
     --popover-foreground: var(--text-primary);
+    --muted-foreground: #94a3b8; /* softer for muted text */
 
     /* Brand colors */
     --primary: #22d3ee;
@@ -111,15 +113,17 @@
     --success: #22c55e;
     --warning: #fbbf24;
     --error: #f87171;
-    --destructive: var(--error);
+    --destructive: #ef4444; /* slightly brighter for buttons */
     --destructive-foreground: #0f172a;
-    --muted: #334155;
-    --muted-foreground: #94a3b8;
+    --muted: #334155; /* softer background for muted elements */
 
-    /* Borders & inputs */
-    --border: #334155;
-    --input: #334155;
+    /* Borders & Inputs */
+    --border: #475569; /* more visible against surface */
+    --input: #475569;
     --ring: #22d3ee;
+
+    /* Misc */
+    --radius: 0.625rem;
 }
 
 @layer base {
