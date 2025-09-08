@@ -52,18 +52,18 @@ export function Footer() {
                         <h3 className="mb-4 font-bold text-foreground">{t('support')}</h3>
                         <ul className="space-y-3 text-muted-foreground">
                             <li>
-                                <a href="#" className="transition-colors hover:text-primary">
-                                    {t('helpCenter')}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="transition-colors hover:text-primary">
+                                <a href="/contact-us" className="transition-colors hover:text-primary">
                                     {t('contactUs')}
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="transition-colors hover:text-primary">
+                                <a href="/privacy-policy" className="transition-colors hover:text-primary">
                                     {t('privacyPolicy')}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/terms-of-use" className="transition-colors hover:text-primary">
+                                    Terms of Use
                                 </a>
                             </li>
                         </ul>

@@ -11,6 +11,18 @@ Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
 
+Route::get('/privacy-policy', function () {
+    return Inertia::render('privacy-policy');
+})->name('privacy.policy');
+
+Route::get('/terms-of-use', function () {
+    return Inertia::render('terms-of-use');
+})->name('terms.of.use');
+
+Route::get('/contact-us', function () {
+    return Inertia::render('contact-us');
+})->name('contact.us');
+
 Route::post('/locale', function (Request $request) {
     $locale = $request->input('locale');
     if (in_array($locale, ['en', 'fr', 'de', 'nl'])) {
