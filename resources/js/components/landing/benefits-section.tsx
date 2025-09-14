@@ -1,5 +1,5 @@
 import { translate as t } from '@/utils/translate-utils';
-import { CheckCircle, Shield, Clock, TrendingUp, Euro } from 'lucide-react';
+import { CheckCircle, Shield, Clock, TrendingUp, Euro, Database } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
@@ -32,17 +32,17 @@ export function BenefitsSection() {
                                         Faster Placements, Swifter Commissions
                                     </h3>
                                     <p className="leading-relaxed text-muted-foreground">
-                                        Automated follow-ups mean faster tenant placements. Know exactly when each property will be rented.
+                                        Automated follow-ups help place tenants faster. Know exactly when each property will be rented.
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-accent">
-                                    <Shield className="h-6 w-6 text-white" />
+                                <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-primary">
+                                    <Database className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
                                     <h3 className="mb-2 text-xl font-bold text-foreground">
-                                        Everything in One Place
+                                        All Tenant Data, Centralized
                                     </h3>
                                     <p className="leading-relaxed text-muted-foreground">
                                         All tenant documents and application progress stored securely. No more searching through emails.
@@ -50,12 +50,12 @@ export function BenefitsSection() {
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-primary">
+                                <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-primary">
                                     <TrendingUp className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
                                     <h3 className="mb-2 text-xl font-bold text-foreground">
-                                        Professional Landlord Relations
+                                        Automated Landlord Updates
                                     </h3>
                                     <p className="leading-relaxed text-muted-foreground">
                                         Automated updates and professional reporting strengthen your relationships with property owners.
@@ -63,7 +63,7 @@ export function BenefitsSection() {
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-secondary">
+                                <div className="mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-accent">
                                     <Euro className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
@@ -90,7 +90,7 @@ export function BenefitsSection() {
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Right side - Metrics and Trial Box */}
                     <div className="relative">
                         <div className="relative rounded-2xl border border-border bg-card p-8 shadow-xl mb-8">
@@ -109,12 +109,12 @@ export function BenefitsSection() {
                                         <span className="text-2xl font-bold text-secondary">-60%</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">Administrative Time</span>
-                                        <span className="text-2xl font-bold text-primary">-75%</span>
+                                        <span className="text-muted-foreground">Landlord Satisfaction</span>
+                                        <span className="text-2xl font-bold text-primary">+90%</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">Landlord Satisfaction</span>
-                                        <span className="text-2xl font-bold text-secondary">+90%</span>
+                                        <span className="text-muted-foreground">Administrative Time</span>
+                                        <span className="text-2xl font-bold text-secondary">-75%</span>
                                     </div>
                                 </div>
                             </div>
@@ -127,7 +127,7 @@ export function BenefitsSection() {
                                 <h3 className="mb-4 text-xl font-bold text-foreground">
                                     Start Your Free Trial
                                 </h3>
-                                
+
                                 <div className="mb-4 space-y-3">
                                     <div className="flex items-center text-muted-foreground">
                                         <CheckCircle className="mr-3 h-5 w-5 flex-shrink-0 text-primary" />
@@ -158,7 +158,7 @@ export function BenefitsSection() {
                                             <span className="ml-2 text-muted-foreground">per agent/month</span>
                                         </div>
                                         <motion.div
-                                            animate={shouldShake ? { 
+                                            animate={shouldShake ? {
                                                 y: [0, -4, 4, -4, 4, -2, 2, 0],
                                                 rotate: [0, -2, 2, -2, 2, -1, 1, 0]
                                             } : { y: 0, rotate: 0 }}

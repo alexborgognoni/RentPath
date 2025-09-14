@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, Zap, Eye, Clock, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, Eye, Clock, Check, Workflow, Sliders, ArrowRight } from 'lucide-react';
 
 export function ProblemSolutionSection() {
     const [activeSlide, setActiveSlide] = useState(0);
@@ -21,11 +21,11 @@ export function ProblemSolutionSection() {
         {
             id: 2,
             title: "Guided Tenant Applications",
-            description: "Step-by-step application flow ensures all necessary documents are collected before submission. Complete applications, every time.",
+            description: "Invite leads to a step-by-step application flow that ensures all necessary documents are collected. Complete applications, every time.",
             features: [
-                "Required document checklist",
+                "Application invite links",
                 "Progress validation at each step", 
-                "Prevents incomplete submissions",
+                "Required documents checklists",
                 "Professional application experience",
             ],
         },
@@ -135,7 +135,7 @@ export function ProblemSolutionSection() {
                             Built for Modern Rental Applications
                         </h3>
                         <p className="mx-auto mb-12 max-w-3xl text-xl leading-relaxed text-muted-foreground">
-                            Transform your rental process with real-time insights, document management, and automated landlord updates.
+                            Transform your tenant placements with real-time insights, document management, and automated landlord updates.
                         </p>
 
                         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -149,7 +149,7 @@ export function ProblemSolutionSection() {
                                         Complete Applications
                                     </div>
                                     <p className="leading-relaxed text-muted-foreground">
-                                        No more chasing IDs, contracts, or references — collect complete tenant applications, in one place.
+                                        No more chasing IDs, contracts, or references — invite tenants and collect applications in one place.
                                     </p>
                                 </div>
                             </div>
@@ -158,13 +158,13 @@ export function ProblemSolutionSection() {
                                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
                                 <div className="relative z-10">
                                     <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary transition-transform duration-300 group-hover:scale-110">
-                                        <Eye className="h-8 w-8 text-white" />
+                                        <ArrowRight className="h-8 w-8 text-white" />
                                     </div>
                                     <div className="mb-4 text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent transition-transform duration-300 group-hover:scale-110">
-                                        Occupancy Overview
+                                        Streamlined Leasing
                                     </div>
                                     <p className="leading-relaxed text-muted-foreground">
-                                        See which units are vacant, occupied, or in process — and never lose sight of your portfolio.
+                                        Seamlessly guide applicants to move-in — cutting time-to-fill and reducing vacancies.
                                     </p>
                                 </div>
                             </div>
@@ -176,10 +176,10 @@ export function ProblemSolutionSection() {
                                         <Clock className="h-8 w-8 text-white" />
                                     </div>
                                     <div className="mb-4 text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent transition-transform duration-300 group-hover:scale-110">
-                                        Streamlined Process
+                                        Occupancy Overview
                                     </div>
                                     <p className="leading-relaxed text-muted-foreground">
-                                        Guide applicants through visits, verifications, and lease — cutting time-to-fill and vacancies.
+                                        See which units are vacant, occupied, or have leads — and never lose sight of your portfolio.
                                     </p>
                                 </div>
                             </div>
