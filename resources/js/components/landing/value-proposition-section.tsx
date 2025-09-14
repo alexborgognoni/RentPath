@@ -1,6 +1,6 @@
+import { motion } from 'framer-motion';
 import { ArrowRight, Bell, Camera, Eye, FileText, Mail, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 
 function useCountAnimation(target: number, duration: number = 2000) {
     const [count, setCount] = useState(0);
@@ -18,16 +18,10 @@ function useCountAnimation(target: number, duration: number = 2000) {
         const animate = () => {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            
-            // Easing function (ease out)
             const easeOut = 1 - Math.pow(1 - progress, 3);
-            
-            const currentCount = Math.round(startCount + (target - startCount) * easeOut);
-            setCount(currentCount);
+            setCount(Math.round(startCount + (target - startCount) * easeOut));
 
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
+            if (progress < 1) requestAnimationFrame(animate);
         };
 
         animate();
@@ -36,23 +30,19 @@ function useCountAnimation(target: number, duration: number = 2000) {
     return { count, setIsInView };
 }
 
-export function FeaturesSection() {
-    const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    
-    const { count: count1, setIsInView: setIsInView1 } = useCountAnimation(5);
-    const { count: count2, setIsInView: setIsInView2 } = useCountAnimation(97);
-    const { count: count3, setIsInView: setIsInView3 } = useCountAnimation(24);
+export function ValuePropositionSection() {
+    const HEADER_TITLE = 'Next-Generation';
+    const HEADER_HIGHLIGHT = 'Rental Deals';
+    const HEADER_DESCRIPTION =
+        'Experience the future of tenant placements with automated applications, real time insights, seamless tenant experiences and professional landlord communications';
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({ x: e.clientX, y: e.clientY });
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
+    const STATS = [
+        { id: 1, value: 5, suffix: ',000+', label: 'Applications' },
+        { id: 2, value: 97, suffix: '%', label: 'Conversion Rate' },
+        { id: 3, value: 24, suffix: '/7', label: 'Support' },
+    ];
 
-    const features = [
+    const FEATURES = [
         {
             id: 1,
             title: 'Simple Tenant Invitation',
@@ -103,9 +93,14 @@ export function FeaturesSection() {
         },
     ];
 
+    const { count: count1, setIsInView: setIsInView1 } = useCountAnimation(STATS[0].value);
+    const { count: count2, setIsInView: setIsInView2 } = useCountAnimation(STATS[1].value);
+    const { count: count3, setIsInView: setIsInView3 } = useCountAnimation(STATS[2].value);
+
     return (
         <section className="bg-background py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                {/* Header */}
                 <div className="mb-20 text-center">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
@@ -114,7 +109,7 @@ export function FeaturesSection() {
                         viewport={{ once: false, amount: 0.6 }}
                         className="mb-8 text-5xl leading-tight font-bold text-foreground lg:text-7xl"
                     >
-                        Next-Generation
+                        {HEADER_TITLE}
                         <br />
                         <motion.span
                             initial={{ backgroundPosition: '200% 0' }}
@@ -123,14 +118,11 @@ export function FeaturesSection() {
                             viewport={{ once: false }}
                             className="inline-block bg-gradient-to-r from-primary via-secondary to-accent bg-[length:200%_100%] bg-clip-text text-transparent"
                         >
-                            Rental Deals
+                            {HEADER_HIGHLIGHT}
                         </motion.span>
                     </motion.h2>
 
-                    <p className="mx-auto mb-12 max-w-4xl text-xl leading-relaxed text-muted-foreground">
-                        Experience the future of tenant placements with automated applications, real time insights, seamless tenant experiences and
-                        professional landlord communications
-                    </p>
+                    <p className="mx-auto mb-12 max-w-4xl text-xl leading-relaxed text-muted-foreground">{HEADER_DESCRIPTION}</p>
 
                     {/* Floating Stats */}
                     <div className="flex justify-center">
@@ -151,49 +143,30 @@ export function FeaturesSection() {
                             }}
                             className="mb-16 flex items-center space-x-12"
                         >
-                            <div className="group text-center w-32">
-                                <div className="mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110 min-h-[2.25rem] flex items-center justify-center">
-                                    {count1},000+
+                            {STATS.map((stat, i) => (
+                                <div key={stat.id} className="group w-32 text-center">
+                                    <div className="mb-2 flex min-h-[2.25rem] items-center justify-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
+                                        {i === 0 ? count1 : i === 1 ? count2 : count3}
+                                        {stat.suffix}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">{stat.label}</div>
                                 </div>
-                                <div className="text-sm text-muted-foreground">Applications</div>
-                            </div>
-                            <div className="h-8 w-px bg-gradient-to-b from-transparent via-border to-transparent"></div>
-                            <div className="group text-center w-32">
-                                <div className="mb-2 bg-gradient-to-r from-secondary to-accent bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110 min-h-[2.25rem] flex items-center justify-center">
-                                    {count2}%
-                                </div>
-                                <div className="text-sm text-muted-foreground">Conversion Rate</div>
-                            </div>
-                            <div className="h-8 w-px bg-gradient-to-b from-transparent via-border to-transparent"></div>
-                            <div className="group text-center w-32">
-                                <div className="mb-2 bg-gradient-to-r from-accent to-primary bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110 min-h-[2.25rem] flex items-center justify-center">
-                                    {count3}/7
-                                </div>
-                                <div className="text-sm text-muted-foreground">Support</div>
-                            </div>
+                            ))}
                         </motion.div>
                     </div>
                 </div>
 
                 {/* Feature Grid */}
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    {features.map((feature, index) => (
+                    {FEATURES.map((feature) => (
                         <div key={feature.id} className="relative h-80 rounded-xl border border-border bg-card/50">
-                            {/* Content */}
                             <div className="flex h-full flex-col p-8">
-                                {/* Icon */}
                                 <div className={`mb-6 flex h-16 w-16 items-center justify-center rounded-lg ${feature.iconBg}`}>{feature.icon}</div>
-
-                                {/* Title and Description - Flex grow to fill available space */}
                                 <div className="flex-grow">
                                     <h3 className="mb-3 line-clamp-1 text-xl font-bold text-foreground">{feature.title}</h3>
                                     <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
                                 </div>
-
-                                {/* Divider */}
                                 <div className="my-4 h-px bg-border"></div>
-
-                                {/* Stats at bottom - Always at bottom */}
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <div className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-lg font-bold text-transparent">
@@ -207,23 +180,17 @@ export function FeaturesSection() {
                     ))}
                 </div>
 
-                {/* Enhanced CTA Section */}
-                <motion.div 
+                {/* CTA */}
+                <motion.div
                     className="mt-24 text-center"
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
                     viewport={{ once: false, amount: 0.6 }}
                 >
                     <div className="relative inline-block">
                         <div className="absolute inset-0 animate-pulse rounded-2xl bg-gradient-to-r from-primary to-secondary opacity-75 blur-xl"></div>
-                        <motion.button 
-                            className="relative transform cursor-pointer rounded-2xl bg-gradient-to-r from-primary to-secondary px-12 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-primary hover:to-secondary hover:shadow-2xl"
-                            initial={{ scale: 1 }}
-                            whileInView={{ scale: [1, 1.05, 1] }}
-                            transition={{ duration: 0.8, delay: 0.3, ease: "easeInOut" }}
-                            viewport={{ once: false, amount: 0.6 }}
-                        >
+                        <motion.button className="relative transform cursor-pointer rounded-2xl bg-gradient-to-r from-primary to-secondary px-12 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-primary hover:to-secondary hover:shadow-2xl">
                             <span className="flex items-center space-x-3">
                                 <span>Try Now</span>
                                 <ArrowRight className="h-5 w-5" />

@@ -2,6 +2,24 @@ import { translate as t } from '@/utils/translate-utils';
 import { Home } from 'lucide-react';
 
 export function Footer() {
+    const BRAND_NAME = 'RentPath';
+    const BRAND_DESCRIPTION =
+        'Streamline your tenant application process from first contact to move-in. Say goodbye to incomplete applications, missing documents, and communication chaos.';
+
+    const PRODUCT_LINKS = [
+        { href: '#features', label: t('features') },
+        { href: '/register', label: t('pricing') },
+        { href: '/register', label: t('freeTrial') },
+    ];
+
+    const SUPPORT_LINKS = [
+        { href: '/contact-us', label: t('contactUs') },
+        { href: '/privacy-policy', label: t('privacyPolicy') },
+        { href: '/terms-of-use', label: 'Terms of Use' },
+    ];
+
+    const COPYRIGHT_TEXT = `© 2025 ${BRAND_NAME}. ${t('allRightsReserved')}`;
+
     return (
         <footer className="border-t border-border bg-surface py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -11,67 +29,40 @@ export function Footer() {
                             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-r from-primary to-secondary">
                                 <Home className="h-5 w-5 text-white" />
                             </div>
-                            <span className="text-xl font-bold text-foreground">RentPath</span>
+                            <span className="text-xl font-bold text-foreground">{BRAND_NAME}</span>
                         </div>
-                        <p className="max-w-md leading-relaxed text-muted-foreground">
-                            Streamline your tenant application process from first contact to move-in. Say goodbye to incomplete applications, missing documents, and communication chaos.
-                        </p>
+                        <p className="max-w-md leading-relaxed text-muted-foreground">{BRAND_DESCRIPTION}</p>
                     </div>
 
                     <div>
                         <h3 className="mb-4 font-bold text-foreground">{t('product')}</h3>
                         <ul className="space-y-3 text-muted-foreground">
-                            <li>
-                                <a
-                                    href="#features"
-                                    className="transition-colors hover:text-primary"
-                                >
-                                    {t('features')}
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="/register"
-                                    className="transition-colors hover:text-primary"
-                                >
-                                    {t('pricing')}
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="/register"
-                                    className="transition-colors hover:text-primary"
-                                >
-                                    {t('freeTrial')}
-                                </a>
-                            </li>
+                            {PRODUCT_LINKS.map((link, idx) => (
+                                <li key={idx}>
+                                    <a href={link.href} className="transition-colors hover:text-primary">
+                                        {link.label}
+                                    </a>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
                     <div>
                         <h3 className="mb-4 font-bold text-foreground">{t('support')}</h3>
                         <ul className="space-y-3 text-muted-foreground">
-                            <li>
-                                <a href="/contact-us" className="transition-colors hover:text-primary">
-                                    {t('contactUs')}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/privacy-policy" className="transition-colors hover:text-primary">
-                                    {t('privacyPolicy')}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/terms-of-use" className="transition-colors hover:text-primary">
-                                    Terms of Use
-                                </a>
-                            </li>
+                            {SUPPORT_LINKS.map((link, idx) => (
+                                <li key={idx}>
+                                    <a href={link.href} className="transition-colors hover:text-primary">
+                                        {link.label}
+                                    </a>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
 
                 <div className="mt-12 border-t border-border pt-8 text-center text-muted-foreground">
-                    <p>&copy; 2025 RentPath. {t('allRightsReserved')}</p>
+                    <p>{COPYRIGHT_TEXT}</p>
                 </div>
             </div>
         </footer>
