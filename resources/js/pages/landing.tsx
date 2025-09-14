@@ -12,7 +12,7 @@ import { translate as t } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 
-export default function WelcomePage() {
+export default function LandingPage() {
     const page = usePage<SharedData>();
     const { auth } = page.props;
 

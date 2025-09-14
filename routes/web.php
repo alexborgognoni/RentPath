@@ -8,8 +8,8 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyManagerController;
 
 Route::get('/', function () {
-    return Inertia::render('home');
-})->name('home');
+    return Inertia::render('landing');
+})->name('landing');
 
 Route::get('/privacy-policy', function () {
     return Inertia::render('privacy-policy');
