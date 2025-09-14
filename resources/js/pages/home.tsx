@@ -4,7 +4,8 @@ import { CtaSection } from '@/components/landing/cta-section';
 import { FeaturesSection } from '@/components/landing/features-section';
 import { Footer } from '@/components/landing/footer';
 import { ProblemSolutionSection } from '@/components/landing/problem-solution-section';
-import { TrustedBySection } from '@/components/landing/trusted-by-section';
+import { ReviewsSection } from '@/components/landing/reviews-section';
+// import { TrustedBySection } from '@/components/landing/trusted-by-section';
 import { ParallaxBackground } from '@/components/parallax-background';
 import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
@@ -81,9 +82,10 @@ export default function WelcomePage() {
                 </div>
             </section>
 
-            <TrustedBySection />
+            {/* <TrustedBySection /> */}
             <ProblemSolutionSection />
             <FeaturesSection />
+            <ReviewsSection />
             <BenefitsSection />
             <CtaSection />
             <Footer />
