@@ -1,24 +1,28 @@
-import { translate as t } from '@/utils/translate-utils';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { Home } from 'lucide-react';
 
 export function Footer() {
+    const { translations } = usePage<SharedData>().props;
+
     const BRAND_NAME = 'RentPath';
-    const BRAND_DESCRIPTION =
-        'Streamline your tenant application process from first contact to move-in. Say goodbye to incomplete applications, missing documents, and communication chaos.';
+    const BRAND_DESCRIPTION = translate(translations, 'landing.footer.description');
+    const PRODUCT_HEADING = translate(translations, 'landing.footer.product');
+    const SUPPORT_HEADING = translate(translations, 'landing.footer.support');
 
     const PRODUCT_LINKS = [
-        { href: '#features', label: t('features') },
-        { href: '/register', label: t('pricing') },
-        { href: '/register', label: t('freeTrial') },
+        { href: '#features', label: translate(translations, 'landing.footer.links.features') },
+        { href: '/register', label: translate(translations, 'landing.footer.links.pricing') },
+        { href: '/register', label: translate(translations, 'landing.footer.links.free_trial') },
     ];
 
     const SUPPORT_LINKS = [
-        { href: '/contact-us', label: t('contactUs') },
-        { href: '/privacy-policy', label: t('privacyPolicy') },
+        { href: '/contact-us', label: translate(translations, 'landing.footer.links.contact_us') },
+        { href: '/privacy-policy', label: translate(translations, 'landing.footer.links.privacy_policy') },
         { href: '/terms-of-use', label: 'Terms of Use' },
     ];
 
-    const COPYRIGHT_TEXT = `© 2025 ${BRAND_NAME}. ${t('allRightsReserved')}`;
+    const COPYRIGHT_TEXT = `© 2025 ${BRAND_NAME}. ${translate(translations, 'landing.footer.all_rights_reserved')}`;
 
     return (
         <footer className="border-t border-border bg-surface py-16">
@@ -35,7 +39,7 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-bold text-foreground">{t('product')}</h3>
+                        <h3 className="mb-4 font-bold text-foreground">{PRODUCT_HEADING}</h3>
                         <ul className="space-y-3 text-muted-foreground">
                             {PRODUCT_LINKS.map((link, idx) => (
                                 <li key={idx}>
@@ -48,7 +52,7 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 font-bold text-foreground">{t('support')}</h3>
+                        <h3 className="mb-4 font-bold text-foreground">{SUPPORT_HEADING}</h3>
                         <ul className="space-y-3 text-muted-foreground">
                             {SUPPORT_LINKS.map((link, idx) => (
                                 <li key={idx}>

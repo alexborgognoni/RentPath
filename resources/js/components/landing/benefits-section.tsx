@@ -1,53 +1,81 @@
-import { translate as t } from '@/utils/translate-utils';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Clock, Database, Euro, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function BenefitsSection() {
-    const HEADER_TITLE = 'Why Agents Choose RentPath';
+    const { translations } = usePage<SharedData>().props;
+
+    const HEADING = translate(translations, 'landing.benefits.heading');
+    
+    const FASTER_PLACEMENTS_TITLE = translate(translations, 'landing.benefits.benefits.faster_placements.title');
+    const FASTER_PLACEMENTS_DESCRIPTION = translate(translations, 'landing.benefits.benefits.faster_placements.description');
+    const CENTRALIZED_DATA_TITLE = translate(translations, 'landing.benefits.benefits.centralized_data.title');
+    const CENTRALIZED_DATA_DESCRIPTION = translate(translations, 'landing.benefits.benefits.centralized_data.description');
+    const AUTOMATED_UPDATES_TITLE = translate(translations, 'landing.benefits.benefits.automated_updates.title');
+    const AUTOMATED_UPDATES_DESCRIPTION = translate(translations, 'landing.benefits.benefits.automated_updates.description');
+    const REDUCED_OVERHEAD_TITLE = translate(translations, 'landing.benefits.benefits.reduced_overhead.title');
+    const REDUCED_OVERHEAD_DESCRIPTION = translate(translations, 'landing.benefits.benefits.reduced_overhead.description');
+    const HIGHER_CONVERSION_TITLE = translate(translations, 'landing.benefits.benefits.higher_conversion.title');
+    const HIGHER_CONVERSION_DESCRIPTION = translate(translations, 'landing.benefits.benefits.higher_conversion.description');
+
     const BENEFITS = [
         {
-            title: 'Faster Placements, Swifter Commissions',
-            description: 'Automated follow-ups help place tenants faster. Know exactly when each property will be rented.',
+            title: FASTER_PLACEMENTS_TITLE,
+            description: FASTER_PLACEMENTS_DESCRIPTION,
             icon: Clock,
             gradient: 'bg-gradient-to-r from-primary to-secondary',
         },
         {
-            title: 'All Tenant Data, Centralized',
-            description: 'All tenant documents and application progress stored securely. No more searching through emails.',
+            title: CENTRALIZED_DATA_TITLE,
+            description: CENTRALIZED_DATA_DESCRIPTION,
             icon: Database,
             gradient: 'bg-gradient-to-r from-primary to-primary',
         },
         {
-            title: 'Automated Landlord Updates',
-            description: 'Automated updates and professional reporting strengthen your relationships with property owners.',
+            title: AUTOMATED_UPDATES_TITLE,
+            description: AUTOMATED_UPDATES_DESCRIPTION,
             icon: TrendingUp,
             gradient: 'bg-gradient-to-r from-secondary to-primary',
         },
         {
-            title: 'Reduced Administrative Overhead',
-            description: 'Less time on paperwork means more time for revenue-generating activities and client relationships.',
+            title: REDUCED_OVERHEAD_TITLE,
+            description: REDUCED_OVERHEAD_DESCRIPTION,
             icon: Euro,
             gradient: 'bg-gradient-to-r from-secondary to-accent',
         },
         {
-            title: 'Higher Conversion Rates',
-            description: 'Streamlined processes lead to better tenant experience and higher application completion rates.',
+            title: HIGHER_CONVERSION_TITLE,
+            description: HIGHER_CONVERSION_DESCRIPTION,
             icon: CheckCircle,
             gradient: 'bg-gradient-to-r from-primary to-secondary',
         },
     ];
 
+    const COMPLETION_RATE_LABEL = translate(translations, 'landing.benefits.metrics.completion_rate_label');
+    const TIME_TO_PLACEMENT_LABEL = translate(translations, 'landing.benefits.metrics.time_to_placement_label');
+    const LANDLORD_SATISFACTION_LABEL = translate(translations, 'landing.benefits.metrics.landlord_satisfaction_label');
+    const ADMIN_TIME_LABEL = translate(translations, 'landing.benefits.metrics.admin_time_label');
+
     const METRICS = [
-        { label: 'Application Completion Rate', value: '+85%', color: 'text-primary' },
-        { label: 'Time to Placement', value: '-60%', color: 'text-secondary' },
-        { label: 'Landlord Satisfaction', value: '+90%', color: 'text-primary' },
-        { label: 'Administrative Time', value: '-75%', color: 'text-secondary' },
+        { label: COMPLETION_RATE_LABEL, value: '+85%', color: 'text-primary' },
+        { label: TIME_TO_PLACEMENT_LABEL, value: '-60%', color: 'text-secondary' },
+        { label: LANDLORD_SATISFACTION_LABEL, value: '+90%', color: 'text-primary' },
+        { label: ADMIN_TIME_LABEL, value: '-75%', color: 'text-secondary' },
     ];
 
-    const TRIAL_BENEFITS = ['Unlimited tenant applications.', 'Automated document collection.', 'Progress tracking & notifications.'];
+    const TRIAL_HEADING = translate(translations, 'landing.benefits.trial.heading');
+    const PRICING_UNIT = translate(translations, 'landing.benefits.trial.pricing.unit');
+    const PRICING_OFFER = translate(translations, 'landing.benefits.trial.pricing.offer');
+    
+    const TRIAL_BENEFITS = [
+        translate(translations, 'landing.benefits.trial.benefits.0'),
+        translate(translations, 'landing.benefits.trial.benefits.1'),
+        translate(translations, 'landing.benefits.trial.benefits.2'),
+    ];
 
-    const PRICING = { price: '25', currency: 'per agent/month', icon: Euro };
+    const PRICING = { price: '25', currency: PRICING_UNIT, icon: Euro };
 
     const [shouldShake, setShouldShake] = useState(false);
 
@@ -65,7 +93,7 @@ export function BenefitsSection() {
                 <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
                     {/* Left - Benefits */}
                     <div>
-                        <h2 className="mb-8 text-4xl font-bold text-foreground lg:text-5xl">{HEADER_TITLE}</h2>
+                        <h2 className="mb-8 text-4xl font-bold text-foreground lg:text-5xl">{HEADING}</h2>
                         <div className="space-y-8">
                             {BENEFITS.map((benefit, idx) => {
                                 const Icon = benefit.icon;
@@ -108,7 +136,7 @@ export function BenefitsSection() {
                         <div className="relative rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 to-secondary/10 p-8 shadow-xl">
                             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5"></div>
                             <div className="relative text-center">
-                                <h3 className="mb-4 text-xl font-bold text-foreground">Start Your Free Trial</h3>
+                                <h3 className="mb-4 text-xl font-bold text-foreground">{TRIAL_HEADING}</h3>
 
                                 {/* Benefits */}
                                 <div className="mb-4 space-y-3">
@@ -141,7 +169,7 @@ export function BenefitsSection() {
                                             style={{ transformOrigin: 'center center' }}
                                             className="rounded-lg border border-green-500/20 bg-green-500/10 p-3"
                                         >
-                                            <p className="font-semibold text-green-600">🎉 Get 3 months FREE when you sign up!</p>
+                                            <p className="font-semibold text-green-600">{PRICING_OFFER}</p>
                                         </motion.div>
                                     </div>
                                 </div>
@@ -150,7 +178,7 @@ export function BenefitsSection() {
                                     href="/register"
                                     className="block w-full rounded-lg bg-gradient-to-r from-primary to-secondary py-4 text-center text-lg font-bold text-white shadow-lg transition-all hover:scale-105 hover:from-primary hover:to-secondary"
                                 >
-                                    {t('getStarted')}
+                                    Get Started
                                 </a>
                             </div>
                         </div>

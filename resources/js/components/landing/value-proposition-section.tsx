@@ -31,6 +31,7 @@ function useCountAnimation(target: number, duration: number = 2000) {
 }
 
 export function ValuePropositionSection() {
+
     const HEADER_TITLE = 'Next-Generation';
     const HEADER_HIGHLIGHT = 'Rental Deals';
     const HEADER_DESCRIPTION =

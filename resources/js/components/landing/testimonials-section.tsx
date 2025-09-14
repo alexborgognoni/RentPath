@@ -1,3 +1,5 @@
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 
@@ -18,48 +20,47 @@ const renderStars = (rating: number) =>
     ));
 
 export function TestimonialsSection() {
-    const HEADER_TITLE = 'Trusted by Property Professionals';
-    const HEADER_DESCRIPTION = 'See why thousands of agents, property managers, and landlords choose RentPath to streamline rentals.';
+    const { translations } = usePage<SharedData>().props;
+
+    const HEADER_TITLE = translate(translations, 'landing.testimonials.heading');
+    const HEADER_DESCRIPTION = translate(translations, 'landing.testimonials.subtitle');
 
     const REVIEWS: Review[] = [
         {
             id: 1,
             name: 'Amar Ramdedovic',
-            role: 'Real Estate Agent',
+            role: translate(translations, 'landing.testimonials.testimonials.amar_ramdedovic.role'),
             company: 'Valora',
             avatar: 'AR',
             avatarUrl: 'https://i1.static.athome.eu/images/annonces2/agent/21e564872da32ef502948911aa9589583d720136.jpg',
             rating: 5,
-            content:
-                'RentPath transformed our application process completely. We went from 3-week visit delays to same-day lease signing. The automated document collection is a game-changer.',
+            content: translate(translations, 'landing.testimonials.testimonials.amar_ramdedovic.content'),
         },
         {
             id: 2,
             name: 'Alessandro Rossi',
-            role: 'Landlord with 25+ Properties',
+            role: translate(translations, 'landing.testimonials.testimonials.alessandro_rossi.role'),
             avatar: 'AR',
             rating: 5,
-            content:
-                'Since switching to RentPath, I haven’t looked back. Tenant retention has improved noticeably, and managing my rentals has become far simpler and less stressful than I ever expected.',
+            content: translate(translations, 'landing.testimonials.testimonials.alessandro_rossi.content'),
         },
         {
             id: 3,
             name: 'Philippe Hengen',
-            role: 'Agency Director',
+            role: translate(translations, 'landing.testimonials.testimonials.philippe_hengen.role'),
             company: 'AXA',
             avatar: 'PH',
             avatarUrl:
                 'https://media.licdn.com/dms/image/v2/C4E03AQEVIRE2F_cMfA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1650549914072?e=1760572800&v=beta&t=41c1UTxyqbx-4appS5xPil1sGV9IvGZ-28yt-KBFpHo',
             rating: 5,
-            content:
-                'RentPath makes owning multiple properties effortless. It’s helped reduce vacancies and quickly find tenants. I’d recommend it to anyone looking to optimize their time.',
+            content: translate(translations, 'landing.testimonials.testimonials.philippe_hengen.content'),
         },
     ];
 
     const STATS = [
-        { value: '4.9/5', label: 'Average Rating' },
-        { value: '200+', label: 'Happy Customers' },
-        { value: '500+', label: 'Properties Managed' },
+        { value: '4.9/5', label: translate(translations, 'landing.testimonials.stats.rating_label') },
+        { value: '200+', label: translate(translations, 'landing.testimonials.stats.customers_label') },
+        { value: '500+', label: translate(translations, 'landing.testimonials.stats.properties_label') },
     ];
 
     return (
