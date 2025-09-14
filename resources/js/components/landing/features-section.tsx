@@ -41,7 +41,7 @@ export function FeaturesSection() {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     
     const { count: count1, setIsInView: setIsInView1 } = useCountAnimation(5);
-    const { count: count2, setIsInView: setIsInView2 } = useCountAnimation(99.2);
+    const { count: count2, setIsInView: setIsInView2 } = useCountAnimation(97);
     const { count: count3, setIsInView: setIsInView3 } = useCountAnimation(24);
 
     useEffect(() => {
@@ -153,16 +153,16 @@ export function FeaturesSection() {
                         >
                             <div className="group text-center w-32">
                                 <div className="mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110 min-h-[2.25rem] flex items-center justify-center">
-                                    {count1}k+
+                                    {count1},000+
                                 </div>
-                                <div className="text-sm text-muted-foreground">Applications Processed</div>
+                                <div className="text-sm text-muted-foreground">Applications</div>
                             </div>
                             <div className="h-8 w-px bg-gradient-to-b from-transparent via-border to-transparent"></div>
                             <div className="group text-center w-32">
                                 <div className="mb-2 bg-gradient-to-r from-secondary to-accent bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110 min-h-[2.25rem] flex items-center justify-center">
                                     {count2}%
                                 </div>
-                                <div className="text-sm text-muted-foreground">Success Rate</div>
+                                <div className="text-sm text-muted-foreground">Conversion Rate</div>
                             </div>
                             <div className="h-8 w-px bg-gradient-to-b from-transparent via-border to-transparent"></div>
                             <div className="group text-center w-32">
