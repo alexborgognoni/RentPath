@@ -112,7 +112,7 @@ export function TestimonialsSection() {
                                     <div>
                                         <div className="font-semibold text-foreground">{review.name}</div>
                                         <div className="text-sm text-muted-foreground">
-                                            {review.role} {review.company && `at ${review.company}`}
+                                            {review.role} {review.company && ` ${translate(translations, 'landing.testimonials.at_keyword')} ${review.company}`}
                                         </div>
                                     </div>
                                 </div>

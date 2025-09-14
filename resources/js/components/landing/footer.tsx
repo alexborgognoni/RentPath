@@ -19,7 +19,7 @@ export function Footer() {
     const SUPPORT_LINKS = [
         { href: '/contact-us', label: translate(translations, 'landing.footer.links.contact_us') },
         { href: '/privacy-policy', label: translate(translations, 'landing.footer.links.privacy_policy') },
-        { href: '/terms-of-use', label: 'Terms of Use' },
+        { href: '/terms-of-use', label: translate(translations, 'landing.footer.links.terms_of_use') },
     ];
 
     const COPYRIGHT_TEXT = `© 2025 ${BRAND_NAME}. ${translate(translations, 'landing.footer.all_rights_reserved')}`;

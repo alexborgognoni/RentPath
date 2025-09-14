@@ -3,106 +3,106 @@
 return [
     // Hero Section
     'hero' => [
-        'heading_primary' => 'Streamline Tenant Applications,',
-        'heading_highlighted' => 'Close Deals Faster.',
-        'subtitle' => 'No more incomplete applications or endless chasing. Invite, track, and follow up on leads instantly. All from one intelligent Dashboard.',
-        'cta_primary_auth' => 'Go to Dashboard',
-        'cta_primary_guest' => 'Get Started',
-        'cta_secondary' => 'See How It Works',
+        'heading_primary' => 'Huurder Aanvragen Stroomlijnen,',
+        'heading_highlighted' => 'Sneller Afsluiten.',
+        'subtitle' => 'Geen incomplete aanvragen of eindeloos achtervolgen meer. Nodig uit, volg en follow-up prospects direct. Alles vanuit één intelligent dashboard.',
+        'cta_primary_auth' => 'Naar Dashboard',
+        'cta_primary_guest' => 'Aan de Slag',
+        'cta_secondary' => 'Zie Hoe Het Werkt',
     ],
 
     // Top Features Section
     'top_features' => [
-        'heading' => 'Built for Modern Rental Applications',
-        'subtitle' => 'Transform your tenant placements with real-time insights, document management, and automated landlord updates.',
+        'heading' => 'Gebouwd voor Moderne Huur Aanvragen',
+        'subtitle' => 'Transformeer uw huurder plaatsingen met real-time inzichten, documentbeheer en geautomatiseerde verhuurder updates.',
         'complete_applications' => [
-            'title' => 'Complete Applications',
-            'description' => 'No more chasing IDs, contracts, or references — invite tenants and collect applications in one place.',
+            'title' => 'Volledige Aanvragen',
+            'description' => 'Geen achtervolging van ID\'s, contracten of referenties meer — nodig huurders uit en verzamel aanvragen op één plek.',
         ],
         'streamlined_leasing' => [
-            'title' => 'Streamlined Leasing',
-            'description' => 'Seamlessly guide applicants to move-in — cutting time-to-fill and reducing vacancies.',
+            'title' => 'Gestroomlijnde Verhuur',
+            'description' => 'Begeleid aanvragers naadloos naar intrek — verkort tijd tot verhuur en verminder leegstand.',
         ],
         'occupancy_overview' => [
-            'title' => 'Occupancy Overview',
-            'description' => 'See which units are vacant, occupied, or have leads — and never lose sight of your portfolio.',
+            'title' => 'Bezettingsoverzicht',
+            'description' => 'Zie welke eenheden leeg, bewoond zijn of prospects hebben — en verlies nooit het overzicht van uw portefeuille.',
         ],
     ],
 
     // Demo Carousel Section
     'demo_carousel' => [
-        'heading' => 'Streamlined from First Interest to Move-In',
-        'subtitle' => 'Manual reviews, missed applications, messy communication - rentals are inefficient. Our platform streamlines the tenant journey.',
-        'interactive_demo' => 'Interactive Demo',
+        'heading' => 'Gestroomlijnd van Eerste Interesse tot Intrek',
+        'subtitle' => 'Handmatige beoordelingen, gemiste aanvragen, rommelige communicatie - verhuur is inefficiënt. ons platform stroomlijnt de huurder reis.',
+        'interactive_demo' => 'Interactieve Demo',
         'slides' => [
             "real_time_dashboard" => [
                 'title' => 'Real-time Dashboard',
-                'description' => 'Visibility across all your properties, tracking applications, inspections, leases, and marketing efforts — instantly.',
+                'description' => 'Zichtbaarheid over al uw eigendommen, volgen van aanvragen, inspecties, huurcontracten en marketing inspanningen — direct.',
                 'features' => [
-                    'Live application pipeline',
-                    'Lease & marketing calendar',
-                    'User-friendly inspection tools',
-                    'Swift landlord reporting',
+                    'Live aanvragen pijplijn',
+                    'Huur & marketing kalender',
+                    'Gebruiksvriendelijke inspectie tools',
+                    'Snelle verhuurder rapportage',
                 ],
             ],
             "guided_applications" => [
-                'title' => 'Guided Tenant Applications',
-                'description' => 'Invite leads to a step-by-step application flow that ensures all necessary documents are collected. Complete applications, every time.',
+                'title' => 'Begeleide Huurder Aanvragen',
+                'description' => 'Nodig prospects uit voor een stap-voor-stap aanvraag proces dat ervoor zorgt dat alle benodigde documenten worden verzameld. Volledige aanvragen, elke keer.',
                 'features' => [
-                    'Application invite links',
-                    'Progress validation at each step',
-                    'Required documents checklists',
-                    'Professional application experience',
+                    'Aanvraag uitnodigingslinks',
+                    'Voortgang validatie bij elke stap',
+                    'Vereiste documenten checklists',
+                    'Professionele aanvraag ervaring',
                 ],
             ],
             "automated_review" => [
-                'title' => 'Automated Application Review',
-                'description' => 'Validate tenant information and documents instantly. No more digging through emails or paper.',
+                'title' => 'Geautomatiseerde Aanvraag Beoordeling',
+                'description' => 'Valideer huurder informatie en documenten direct. Geen spitten door emails of papier meer.',
                 'features' => [
-                    'Missing information alerts',
-                    'Authenticity and identity validation',
-                    'Instant document verification',
-                    'Complete contract management',
+                    'Ontbrekende informatie waarschuwingen',
+                    'Authenticiteit en identiteit validatie',
+                    'Directe document verificatie',
+                    'Volledig contract beheer',
                 ],
             ],
             "progress_visibility" => [
-                'title' => 'Full Progress Visibility',
-                'description' => 'Monitor each applicant and lease stage in one view to spot bottlenecks and accelerate leasing.',
+                'title' => 'Volledige Voortgang Zichtbaarheid',
+                'description' => 'Monitor elke aanvrager en huurcontract fase in één overzicht om knelpunten te spotten en verhuur te versnellen.',
                 'features' => [
-                    'Real-time application status',
-                    'Progress indicators per applicant',
-                    'Property lease tracking',
-                    'Bottleneck identification',
+                    'Real-time aanvraag status',
+                    'Voortgang indicatoren per aanvrager',
+                    'Eigendom huurcontract tracking',
+                    'Knelpunt identificatie',
                 ],
             ],
             "smart_followup" => [
-                'title' => 'Smart Follow-up System',
-                'description' => 'Automated reminders and follow-ups keep applicants moving, reducing vacant days.',
+                'title' => 'Slim Follow-up Systeem',
+                'description' => 'Geautomatiseerde herinneringen en follow-ups houden aanvragers in beweging, vermindert leegstand dagen.',
                 'features' => [
-                    'Automated reminder emails',
-                    'Application recovery for stalled submissions',
-                    'Follow-up scheduling',
-                    'Conversion optimization',
+                    'Geautomatiseerde herinnerings emails',
+                    'Aanvraag herstel voor vastgelopen inzendingen',
+                    'Follow-up planning',
+                    'Conversie optimalisatie',
                 ],
             ],
             "digital_inspections" => [
-                'title' => 'Digital Property Inspections',
-                'description' => 'Capture move-in/move-out conditions digitally, with photos, notes, and full history for transparency and efficiency.',
+                'title' => 'Digitale Eigendom Inspecties',
+                'description' => 'Leg intrek/uittrek condities digitaal vast, met foto\'s, notities en volledige geschiedenis voor transparantie en efficiëntie.',
                 'features' => [
-                    'Photo-documented inspections',
-                    'Complete inspection history',
-                    'Digital report generation',
-                    'Move-in & move-out tracking',
+                    'Foto-gedocumenteerde inspecties',
+                    'Volledige inspectie geschiedenis',
+                    'Digitale rapport generatie',
+                    'Intrek & uittrek tracking',
                 ],
             ],
             "landlord_reporting" => [
-                'title' => 'Professional Landlord Reporting',
-                'description' => 'Keep landlords informed with automated updates, tenant validation, and professional reports.',
+                'title' => 'Professionele Verhuurder Rapportage',
+                'description' => 'Houd verhuurders geïnformeerd met geautomatiseerde updates, huurder validatie en professionele rapporten.',
                 'features' => [
-                    'Automated report generation',
-                    'Automated tenant validation',
-                    'Professional progress updates',
-                    'Live client communication',
+                    'Geautomatiseerde rapport generatie',
+                    'Geautomatiseerde huurder validatie',
+                    'Professionele voortgang updates',
+                    'Live klant communicatie',
                 ],
             ],
         ],
@@ -110,117 +110,146 @@ return [
 
     // Value Proposition Section
     'value_proposition' => [
-        'heading' => 'Why Choose RentPath?',
-        'subtitle' => 'Built specifically for property agents to scale their business.',
+        'heading_primary' => 'Volgende Generatie',
+        'heading_highlighted' => 'Huur Deals',
+        'subtitle' => 'Ervaar de toekomst van huurder plaatsingen met geautomatiseerde aanvragen, real-time inzichten, naadloze huurder ervaringen en professionele verhuurder communicatie',
+        'stats' => [
+            'applications' => 'Aanvragen',
+            'conversion_rate' => 'Conversie Percentage',
+            'support' => 'Ondersteuning',
+        ],
         'features' => [
-            'efficiency' => [
-                'title' => 'Increase Efficiency',
-                'description' => 'Automate repetitive tasks and focus on growing your business.',
+            'simple_tenant_invitation' => [
+                'title' => 'Eenvoudige Huurder Uitnodiging',
+                'description' => 'Verstuur professionele uitnodigingslinks met één klik. Stap-voor-stap formulieren zorgen voor een naadloze huurder ervaring.',
+                'stats_label' => 'Verzend Uitnodigingen',
             ],
-            'tenant_experience' => [
-                'title' => 'Better Tenant Experience',
-                'description' => 'Professional application process that tenants love.',
+            'document_collection' => [
+                'title' => 'Document Verzameling',
+                'description' => 'Intelligente document verzameling die 100% voltooiingspercentages garandeert. Geen achtervolging van papierwerk meer.',
+                'stats_label' => 'Volledige Aanvragen',
             ],
-            'landlord_satisfaction' => [
-                'title' => 'Landlord Satisfaction',
-                'description' => 'Keep landlords informed with automated updates and reports.',
+            'complete_visibility' => [
+                'title' => 'Volledige Zichtbaarheid',
+                'description' => 'Zie alle eigendommen en aanvragen in één dashboard. Volg voortgang in real-time en beheer huurders efficiënt.',
+                'stats_label' => 'Voortgang Tracking',
             ],
-            'data_insights' => [
-                'title' => 'Data & Insights',
-                'description' => 'Make informed decisions with comprehensive analytics.',
+            'secure_document_storage' => [
+                'title' => 'Veilige Document Opslag',
+                'description' => 'Bewaar huurder documenten veilig in de cloud met volledige audit trails. Toegang altijd en overal.',
+                'stats_label' => 'Veiligheid',
             ],
+            'intelligent_notifications' => [
+                'title' => 'Intelligente Meldingen',
+                'description' => 'Slimme meldingen die het juiste bericht op het perfecte moment versturen. Maximaliseer betrokkenheid en respons percentages.',
+                'stats_label' => 'Live Updates',
+            ],
+            'digital_inspection_features' => [
+                'title' => 'Digitale Inspectie Functies',
+                'description' => 'Stroomlijn inspecties met foto documentatie, geautomatiseerde rapporten en volledige intrek/uittrek geschiedenis.',
+                'stats_label' => 'Tijd Bespaard',
+            ],
+        ],
+        'cta_subtitle' => 'Sluit je aan bij duizenden eigendom beheerders die hun bedrijf hebben getransformeerd.',
+        'stats_percentages' => [
+            'real_time' => 'Real-time',
+            'bank_level' => 'Bank-niveau',
         ],
     ],
 
     // Testimonials Section
     'testimonials' => [
-        'heading' => 'Trusted by Property Professionals',
-        'subtitle' => 'See why thousands of agents, property managers, and landlords choose RentPath to streamline rentals.',
+        'heading' => 'Vertrouwd door Eigendom Professionals',
+        'subtitle' => 'Zie waarom duizenden makelaars, eigendom beheerders en verhuurders RentPath kiezen om verhuur te stroomlijnen.',
         'testimonials' => [
             'amar_ramdedovic' => [
-                'role' => 'Real Estate Agent',
-                'content' => 'RentPath transformed our application process completely. We went from 3-week visit delays to same-day lease signing. The automated document collection is a game-changer.',
+                'role' => 'Makelaar',
+                'content' => 'RentPath heeft ons aanvraag proces volledig getransformeerd. We gingen van 3-weken bezichtiging vertragingen naar zelfde-dag huurcontract ondertekening. De geautomatiseerde document verzameling is een spelwisselaar.',
             ],
             'alessandro_rossi' => [
-                'role' => 'Landlord with 25+ Properties',
-                'content' => 'Since switching to RentPath, I haven\'t looked back. Tenant retention has improved noticeably, and managing my rentals has become far simpler and less stressful than I ever expected.',
+                'role' => 'Verhuurder met 25+ Eigendommen',
+                'content' => 'Sinds de overstap naar RentPath heb ik nooit terug gekeken. Huurder retentie is merkbaar verbeterd, en het beheren van mijn verhuur is veel eenvoudiger en stressvrij geworden dan ik ooit verwacht had.',
             ],
             'philippe_hengen' => [
-                'role' => 'Agency Director',
-                'content' => 'RentPath makes owning multiple properties effortless. It\'s helped reduce vacancies and quickly find tenants. I\'d recommend it to anyone looking to optimize their time.',
+                'role' => 'Agentschap Directeur',
+                'content' => 'RentPath maakt het bezitten van meerdere eigendommen moeiteloos. Het heeft geholpen leegstand te verminderen en snel huurders te vinden. Ik zou het aanbevelen aan iedereen die hun tijd wil optimaliseren.',
             ],
         ],
         'stats' => [
-            'rating_label' => 'Average Rating',
-            'customers_label' => 'Happy Customers',
-            'properties_label' => 'Properties Managed',
+            'rating_label' => 'Gemiddelde Beoordeling',
+            'customers_label' => 'Tevreden Klanten',
+            'properties_label' => 'Beheerde Eigendommen',
         ],
+        'at_keyword' => 'bij',
     ],
 
     // Benefits Section
     'benefits' => [
-        'heading' => 'Why Agents Choose RentPath',
+        'heading' => 'Waarom Makelaars RentPath Kiezen',
         'benefits' => [
             'faster_placements' => [
-                'title' => 'Faster Placements, Swifter Commissions',
-                'description' => 'Automated follow-ups help place tenants faster. Know exactly when each property will be rented.',
+                'title' => 'Snellere Plaatsingen, Snellere Commissies',
+                'description' => 'Geautomatiseerde follow-ups helpen huurders sneller te plaatsen. Weet precies wanneer elke eigendom verhuurd zal worden.',
             ],
             'centralized_data' => [
-                'title' => 'All Tenant Data, Centralized',
-                'description' => 'All tenant documents and application progress stored securely. No more searching through emails.',
+                'title' => 'Alle Huurder Data, Gecentraliseerd',
+                'description' => 'Alle huurder documenten en aanvraag voortgang veilig opgeslagen. Geen zoeken door emails meer.',
             ],
             'automated_updates' => [
-                'title' => 'Automated Landlord Updates',
-                'description' => 'Automated updates and professional reporting strengthen your relationships with property owners.',
+                'title' => 'Geautomatiseerde Verhuurder Updates',
+                'description' => 'Geautomatiseerde updates en professionele rapportage verstevigen uw relaties met eigendom eigenaren.',
             ],
             'reduced_overhead' => [
-                'title' => 'Reduced Administrative Overhead',
-                'description' => 'Less time on paperwork means more time for revenue-generating activities and client relationships.',
+                'title' => 'Verminderde Administratieve Overhead',
+                'description' => 'Minder tijd aan papierwerk betekent meer tijd voor inkomsten-genererende activiteiten en klantrelaties.',
             ],
             'higher_conversion' => [
-                'title' => 'Higher Conversion Rates',
-                'description' => 'Streamlined processes lead to better tenant experience and higher application completion rates.',
+                'title' => 'Hogere Conversie Percentages',
+                'description' => 'Gestroomlijnde processen leiden tot betere huurder ervaring en hogere aanvraag voltooiing percentages.',
             ],
         ],
         'metrics' => [
-            'completion_rate_label' => 'Application Completion Rate',
-            'time_to_placement_label' => 'Time to Placement',
-            'landlord_satisfaction_label' => 'Landlord Satisfaction',
-            'admin_time_label' => 'Administrative Time',
+            'heading' => 'Belangrijkste Metrics Verbetering',
+            'completion_rate_label' => 'Aanvraag Voltooiing Percentage',
+            'time_to_placement_label' => 'Tijd tot Plaatsing',
+            'landlord_satisfaction_label' => 'Verhuurder Tevredenheid',
+            'admin_time_label' => 'Administratieve Tijd',
         ],
         'trial' => [
-            'heading' => 'Start Your Free Trial',
+            'heading' => 'Start Uw Gratis Proefperiode',
             'benefits' => [
-                'Unlimited tenant applications.',
-                'Automated document collection.',
-                'Progress tracking & notifications.',
+                'Onbeperkte huurder aanvragen.',
+                'Geautomatiseerde document verzameling.',
+                'Voortgang tracking & notificaties.',
             ],
             'pricing' => [
-                'unit' => 'per agent/month',
-                'offer' => '🎉 Get 3 months FREE when you sign up!',
+                'unit' => 'per makelaar/maand',
+                'offer' => '🎉 Krijg 3 maanden GRATIS bij aanmelding!',
             ],
         ],
     ],
 
     // CTA Section
     'cta' => [
-        'heading' => 'Ready to End Application Chaos?',
-        'subtitle' => 'Join property agents who have streamlined their tenant application process and improve their service quality with landlords and tenants alike.',
-        'button_text' => 'Start Your Free Trial',
+        'heading' => 'Klaar om Aanvraag Chaos te Beëindigen?',
+        'subtitle' => 'Sluit je aan bij eigendom makelaars die hun huurder aanvraag proces hebben gestroomlijnd en hun service kwaliteit met verhuurders en huurders verbeteren.',
+        'button_text' => 'Start Uw Gratis Proefperiode',
     ],
 
     // Footer
     'footer' => [
-        'description' => 'RentPath is the easiest way to manage rental properties.',
+        'description' => 'Stroomlijn uw huurder aanvraag proces van eerste contact tot intrek. Zeg vaarwel tegen incomplete aanvragen, ontbrekende documenten en communicatie chaos.',
         'product' => 'Product',
-        'support' => 'Support',
-        'all_rights_reserved' => 'All rights reserved',
+        'support' => 'Ondersteuning',
+        'all_rights_reserved' => 'Alle rechten voorbehouden',
         'links' => [
-            'features' => 'Features',
-            'pricing' => 'Pricing',
+            'features' => 'Functies',
+            'pricing' => 'Prijzen',
+            'free_trial' => 'Gratis Proefperiode',
             'help_center' => 'Help Center',
-            'contact_us' => 'Contact Us',
-            'privacy_policy' => 'Privacy Policy',
+            'contact_us' => 'Contact Ons',
+            'privacy_policy' => 'Privacybeleid',
+            'terms_of_use' => 'Gebruiksvoorwaarden',
         ],
     ],
 ];

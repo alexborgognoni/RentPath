@@ -120,7 +120,7 @@ export function BenefitsSection() {
                         <div className="relative mb-8 rounded-2xl border border-border bg-card p-8 shadow-xl">
                             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5"></div>
                             <div className="relative">
-                                <h3 className="mb-6 text-2xl font-bold text-foreground">Key Metrics Improvement</h3>
+                                <h3 className="mb-6 text-2xl font-bold text-foreground">{translate(translations, 'landing.benefits.metrics.heading')}</h3>
                                 <div className="space-y-6">
                                     {METRICS.map((metric, idx) => (
                                         <div key={idx} className="flex items-center justify-between">

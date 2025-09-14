@@ -3,106 +3,106 @@
 return [
     // Hero Section
     'hero' => [
-        'heading_primary' => 'Streamline Tenant Applications,',
-        'heading_highlighted' => 'Close Deals Faster.',
-        'subtitle' => 'No more incomplete applications or endless chasing. Invite, track, and follow up on leads instantly. All from one intelligent Dashboard.',
-        'cta_primary_auth' => 'Go to Dashboard',
-        'cta_primary_guest' => 'Get Started',
-        'cta_secondary' => 'See How It Works',
+        'heading_primary' => 'Mieter-Bewerbungen Optimieren,',
+        'heading_highlighted' => 'Schneller Abschließen.',
+        'subtitle' => 'Schluss mit unvollständigen Bewerbungen und endlosem Nachfassen. Laden Sie ein, verfolgen Sie und folgen Sie Interessenten sofort nach. Alles von einem intelligenten Dashboard.',
+        'cta_primary_auth' => 'Zum Dashboard',
+        'cta_primary_guest' => 'Loslegen',
+        'cta_secondary' => 'Wie es Funktioniert',
     ],
 
     // Top Features Section
     'top_features' => [
-        'heading' => 'Built for Modern Rental Applications',
-        'subtitle' => 'Transform your tenant placements with real-time insights, document management, and automated landlord updates.',
+        'heading' => 'Entwickelt für Moderne Mietbewerbungen',
+        'subtitle' => 'Transformieren Sie Ihre Mieterplatzierungen mit Echtzeit-Insights, Dokumentenverwaltung und automatisierten Vermieter-Updates.',
         'complete_applications' => [
-            'title' => 'Complete Applications',
-            'description' => 'No more chasing IDs, contracts, or references — invite tenants and collect applications in one place.',
+            'title' => 'Vollständige Bewerbungen',
+            'description' => 'Schluss mit dem Hinterherlaufen nach Ausweisen, Verträgen oder Referenzen — laden Sie Mieter ein und sammeln Sie Bewerbungen an einem Ort.',
         ],
         'streamlined_leasing' => [
-            'title' => 'Streamlined Leasing',
-            'description' => 'Seamlessly guide applicants to move-in — cutting time-to-fill and reducing vacancies.',
+            'title' => 'Optimierte Vermietung',
+            'description' => 'Führen Sie Bewerber nahtlos zum Einzug — verkürzen Sie die Vermietungszeit und reduzieren Sie Leerstände.',
         ],
         'occupancy_overview' => [
-            'title' => 'Occupancy Overview',
-            'description' => 'See which units are vacant, occupied, or have leads — and never lose sight of your portfolio.',
+            'title' => 'Belegungsübersicht',
+            'description' => 'Sehen Sie, welche Einheiten leer, bewohnt sind oder Interessenten haben — und verlieren Sie nie den Überblick über Ihr Portfolio.',
         ],
     ],
 
     // Demo Carousel Section
     'demo_carousel' => [
-        'heading' => 'Streamlined from First Interest to Move-In',
-        'subtitle' => 'Manual reviews, missed applications, messy communication - rentals are inefficient. Our platform streamlines the tenant journey.',
-        'interactive_demo' => 'Interactive Demo',
+        'heading' => 'Optimiert vom Ersten Interesse bis zum Einzug',
+        'subtitle' => 'Manuelle Prüfungen, verpasste Bewerbungen, chaotische Kommunikation - Vermietungen sind ineffizient. Unsere Plattform optimiert die Mieter-Journey.',
+        'interactive_demo' => 'Interaktive Demo',
         'slides' => [
             "real_time_dashboard" => [
-                'title' => 'Real-time Dashboard',
-                'description' => 'Visibility across all your properties, tracking applications, inspections, leases, and marketing efforts — instantly.',
+                'title' => 'Echtzeit-Dashboard',
+                'description' => 'Sichtbarkeit über alle Ihre Immobilien, Verfolgung von Bewerbungen, Besichtigungen, Mietverträgen und Marketing-Bemühungen — sofort.',
                 'features' => [
-                    'Live application pipeline',
-                    'Lease & marketing calendar',
-                    'User-friendly inspection tools',
-                    'Swift landlord reporting',
+                    'Live-Bewerbungs-Pipeline',
+                    'Miet- und Marketing-Kalender',
+                    'Benutzerfreundliche Besichtigungstools',
+                    'Schnelle Vermieter-Berichte',
                 ],
             ],
             "guided_applications" => [
-                'title' => 'Guided Tenant Applications',
-                'description' => 'Invite leads to a step-by-step application flow that ensures all necessary documents are collected. Complete applications, every time.',
+                'title' => 'Geführte Mieter-Bewerbungen',
+                'description' => 'Laden Sie Interessenten zu einem Schritt-für-Schritt-Bewerbungsprozess ein, der die Sammlung aller notwendigen Dokumente gewährleistet. Vollständige Bewerbungen, jedes Mal.',
                 'features' => [
-                    'Application invite links',
-                    'Progress validation at each step',
-                    'Required documents checklists',
-                    'Professional application experience',
+                    'Bewerbungs-Einladungslinks',
+                    'Fortschrittsvalidierung bei jedem Schritt',
+                    'Checklisten für erforderliche Dokumente',
+                    'Professionelle Bewerbungserfahrung',
                 ],
             ],
             "automated_review" => [
-                'title' => 'Automated Application Review',
-                'description' => 'Validate tenant information and documents instantly. No more digging through emails or paper.',
+                'title' => 'Automatisierte Bewerbungsprüfung',
+                'description' => 'Validieren Sie Mieterinformationen und Dokumente sofort. Schluss mit dem Durchsuchen von E-Mails oder Papierkram.',
                 'features' => [
-                    'Missing information alerts',
-                    'Authenticity and identity validation',
-                    'Instant document verification',
-                    'Complete contract management',
+                    'Fehlende Informationen Warnungen',
+                    'Authentizitäts- und Identitätsvalidierung',
+                    'Sofortige Dokumentenverifikation',
+                    'Vollständiges Vertragsmanagement',
                 ],
             ],
             "progress_visibility" => [
-                'title' => 'Full Progress Visibility',
-                'description' => 'Monitor each applicant and lease stage in one view to spot bottlenecks and accelerate leasing.',
+                'title' => 'Vollständige Fortschrittssichtbarkeit',
+                'description' => 'Überwachen Sie jeden Bewerber und Mietvertragsstatus in einer Ansicht, um Engpässe zu erkennen und die Vermietung zu beschleunigen.',
                 'features' => [
-                    'Real-time application status',
-                    'Progress indicators per applicant',
-                    'Property lease tracking',
-                    'Bottleneck identification',
+                    'Echtzeit-Bewerbungsstatus',
+                    'Fortschrittsindikatoren pro Bewerber',
+                    'Immobilien-Mietvertragsverfolgung',
+                    'Engpass-Identifikation',
                 ],
             ],
             "smart_followup" => [
-                'title' => 'Smart Follow-up System',
-                'description' => 'Automated reminders and follow-ups keep applicants moving, reducing vacant days.',
+                'title' => 'Intelligentes Nachfass-System',
+                'description' => 'Automatisierte Erinnerungen und Nachfassungen halten Bewerber in Bewegung und reduzieren Leerstandstage.',
                 'features' => [
-                    'Automated reminder emails',
-                    'Application recovery for stalled submissions',
-                    'Follow-up scheduling',
-                    'Conversion optimization',
+                    'Automatisierte Erinnerungs-E-Mails',
+                    'Bewerbungswiederherstellung für stockende Einreichungen',
+                    'Nachfass-Planung',
+                    'Konversionsoptimierung',
                 ],
             ],
             "digital_inspections" => [
-                'title' => 'Digital Property Inspections',
-                'description' => 'Capture move-in/move-out conditions digitally, with photos, notes, and full history for transparency and efficiency.',
+                'title' => 'Digitale Immobilienbesichtigungen',
+                'description' => 'Erfassen Sie Ein-/Auszugszustände digital, mit Fotos, Notizen und vollständiger Historie für Transparenz und Effizienz.',
                 'features' => [
-                    'Photo-documented inspections',
-                    'Complete inspection history',
-                    'Digital report generation',
-                    'Move-in & move-out tracking',
+                    'Foto-dokumentierte Besichtigungen',
+                    'Vollständige Besichtigungshistorie',
+                    'Digitale Berichtsgenerierung',
+                    'Ein- und Auszugsverfolgung',
                 ],
             ],
             "landlord_reporting" => [
-                'title' => 'Professional Landlord Reporting',
-                'description' => 'Keep landlords informed with automated updates, tenant validation, and professional reports.',
+                'title' => 'Professionelle Vermieter-Berichte',
+                'description' => 'Halten Sie Vermieter mit automatisierten Updates, Mietervalidierung und professionellen Berichten informiert.',
                 'features' => [
-                    'Automated report generation',
-                    'Automated tenant validation',
-                    'Professional progress updates',
-                    'Live client communication',
+                    'Automatisierte Berichtsgenerierung',
+                    'Automatisierte Mietervalidierung',
+                    'Professionelle Fortschrittsupdates',
+                    'Live-Kundenkommunikation',
                 ],
             ],
         ],
@@ -110,117 +110,146 @@ return [
 
     // Value Proposition Section
     'value_proposition' => [
-        'heading' => 'Why Choose RentPath?',
-        'subtitle' => 'Built specifically for property agents to scale their business.',
+        'heading_primary' => 'Nächste Generation',
+        'heading_highlighted' => 'Miet-Angebote',
+        'subtitle' => 'Erleben Sie die Zukunft der Mieterplatzierungen mit automatisierten Bewerbungen, Echtzeit-Einblicken, nahtlosen Mieter-Erfahrungen und professioneller Vermieter-Kommunikation',
+        'stats' => [
+            'applications' => 'Bewerbungen',
+            'conversion_rate' => 'Konversionsrate',
+            'support' => 'Support',
+        ],
         'features' => [
-            'efficiency' => [
-                'title' => 'Increase Efficiency',
-                'description' => 'Automate repetitive tasks and focus on growing your business.',
+            'simple_tenant_invitation' => [
+                'title' => 'Einfache Mieter-Einladung',
+                'description' => 'Senden Sie professionelle Einladungslinks mit einem Klick. Schritt-für-Schritt-Formulare gewährleisten eine nahtlose Mieter-Erfahrung.',
+                'stats_label' => 'Einladungen Senden',
             ],
-            'tenant_experience' => [
-                'title' => 'Better Tenant Experience',
-                'description' => 'Professional application process that tenants love.',
+            'document_collection' => [
+                'title' => 'Dokumentensammlung',
+                'description' => 'Intelligente Dokumentensammlung, die 100% Vollständigkeitsraten gewährleistet. Schluss mit dem Hinterherlaufen nach Papierkram.',
+                'stats_label' => 'Vollständige Bewerbungen',
             ],
-            'landlord_satisfaction' => [
-                'title' => 'Landlord Satisfaction',
-                'description' => 'Keep landlords informed with automated updates and reports.',
+            'complete_visibility' => [
+                'title' => 'Vollständige Sichtbarkeit',
+                'description' => 'Sehen Sie alle Immobilien und Bewerbungen in einem Dashboard. Verfolgen Sie den Fortschritt in Echtzeit und verwalten Sie Mieter effizient.',
+                'stats_label' => 'Fortschrittsverfolgung',
             ],
-            'data_insights' => [
-                'title' => 'Data & Insights',
-                'description' => 'Make informed decisions with comprehensive analytics.',
+            'secure_document_storage' => [
+                'title' => 'Sichere Dokumentenspeicherung',
+                'description' => 'Speichern Sie Mieter-Dokumente sicher in der Cloud mit vollständigen Audit-Pfaden. Zugriff jederzeit, überall.',
+                'stats_label' => 'Sicherheit',
             ],
+            'intelligent_notifications' => [
+                'title' => 'Intelligente Benachrichtigungen',
+                'description' => 'Smarte Benachrichtigungen, die die richtige Nachricht zum perfekten Zeitpunkt senden. Maximieren Sie Engagement und Antwortquoten.',
+                'stats_label' => 'Live-Updates',
+            ],
+            'digital_inspection_features' => [
+                'title' => 'Digitale Besichtigungsfunktionen',
+                'description' => 'Optimieren Sie Besichtigungen mit Foto-Dokumentation, automatisierten Berichten und vollständiger Ein-/Auszugshistorie.',
+                'stats_label' => 'Zeit Gespart',
+            ],
+        ],
+        'cta_subtitle' => 'Schließen Sie sich Tausenden von Immobilienverwaltern an, die ihr Geschäft transformiert haben.',
+        'stats_percentages' => [
+            'real_time' => 'Echtzeit',
+            'bank_level' => 'Bank-Niveau',
         ],
     ],
 
     // Testimonials Section
     'testimonials' => [
-        'heading' => 'Trusted by Property Professionals',
-        'subtitle' => 'See why thousands of agents, property managers, and landlords choose RentPath to streamline rentals.',
+        'heading' => 'Vertraut von Immobilien-Profis',
+        'subtitle' => 'Sehen Sie, warum Tausende von Maklern, Immobilienverwaltern und Vermietern RentPath wählen, um Vermietungen zu optimieren.',
         'testimonials' => [
             'amar_ramdedovic' => [
-                'role' => 'Real Estate Agent',
-                'content' => 'RentPath transformed our application process completely. We went from 3-week visit delays to same-day lease signing. The automated document collection is a game-changer.',
+                'role' => 'Immobilienmakler',
+                'content' => 'RentPath hat unseren Bewerbungsprozess komplett transformiert. Wir sind von 3-wöchigen Besichtigungsverzögerungen zu Mietvertragsunterzeichnungen am selben Tag gewechselt. Die automatisierte Dokumentensammlung ist ein Wendepunkt.',
             ],
             'alessandro_rossi' => [
-                'role' => 'Landlord with 25+ Properties',
-                'content' => 'Since switching to RentPath, I haven\'t looked back. Tenant retention has improved noticeably, and managing my rentals has become far simpler and less stressful than I ever expected.',
+                'role' => 'Vermieter mit 25+ Immobilien',
+                'content' => 'Seit dem Wechsel zu RentPath habe ich nie zurückgeblickt. Die Mieterbindung hat sich merklich verbessert, und die Verwaltung meiner Mietobjekte ist viel einfacher und stressfreier geworden, als ich je erwartet hatte.',
             ],
             'philippe_hengen' => [
-                'role' => 'Agency Director',
-                'content' => 'RentPath makes owning multiple properties effortless. It\'s helped reduce vacancies and quickly find tenants. I\'d recommend it to anyone looking to optimize their time.',
+                'role' => 'Agentur-Direktor',
+                'content' => 'RentPath macht das Besitzen mehrerer Immobilien mühelos. Es hat geholfen, Leerstände zu reduzieren und schnell Mieter zu finden. Ich würde es jedem empfehlen, der seine Zeit optimieren möchte.',
             ],
         ],
         'stats' => [
-            'rating_label' => 'Average Rating',
-            'customers_label' => 'Happy Customers',
-            'properties_label' => 'Properties Managed',
+            'rating_label' => 'Durchschnittsbewertung',
+            'customers_label' => 'Zufriedene Kunden',
+            'properties_label' => 'Verwaltete Immobilien',
         ],
+        'at_keyword' => 'bei',
     ],
 
     // Benefits Section
     'benefits' => [
-        'heading' => 'Why Agents Choose RentPath',
+        'heading' => 'Warum Makler RentPath Wählen',
         'benefits' => [
             'faster_placements' => [
-                'title' => 'Faster Placements, Swifter Commissions',
-                'description' => 'Automated follow-ups help place tenants faster. Know exactly when each property will be rented.',
+                'title' => 'Schnellere Platzierungen, Raschere Provisionen',
+                'description' => 'Automatisierte Nachfassungen helfen, Mieter schneller zu platzieren. Wissen Sie genau, wann jede Immobilie vermietet wird.',
             ],
             'centralized_data' => [
-                'title' => 'All Tenant Data, Centralized',
-                'description' => 'All tenant documents and application progress stored securely. No more searching through emails.',
+                'title' => 'Alle Mieter-Daten, Zentralisiert',
+                'description' => 'Alle Mieter-Dokumente und Bewerbungsfortschritte sicher gespeichert. Schluss mit der Suche in E-Mails.',
             ],
             'automated_updates' => [
-                'title' => 'Automated Landlord Updates',
-                'description' => 'Automated updates and professional reporting strengthen your relationships with property owners.',
+                'title' => 'Automatisierte Vermieter-Updates',
+                'description' => 'Automatisierte Updates und professionelle Berichte stärken Ihre Beziehungen zu Immobilienbesitzern.',
             ],
             'reduced_overhead' => [
-                'title' => 'Reduced Administrative Overhead',
-                'description' => 'Less time on paperwork means more time for revenue-generating activities and client relationships.',
+                'title' => 'Reduzierter Verwaltungsaufwand',
+                'description' => 'Weniger Zeit für Papierkram bedeutet mehr Zeit für umsatzgenerierende Aktivitäten und Kundenbeziehungen.',
             ],
             'higher_conversion' => [
-                'title' => 'Higher Conversion Rates',
-                'description' => 'Streamlined processes lead to better tenant experience and higher application completion rates.',
+                'title' => 'Höhere Konversionsraten',
+                'description' => 'Optimierte Prozesse führen zu besserer Mieter-Erfahrung und höheren Bewerbungsabschlussraten.',
             ],
         ],
         'metrics' => [
-            'completion_rate_label' => 'Application Completion Rate',
-            'time_to_placement_label' => 'Time to Placement',
-            'landlord_satisfaction_label' => 'Landlord Satisfaction',
-            'admin_time_label' => 'Administrative Time',
+            'heading' => 'Wichtige Kennzahlen Verbesserung',
+            'completion_rate_label' => 'Bewerbungsabschlussrate',
+            'time_to_placement_label' => 'Zeit bis zur Platzierung',
+            'landlord_satisfaction_label' => 'Vermieter-Zufriedenheit',
+            'admin_time_label' => 'Verwaltungszeit',
         ],
         'trial' => [
-            'heading' => 'Start Your Free Trial',
+            'heading' => 'Starten Sie Ihre Kostenlose Testversion',
             'benefits' => [
-                'Unlimited tenant applications.',
-                'Automated document collection.',
-                'Progress tracking & notifications.',
+                'Unbegrenzte Mieter-Bewerbungen.',
+                'Automatisierte Dokumentensammlung.',
+                'Fortschrittsverfolgung & Benachrichtigungen.',
             ],
             'pricing' => [
-                'unit' => 'per agent/month',
-                'offer' => '🎉 Get 3 months FREE when you sign up!',
+                'unit' => 'pro Makler/Monat',
+                'offer' => '🎉 Erhalten Sie 3 Monate KOSTENLOS bei der Anmeldung!',
             ],
         ],
     ],
 
     // CTA Section
     'cta' => [
-        'heading' => 'Ready to End Application Chaos?',
-        'subtitle' => 'Join property agents who have streamlined their tenant application process and improve their service quality with landlords and tenants alike.',
-        'button_text' => 'Start Your Free Trial',
+        'heading' => 'Bereit, das Bewerbungschaos zu Beenden?',
+        'subtitle' => 'Schließen Sie sich Immobilienmaklern an, die ihren Mieter-Bewerbungsprozess optimiert haben und ihre Servicequalität mit Vermietern und Mietern verbessern.',
+        'button_text' => 'Kostenlose Testversion Starten',
     ],
 
     // Footer
     'footer' => [
-        'description' => 'RentPath is the easiest way to manage rental properties.',
-        'product' => 'Product',
+        'description' => 'Optimieren Sie Ihren Mieter-Bewerbungsprozess vom ersten Kontakt bis zum Einzug. Verabschieden Sie sich von unvollständigen Bewerbungen, fehlenden Dokumenten und Kommunikationschaos.',
+        'product' => 'Produkt',
         'support' => 'Support',
-        'all_rights_reserved' => 'All rights reserved',
+        'all_rights_reserved' => 'Alle Rechte vorbehalten',
         'links' => [
-            'features' => 'Features',
-            'pricing' => 'Pricing',
-            'help_center' => 'Help Center',
-            'contact_us' => 'Contact Us',
-            'privacy_policy' => 'Privacy Policy',
+            'features' => 'Funktionen',
+            'pricing' => 'Preise',
+            'free_trial' => 'Kostenlose Testversion',
+            'help_center' => 'Hilfe-Center',
+            'contact_us' => 'Kontakt',
+            'privacy_policy' => 'Datenschutzrichtlinie',
+            'terms_of_use' => 'Nutzungsbedingungen',
         ],
     ],
 ];
