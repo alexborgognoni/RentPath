@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Bell, Camera, Eye, FileText, Mail, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 
 function useCountAnimation(target: number, duration: number = 2000) {
     const [count, setCount] = useState(0);
@@ -31,66 +33,66 @@ function useCountAnimation(target: number, duration: number = 2000) {
 }
 
 export function ValuePropositionSection() {
+    const { translations } = usePage<SharedData>().props;
 
-    const HEADER_TITLE = 'Next-Generation';
-    const HEADER_HIGHLIGHT = 'Rental Deals';
-    const HEADER_DESCRIPTION =
-        'Experience the future of tenant placements with automated applications, real time insights, seamless tenant experiences and professional landlord communications';
+    const HEADER_TITLE = translate(translations, 'landing.value_proposition.heading_primary');
+    const HEADER_HIGHLIGHT = translate(translations, 'landing.value_proposition.heading_highlighted');
+    const HEADER_DESCRIPTION = translate(translations, 'landing.value_proposition.subtitle');
 
     const STATS = [
-        { id: 1, value: 5, suffix: ',000+', label: 'Applications' },
-        { id: 2, value: 97, suffix: '%', label: 'Conversion Rate' },
-        { id: 3, value: 24, suffix: '/7', label: 'Support' },
+        { id: 1, value: 5, suffix: ',000+', label: translate(translations, 'landing.value_proposition.stats.applications') },
+        { id: 2, value: 97, suffix: '%', label: translate(translations, 'landing.value_proposition.stats.conversion_rate') },
+        { id: 3, value: 24, suffix: '/7', label: translate(translations, 'landing.value_proposition.stats.support') },
     ];
 
     const FEATURES = [
         {
             id: 1,
-            title: 'Simple Tenant Invitation',
-            description: 'Send professional invitation links with one click. Step-by-step forms ensure a seamless tenant experience.',
+            title: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.title'),
+            description: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.description'),
             icon: <Mail className="h-8 w-8 text-white" />,
             iconBg: 'bg-blue-600',
-            stats: { percentage: '1-Click', label: 'Send Invites' },
+            stats: { percentage: '1-Click', label: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.stats_label') },
         },
         {
             id: 2,
-            title: 'Document Collection',
-            description: 'Intelligent document collection that ensures 100% completion rates. No more chasing paperwork.',
+            title: translate(translations, 'landing.value_proposition.features.document_collection.title'),
+            description: translate(translations, 'landing.value_proposition.features.document_collection.description'),
             icon: <FileText className="h-8 w-8 text-white" />,
             iconBg: 'bg-purple-600',
-            stats: { percentage: '100%', label: 'Complete Applications' },
+            stats: { percentage: '100%', label: translate(translations, 'landing.value_proposition.features.document_collection.stats_label') },
         },
         {
             id: 3,
-            title: 'Complete Visibility',
-            description: 'See all properties and applications in one dashboard. Track progress in real time and manage tenants efficiently.',
+            title: translate(translations, 'landing.value_proposition.features.complete_visibility.title'),
+            description: translate(translations, 'landing.value_proposition.features.complete_visibility.description'),
             icon: <Eye className="h-8 w-8 text-white" />,
             iconBg: 'bg-green-600',
-            stats: { percentage: 'Real-time', label: 'Progress Tracking' },
+            stats: { percentage: translate(translations, 'landing.value_proposition.stats_percentages.real_time'), label: translate(translations, 'landing.value_proposition.features.complete_visibility.stats_label') },
         },
         {
             id: 4,
-            title: 'Secure Document Storage',
-            description: 'Store tenant documents securely in the cloud with full audit trails. Access anytime, anywhere.',
+            title: translate(translations, 'landing.value_proposition.features.secure_document_storage.title'),
+            description: translate(translations, 'landing.value_proposition.features.secure_document_storage.description'),
             icon: <Shield className="h-8 w-8 text-white" />,
             iconBg: 'bg-teal-600',
-            stats: { percentage: 'Bank-level', label: 'Security' },
+            stats: { percentage: translate(translations, 'landing.value_proposition.stats_percentages.bank_level'), label: translate(translations, 'landing.value_proposition.features.secure_document_storage.stats_label') },
         },
         {
             id: 5,
-            title: 'Intelligent Notifications',
-            description: 'Smart notifications that send the right message at the perfect time. Maximize engagement and response rates.',
+            title: translate(translations, 'landing.value_proposition.features.intelligent_notifications.title'),
+            description: translate(translations, 'landing.value_proposition.features.intelligent_notifications.description'),
             icon: <Bell className="h-8 w-8 text-white" />,
             iconBg: 'bg-orange-500',
-            stats: { percentage: '24/7', label: 'Live Updates' },
+            stats: { percentage: '24/7', label: translate(translations, 'landing.value_proposition.features.intelligent_notifications.stats_label') },
         },
         {
             id: 6,
-            title: 'Digital Inspection Features',
-            description: 'Streamline inspections with photo documentation, automated reports, and complete move-in/move-out history.',
+            title: translate(translations, 'landing.value_proposition.features.digital_inspection_features.title'),
+            description: translate(translations, 'landing.value_proposition.features.digital_inspection_features.description'),
             icon: <Camera className="h-8 w-8 text-white" />,
             iconBg: 'bg-red-500',
-            stats: { percentage: '60%', label: 'Time Saved' },
+            stats: { percentage: '60%', label: translate(translations, 'landing.value_proposition.features.digital_inspection_features.stats_label') },
         },
     ];
 
@@ -193,13 +195,13 @@ export function ValuePropositionSection() {
                         <div className="absolute inset-0 animate-pulse rounded-2xl bg-gradient-to-r from-primary to-secondary opacity-75 blur-xl"></div>
                         <motion.button className="relative transform cursor-pointer rounded-2xl bg-gradient-to-r from-primary to-secondary px-12 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-primary hover:to-secondary hover:shadow-2xl">
                             <span className="flex items-center space-x-3">
-                                <span>Try Now</span>
+                                <span>{translate(translations, 'landing.cta.button_text')}</span>
                                 <ArrowRight className="h-5 w-5" />
                             </span>
                         </motion.button>
                     </div>
 
-                    <p className="mt-6 text-sm text-muted-foreground">Join thousands of property managers who've transformed their business.</p>
+                    <p className="mt-6 text-sm text-muted-foreground">{translate(translations, 'landing.value_proposition.cta_subtitle')}</p>
                 </motion.div>
             </div>
         </section>

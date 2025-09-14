@@ -66,25 +66,50 @@ interface LandingTranslations {
         };
     };
     value_proposition: {
-        heading: string;
+        heading_primary: string;
+        heading_highlighted: string;
         subtitle: string;
+        stats: {
+            applications: string;
+            conversion_rate: string;
+            support: string;
+        };
         features: {
-            efficiency: {
+            simple_tenant_invitation: {
                 title: string;
                 description: string;
+                stats_label: string;
             };
-            tenant_experience: {
+            document_collection: {
                 title: string;
                 description: string;
+                stats_label: string;
             };
-            landlord_satisfaction: {
+            complete_visibility: {
                 title: string;
                 description: string;
+                stats_label: string;
             };
-            data_insights: {
+            secure_document_storage: {
                 title: string;
                 description: string;
+                stats_label: string;
             };
+            intelligent_notifications: {
+                title: string;
+                description: string;
+                stats_label: string;
+            };
+            digital_inspection_features: {
+                title: string;
+                description: string;
+                stats_label: string;
+            };
+        };
+        cta_subtitle: string;
+        stats_percentages: {
+            real_time: string;
+            bank_level: string;
         };
     };
     testimonials: {
@@ -110,6 +135,7 @@ interface LandingTranslations {
             customers_label: string;
             properties_label: string;
         };
+        at_keyword: string;
     };
     benefits: {
         heading: string;
@@ -136,22 +162,11 @@ interface LandingTranslations {
             };
         };
         metrics: {
-            completion_rate: {
-                label: string;
-                value: string;
-            };
-            time_to_placement: {
-                label: string;
-                value: string;
-            };
-            landlord_satisfaction: {
-                label: string;
-                value: string;
-            };
-            admin_time: {
-                label: string;
-                value: string;
-            };
+            heading: string;
+            completion_rate_label: string;
+            time_to_placement_label: string;
+            landlord_satisfaction_label: string;
+            admin_time_label: string;
         };
         trial: {
             heading: string;
@@ -179,6 +194,7 @@ interface LandingTranslations {
             help_center: string;
             contact_us: string;
             privacy_policy: string;
+            terms_of_use: string;
         };
     };
 }

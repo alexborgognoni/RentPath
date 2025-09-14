@@ -110,25 +110,50 @@ return [
 
     // Value Proposition Section
     'value_proposition' => [
-        'heading' => 'Why Choose RentPath?',
-        'subtitle' => 'Built specifically for property agents to scale their business.',
+        'heading_primary' => 'Next-Generation',
+        'heading_highlighted' => 'Rental Deals',
+        'subtitle' => 'Experience the future of tenant placements with automated applications, real time insights, seamless tenant experiences and professional landlord communications',
+        'stats' => [
+            'applications' => 'Applications',
+            'conversion_rate' => 'Conversion Rate',
+            'support' => 'Support',
+        ],
         'features' => [
-            'efficiency' => [
-                'title' => 'Increase Efficiency',
-                'description' => 'Automate repetitive tasks and focus on growing your business.',
+            'simple_tenant_invitation' => [
+                'title' => 'Simple Tenant Invitation',
+                'description' => 'Send professional invitation links with one click. Step-by-step forms ensure a seamless tenant experience.',
+                'stats_label' => 'Send Invites',
             ],
-            'tenant_experience' => [
-                'title' => 'Better Tenant Experience',
-                'description' => 'Professional application process that tenants love.',
+            'document_collection' => [
+                'title' => 'Document Collection',
+                'description' => 'Intelligent document collection that ensures 100% completion rates. No more chasing paperwork.',
+                'stats_label' => 'Complete Applications',
             ],
-            'landlord_satisfaction' => [
-                'title' => 'Landlord Satisfaction',
-                'description' => 'Keep landlords informed with automated updates and reports.',
+            'complete_visibility' => [
+                'title' => 'Complete Visibility',
+                'description' => 'See all properties and applications in one dashboard. Track progress in real time and manage tenants efficiently.',
+                'stats_label' => 'Progress Tracking',
             ],
-            'data_insights' => [
-                'title' => 'Data & Insights',
-                'description' => 'Make informed decisions with comprehensive analytics.',
+            'secure_document_storage' => [
+                'title' => 'Secure Document Storage',
+                'description' => 'Store tenant documents securely in the cloud with full audit trails. Access anytime, anywhere.',
+                'stats_label' => 'Security',
             ],
+            'intelligent_notifications' => [
+                'title' => 'Intelligent Notifications',
+                'description' => 'Smart notifications that send the right message at the perfect time. Maximize engagement and response rates.',
+                'stats_label' => 'Live Updates',
+            ],
+            'digital_inspection_features' => [
+                'title' => 'Digital Inspection Features',
+                'description' => 'Streamline inspections with photo documentation, automated reports, and complete move-in/move-out history.',
+                'stats_label' => 'Time Saved',
+            ],
+        ],
+        'cta_subtitle' => 'Join thousands of property managers who\'ve transformed their business.',
+        'stats_percentages' => [
+            'real_time' => 'Real-time',
+            'bank_level' => 'Bank-level',
         ],
     ],
 
@@ -155,6 +180,7 @@ return [
             'customers_label' => 'Happy Customers',
             'properties_label' => 'Properties Managed',
         ],
+        'at_keyword' => 'at',
     ],
 
     // Benefits Section
@@ -183,6 +209,7 @@ return [
             ],
         ],
         'metrics' => [
+            'heading' => 'Key Metrics Improvement',
             'completion_rate_label' => 'Application Completion Rate',
             'time_to_placement_label' => 'Time to Placement',
             'landlord_satisfaction_label' => 'Landlord Satisfaction',
@@ -218,9 +245,11 @@ return [
         'links' => [
             'features' => 'Features',
             'pricing' => 'Pricing',
+            'free_trial' => 'Free Trial',
             'help_center' => 'Help Center',
             'contact_us' => 'Contact Us',
             'privacy_policy' => 'Privacy Policy',
+            'terms_of_use' => 'Terms of Use',
         ],
     ],
 ];
