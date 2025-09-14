@@ -27,7 +27,7 @@ export function ReviewsSection() {
         {
             id: 2,
             name: "Alessandro Rossi",
-            role: "Private Owner with 25+ Properties",
+            role: "Landlord with 25+ Properties",
             avatar: "AR",
             rating: 5,
             content: "Since switching to RentPath, I haven’t looked back. Tenant retention has improved noticeably, and managing my rentals has become far simpler and less stressful than I ever expected." 
@@ -71,7 +71,7 @@ export function ReviewsSection() {
                         Trusted by Property Professionals
                     </motion.h2>
                     <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
-                        See why thousands of agents and property managers choose RentPath to streamline their rental processes.
+                        See why thousands of agents, property managers, and landlords choose RentPath to streamline rentals.
                     </p>
                 </div>
 
@@ -116,7 +116,7 @@ export function ReviewsSection() {
                                             {review.name}
                                         </div>
                                         <div className="text-sm text-muted-foreground">
-                                            {review.role} {review.company ? `at ${review.company}` : ""}
+                                            {review.role} {review.company && `at ${review.company}`}
                                         </div>
                                     </div>
                                 </div>

@@ -43,7 +43,7 @@ export default function WelcomePage() {
                             viewport={{ once: false }}
                             className="inline-block bg-gradient-to-r from-primary to-secondary bg-[length:200%_100%] bg-clip-text text-transparent"
                         >
-                            Simplify Property Management.
+                            Close Deals Faster.
                         </motion.span>
                     </motion.h1>
 
@@ -55,7 +55,7 @@ export default function WelcomePage() {
                         viewport={{ once: false, amount: 0.6 }}
                         className="mx-auto mb-12 max-w-3xl text-xl text-muted-foreground lg:text-2xl"
                     >
-                        Collect tenant applications and documents, verify profiles, and track occupancy — all in one smart dashboard.
+                    No more incomplete applications or endless chasing. Invite, track, and follow up on leads instantly. All from one intelligent Dashboard.
                     </motion.p>
 
                     {/* Animated buttons */}
