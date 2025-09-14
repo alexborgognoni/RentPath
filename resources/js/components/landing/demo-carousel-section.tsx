@@ -1,71 +1,92 @@
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { Check, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export function DemoCarouselSection() {
-    const SECTION_TITLE = 'Streamlined from First Interest to Move-In';
-    const SECTION_DESCRIPTION =
-        'Manual reviews, missed applications, messy communication - rentals are inefficient. Our platform streamlines the tenant journey.';
+    const { translations } = usePage<SharedData>().props;
 
     const SLIDES = [
         {
             id: 1,
-            title: 'Real-time Dashboard',
-            description: 'Visibility across all your properties, tracking applications, inspections, leases, and marketing efforts — instantly.',
-            features: ['Live application pipeline', 'Lease & marketing calendar', 'User-friendly inspection tools', 'Swift landlord reporting'],
+            title: translate(translations, `landing.demo_carousel.slides.real_time_dashboard.title` as const),
+            description: translate(translations, `landing.demo_carousel.slides.real_time_dashboard.description` as const),
+            features: [
+                translate(translations, `landing.demo_carousel.slides.real_time_dashboard.features[0]` as const),
+                translate(translations, `landing.demo_carousel.slides.real_time_dashboard.features[1]` as const),
+                translate(translations, `landing.demo_carousel.slides.real_time_dashboard.features[2]` as const),
+                translate(translations, `landing.demo_carousel.slides.real_time_dashboard.features[3]` as const),
+            ],
         },
         {
             id: 2,
-            title: 'Guided Tenant Applications',
-            description:
-                'Invite leads to a step-by-step application flow that ensures all necessary documents are collected. Complete applications, every time.',
+            title: translate(translations, `landing.demo_carousel.slides.guided_applications.title` as const),
+            description: translate(translations, `landing.demo_carousel.slides.guided_applications.description` as const),
             features: [
-                'Application invite links',
-                'Progress validation at each step',
-                'Required documents checklists',
-                'Professional application experience',
+                translate(translations, `landing.demo_carousel.slides.guided_applications.features[0]` as const),
+                translate(translations, `landing.demo_carousel.slides.guided_applications.features[1]` as const),
+                translate(translations, `landing.demo_carousel.slides.guided_applications.features[2]` as const),
+                translate(translations, `landing.demo_carousel.slides.guided_applications.features[3]` as const),
             ],
         },
         {
             id: 3,
-            title: 'Automated Application Review',
-            description: 'Validate tenant information and documents instantly. No more digging through emails or paper.',
+            title: translate(translations, `landing.demo_carousel.slides.automated_review.title` as const),
+            description: translate(translations, `landing.demo_carousel.slides.automated_review.description` as const),
             features: [
-                'Missing information alerts',
-                'Authenticity and identity validation',
-                'Instant document verification',
-                'Complete contract management',
+                translate(translations, `landing.demo_carousel.slides.automated_review.features[0]` as const),
+                translate(translations, `landing.demo_carousel.slides.automated_review.features[1]` as const),
+                translate(translations, `landing.demo_carousel.slides.automated_review.features[2]` as const),
+                translate(translations, `landing.demo_carousel.slides.automated_review.features[3]` as const),
             ],
         },
         {
             id: 4,
-            title: 'Full Progress Visibility',
-            description: 'Monitor each applicant and lease stage in one view to spot bottlenecks and accelerate leasing.',
-            features: ['Real-time application status', 'Progress indicators per applicant', 'Property lease tracking', 'Bottleneck identification'],
+            title: translate(translations, `landing.demo_carousel.slides.progress_visibility.title` as const),
+            description: translate(translations, `landing.demo_carousel.slides.progress_visibility.description` as const),
+            features: [
+                translate(translations, `landing.demo_carousel.slides.progress_visibility.features[0]` as const),
+                translate(translations, `landing.demo_carousel.slides.progress_visibility.features[1]` as const),
+                translate(translations, `landing.demo_carousel.slides.progress_visibility.features[2]` as const),
+                translate(translations, `landing.demo_carousel.slides.progress_visibility.features[3]` as const),
+            ],
         },
         {
             id: 5,
-            title: 'Smart Follow-up System',
-            description: 'Automated reminders and follow-ups keep applicants moving, reducing vacant days.',
+            title: translate(translations, `landing.demo_carousel.slides.smart_followup.title` as const),
+            description: translate(translations, `landing.demo_carousel.slides.smart_followup.description` as const),
             features: [
-                'Automated reminder emails',
-                'Application recovery for stalled submissions',
-                'Follow-up scheduling',
-                'Conversion optimization',
+                translate(translations, `landing.demo_carousel.slides.smart_followup.features[0]` as const),
+                translate(translations, `landing.demo_carousel.slides.smart_followup.features[1]` as const),
+                translate(translations, `landing.demo_carousel.slides.smart_followup.features[2]` as const),
+                translate(translations, `landing.demo_carousel.slides.smart_followup.features[3]` as const),
             ],
         },
         {
             id: 6,
-            title: 'Digital Property Inspections',
-            description: 'Capture move-in/move-out conditions digitally, with photos, notes, and full history for transparency and efficiency.',
-            features: ['Photo-documented inspections', 'Complete inspection history', 'Digital report generation', 'Move-in & move-out tracking'],
+            title: translate(translations, `landing.demo_carousel.slides.digital_inspections.title` as const),
+            description: translate(translations, `landing.demo_carousel.slides.digital_inspections.description` as const),
+            features: [
+                translate(translations, `landing.demo_carousel.slides.digital_inspections.features[0]` as const),
+                translate(translations, `landing.demo_carousel.slides.digital_inspections.features[1]` as const),
+                translate(translations, `landing.demo_carousel.slides.digital_inspections.features[2]` as const),
+                translate(translations, `landing.demo_carousel.slides.digital_inspections.features[3]` as const),
+            ],
         },
         {
             id: 7,
-            title: 'Professional Landlord Reporting',
-            description: 'Keep landlords informed with automated updates, tenant validation, and professional reports.',
-            features: ['Automated report generation', 'Automated tenant validation', 'Professional progress updates', 'Live client communication'],
+            title: translate(translations, `landing.demo_carousel.slides.landlord_reporting.title` as const),
+            description: translate(translations, `landing.demo_carousel.slides.landlord_reporting.description` as const),
+            features: [
+                translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[0]` as const),
+                translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[1]` as const),
+                translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[2]` as const),
+                translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[3]` as const),
+            ],
         },
     ];
+
+    const NUM_SLIDES = 7;
 
     const [activeSlide, setActiveSlide] = useState(0);
     const [isManuallyControlled, setIsManuallyControlled] = useState(false);
@@ -75,7 +96,7 @@ export function DemoCarouselSection() {
         if (intervalRef.current) clearInterval(intervalRef.current);
         const delay = isManuallyControlled ? 15000 : 5000;
         intervalRef.current = setInterval(() => {
-            setActiveSlide((prev) => (prev + 1) % SLIDES.length);
+            setActiveSlide((prev) => (prev + 1) % NUM_SLIDES);
             setIsManuallyControlled(false);
         }, delay);
 
@@ -85,12 +106,12 @@ export function DemoCarouselSection() {
     }, [isManuallyControlled]);
 
     const nextSlide = () => {
-        setActiveSlide((prev) => (prev + 1) % SLIDES.length);
+        setActiveSlide((prev) => (prev + 1) % NUM_SLIDES);
         setIsManuallyControlled(true);
     };
 
     const prevSlide = () => {
-        setActiveSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+        setActiveSlide((prev) => (prev - 1 + NUM_SLIDES) % NUM_SLIDES);
         setIsManuallyControlled(true);
     };
 
@@ -106,8 +127,12 @@ export function DemoCarouselSection() {
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="mb-20 text-center">
-                    <h2 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">{SECTION_TITLE}</h2>
-                    <p className="mx-auto mb-8 max-w-4xl text-xl leading-relaxed text-muted-foreground">{SECTION_DESCRIPTION}</p>
+                    <h2 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">
+                        {translate(translations, 'landing.demo_carousel.heading')}
+                    </h2>
+                    <p className="mx-auto mb-8 max-w-4xl text-xl leading-relaxed text-muted-foreground">
+                        {translate(translations, 'landing.demo_carousel.subtitle')}
+                    </p>
                 </div>
 
                 {/* Carousel */}
@@ -130,7 +155,9 @@ export function DemoCarouselSection() {
                                                             <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary">
                                                                 <Eye className="h-8 w-8 text-white" />
                                                             </div>
-                                                            <span className="text-lg font-medium text-primary">Interactive Demo</span>
+                                                            <span className="text-lg font-medium text-primary">
+                                                                {translate(translations, 'landing.demo_carousel.interactive_demo')}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                     {/* Glow Effect */}

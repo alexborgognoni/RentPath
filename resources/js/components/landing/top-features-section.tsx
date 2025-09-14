@@ -1,24 +1,28 @@
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { ArrowRight, Clock, Zap } from 'lucide-react';
 
 export function TopFeaturesSection() {
-    const SECTION_TITLE = 'Built for Modern Rental Applications';
-    const SECTION_DESCRIPTION = 'Transform your tenant placements with real-time insights, document management, and automated landlord updates.';
+    const { translations } = usePage<SharedData>().props;
+
+    const HEADING = translate(translations, 'landing.top_features.heading');
+    const SUBTITLE = translate(translations, 'landing.top_features.subtitle');
 
     const FEATURES = [
         {
             icon: Zap,
-            title: 'Complete Applications',
-            description: 'No more chasing IDs, contracts, or references — invite tenants and collect applications in one place.',
+            title: translate(translations, 'landing.top_features.complete_applications.title'),
+            description: translate(translations, 'landing.top_features.complete_applications.description'),
         },
         {
             icon: ArrowRight,
-            title: 'Streamlined Leasing',
-            description: 'Seamlessly guide applicants to move-in — cutting time-to-fill and reducing vacancies.',
+            title: translate(translations, 'landing.top_features.streamlined_leasing.title'),
+            description: translate(translations, 'landing.top_features.streamlined_leasing.description'),
         },
         {
             icon: Clock,
-            title: 'Occupancy Overview',
-            description: 'See which units are vacant, occupied, or have leads — and never lose sight of your portfolio.',
+            title: translate(translations, 'landing.top_features.occupancy_overview.title'),
+            description: translate(translations, 'landing.top_features.occupancy_overview.description'),
         },
     ];
 
@@ -32,8 +36,12 @@ export function TopFeaturesSection() {
                 <div className="relative mx-auto mb-20 max-w-7xl rounded-3xl border border-border bg-card/50 p-12 text-center shadow-2xl backdrop-blur-xl">
                     <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/5 to-secondary/5"></div>
                     <div className="relative z-10">
-                        <h3 className="mb-6 text-4xl leading-tight font-bold text-foreground lg:text-5xl">{SECTION_TITLE}</h3>
-                        <p className="mx-auto mb-12 max-w-3xl text-xl leading-relaxed text-muted-foreground">{SECTION_DESCRIPTION}</p>
+                        <h3 className="mb-6 text-4xl leading-tight font-bold text-foreground lg:text-5xl">
+                            {HEADING}
+                        </h3>
+                        <p className="mx-auto mb-12 max-w-3xl text-xl leading-relaxed text-muted-foreground">
+                            {SUBTITLE}
+                        </p>
 
                         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                             {FEATURES.map((feature, idx) => {
