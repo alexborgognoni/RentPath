@@ -12,11 +12,9 @@ resource "aws_iam_role" "eb_ec2_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = { Service = "ec2.amazonaws.com" }
       }
     ]
   })
@@ -24,7 +22,6 @@ resource "aws_iam_role" "eb_ec2_role" {
   tags = local.common_tags
 }
 
-# Attach AWS managed policies to EC2 role
 resource "aws_iam_role_policy_attachment" "eb_web_tier" {
   role       = aws_iam_role.eb_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
@@ -40,7 +37,6 @@ resource "aws_iam_role_policy_attachment" "eb_multicontainer_docker" {
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker"
 }
 
-# IAM instance profile for Elastic Beanstalk
 resource "aws_iam_instance_profile" "eb_ec2_profile" {
   name = "${var.project_name}-${var.environment}-eb-ec2-profile"
   role = aws_iam_role.eb_ec2_role.name
@@ -58,11 +54,9 @@ resource "aws_iam_role" "eb_service_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "elasticbeanstalk.amazonaws.com"
-        }
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = { Service = "elasticbeanstalk.amazonaws.com" }
       }
     ]
   })
@@ -70,7 +64,6 @@ resource "aws_iam_role" "eb_service_role" {
   tags = local.common_tags
 }
 
-# Attach AWS managed policies to service role
 resource "aws_iam_role_policy_attachment" "eb_service" {
   role       = aws_iam_role.eb_service_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService"
@@ -93,11 +86,9 @@ resource "aws_iam_role" "codepipeline_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "codepipeline.amazonaws.com"
-        }
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = { Service = "codepipeline.amazonaws.com" }
       }
     ]
   })
@@ -105,7 +96,6 @@ resource "aws_iam_role" "codepipeline_role" {
   tags = local.common_tags
 }
 
-# IAM policy for CodePipeline
 resource "aws_iam_role_policy" "codepipeline_policy" {
   name = "${var.project_name}-${var.environment}-codepipeline-policy"
   role = aws_iam_role.codepipeline_role.id
@@ -129,8 +119,28 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
       {
         Effect = "Allow"
         Action = [
-          "codeconnections:UseConnection"
+          "s3:CreateBucket",
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:PutBucketOwnershipControls",
+          "s3:GetBucketOwnershipControls",
+          "s3:PutBucketPolicy",
+          "s3:GetBucketPolicy",
+          "s3:PutBucketVersioning",
+          "s3:GetBucketVersioning",
+          "s3:PutBucketPublicAccessBlock",
+          "s3:GetBucketPublicAccessBlock"
         ]
+        Resource = [
+          "arn:aws:s3:::elasticbeanstalk-*",
+          "arn:aws:s3:::elasticbeanstalk-*/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = ["codestar-connections:UseConnection"]
         Resource = local.app_config.codestar_connection_arn
       },
       {
@@ -175,23 +185,17 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
   })
 }
 
-# ==============================================================================
-# RDS IAM RESOURCES
-# ==============================================================================
-
-# IAM role for RDS enhanced monitoring
-resource "aws_iam_role" "rds_monitoring" {
-  name = "${var.project_name}-${var.environment}-rds-monitoring-role"
+# IAM role for CodeBuild
+resource "aws_iam_role" "codebuild_role" {
+  name = "${var.project_name}-${var.environment}-codebuild-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "monitoring.rds.amazonaws.com"
-        }
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = { Service = "codebuild.amazonaws.com" }
       }
     ]
   })
@@ -199,9 +203,43 @@ resource "aws_iam_role" "rds_monitoring" {
   tags = local.common_tags
 }
 
-# Attach AWS managed policy for RDS monitoring
+resource "aws_iam_role_policy_attachment" "codebuild_s3" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild_logs" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild_passrole" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = "arn:aws:iam::aws:policy/IAMFullAccess"
+}
+
+# ==============================================================================
+# RDS IAM RESOURCES
+# ==============================================================================
+
+resource "aws_iam_role" "rds_monitoring" {
+  name = "${var.project_name}-${var.environment}-rds-monitoring-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = { Service = "monitoring.rds.amazonaws.com" }
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
 resource "aws_iam_role_policy_attachment" "rds_monitoring" {
   role       = aws_iam_role.rds_monitoring.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }
-

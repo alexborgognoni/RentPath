@@ -32,6 +32,25 @@ resource "aws_codepipeline" "main" {
   }
 
   stage {
+    name = "Build"
+
+    action {
+      name             = "Build"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      input_artifacts  = ["SourceArtifact"]
+      output_artifacts = ["BuildArtifact"]
+      version          = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.build.name
+      }
+    }
+  }
+
+
+  stage {
     name = "Deploy"
 
     action {
@@ -39,8 +58,8 @@ resource "aws_codepipeline" "main" {
       category        = "Deploy"
       owner           = "AWS"
       provider        = "ElasticBeanstalk"
+      input_artifacts = ["BuildArtifact"]
       version         = "1"
-      input_artifacts = ["SourceArtifact"]
 
       configuration = {
         ApplicationName = aws_elastic_beanstalk_application.main.name
