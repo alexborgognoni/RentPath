@@ -25,12 +25,3 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-
-# Terraform
-.terraform/
-.terraform.lock.hcl
-terraform.tfvars
-terraform.tfstate*
-*.tfplan
-crash.log
-crash.*.log
