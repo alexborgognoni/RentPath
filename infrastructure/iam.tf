@@ -203,6 +203,25 @@ resource "aws_iam_role" "codebuild_role" {
   tags = local.common_tags
 }
 
+resource "aws_iam_role_policy" "codepipeline_codebuild" {
+  name = "${var.project_name}-${var.environment}-codepipeline-codebuild"
+  role = aws_iam_role.codepipeline_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "codebuild:BatchGetBuilds",
+          "codebuild:StartBuild"
+        ]
+        Resource = aws_codebuild_project.build.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "codebuild_s3" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
