@@ -18,17 +18,21 @@ The infrastructure includes:
 
 ```
 infrastructure/
-├── main.tf                    # Main configuration and data sources
 ├── versions.tf                # Terraform and provider version constraints
 ├── providers.tf               # AWS provider configuration
 ├── variables.tf               # Input variables with validation
 ├── outputs.tf                 # Output values
+├── locals.tf                  # Local values and computed expressions
 ├── data.tf                    # Data sources for existing resources
-├── elastic-beanstalk.tf       # EB application, environment, and IAM
-├── rds.tf                     # MySQL database and security
+├── elastic-beanstalk.tf       # EB application and environment
+├── rds.tf                     # MySQL database configuration
+├── security-groups.tf         # Security group definitions
 ├── s3.tf                      # S3 buckets and CloudFront CDN
 ├── codepipeline.tf            # CI/CD pipeline configuration
-└── terraform.tfvars.example   # Example configuration values
+├── iam.tf                     # IAM roles and policies
+├── secrets.tf                 # AWS Secrets Manager configuration
+├── terraform.tfvars.example   # Example configuration values
+└── README.md                  # This documentation
 ```
 
 ## Infrastructure Components
@@ -117,6 +121,28 @@ After successful deployment:
 4. **Review security groups** and access patterns
 
 ## Environment Configuration
+
+### Secrets Management 🔒
+
+**Sensitive data is automatically stored in AWS Secrets Manager:**
+
+- **Application Key**: Laravel encryption key
+- **Database Username**: RDS database username
+- **Database Name**: RDS database name
+- **Database Password**: Auto-generated and rotated
+
+**How it works:**
+1. During initial deployment, sensitive variables are stored as secrets
+2. Terraform retrieves secrets via data sources for subsequent deployments
+3. Secrets are injected into Elastic Beanstalk as environment variables
+4. No sensitive data is stored in state files or logs
+
+**Secret Names:**
+- `{project-name}-{environment}/app-key`
+- `{project-name}-{environment}/database-config`
+- `{project-name}-{environment}/app-config`
+- `{project-name}-{environment}/codestar-connection`
+- `{project-name}-{environment}-db-password`
 
 ### Database Connection
 
@@ -220,11 +246,45 @@ Common issues and solutions:
 - Check IAM permissions for CodePipeline role
 - Ensure source repository has correct branch
 
+## Secrets Rotation
+
+To rotate sensitive values:
+
+### Application Key Rotation
+```bash
+# 1. Generate new key in Laravel
+php artisan key:generate --show
+
+# 2. Update secret in AWS
+aws secretsmanager update-secret --secret-id rentpath-production/app-key \
+  --secret-string "base64:NEW_KEY_HERE"
+
+# 3. Deploy changes
+terraform apply
+```
+
+### Database Credentials Rotation
+```bash
+# 1. Update database config secret
+aws secretsmanager update-secret --secret-id rentpath-production/database-config \
+  --secret-string '{"username":"new_user","database":"new_db","engine":"mysql","port":3306}'
+
+# 2. Deploy changes (will recreate RDS instance)
+terraform apply
+```
+
+### Database Password Rotation
+```bash
+# Password rotation is handled automatically by AWS
+# Or manually trigger:
+aws secretsmanager rotate-secret --secret-id rentpath-production/db-password
+```
+
 ## Maintenance
 
 Regular maintenance tasks:
 - **Update platform version** when new versions are available
-- **Review and rotate** database passwords quarterly
+- **Rotate secrets** quarterly using above procedures
 - **Monitor costs** and optimize resource usage
 - **Update Terraform** and provider versions
 - **Review security groups** and access patterns

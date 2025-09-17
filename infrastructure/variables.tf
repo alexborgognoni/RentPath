@@ -1,3 +1,20 @@
+# ==============================================================================
+# TERRAFORM VARIABLES FOR RENTPATH INFRASTRUCTURE
+# ==============================================================================
+#
+# SECRETS MANAGEMENT:
+# The following sensitive values are now managed via AWS Secrets Manager:
+# - app_key: Laravel application encryption key
+# - app_url: Application URL
+# - database username: RDS database username
+# - database name: RDS database name
+# - codestar_connection_arn: GitHub CodeStar connection ARN
+#
+# These secrets are automatically retrieved via data sources in data.tf
+# and applied via locals in locals.tf. See secrets.tf for secret definitions.
+#
+# ==============================================================================
+
 # Project configuration
 variable "project_name" {
   description = "Name of the project"
@@ -64,10 +81,18 @@ variable "eb_max_size" {
 }
 
 # Application configuration
+# NOTE: app_key is now managed via AWS Secrets Manager
+# Use the secrets.tf file to manage the app-key secret
 variable "app_key" {
-  description = "Laravel application key"
+  description = "[DEPRECATED] Laravel application key - now managed via AWS Secrets Manager"
   type        = string
+  default     = null
   sensitive   = true
+
+  validation {
+    condition     = var.app_key == null || can(regex("^base64:", var.app_key))
+    error_message = "App key must start with 'base64:' prefix or be null (recommended: use Secrets Manager)."
+  }
 }
 
 variable "app_debug" {
@@ -76,9 +101,12 @@ variable "app_debug" {
   default     = "false"
 }
 
+# NOTE: app_url is now managed via AWS Secrets Manager
+# Use the secrets.tf file to manage the app-config secret
 variable "app_url" {
-  description = "Application URL"
+  description = "[DEPRECATED] Application URL - now managed via AWS Secrets Manager"
   type        = string
+  default     = null
 }
 
 # RDS configuration
@@ -100,16 +128,32 @@ variable "rds_instance_class" {
   default     = "db.t3.micro"
 }
 
+# NOTE: rds_database_name is now managed via AWS Secrets Manager
+# Use the secrets.tf file to manage the database-config secret
 variable "rds_database_name" {
-  description = "RDS database name"
+  description = "[DEPRECATED] RDS database name - now managed via AWS Secrets Manager"
   type        = string
   default     = "rentpath"
+  sensitive   = true
+
+  validation {
+    condition     = can(regex("^[a-zA-Z][a-zA-Z0-9_]*$", var.rds_database_name))
+    error_message = "Database name must start with a letter and contain only alphanumeric characters and underscores."
+  }
 }
 
+# NOTE: rds_database_username is now managed via AWS Secrets Manager
+# Use the secrets.tf file to manage the database-config secret
 variable "rds_database_username" {
-  description = "RDS database username"
+  description = "[DEPRECATED] RDS database username - now managed via AWS Secrets Manager"
   type        = string
   default     = "rentpath"
+  sensitive   = true
+
+  validation {
+    condition     = can(regex("^[a-zA-Z][a-zA-Z0-9_]*$", var.rds_database_username))
+    error_message = "Database username must start with a letter and contain only alphanumeric characters and underscores."
+  }
 }
 
 variable "db_allocated_storage" {
@@ -159,7 +203,6 @@ variable "s3_create_backup_bucket" {
 variable "github_repo" {
   description = "GitHub repository in format owner/repo"
   type        = string
-  default     = "alexborgognoni/RentPath"
 }
 
 variable "github_branch" {
@@ -168,7 +211,10 @@ variable "github_branch" {
   default     = "main"
 }
 
+# NOTE: codestar_connection_arn is now managed via AWS Secrets Manager
+# Use the secrets.tf file to manage the codestar-connection secret
 variable "codestar_connection_arn" {
-  description = "CodeStar connection ARN for GitHub"
+  description = "[DEPRECATED] CodeStar connection ARN for GitHub - now managed via AWS Secrets Manager"
   type        = string
+  default     = null
 }

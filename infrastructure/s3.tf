@@ -45,6 +45,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
     id     = "cleanup_incomplete_uploads"
     status = "Enabled"
 
+    filter {}
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -53,6 +55,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
   rule {
     id     = "transition_to_ia"
     status = "Enabled"
+
+    filter {}
 
     transition {
       days          = 30
@@ -75,6 +79,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
     content {
       id     = "cleanup_old_versions"
       status = "Enabled"
+
+      filter {}
 
       noncurrent_version_transition {
         noncurrent_days = 30

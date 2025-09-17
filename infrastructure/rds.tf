@@ -8,50 +8,6 @@ resource "aws_db_subnet_group" "main" {
   })
 }
 
-# Security Group for RDS
-resource "aws_security_group" "rds" {
-  name_prefix = "${var.project_name}-${var.environment}-rds-"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.eb_ec2.id]
-    description     = "MySQL access from Elastic Beanstalk instances"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "All outbound traffic"
-  }
-
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-${var.environment}-rds-sg"
-  })
-}
-
-# Security Group for Elastic Beanstalk EC2 instances
-resource "aws_security_group" "eb_ec2" {
-  name_prefix = "${var.project_name}-${var.environment}-eb-ec2-"
-  vpc_id      = var.vpc_id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "All outbound traffic"
-  }
-
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-${var.environment}-eb-ec2-sg"
-  })
-}
-
 # Random password for RDS
 resource "random_password" "db_password" {
   length  = 16
@@ -88,9 +44,9 @@ resource "aws_db_instance" "main" {
   storage_type          = "gp2"
   storage_encrypted     = true
 
-  # Database configuration
-  db_name  = var.rds_database_name
-  username = var.rds_database_username
+  # Database configuration (using secrets)
+  db_name  = local.database_config.database
+  username = local.database_config.username
   password = random_password.db_password.result
   port     = 3306
 

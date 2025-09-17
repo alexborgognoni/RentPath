@@ -22,7 +22,7 @@ resource "aws_codepipeline" "main" {
       output_artifacts = ["SourceArtifact"]
 
       configuration = {
-        ConnectionArn        = var.codestar_connection_arn
+        ConnectionArn        = local.codestar_config.connection_arn
         FullRepositoryId     = var.github_repo
         BranchName           = var.github_branch
         OutputArtifactFormat = "CODE_ZIP"

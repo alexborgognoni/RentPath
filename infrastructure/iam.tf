@@ -131,7 +131,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         Action = [
           "codeconnections:UseConnection"
         ]
-        Resource = var.codestar_connection_arn
+        Resource = local.codestar_config.connection_arn
       },
       {
         Effect = "Allow"
@@ -204,3 +204,4 @@ resource "aws_iam_role_policy_attachment" "rds_monitoring" {
   role       = aws_iam_role.rds_monitoring.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }
+
