@@ -38,7 +38,7 @@ output "s3_bucket_arn" {
 
 output "s3_backup_bucket_name" {
   description = "Name of the backup S3 bucket"
-  value       = var.s3_create_backup_bucket ? aws_s3_bucket.backups[0].bucket : null
+  value       = var.s3_create_backup_bucket && length(aws_s3_bucket.backups) > 0 ? aws_s3_bucket.backups[0].bucket : null
 }
 
 # CloudFront outputs
@@ -78,9 +78,8 @@ output "eb_ec2_security_group_id" {
 output "secrets_manager_info" {
   description = "Non-sensitive information about secrets stored in AWS Secrets Manager"
   value = {
-    app_key_secret_name         = aws_secretsmanager_secret.app_key.name
-    database_config_secret_name = aws_secretsmanager_secret.database_config.name
-    database_password_secret_name = aws_secretsmanager_secret.db_password.name
+    app_config_secret_name = data.aws_secretsmanager_secret.app_config.name
+    app_config_secret_arn  = data.aws_secretsmanager_secret.app_config.arn
   }
 }
 

@@ -6,7 +6,7 @@
 
 # IAM role for EC2 instances
 resource "aws_iam_role" "eb_ec2_role" {
-  name = "${var.project_name}-eb-ec2-role"
+  name = "${var.project_name}-${var.environment}-eb-ec2-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -42,17 +42,17 @@ resource "aws_iam_role_policy_attachment" "eb_multicontainer_docker" {
 
 # IAM instance profile for Elastic Beanstalk
 resource "aws_iam_instance_profile" "eb_ec2_profile" {
-  name = "${var.project_name}-eb-ec2-profile"
+  name = "${var.project_name}-${var.environment}-eb-ec2-profile"
   role = aws_iam_role.eb_ec2_role.name
 
   tags = merge(local.common_tags, {
-    Name = "${var.project_name}-eb-ec2-profile"
+    Name = "${var.project_name}-${var.environment}-eb-ec2-profile"
   })
 }
 
 # Service role for Elastic Beanstalk
 resource "aws_iam_role" "eb_service_role" {
-  name = "${var.project_name}-eb-service-role"
+  name = "${var.project_name}-${var.environment}-eb-service-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -87,7 +87,7 @@ resource "aws_iam_role_policy_attachment" "eb_health" {
 
 # IAM role for CodePipeline
 resource "aws_iam_role" "codepipeline_role" {
-  name = "${var.project_name}-codepipeline-role"
+  name = "${var.project_name}-${var.environment}-codepipeline-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -107,7 +107,7 @@ resource "aws_iam_role" "codepipeline_role" {
 
 # IAM policy for CodePipeline
 resource "aws_iam_role_policy" "codepipeline_policy" {
-  name = "${var.project_name}-codepipeline-policy"
+  name = "${var.project_name}-${var.environment}-codepipeline-policy"
   role = aws_iam_role.codepipeline_role.id
 
   policy = jsonencode({
@@ -131,7 +131,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         Action = [
           "codeconnections:UseConnection"
         ]
-        Resource = local.codestar_config.connection_arn
+        Resource = local.app_config.codestar_connection_arn
       },
       {
         Effect = "Allow"

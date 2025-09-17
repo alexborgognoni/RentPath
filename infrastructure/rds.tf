@@ -8,11 +8,7 @@ resource "aws_db_subnet_group" "main" {
   })
 }
 
-# Random password for RDS
-resource "random_password" "db_password" {
-  length  = 16
-  special = true
-}
+# Note: Database password is now managed via the app-config secret
 
 # RDS Parameter Group
 resource "aws_db_parameter_group" "main" {
@@ -44,10 +40,10 @@ resource "aws_db_instance" "main" {
   storage_type          = "gp2"
   storage_encrypted     = true
 
-  # Database configuration (using secrets)
-  db_name  = local.database_config.database
-  username = local.database_config.username
-  password = random_password.db_password.result
+  # Database configuration (using app-config secret)
+  db_name  = local.app_config.DB_DATABASE
+  username = local.app_config.DB_USERNAME
+  password = local.app_config.DB_PASSWORD
   port     = 3306
 
   # Network configuration
@@ -77,24 +73,5 @@ resource "aws_db_instance" "main" {
   })
 }
 
-# Store database password in AWS Secrets Manager
-resource "aws_secretsmanager_secret" "db_password" {
-  name = "${var.project_name}-${var.environment}-db-password"
-
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-${var.environment}-db-password"
-  })
-}
-
-resource "aws_secretsmanager_secret_version" "db_password" {
-  secret_id = aws_secretsmanager_secret.db_password.id
-  secret_string = jsonencode({
-    username = aws_db_instance.main.username
-    password = random_password.db_password.result
-    engine   = aws_db_instance.main.engine
-    host     = aws_db_instance.main.endpoint
-    port     = aws_db_instance.main.port
-    dbname   = aws_db_instance.main.db_name
-  })
-}
+# Note: Database credentials are now managed via the app-config secret
 

@@ -1,6 +1,6 @@
 # CodePipeline
 resource "aws_codepipeline" "main" {
-  name           = var.project_name
+  name           = "${var.project_name}-${var.environment}"
   role_arn       = aws_iam_role.codepipeline_role.arn
   pipeline_type  = "V2"
   execution_mode = "QUEUED"
@@ -22,7 +22,7 @@ resource "aws_codepipeline" "main" {
       output_artifacts = ["SourceArtifact"]
 
       configuration = {
-        ConnectionArn        = local.codestar_config.connection_arn
+        ConnectionArn        = local.app_config.codestar_connection_arn
         FullRepositoryId     = var.github_repo
         BranchName           = var.github_branch
         OutputArtifactFormat = "CODE_ZIP"
@@ -65,7 +65,7 @@ resource "aws_codepipeline" "main" {
   }
 
   tags = merge(local.common_tags, {
-    Name = "${var.project_name}-pipeline"
+    Name = "${var.project_name}-${var.environment}-pipeline"
   })
 }
 

@@ -134,9 +134,9 @@ resource "aws_elastic_beanstalk_environment" "main" {
     value     = "600"
   }
 
-  # Application environment variables using locals
+  # Application environment variables from consolidated app-config secret
   dynamic "setting" {
-    for_each = merge(local.app_env_vars, local.db_env_vars)
+    for_each = local.environment_variables
     content {
       namespace = "aws:elasticbeanstalk:application:environment"
       name      = setting.key

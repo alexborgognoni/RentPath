@@ -82,18 +82,7 @@ variable "eb_max_size" {
 
 # Application configuration
 # NOTE: app_key is now managed via AWS Secrets Manager
-# Use the secrets.tf file to manage the app-key secret
-variable "app_key" {
-  description = "[DEPRECATED] Laravel application key - now managed via AWS Secrets Manager"
-  type        = string
-  default     = null
-  sensitive   = true
-
-  validation {
-    condition     = var.app_key == null || can(regex("^base64:", var.app_key))
-    error_message = "App key must start with 'base64:' prefix or be null (recommended: use Secrets Manager)."
-  }
-}
+# Create the secret manually using AWS CLI before running Terraform
 
 variable "app_debug" {
   description = "Enable Laravel debug mode"
@@ -102,12 +91,7 @@ variable "app_debug" {
 }
 
 # NOTE: app_url is now managed via AWS Secrets Manager
-# Use the secrets.tf file to manage the app-config secret
-variable "app_url" {
-  description = "[DEPRECATED] Application URL - now managed via AWS Secrets Manager"
-  type        = string
-  default     = null
-}
+# Create the secret manually using AWS CLI before running Terraform
 
 # RDS configuration
 variable "rds_engine" {
@@ -129,32 +113,10 @@ variable "rds_instance_class" {
 }
 
 # NOTE: rds_database_name is now managed via AWS Secrets Manager
-# Use the secrets.tf file to manage the database-config secret
-variable "rds_database_name" {
-  description = "[DEPRECATED] RDS database name - now managed via AWS Secrets Manager"
-  type        = string
-  default     = "rentpath"
-  sensitive   = true
-
-  validation {
-    condition     = can(regex("^[a-zA-Z][a-zA-Z0-9_]*$", var.rds_database_name))
-    error_message = "Database name must start with a letter and contain only alphanumeric characters and underscores."
-  }
-}
+# Create the secret manually using AWS CLI before running Terraform
 
 # NOTE: rds_database_username is now managed via AWS Secrets Manager
-# Use the secrets.tf file to manage the database-config secret
-variable "rds_database_username" {
-  description = "[DEPRECATED] RDS database username - now managed via AWS Secrets Manager"
-  type        = string
-  default     = "rentpath"
-  sensitive   = true
-
-  validation {
-    condition     = can(regex("^[a-zA-Z][a-zA-Z0-9_]*$", var.rds_database_username))
-    error_message = "Database username must start with a letter and contain only alphanumeric characters and underscores."
-  }
-}
+# Create the secret manually using AWS CLI before running Terraform
 
 variable "db_allocated_storage" {
   description = "RDS allocated storage in GB"
@@ -212,9 +174,4 @@ variable "github_branch" {
 }
 
 # NOTE: codestar_connection_arn is now managed via AWS Secrets Manager
-# Use the secrets.tf file to manage the codestar-connection secret
-variable "codestar_connection_arn" {
-  description = "[DEPRECATED] CodeStar connection ARN for GitHub - now managed via AWS Secrets Manager"
-  type        = string
-  default     = null
-}
+# Create the secret manually using AWS CLI before running Terraform

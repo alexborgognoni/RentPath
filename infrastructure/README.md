@@ -90,17 +90,51 @@ cp terraform.tfvars.example terraform.tfvars
 
 Edit `terraform.tfvars` with your specific values:
 - VPC ID and subnet IDs
-- CodeStar connection ARN
-- Application key and URL
-- Database and S3 configuration
+- GitHub repository and branch
+- Instance types and scaling configuration
 
-### 3. Validate Configuration
+### 3. Create Secrets Manually
+**⚠️ IMPORTANT: Create the consolidated secret before running Terraform**
+
+```bash
+# Create the consolidated app-config secret with all environment variables
+aws secretsmanager create-secret --name "rentpath-production/app-config" \
+  --description "Consolidated application configuration for RentPath"
+
+# Update the secret with your production values
+aws secretsmanager update-secret --secret-id "rentpath-production/app-config" \
+  --secret-string '{
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "APP_KEY": "base64:YOUR_LARAVEL_APP_KEY_HERE",
+    "APP_NAME": "RentPath",
+    "APP_URL": "https://your-domain.com",
+    "CACHE_STORE": "database",
+    "SESSION_DRIVER": "database",
+    "QUEUE_CONNECTION": "database",
+    "LOG_CHANNEL": "stack",
+    "DB_CONNECTION": "mysql",
+    "DB_DATABASE": "rentpath",
+    "DB_USERNAME": "rentpath",
+    "DB_PASSWORD": "your-secure-database-password",
+    "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/your-connection-id"
+  }'
+```
+
+**Generate Laravel App Key:**
+```bash
+# If you don't have a Laravel app key yet:
+php artisan key:generate --show
+# Use the generated key in the secret above
+```
+
+### 4. Validate Configuration
 ```bash
 terraform validate
 terraform plan
 ```
 
-### 4. Deploy Infrastructure
+### 5. Deploy Infrastructure
 ```bash
 terraform apply
 ```
@@ -111,7 +145,7 @@ The deployment will create:
 - S3 buckets and CloudFront distribution
 - CodePipeline for automated deployments
 
-### 5. Post-Deployment Setup
+### 6. Post-Deployment Setup
 
 After successful deployment:
 
@@ -124,32 +158,33 @@ After successful deployment:
 
 ### Secrets Management 🔒
 
-**Sensitive data is automatically stored in AWS Secrets Manager:**
+**All sensitive data is stored in a single AWS Secrets Manager secret:**
 
-- **Application Key**: Laravel encryption key
-- **Database Username**: RDS database username
-- **Database Name**: RDS database name
-- **Database Password**: Auto-generated and rotated
+- **Consolidated Secret**: Contains all environment variables and configuration
+- **No Circular Dependencies**: Secrets are created manually before Terraform deployment
+- **Environment-Specific**: All resource names include environment for multi-environment support
 
 **How it works:**
-1. During initial deployment, sensitive variables are stored as secrets
-2. Terraform retrieves secrets via data sources for subsequent deployments
-3. Secrets are injected into Elastic Beanstalk as environment variables
-4. No sensitive data is stored in state files or logs
+1. **Manual Secret Creation**: Create the consolidated secret using AWS CLI before deployment
+2. **Terraform Data Source**: Terraform retrieves the secret via data source (no creation)
+3. **Environment Variables**: All secrets are injected into Elastic Beanstalk as environment variables
+4. **No Sensitive Data in State**: No sensitive data is stored in Terraform state files or logs
 
-**Secret Names:**
-- `{project-name}-{environment}/app-key`
-- `{project-name}-{environment}/database-config`
+**Consolidated Secret Name:**
 - `{project-name}-{environment}/app-config`
-- `{project-name}-{environment}/codestar-connection`
-- `{project-name}-{environment}-db-password`
+
+**Secret Contains:**
+- Laravel application settings (APP_KEY, APP_URL, APP_ENV, etc.)
+- Database credentials (DB_USERNAME, DB_PASSWORD, DB_DATABASE)
+- CodeStar connection ARN for CI/CD
+- Cache, session, and queue configuration
 
 ### Database Connection
 
-The RDS database credentials are automatically:
-- Generated as random passwords
-- Stored in AWS Secrets Manager
+The RDS database credentials are:
+- Stored in the consolidated app-config secret in AWS Secrets Manager
 - Injected as environment variables into Elastic Beanstalk
+- The database host and port are computed by Terraform and merged with the secret values
 
 ### Application Settings
 
@@ -248,46 +283,98 @@ Common issues and solutions:
 
 ## Secrets Rotation
 
-To rotate sensitive values:
+To rotate sensitive values in the consolidated secret:
 
-### Application Key Rotation
+### Complete Secret Update
 ```bash
-# 1. Generate new key in Laravel
+# 1. Get current secret values
+aws secretsmanager get-secret-value --secret-id rentpath-production/app-config \
+  --query SecretString --output text | jq .
+
+# 2. Update specific values and rotate the entire secret
+aws secretsmanager update-secret --secret-id rentpath-production/app-config \
+  --secret-string '{
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "APP_KEY": "base64:NEW_LARAVEL_KEY_HERE",
+    "APP_NAME": "RentPath",
+    "APP_URL": "https://your-domain.com",
+    "CACHE_STORE": "database",
+    "SESSION_DRIVER": "database",
+    "QUEUE_CONNECTION": "database",
+    "LOG_CHANNEL": "stack",
+    "DB_CONNECTION": "mysql",
+    "DB_DATABASE": "rentpath",
+    "DB_USERNAME": "rentpath",
+    "DB_PASSWORD": "NEW_SECURE_DATABASE_PASSWORD",
+    "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/your-connection-id"
+  }'
+
+# 3. Deploy changes to apply new environment variables
+terraform apply
+```
+
+### Individual Value Updates
+```bash
+# For updating just the Laravel app key:
+# 1. Generate new key
 php artisan key:generate --show
 
-# 2. Update secret in AWS
-aws secretsmanager update-secret --secret-id rentpath-production/app-key \
-  --secret-string "base64:NEW_KEY_HERE"
-
-# 3. Deploy changes
-terraform apply
+# 2. Update the secret with new APP_KEY value (keeping all other values the same)
+# Use the complete secret update approach above with just the APP_KEY changed
 ```
 
-### Database Credentials Rotation
-```bash
-# 1. Update database config secret
-aws secretsmanager update-secret --secret-id rentpath-production/database-config \
-  --secret-string '{"username":"new_user","database":"new_db","engine":"mysql","port":3306}'
+**⚠️ Important Notes:**
+- Always update the entire secret JSON when making changes
+- Database password changes will require application restart
+- Test changes in a development environment first
+- Keep backups of working secret configurations
 
-# 2. Deploy changes (will recreate RDS instance)
-terraform apply
-```
+## Multi-Environment Support
 
-### Database Password Rotation
+The infrastructure is designed to support multiple environments (dev, staging, production) without conflicts:
+
+### Environment-Specific Resources
+All resource names include the environment:
+- IAM roles: `rentpath-{environment}-eb-ec2-role`
+- S3 buckets: `rentpath-{environment}-assets`
+- CodePipeline: `rentpath-{environment}`
+- Secrets: `rentpath-{environment}/app-config`
+
+### Deploying Multiple Environments
 ```bash
-# Password rotation is handled automatically by AWS
-# Or manually trigger:
-aws secretsmanager rotate-secret --secret-id rentpath-production/db-password
+# Development environment
+cp terraform.tfvars.example terraform.tfvars.dev
+# Edit terraform.tfvars.dev with development values (environment = "dev")
+
+# Create dev secret
+aws secretsmanager create-secret --name "rentpath-dev/app-config"
+# ... populate with dev configuration
+
+# Deploy dev environment
+terraform apply -var-file="terraform.tfvars.dev"
+
+# Production environment
+cp terraform.tfvars.example terraform.tfvars.prod
+# Edit terraform.tfvars.prod with production values (environment = "production")
+
+# Create production secret
+aws secretsmanager create-secret --name "rentpath-production/app-config"
+# ... populate with production configuration
+
+# Deploy production environment
+terraform apply -var-file="terraform.tfvars.prod"
 ```
 
 ## Maintenance
 
 Regular maintenance tasks:
 - **Update platform version** when new versions are available
-- **Rotate secrets** quarterly using above procedures
+- **Rotate secrets** quarterly using consolidated secret approach
 - **Monitor costs** and optimize resource usage
 - **Update Terraform** and provider versions
 - **Review security groups** and access patterns
+- **Backup secret configurations** before making changes
 
 ## Support
 
