@@ -22,6 +22,7 @@ resource "aws_iam_role" "eb_ec2_role" {
   tags = local.common_tags
 }
 
+# Attach AWS managed policies to EC2 role
 resource "aws_iam_role_policy_attachment" "eb_web_tier" {
   role       = aws_iam_role.eb_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
@@ -37,6 +38,42 @@ resource "aws_iam_role_policy_attachment" "eb_multicontainer_docker" {
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker"
 }
 
+# Attach S3 read and CloudWatch logs for EC2 role
+resource "aws_iam_role_policy_attachment" "eb_ec2_s3" {
+  role       = aws_iam_role.eb_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "eb_ec2_logs" {
+  role       = aws_iam_role.eb_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+# Additional permissions for EC2 instances during deployment
+resource "aws_iam_role_policy" "eb_ec2_deployment" {
+  name = "${var.project_name}-${var.environment}-eb-ec2-deployment"
+  role = aws_iam_role.eb_ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSecurityGroups",
+          "s3:GetObjectAcl",
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# IAM instance profile for Elastic Beanstalk EC2
 resource "aws_iam_instance_profile" "eb_ec2_profile" {
   name = "${var.project_name}-${var.environment}-eb-ec2-profile"
   role = aws_iam_role.eb_ec2_role.name
@@ -45,6 +82,10 @@ resource "aws_iam_instance_profile" "eb_ec2_profile" {
     Name = "${var.project_name}-${var.environment}-eb-ec2-profile"
   })
 }
+
+# ==============================================================================
+# EB SERVICE ROLE
+# ==============================================================================
 
 # Service role for Elastic Beanstalk
 resource "aws_iam_role" "eb_service_role" {
@@ -64,6 +105,7 @@ resource "aws_iam_role" "eb_service_role" {
   tags = local.common_tags
 }
 
+# Attach AWS managed policies
 resource "aws_iam_role_policy_attachment" "eb_service" {
   role       = aws_iam_role.eb_service_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService"
@@ -72,6 +114,33 @@ resource "aws_iam_role_policy_attachment" "eb_service" {
 resource "aws_iam_role_policy_attachment" "eb_health" {
   role       = aws_iam_role.eb_service_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth"
+}
+
+resource "aws_iam_role_policy" "eb_service" {
+  name = "${var.project_name}-${var.environment}-eb-service"
+  role = aws_iam_role.eb_service_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSecurityGroups",
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "autoscaling:DescribeAutoScalingGroups",
+          "autoscaling:DescribeLaunchConfigurations",
+          "autoscaling:DescribeScalingActivities",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:ListBucket"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 # ==============================================================================
@@ -122,7 +191,9 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "s3:CreateBucket",
           "s3:ListBucket",
           "s3:GetObject",
+          "s3:GetObjectAcl",
           "s3:PutObject",
+          "s3:PutObjectAcl",
           "s3:DeleteObject",
           "s3:PutBucketOwnershipControls",
           "s3:GetBucketOwnershipControls",
@@ -139,8 +210,8 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         ]
       },
       {
-        Effect = "Allow"
-        Action = ["codestar-connections:UseConnection"]
+        Effect   = "Allow"
+        Action   = ["codestar-connections:UseConnection"]
         Resource = local.app_config.codestar_connection_arn
       },
       {
@@ -160,16 +231,27 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "autoscaling:DescribeAutoScalingGroups",
           "autoscaling:DescribeLaunchConfigurations",
           "autoscaling:DescribeScalingActivities",
+          "autoscaling:SuspendProcesses",
+          "autoscaling:ResumeProcesses",
+          "cloudformation:CreateStack",
+          "cloudformation:UpdateStack",
+          "cloudformation:CancelUpdateStack",
+          "cloudformation:DeleteStack",
           "cloudformation:DescribeStacks",
           "cloudformation:DescribeStackEvents",
           "cloudformation:DescribeStackResources",
+          "cloudformation:DescribeStackResource",
           "cloudformation:GetTemplate",
+          "ec2:DescribeImages",
           "ec2:DescribeInstanceAttribute",
           "ec2:DescribeInstanceStatus",
           "ec2:DescribeInstances",
           "ec2:DescribeKeyPairs",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:DescribeLaunchTemplateVersions",
           "ec2:DescribeSecurityGroups",
           "ec2:DescribeSnapshots",
+          "ec2:DescribeSubnets",
           "ec2:DescribeVpcs",
           "elasticloadbalancing:DescribeLoadBalancers",
           "iam:PassRole",
@@ -180,6 +262,15 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "logs:PutLogEvents"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:*"
+        ]
+        Resource = [
+          "arn:aws:s3:::*"
+        ]
       }
     ]
   })
@@ -203,6 +294,7 @@ resource "aws_iam_role" "codebuild_role" {
   tags = local.common_tags
 }
 
+# Allow CodePipeline to start CodeBuild
 resource "aws_iam_role_policy" "codepipeline_codebuild" {
   name = "${var.project_name}-${var.environment}-codepipeline-codebuild"
   role = aws_iam_role.codepipeline_role.id
@@ -211,17 +303,15 @@ resource "aws_iam_role_policy" "codepipeline_codebuild" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = [
-          "codebuild:BatchGetBuilds",
-          "codebuild:StartBuild"
-        ]
+        Effect   = "Allow"
+        Action   = ["codebuild:BatchGetBuilds", "codebuild:StartBuild"]
         Resource = aws_codebuild_project.build.arn
       }
     ]
   })
 }
 
+# Attach S3 and CloudWatch policies to CodeBuild
 resource "aws_iam_role_policy_attachment" "codebuild_s3" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
