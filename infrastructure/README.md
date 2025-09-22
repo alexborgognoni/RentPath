@@ -6,7 +6,7 @@ This directory contains Terraform configuration for the RentPath Laravel applica
 
 The infrastructure includes:
 
-- **Elastic Beanstalk**: Laravel 12 application hosting with PHP 8.4
+- **Elastic Beanstalk**: Laravel 12 application hosting with PHP 8.3
 - **RDS MySQL**: Database with automated backups and monitoring
 - **S3 + CloudFront**: Asset storage with CDN
 - **CodePipeline**: CI/CD pipeline for automated deployments
@@ -38,7 +38,7 @@ infrastructure/
 ## Infrastructure Components
 
 ### Elastic Beanstalk
-- **Application**: PHP 8.4 on Amazon Linux 2023
+- **Application**: PHP 8.3 on Amazon Linux 2023
 - **Environment**: Load-balanced with auto-scaling
 - **Instance Type**: Configurable (default: t3.medium)
 - **Scaling**: Min/max instances configurable

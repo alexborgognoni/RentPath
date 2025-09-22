@@ -101,7 +101,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
 
 # CloudFront Origin Access Control
 resource "aws_cloudfront_origin_access_control" "main" {
-  name                              = "${var.project_name}-${var.environment}-oac"
+  name                              = "${var.project_name}-${var.environment}-oac-v2"
   description                       = "OAC for ${var.project_name} ${var.environment}"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
