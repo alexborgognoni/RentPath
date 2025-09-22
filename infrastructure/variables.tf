@@ -59,7 +59,7 @@ variable "private_subnet_ids" {
 variable "eb_solution_stack" {
   description = "Elastic Beanstalk solution stack"
   type        = string
-  default     = "64bit Amazon Linux 2023 v4.7.5 running PHP 8.4"
+  default     = "64bit Amazon Linux 2023 v4.7.5 running PHP 8.3"
 }
 
 variable "eb_instance_type" {

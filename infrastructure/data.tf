@@ -2,10 +2,10 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-# Get latest PHP 8.4 platform version for Elastic Beanstalk
+# Get latest PHP 8.3 platform version for Elastic Beanstalk
 data "aws_elastic_beanstalk_solution_stack" "php" {
   most_recent = true
-  name_regex  = "^64bit Amazon Linux .* running PHP 8\\.4$"
+  name_regex  = "^64bit Amazon Linux .* running PHP 8\\.3$"
 }
 
 # Get availability zones
