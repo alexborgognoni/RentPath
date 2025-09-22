@@ -39,7 +39,13 @@ resource "aws_elastic_beanstalk_environment" "main" {
     value     = aws_iam_role.eb_service_role.arn
   }
 
-  # Auto Scaling configuration
+  # Auto Scaling configuration (using Launch Templates)
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "HealthCheckPath"
+    value     = "/up"
+  }
+
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
@@ -64,55 +70,7 @@ resource "aws_elastic_beanstalk_environment" "main" {
     value     = tostring(var.eb_max_size)
   }
 
-  # PHP configuration
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "document_root"
-    value     = "/public"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "memory_limit"
-    value     = "512M"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "allow_url_fopen"
-    value     = "On"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "display_errors"
-    value     = "Off"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "max_execution_time"
-    value     = "120"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "zlib.output_compression"
-    value     = "Off"
-  }
-
-  # Node.js configuration for React builds
-  setting {
-    namespace = "aws:elasticbeanstalk:container:nodejs"
-    name      = "NodeVersion"
-    value     = "20"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:nodejs"
-    name      = "NodeCommand"
-    value     = "npm start"
-  }
+  # PHP configuration handled by .platform/files/php.ini
 
   # Proxy configuration
   setting {
