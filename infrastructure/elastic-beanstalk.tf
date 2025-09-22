@@ -74,7 +74,7 @@ resource "aws_elastic_beanstalk_environment" "main" {
   setting {
     namespace = "aws:elasticbeanstalk:container:php:phpini"
     name      = "memory_limit"
-    value     = "256M"
+    value     = "512M"
   }
 
   setting {
@@ -92,13 +92,26 @@ resource "aws_elastic_beanstalk_environment" "main" {
   setting {
     namespace = "aws:elasticbeanstalk:container:php:phpini"
     name      = "max_execution_time"
-    value     = "60"
+    value     = "120"
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:container:php:phpini"
     name      = "zlib.output_compression"
     value     = "Off"
+  }
+
+  # Node.js configuration for React builds
+  setting {
+    namespace = "aws:elasticbeanstalk:container:nodejs"
+    name      = "NodeVersion"
+    value     = "20"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:container:nodejs"
+    name      = "NodeCommand"
+    value     = "npm start"
   }
 
   # Proxy configuration
@@ -119,6 +132,13 @@ resource "aws_elastic_beanstalk_environment" "main" {
     namespace = "aws:elasticbeanstalk:healthreporting:system"
     name      = "EnhancedHealthAuthEnabled"
     value     = "true"
+  }
+
+  # Health check endpoint for Laravel/Inertia applications
+  setting {
+    namespace = "aws:elasticbeanstalk:application"
+    name      = "Application Healthcheck URL"
+    value     = "/up"
   }
 
   # Deployment configuration
