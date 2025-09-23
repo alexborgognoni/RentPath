@@ -113,8 +113,7 @@ aws secretsmanager update-secret --secret-id "rentpath-production/app-config" \
     "MAIL_PASSWORD": "your-smtp-password",
     "AWS_ACCESS_KEY_ID": "your-aws-access-key",
     "AWS_SECRET_ACCESS_KEY": "your-aws-secret-key",
-    "AWS_BUCKET": "your-s3-bucket-name",
-    "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/your-connection-id"
+    "AWS_BUCKET": "your-s3-bucket-name"
   }'
 ```
 
@@ -178,7 +177,6 @@ After successful deployment:
 - Database credentials (DB_USERNAME, DB_PASSWORD, DB_DATABASE)
 - Mail credentials (MAIL_USERNAME, MAIL_PASSWORD)
 - AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET)
-- CodeStar connection ARN for CI/CD
 
 **Terraform Variables (Non-Sensitive):**
 - Application settings (name, locale, environment)
@@ -219,6 +217,7 @@ All Laravel environment variables are explicitly defined and categorized:
 **Computed by Terraform:**
 - DB_HOST (from RDS endpoint)
 - DB_PORT (from RDS port)
+- CodeStar connection (for CI/CD pipeline)
 
 ## Best Practices Implemented
 
@@ -328,8 +327,7 @@ aws secretsmanager update-secret --secret-id rentpath-production/app-config \
     "MAIL_PASSWORD": "new-smtp-password",
     "AWS_ACCESS_KEY_ID": "new-aws-access-key",
     "AWS_SECRET_ACCESS_KEY": "new-aws-secret-key",
-    "AWS_BUCKET": "your-s3-bucket-name",
-    "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/your-connection-id"
+    "AWS_BUCKET": "your-s3-bucket-name"
   }'
 
 # 3. Deploy changes to apply new environment variables
@@ -398,8 +396,7 @@ aws secretsmanager update-secret --secret-id "rentpath-dev/app-config" \
     "MAIL_PASSWORD": "dev-smtp-password",
     "AWS_ACCESS_KEY_ID": "dev-aws-access-key",
     "AWS_SECRET_ACCESS_KEY": "dev-aws-secret-key",
-    "AWS_BUCKET": "dev-s3-bucket-name",
-    "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/dev-connection-id"
+    "AWS_BUCKET": "dev-s3-bucket-name"
   }'
 
 # Deploy dev environment
@@ -423,8 +420,7 @@ aws secretsmanager update-secret --secret-id "rentpath-production/app-config" \
     "MAIL_PASSWORD": "prod-smtp-password",
     "AWS_ACCESS_KEY_ID": "prod-aws-access-key",
     "AWS_SECRET_ACCESS_KEY": "prod-aws-secret-key",
-    "AWS_BUCKET": "prod-s3-bucket-name",
-    "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/prod-connection-id"
+    "AWS_BUCKET": "prod-s3-bucket-name"
   }'
 
 # Deploy production environment

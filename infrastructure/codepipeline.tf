@@ -1,3 +1,13 @@
+# CodeStar Connection for GitHub integration
+resource "aws_codestarconnections_connection" "github" {
+  name          = "${var.project_name}-${var.environment}-github"
+  provider_type = "GitHub"
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-${var.environment}-github-connection"
+  })
+}
+
 # CodePipeline
 resource "aws_codepipeline" "main" {
   name           = "${var.project_name}-${var.environment}"
@@ -22,7 +32,7 @@ resource "aws_codepipeline" "main" {
       output_artifacts = ["SourceArtifact"]
 
       configuration = {
-        ConnectionArn        = local.app_config.codestar_connection_arn
+        ConnectionArn        = aws_codestarconnections_connection.github.arn
         FullRepositoryId     = var.github_repo
         BranchName           = var.github_branch
         OutputArtifactFormat = "CODE_ZIP"
