@@ -101,6 +101,12 @@ resource "aws_elastic_beanstalk_environment" "main" {
     value     = "UTC"
   }
 
+  setting {
+    namespace = "aws:elasticbeanstalk:container:php:phpini"
+    name      = "document_root"
+    value     = "/public"
+  }
+
   # Proxy configuration
   setting {
     namespace = "aws:elasticbeanstalk:environment:proxy"
