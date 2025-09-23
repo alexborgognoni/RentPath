@@ -1,20 +1,3 @@
-# ==============================================================================
-# TERRAFORM VARIABLES FOR RENTPATH INFRASTRUCTURE
-# ==============================================================================
-#
-# SECRETS MANAGEMENT:
-# The following sensitive values are now managed via AWS Secrets Manager:
-# - app_key: Laravel application encryption key
-# - app_url: Application URL
-# - database username: RDS database username
-# - database name: RDS database name
-# - codestar_connection_arn: GitHub CodeStar connection ARN
-#
-# These secrets are automatically retrieved via data sources in data.tf
-# and applied via locals in locals.tf. See secrets.tf for secret definitions.
-#
-# ==============================================================================
-
 # Project configuration
 variable "project_name" {
   description = "Name of the project"
@@ -80,19 +63,6 @@ variable "eb_max_size" {
   default     = 3
 }
 
-# Application configuration
-# NOTE: app_key is now managed via AWS Secrets Manager
-# Create the secret manually using AWS CLI before running Terraform
-
-variable "app_debug" {
-  description = "Enable Laravel debug mode"
-  type        = string
-  default     = "false"
-}
-
-# NOTE: app_url is now managed via AWS Secrets Manager
-# Create the secret manually using AWS CLI before running Terraform
-
 # RDS configuration
 variable "rds_engine" {
   description = "RDS database engine"
@@ -111,12 +81,6 @@ variable "rds_instance_class" {
   type        = string
   default     = "db.t3.micro"
 }
-
-# NOTE: rds_database_name is now managed via AWS Secrets Manager
-# Create the secret manually using AWS CLI before running Terraform
-
-# NOTE: rds_database_username is now managed via AWS Secrets Manager
-# Create the secret manually using AWS CLI before running Terraform
 
 variable "db_allocated_storage" {
   description = "RDS allocated storage in GB"
@@ -173,5 +137,57 @@ variable "github_branch" {
   default     = "main"
 }
 
-# NOTE: codestar_connection_arn is now managed via AWS Secrets Manager
-# Create the secret manually using AWS CLI before running Terraform
+variable "eb_laravel_config" {
+  description = "Laravel application configuration (non-sensitive)"
+  type = object({
+    # Application Configuration
+    app_name                = string
+    app_env                 = string
+    app_locale              = string
+    app_fallback_locale     = string
+    app_faker_locale        = string
+    app_maintenance_driver  = string
+    php_cli_server_workers  = number
+    bcrypt_rounds          = number
+
+    # Database Configuration (non-sensitive)
+    db_connection = string
+
+    # Logging Configuration
+    log_channel             = string
+    log_stack              = string
+    log_deprecations_channel = string
+    log_level              = string
+
+    # Session Configuration
+    session_driver   = string
+    session_lifetime = number
+    session_encrypt  = bool
+    session_path     = string
+    session_domain   = string
+
+    # Cache and Queue Configuration
+    broadcast_connection = string
+    filesystem_disk     = string
+    queue_connection    = string
+    cache_store        = string
+    cache_prefix       = string
+
+    # Redis Configuration
+    redis_client = string
+    redis_host   = string
+    redis_port   = number
+
+    # Mail Configuration (non-sensitive)
+    mail_mailer       = string
+    mail_scheme       = string
+    mail_host         = string
+    mail_port         = number
+    mail_from_address = string
+    mail_from_name    = string
+
+    # AWS Configuration (non-sensitive)
+    aws_default_region           = string
+    aws_use_path_style_endpoint = bool
+  })
+}

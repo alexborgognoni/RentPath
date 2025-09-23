@@ -1,17 +1,6 @@
 # ==============================================================================
 # EXAMPLE CONFIGURATION FOR RENTPATH INFRASTRUCTURE
 # ==============================================================================
-#
-# Copy this file to terraform.tfvars and customize the values for your environment
-#
-# IMPORTANT: Sensitive values are managed via AWS Secrets Manager.
-# Before running terraform, ensure these secrets are created:
-# - {project_name}-{environment}/app-key
-# - {project_name}-{environment}/database-config
-# - {project_name}-{environment}/app-config
-# - {project_name}-{environment}/codestar-connection
-#
-# ==============================================================================
 
 # Project Configuration
 project_name = "rentpath"
@@ -59,6 +48,60 @@ s3_create_backup_bucket = true
 github_repo   = "your-username/your-repo"  # Format: owner/repository
 github_branch = "main"                     # Branch to deploy from
 
+# Laravel Application Configuration (Non-Sensitive)
+# These values are injected as environment variables into Elastic Beanstalk
+eb_laravel_config = {
+  # Application Configuration
+  app_name                = "RentPath"
+  app_env                 = "production"
+  app_locale              = "en"
+  app_fallback_locale     = "en"
+  app_faker_locale        = "en_US"
+  app_maintenance_driver  = "file"
+  php_cli_server_workers  = 4
+  bcrypt_rounds          = 12
+
+  # Database Configuration (non-sensitive)
+  db_connection = "mysql"
+
+  # Logging Configuration
+  log_channel             = "stack"
+  log_stack              = "single"
+  log_deprecations_channel = "null"
+  log_level              = "error"  # Use "debug" for dev, "error" for production
+
+  # Session Configuration
+  session_driver   = "database"
+  session_lifetime = 120
+  session_encrypt  = false
+  session_path     = "/"
+  session_domain   = "null"
+
+  # Cache and Queue Configuration
+  broadcast_connection = "log"
+  filesystem_disk     = "s3"
+  queue_connection    = "database"
+  cache_store        = "database"
+  cache_prefix       = ""
+
+  # Redis Configuration
+  redis_client = "phpredis"
+  redis_host   = "127.0.0.1"  # Will be overridden if using ElastiCache
+  redis_port   = 6379
+
+  # Mail Configuration (non-sensitive)
+  mail_mailer       = "smtp"
+  mail_scheme       = "null"
+  mail_host         = "127.0.0.1"  # Your SMTP server host
+  mail_port         = 587
+  mail_from_address = "hello@rentpath.com"
+  mail_from_name    = "RentPath"
+
+  # AWS Configuration (non-sensitive)
+  aws_default_region           = "eu-central-1"
+  aws_use_path_style_endpoint = false
+}
+
 # ==============================================================================
 # ENVIRONMENT-SPECIFIC EXAMPLES:
 # ==============================================================================
@@ -71,6 +114,11 @@ github_branch = "main"                     # Branch to deploy from
 # rds_multi_az = false
 # rds_deletion_protection = false
 # app_debug = "true"
+# eb_laravel_config = {
+#   app_env = "development"
+#   log_level = "debug"
+#   # ... other dev-specific overrides
+# }
 
 # STAGING ENVIRONMENT:
 # environment = "staging"
@@ -79,6 +127,11 @@ github_branch = "main"                     # Branch to deploy from
 # rds_instance_class = "db.t3.small"
 # rds_multi_az = false
 # rds_deletion_protection = true
+# eb_laravel_config = {
+#   app_env = "staging"
+#   log_level = "info"
+#   # ... other staging-specific overrides
+# }
 
 # PRODUCTION ENVIRONMENT:
 # environment = "production"
@@ -89,3 +142,12 @@ github_branch = "main"                     # Branch to deploy from
 # rds_deletion_protection = true
 # db_allocated_storage = 50
 # db_max_allocated_storage = 500
+# eb_laravel_config = {
+#   app_env = "production"
+#   log_level = "error"
+#   # ... other production-specific overrides
+# }
+
+# NOTE: When overriding eb_laravel_config for different environments,
+# you only need to specify the values that differ from the defaults above.
+# Terraform will merge your overrides with the default values.
