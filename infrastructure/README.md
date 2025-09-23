@@ -94,29 +94,26 @@ Edit `terraform.tfvars` with your specific values:
 - Instance types and scaling configuration
 
 ### 3. Create Secrets Manually
-**⚠️ IMPORTANT: Create the consolidated secret before running Terraform**
+**⚠️ IMPORTANT: Create the app-config secret before running Terraform**
 
 ```bash
-# Create the consolidated app-config secret with all environment variables
+# Create the app-config secret with sensitive environment variables
 aws secretsmanager create-secret --name "rentpath-production/app-config" \
-  --description "Consolidated application configuration for RentPath"
+  --description "Sensitive environment variables for RentPath Elastic Beanstalk environment"
 
-# Update the secret with your production values
+# Update the secret with your sensitive values only
 aws secretsmanager update-secret --secret-id "rentpath-production/app-config" \
   --secret-string '{
-    "APP_ENV": "production",
-    "APP_DEBUG": "false",
     "APP_KEY": "base64:YOUR_LARAVEL_APP_KEY_HERE",
-    "APP_NAME": "RentPath",
     "APP_URL": "https://your-domain.com",
-    "CACHE_STORE": "database",
-    "SESSION_DRIVER": "database",
-    "QUEUE_CONNECTION": "database",
-    "LOG_CHANNEL": "stack",
-    "DB_CONNECTION": "mysql",
     "DB_DATABASE": "rentpath",
     "DB_USERNAME": "rentpath",
     "DB_PASSWORD": "your-secure-database-password",
+    "MAIL_USERNAME": "your-smtp-username",
+    "MAIL_PASSWORD": "your-smtp-password",
+    "AWS_ACCESS_KEY_ID": "your-aws-access-key",
+    "AWS_SECRET_ACCESS_KEY": "your-aws-secret-key",
+    "AWS_BUCKET": "your-s3-bucket-name",
     "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/your-connection-id"
   }'
 ```
@@ -156,44 +153,72 @@ After successful deployment:
 
 ## Environment Configuration
 
-### Secrets Management 🔒
+### Environment Variables Configuration 🔒
 
-**All sensitive data is stored in a single AWS Secrets Manager secret:**
+**Environment variables are now explicitly defined and separated by sensitivity:**
 
-- **Consolidated Secret**: Contains all environment variables and configuration
-- **No Circular Dependencies**: Secrets are created manually before Terraform deployment
-- **Environment-Specific**: All resource names include environment for multi-environment support
+- **Non-Sensitive Variables**: Defined in `eb_laravel_config` terraform variable map
+- **Sensitive Variables**: Stored individually in AWS Secrets Manager
+- **Database Host**: Automatically computed from RDS terraform resource
+- **Clear Separation**: Sensitive vs non-sensitive values are clearly documented
 
 **How it works:**
-1. **Manual Secret Creation**: Create the consolidated secret using AWS CLI before deployment
-2. **Terraform Data Source**: Terraform retrieves the secret via data source (no creation)
-3. **Environment Variables**: All secrets are injected into Elastic Beanstalk as environment variables
-4. **No Sensitive Data in State**: No sensitive data is stored in Terraform state files or logs
+1. **Terraform Variables**: Non-sensitive Laravel config (app name, locale, cache settings, etc.) defined in `variables.tf`
+2. **AWS Secrets Manager**: Only sensitive values (keys, passwords, credentials) stored in secrets
+3. **Individual Secret Extraction**: Each sensitive value is individually referenced from the secret
+4. **RDS Integration**: Database host automatically uses the actual RDS endpoint after creation
+5. **Environment Variables**: All values are explicitly mapped and injected into Elastic Beanstalk
 
-**Consolidated Secret Name:**
+**Secret Name:**
 - `{project-name}-{environment}/app-config`
 
-**Secret Contains:**
-- Laravel application settings (APP_KEY, APP_URL, APP_ENV, etc.)
+**Secret Contains (Sensitive Only):**
+- Laravel application key (APP_KEY)
+- Application URL (APP_URL)
 - Database credentials (DB_USERNAME, DB_PASSWORD, DB_DATABASE)
+- Mail credentials (MAIL_USERNAME, MAIL_PASSWORD)
+- AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET)
 - CodeStar connection ARN for CI/CD
-- Cache, session, and queue configuration
+
+**Terraform Variables (Non-Sensitive):**
+- Application settings (name, locale, environment)
+- Logging configuration
+- Session and cache settings
+- Mail server configuration (non-credential parts)
+- Redis configuration
+- AWS region settings
 
 ### Database Connection
 
-The RDS database credentials are:
-- Stored in the consolidated app-config secret in AWS Secrets Manager
-- Injected as environment variables into Elastic Beanstalk
-- The database host and port are computed by Terraform and merged with the secret values
+The RDS database connection is now properly configured:
+- **Host & Port**: Automatically computed from the actual RDS terraform resource (`aws_db_instance.main.endpoint`)
+- **Credentials**: Database name, username, and password stored individually in AWS Secrets Manager
+- **No Manual Host Entry**: Database host is no longer manually stored in secrets (fixes circular dependency)
+- **Dynamic Configuration**: Host is available only after RDS resource is created
 
 ### Application Settings
 
-Key environment variables set in Elastic Beanstalk:
-- `DB_*`: Database connection details
-- `APP_*`: Laravel application settings
-- `CACHE_STORE`: Set to 'database'
-- `SESSION_DRIVER`: Set to 'database'
-- `QUEUE_CONNECTION`: Set to 'database'
+All Laravel environment variables are explicitly defined and categorized:
+
+**From Terraform Variables (`eb_laravel_config`):**
+- Application configuration (APP_NAME, APP_LOCALE, etc.)
+- Logging settings (LOG_CHANNEL, LOG_LEVEL, etc.)
+- Session configuration (SESSION_DRIVER, SESSION_LIFETIME, etc.)
+- Cache and queue settings (CACHE_STORE, QUEUE_CONNECTION, etc.)
+- Mail server settings (MAIL_HOST, MAIL_PORT, etc.)
+- Redis configuration (REDIS_CLIENT, REDIS_HOST, etc.)
+- AWS region settings (AWS_DEFAULT_REGION, etc.)
+
+**From AWS Secrets Manager:**
+- APP_KEY (Laravel encryption key)
+- APP_URL (application URL)
+- Database credentials (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
+- Mail credentials (MAIL_USERNAME, MAIL_PASSWORD)
+- AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET)
+
+**Computed by Terraform:**
+- DB_HOST (from RDS endpoint)
+- DB_PORT (from RDS port)
 
 ## Best Practices Implemented
 
@@ -283,7 +308,7 @@ Common issues and solutions:
 
 ## Secrets Rotation
 
-To rotate sensitive values in the consolidated secret:
+To rotate sensitive values in the app-config secret:
 
 ### Complete Secret Update
 ```bash
@@ -291,22 +316,19 @@ To rotate sensitive values in the consolidated secret:
 aws secretsmanager get-secret-value --secret-id rentpath-production/app-config \
   --query SecretString --output text | jq .
 
-# 2. Update specific values and rotate the entire secret
+# 2. Update sensitive values only (non-sensitive values are now in Terraform variables)
 aws secretsmanager update-secret --secret-id rentpath-production/app-config \
   --secret-string '{
-    "APP_ENV": "production",
-    "APP_DEBUG": "false",
     "APP_KEY": "base64:NEW_LARAVEL_KEY_HERE",
-    "APP_NAME": "RentPath",
     "APP_URL": "https://your-domain.com",
-    "CACHE_STORE": "database",
-    "SESSION_DRIVER": "database",
-    "QUEUE_CONNECTION": "database",
-    "LOG_CHANNEL": "stack",
-    "DB_CONNECTION": "mysql",
     "DB_DATABASE": "rentpath",
     "DB_USERNAME": "rentpath",
     "DB_PASSWORD": "NEW_SECURE_DATABASE_PASSWORD",
+    "MAIL_USERNAME": "new-smtp-username",
+    "MAIL_PASSWORD": "new-smtp-password",
+    "AWS_ACCESS_KEY_ID": "new-aws-access-key",
+    "AWS_SECRET_ACCESS_KEY": "new-aws-secret-key",
+    "AWS_BUCKET": "your-s3-bucket-name",
     "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/your-connection-id"
   }'
 
@@ -324,11 +346,27 @@ php artisan key:generate --show
 # Use the complete secret update approach above with just the APP_KEY changed
 ```
 
+### Updating Non-Sensitive Configuration
+```bash
+# Non-sensitive values are now Terraform variables and can be updated via terraform.tfvars:
+# Edit terraform.tfvars and modify the eb_laravel_config values:
+eb_laravel_config = {
+  app_name = "RentPath"
+  app_env  = "production"
+  log_level = "info"  # Changed from "error"
+  # ... other non-sensitive settings
+}
+
+# Apply the changes
+terraform apply
+```
+
 **⚠️ Important Notes:**
-- Always update the entire secret JSON when making changes
+- **Sensitive values**: Update via AWS Secrets Manager (requires `terraform apply`)
+- **Non-sensitive values**: Update via `terraform.tfvars` and `terraform apply`
 - Database password changes will require application restart
 - Test changes in a development environment first
-- Keep backups of working secret configurations
+- Keep backups of working configurations
 
 ## Multi-Environment Support
 
@@ -347,9 +385,22 @@ All resource names include the environment:
 cp terraform.tfvars.example terraform.tfvars.dev
 # Edit terraform.tfvars.dev with development values (environment = "dev")
 
-# Create dev secret
+# Create dev secret with sensitive values only
 aws secretsmanager create-secret --name "rentpath-dev/app-config"
-# ... populate with dev configuration
+aws secretsmanager update-secret --secret-id "rentpath-dev/app-config" \
+  --secret-string '{
+    "APP_KEY": "base64:DEV_LARAVEL_KEY_HERE",
+    "APP_URL": "https://dev.your-domain.com",
+    "DB_DATABASE": "rentpath_dev",
+    "DB_USERNAME": "rentpath_dev",
+    "DB_PASSWORD": "dev-database-password",
+    "MAIL_USERNAME": "dev-smtp-username",
+    "MAIL_PASSWORD": "dev-smtp-password",
+    "AWS_ACCESS_KEY_ID": "dev-aws-access-key",
+    "AWS_SECRET_ACCESS_KEY": "dev-aws-secret-key",
+    "AWS_BUCKET": "dev-s3-bucket-name",
+    "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/dev-connection-id"
+  }'
 
 # Deploy dev environment
 terraform apply -var-file="terraform.tfvars.dev"
@@ -357,10 +408,24 @@ terraform apply -var-file="terraform.tfvars.dev"
 # Production environment
 cp terraform.tfvars.example terraform.tfvars.prod
 # Edit terraform.tfvars.prod with production values (environment = "production")
+# Update eb_laravel_config in terraform.tfvars.prod as needed
 
-# Create production secret
+# Create production secret with sensitive values only
 aws secretsmanager create-secret --name "rentpath-production/app-config"
-# ... populate with production configuration
+aws secretsmanager update-secret --secret-id "rentpath-production/app-config" \
+  --secret-string '{
+    "APP_KEY": "base64:PROD_LARAVEL_KEY_HERE",
+    "APP_URL": "https://your-domain.com",
+    "DB_DATABASE": "rentpath",
+    "DB_USERNAME": "rentpath",
+    "DB_PASSWORD": "prod-database-password",
+    "MAIL_USERNAME": "prod-smtp-username",
+    "MAIL_PASSWORD": "prod-smtp-password",
+    "AWS_ACCESS_KEY_ID": "prod-aws-access-key",
+    "AWS_SECRET_ACCESS_KEY": "prod-aws-secret-key",
+    "AWS_BUCKET": "prod-s3-bucket-name",
+    "codestar_connection_arn": "arn:aws:codeconnections:region:account:connection/prod-connection-id"
+  }'
 
 # Deploy production environment
 terraform apply -var-file="terraform.tfvars.prod"

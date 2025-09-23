@@ -45,12 +45,7 @@ data "aws_subnets" "private" {
   }
 }
 
-# ==============================================================================
-# SECRETS MANAGER DATA SOURCES
-# ==============================================================================
-
-# Data source for consolidated application configuration
-# This secret contains all environment variables and sensitive configuration
+# Get sensitive environment variables
 data "aws_secretsmanager_secret" "app_config" {
   name = "${local.name_prefix}/app-config"
 }
