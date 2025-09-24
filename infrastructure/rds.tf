@@ -16,8 +16,9 @@ resource "aws_db_parameter_group" "main" {
   name   = "${var.project_name}-${var.environment}-db-params"
 
   parameter {
-    name  = "innodb_buffer_pool_size"
-    value = "{DBInstanceClassMemory*3/4}"
+    name         = "innodb_buffer_pool_size"
+    value        = "{DBInstanceClassMemory*3/4}"
+    apply_method = "pending-reboot"
   }
 
   tags = merge(local.common_tags, {
