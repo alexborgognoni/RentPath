@@ -150,6 +150,26 @@ resource "aws_elastic_beanstalk_environment" "main" {
     value     = aws_security_group.eb_ec2.id
   }
 
+  # HTTPS Listener
+  setting {
+    namespace = "aws:elbv2:listener:443"
+    name      = "Protocol"
+    value     = "HTTPS"
+  }
+
+  setting {
+    namespace = "aws:elbv2:listener:443"
+    name      = "SSLCertificateArns"
+    value     = aws_acm_certificate.domain_cert.arn
+  }
+
+  # HTTP Listener (keep default, nginx will handle redirects)
+  setting {
+    namespace = "aws:elbv2:listener:80"
+    name      = "Protocol"
+    value     = "HTTP"
+  }
+
   lifecycle {
     ignore_changes = [setting]
   }
