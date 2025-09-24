@@ -20,7 +20,7 @@ locals {
     APP_NAME                = var.eb_laravel_config.app_name
     APP_ENV                 = var.eb_laravel_config.app_env
     APP_KEY                 = local.app_config.APP_KEY  # Sensitive - from secret
-    APP_DEBUG               = var.app_debug
+    APP_DEBUG               = tostring(var.eb_laravel_config.app_debug)
     APP_URL                 = local.app_config.APP_URL  # Sensitive - from secret
     APP_LOCALE              = var.eb_laravel_config.app_locale
     APP_FALLBACK_LOCALE     = var.eb_laravel_config.app_fallback_locale
