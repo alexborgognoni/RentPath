@@ -143,6 +143,7 @@ variable "eb_laravel_config" {
     # Application Configuration
     app_name                = string
     app_env                 = string
+    app_debug               = bool
     app_locale              = string
     app_fallback_locale     = string
     app_faker_locale        = string
