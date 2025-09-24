@@ -69,38 +69,8 @@ resource "aws_elastic_beanstalk_environment" "main" {
     name      = "MaxSize"
     value     = tostring(var.eb_max_size)
   }
-
+  
   # PHP configuration
-   setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "memory_limit"
-    value     = "256M"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "max_execution_time"
-    value     = "300"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "upload_max_filesize"
-    value     = "64M"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "post_max_size"
-    value     = "64M"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:container:php:phpini"
-    name      = "date.timezone"
-    value     = "UTC"
-  }
-
   setting {
     namespace = "aws:elasticbeanstalk:container:php:phpini"
     name      = "document_root"
