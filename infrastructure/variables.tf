@@ -192,3 +192,35 @@ variable "eb_laravel_config" {
     aws_use_path_style_endpoint = bool
   })
 }
+
+# Route53 and SSL Certificate Configuration
+variable "domain_name" {
+  description = "Domain name for the application"
+  type        = string
+  default     = "rent-path.com"
+}
+
+# Email configuration
+variable "mx_record_value" {
+  description = "MX record value for email routing"
+  type        = string
+  default     = "0 rentpath-com01b.mail.protection.outlook.com"
+}
+
+variable "dkim_selector" {
+  description = "DKIM selector for email authentication"
+  type        = string
+  default     = "20241225054753pm"
+}
+
+variable "dkim_public_key" {
+  description = "DKIM public key for email authentication"
+  type        = string
+  default     = "k=rsa;p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6WRnNRirDbZHgg4WZ+WzQrgKX/t5RTuDIxOE88cbdnjiB4YALm7PNHx6qRJXGe8PgONg4XStdswUCSw/FU/2Mj+HcCbUi369X4UUFL5fl0Rh6P5fV2LAvVL4b28Te0QshW887rjXLiM7JEVGFQmz1ptSweXULHFdjn5KGNxWJRwIDAQAB"
+}
+
+variable "pm_bounces_cname" {
+  description = "CNAME target for pm-bounces subdomain"
+  type        = string
+  default     = "pm.mtasv.net"
+}

@@ -53,4 +53,5 @@ data "aws_secretsmanager_secret" "app_config" {
 data "aws_secretsmanager_secret_version" "app_config" {
   secret_id = data.aws_secretsmanager_secret.app_config.id
 }
-
+# Data source to get the Elastic Beanstalk hosted zone ID for the current region
+data "aws_elastic_beanstalk_hosted_zone" "current" {}
