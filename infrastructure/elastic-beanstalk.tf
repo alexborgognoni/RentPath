@@ -9,9 +9,7 @@ resource "aws_elastic_beanstalk_application" "main" {
     delete_source_from_s3 = true
   }
 
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-application"
-  })
+  tags = local.common_tags
 }
 
 # Elastic Beanstalk environment
@@ -152,7 +150,9 @@ resource "aws_elastic_beanstalk_environment" "main" {
     value     = aws_security_group.eb_ec2.id
   }
 
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-${var.environment}"
-  })
+  lifecycle {
+    ignore_changes = [setting]
+  }
+
+  tags = local.common_tags
 }
