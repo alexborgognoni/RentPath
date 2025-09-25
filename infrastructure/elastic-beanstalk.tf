@@ -67,7 +67,7 @@ resource "aws_elastic_beanstalk_environment" "main" {
     name      = "MaxSize"
     value     = tostring(var.eb_max_size)
   }
-  
+
   # PHP configuration
   setting {
     namespace = "aws:elasticbeanstalk:container:php:phpini"
@@ -168,10 +168,6 @@ resource "aws_elastic_beanstalk_environment" "main" {
     namespace = "aws:elbv2:listener:80"
     name      = "Protocol"
     value     = "HTTP"
-  }
-
-  lifecycle {
-    ignore_changes = [setting]
   }
 
   tags = local.common_tags
