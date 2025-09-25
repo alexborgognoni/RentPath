@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\PropertyManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -16,7 +18,7 @@ class PropertyManagerController extends Controller
     public function create()
     {
         $user = Auth::user();
-        
+
         // Check if user already has a property manager profile
         if ($user->propertyManager) {
             // If profile is rejected, allow editing
@@ -39,8 +41,10 @@ class PropertyManagerController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info('Profile setup submission received', $request->all());
-        
+        $user = Auth::user();
+
+        Log::info('Profile setup submission received', $request->all());
+
         // Check if user already has a property manager profile
         if (Auth::user()->propertyManager) {
             return redirect()->route('dashboard')
@@ -60,11 +64,6 @@ class PropertyManagerController extends Controller
             $rules['company_website'] = 'nullable|url|max:255';
             $rules['license_number'] = 'required|string|max:255';
             $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:5120';
-        } else {
-            $rules['company_name'] = 'nullable|string|max:255';
-            $rules['company_website'] = 'nullable|url|max:255';
-            $rules['license_number'] = 'nullable|string|max:255';
-            $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120';
         }
 
         $validated = $request->validate($rules);
@@ -72,26 +71,25 @@ class PropertyManagerController extends Controller
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
             $validated['profile_picture_path'] = $request->file('profile_picture')
-                ->storePublicly('property-managers/profile-pictures');
+                ->store('property-managers/profile-pictures', ['disk' => 's3', 'visibility' => 'public']);
         }
 
         if ($request->hasFile('id_document')) {
             $validated['id_document_path'] = $request->file('id_document')
-                ->store('property-managers/id-documents');
+                ->store('property-managers/id-documents', ['disk' => 's3', 'visibility' => 'private']);
             $validated['id_document_original_name'] = $request->file('id_document')->getClientOriginalName();
         }
 
         if ($request->hasFile('license_document')) {
             $validated['license_document_path'] = $request->file('license_document')
-                ->store('property-managers/license-documents');
+                ->store('property-managers/license-documents', ['disk' => 's3', 'visibility' => 'private']);
             $validated['license_document_original_name'] = $request->file('license_document')->getClientOriginalName();
         }
 
         // Remove file fields from validated data
         unset($validated['profile_picture'], $validated['id_document'], $validated['license_document']);
 
-        // Create the property manager profile
-        Auth::user()->propertyManager()->create($validated);
+        $user->propertyManager()->create($validated);
 
         return redirect()->route('profile.unverified')
             ->with('success', 'Profile submitted for review!');
@@ -122,7 +120,7 @@ class PropertyManagerController extends Controller
      */
     public function update(Request $request)
     {
-        \Log::info('Profile update request received', $request->all());
+        Log::info('Profile update request received', $request->all());
         
         $propertyManager = Auth::user()->propertyManager;
         
@@ -166,20 +164,20 @@ class PropertyManagerController extends Controller
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
             $validated['profile_picture_path'] = $request->file('profile_picture')
-                ->storePublicly('property-managers/profile-pictures');
+                ->store('property-managers/profile-pictures', ['disk' => 's3', 'visibility' => 'public']);
         } elseif ($request->input('remove_profile_picture')) {
             $validated['profile_picture_path'] = null;
         }
 
         if ($request->hasFile('id_document')) {
             $validated['id_document_path'] = $request->file('id_document')
-                ->store('property-managers/id-documents');
+                ->store('property-managers/id-documents', ['disk' => 's3', 'visibility' => 'private']);
             $validated['id_document_original_name'] = $request->file('id_document')->getClientOriginalName();
         }
 
         if ($request->hasFile('license_document')) {
             $validated['license_document_path'] = $request->file('license_document')
-                ->store('property-managers/license-documents');
+                ->store('property-managers/license-documents', ['disk' => 's3', 'visibility' => 'private']);
             $validated['license_document_original_name'] = $request->file('license_document')->getClientOriginalName();
         }
 
@@ -216,10 +214,25 @@ class PropertyManagerController extends Controller
             default => null
         };
 
-        if (!$documentPath || !\Storage::disk('private')->exists($documentPath)) {
+        if (!$documentPath) {
             abort(404);
         }
 
-        return \Storage::disk('private')->response($documentPath);
+        if ($type === 'profile_picture') {
+            // Public file → return URL
+            return redirect(Storage::disk('s3')->url($documentPath));
+        }
+
+        // Private file → generate temporary signed URL
+        if (!Storage::disk('s3')->exists($documentPath)) {
+            abort(404);
+        }
+
+        $temporaryUrl = Storage::disk('s3')->temporaryUrl(
+            $documentPath,
+            now()->addMinutes(30)
+        );
+
+        return redirect($temporaryUrl);
     }
 }
