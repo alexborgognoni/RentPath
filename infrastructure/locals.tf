@@ -78,6 +78,10 @@ locals {
     AWS_BUCKET            = aws_s3_bucket.main.bucket
     AWS_USE_PATH_STYLE_ENDPOINT = var.eb_laravel_config.aws_use_path_style_endpoint ? "true" : "false"
 
+    # Force AWS SDK to use IAM role authentication
+    AWS_SDK_LOAD_NONDEFAULT_CONFIG = "1"
+    AWS_EC2_METADATA_DISABLED = "false"
+
     # Vite Configuration
     VITE_APP_NAME         = var.eb_laravel_config.app_name
   }

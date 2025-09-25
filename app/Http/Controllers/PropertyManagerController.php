@@ -72,18 +72,18 @@ class PropertyManagerController extends Controller
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
             $validated['profile_picture_path'] = $request->file('profile_picture')
-                ->store('property-managers/profile-pictures', 'public');
+                ->storePublicly('property-managers/profile-pictures');
         }
 
         if ($request->hasFile('id_document')) {
             $validated['id_document_path'] = $request->file('id_document')
-                ->store('property-managers/id-documents', 'private');
+                ->store('property-managers/id-documents');
             $validated['id_document_original_name'] = $request->file('id_document')->getClientOriginalName();
         }
 
         if ($request->hasFile('license_document')) {
             $validated['license_document_path'] = $request->file('license_document')
-                ->store('property-managers/license-documents', 'private');
+                ->store('property-managers/license-documents');
             $validated['license_document_original_name'] = $request->file('license_document')->getClientOriginalName();
         }
 
@@ -166,20 +166,20 @@ class PropertyManagerController extends Controller
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
             $validated['profile_picture_path'] = $request->file('profile_picture')
-                ->store('property-managers/profile-pictures', 'public');
+                ->storePublicly('property-managers/profile-pictures');
         } elseif ($request->input('remove_profile_picture')) {
             $validated['profile_picture_path'] = null;
         }
 
         if ($request->hasFile('id_document')) {
             $validated['id_document_path'] = $request->file('id_document')
-                ->store('property-managers/id-documents', 'private');
+                ->store('property-managers/id-documents');
             $validated['id_document_original_name'] = $request->file('id_document')->getClientOriginalName();
         }
 
         if ($request->hasFile('license_document')) {
             $validated['license_document_path'] = $request->file('license_document')
-                ->store('property-managers/license-documents', 'private');
+                ->store('property-managers/license-documents');
             $validated['license_document_original_name'] = $request->file('license_document')->getClientOriginalName();
         }
 
