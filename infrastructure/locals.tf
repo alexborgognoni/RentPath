@@ -73,11 +73,9 @@ locals {
     MAIL_FROM_ADDRESS     = var.eb_laravel_config.mail_from_address
     MAIL_FROM_NAME        = var.eb_laravel_config.mail_from_name
 
-    # AWS Configuration
-    AWS_ACCESS_KEY_ID     = local.app_config.AWS_ACCESS_KEY_ID      # Sensitive - from secret
-    AWS_SECRET_ACCESS_KEY = local.app_config.AWS_SECRET_ACCESS_KEY  # Sensitive - from secret
+    # AWS Configuration (using IAM role authentication)
     AWS_DEFAULT_REGION    = var.eb_laravel_config.aws_default_region
-    AWS_BUCKET            = local.app_config.AWS_BUCKET             # Sensitive - from secret
+    AWS_BUCKET            = aws_s3_bucket.main.bucket
     AWS_USE_PATH_STYLE_ENDPOINT = var.eb_laravel_config.aws_use_path_style_endpoint ? "true" : "false"
 
     # Vite Configuration

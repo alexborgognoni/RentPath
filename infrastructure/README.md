@@ -110,10 +110,7 @@ aws secretsmanager update-secret --secret-id "rentpath-production/app-config" \
     "DB_USERNAME": "rentpath",
     "DB_PASSWORD": "your-secure-database-password",
     "MAIL_USERNAME": "your-smtp-username",
-    "MAIL_PASSWORD": "your-smtp-password",
-    "AWS_ACCESS_KEY_ID": "your-aws-access-key",
-    "AWS_SECRET_ACCESS_KEY": "your-aws-secret-key",
-    "AWS_BUCKET": "your-s3-bucket-name"
+    "MAIL_PASSWORD": "your-smtp-password"
   }'
 ```
 
@@ -176,7 +173,6 @@ After successful deployment:
 - Application URL (APP_URL)
 - Database credentials (DB_USERNAME, DB_PASSWORD, DB_DATABASE)
 - Mail credentials (MAIL_USERNAME, MAIL_PASSWORD)
-- AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET)
 
 **Terraform Variables (Non-Sensitive):**
 - Application settings (name, locale, environment)
@@ -212,7 +208,10 @@ All Laravel environment variables are explicitly defined and categorized:
 - APP_URL (application URL)
 - Database credentials (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
 - Mail credentials (MAIL_USERNAME, MAIL_PASSWORD)
-- AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET)
+
+**From Terraform Resources:**
+- AWS_BUCKET (S3 bucket name from aws_s3_bucket.main)
+- AWS authentication (IAM role-based, no static credentials needed)
 
 **Computed by Terraform:**
 - DB_HOST (from RDS endpoint)
@@ -324,10 +323,7 @@ aws secretsmanager update-secret --secret-id rentpath-production/app-config \
     "DB_USERNAME": "rentpath",
     "DB_PASSWORD": "NEW_SECURE_DATABASE_PASSWORD",
     "MAIL_USERNAME": "new-smtp-username",
-    "MAIL_PASSWORD": "new-smtp-password",
-    "AWS_ACCESS_KEY_ID": "new-aws-access-key",
-    "AWS_SECRET_ACCESS_KEY": "new-aws-secret-key",
-    "AWS_BUCKET": "your-s3-bucket-name"
+    "MAIL_PASSWORD": "new-smtp-password"
   }'
 
 # 3. Deploy changes to apply new environment variables
@@ -393,10 +389,7 @@ aws secretsmanager update-secret --secret-id "rentpath-dev/app-config" \
     "DB_USERNAME": "rentpath_dev",
     "DB_PASSWORD": "dev-database-password",
     "MAIL_USERNAME": "dev-smtp-username",
-    "MAIL_PASSWORD": "dev-smtp-password",
-    "AWS_ACCESS_KEY_ID": "dev-aws-access-key",
-    "AWS_SECRET_ACCESS_KEY": "dev-aws-secret-key",
-    "AWS_BUCKET": "dev-s3-bucket-name"
+    "MAIL_PASSWORD": "dev-smtp-password"
   }'
 
 # Deploy dev environment
@@ -417,10 +410,7 @@ aws secretsmanager update-secret --secret-id "rentpath-production/app-config" \
     "DB_USERNAME": "rentpath",
     "DB_PASSWORD": "prod-database-password",
     "MAIL_USERNAME": "prod-smtp-username",
-    "MAIL_PASSWORD": "prod-smtp-password",
-    "AWS_ACCESS_KEY_ID": "prod-aws-access-key",
-    "AWS_SECRET_ACCESS_KEY": "prod-aws-secret-key",
-    "AWS_BUCKET": "prod-s3-bucket-name"
+    "MAIL_PASSWORD": "prod-smtp-password"
   }'
 
 # Deploy production environment
