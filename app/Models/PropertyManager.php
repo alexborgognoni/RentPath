@@ -110,7 +110,7 @@ class PropertyManager extends Model
             return null;
         }
         
-        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->profile_picture_path);
+        return \Illuminate\Support\Facades\Storage::url($this->profile_picture_path);
     }
 
     /**
@@ -122,7 +122,7 @@ class PropertyManager extends Model
             return null;
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('private')->url($this->id_document_path);
+        return \Illuminate\Support\Facades\Storage::temporaryUrl($this->id_document_path, now()->addMinutes(30));
     }
 
     /**
@@ -134,6 +134,6 @@ class PropertyManager extends Model
             return null;
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('private')->url($this->license_document_path);
+        return \Illuminate\Support\Facades\Storage::temporaryUrl($this->license_document_path, now()->addMinutes(30));
     }
 }
