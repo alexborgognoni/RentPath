@@ -125,6 +125,12 @@ variable "s3_create_backup_bucket" {
   default     = true
 }
 
+variable "s3_use_cloudfront" {
+  description = "Enable CloudFront CDN for S3 bucket"
+  type        = bool
+  default     = false
+}
+
 # CodePipeline configuration
 variable "github_repo" {
   description = "GitHub repository in format owner/repo"

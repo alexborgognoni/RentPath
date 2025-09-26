@@ -31,10 +31,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
 resource "aws_s3_bucket_public_access_block" "main" {
   bucket = aws_s3_bucket.main.id
 
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  block_public_acls       = var.s3_use_cloudfront
+  block_public_policy     = var.s3_use_cloudfront
+  ignore_public_acls      = var.s3_use_cloudfront
+  restrict_public_buckets = var.s3_use_cloudfront
 }
 
 # S3 bucket lifecycle configuration
@@ -101,6 +101,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
 
 # CloudFront Origin Access Control
 resource "aws_cloudfront_origin_access_control" "main" {
+  count = var.s3_use_cloudfront ? 1 : 0
+
   name                              = "${var.project_name}-${var.environment}-oac-v2"
   description                       = "OAC for ${var.project_name} ${var.environment}"
   origin_access_control_origin_type = "s3"
@@ -110,9 +112,11 @@ resource "aws_cloudfront_origin_access_control" "main" {
 
 # CloudFront distribution for S3 bucket
 resource "aws_cloudfront_distribution" "main" {
+  count = var.s3_use_cloudfront ? 1 : 0
+
   origin {
     domain_name              = aws_s3_bucket.main.bucket_regional_domain_name
-    origin_access_control_id = aws_cloudfront_origin_access_control.main.id
+    origin_access_control_id = aws_cloudfront_origin_access_control.main[0].id
     origin_id                = "S3-${aws_s3_bucket.main.bucket}"
   }
 
@@ -155,6 +159,7 @@ resource "aws_cloudfront_distribution" "main" {
 
 # S3 bucket policy for CloudFront
 resource "aws_s3_bucket_policy" "main" {
+  count  = var.s3_use_cloudfront ? 1 : 0
   bucket = aws_s3_bucket.main.id
 
   policy = jsonencode({
@@ -170,7 +175,7 @@ resource "aws_s3_bucket_policy" "main" {
         Resource = "${aws_s3_bucket.main.arn}/*"
         Condition = {
           StringEquals = {
-            "AWS:SourceArn" = aws_cloudfront_distribution.main.arn
+            "AWS:SourceArn" = aws_cloudfront_distribution.main[0].arn
           }
         }
       }
