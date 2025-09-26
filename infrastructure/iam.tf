@@ -243,6 +243,9 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "elasticbeanstalk:DescribeApplicationVersions",
           "elasticbeanstalk:DescribeApplications",
           "elasticbeanstalk:DescribeEnvironments",
+          "elasticbeanstalk:DescribeEnvironmentHealth",
+          "elasticbeanstalk:DescribeInstancesHealth",
+          "elasticbeanstalk:DescribeEnvironmentResources",
           "elasticbeanstalk:UpdateEnvironment"
         ]
         Resource = "*"
