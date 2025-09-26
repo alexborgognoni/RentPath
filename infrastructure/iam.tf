@@ -203,8 +203,8 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
           "s3:PutObject"
         ]
         Resource = [
-          aws_s3_bucket.main.arn,
-          "${aws_s3_bucket.main.arn}/*"
+          "arn:aws:s3:::elasticbeanstalk-${var.aws_region}-${data.aws_caller_identity.current.account_id}",
+          "arn:aws:s3:::elasticbeanstalk-${var.aws_region}-${data.aws_caller_identity.current.account_id}/*"
         ]
       },
       {

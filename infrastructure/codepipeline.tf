@@ -16,7 +16,7 @@ resource "aws_codepipeline" "main" {
   execution_mode = "QUEUED"
 
   artifact_store {
-    location = aws_s3_bucket.main.id
+    location = "elasticbeanstalk-${var.aws_region}-${data.aws_caller_identity.current.account_id}"
     type     = "S3"
   }
 
