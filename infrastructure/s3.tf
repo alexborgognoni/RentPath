@@ -1,4 +1,4 @@
-# S3 bucket for application assets
+# S3 bucket for user-uploaded assets only
 resource "aws_s3_bucket" "main" {
   bucket = "${var.project_name}-${var.environment}-assets"
 
