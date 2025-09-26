@@ -44,12 +44,12 @@ output "s3_backup_bucket_name" {
 # CloudFront outputs
 output "cloudfront_domain_name" {
   description = "Domain name of the CloudFront distribution"
-  value       = aws_cloudfront_distribution.main.domain_name
+  value       = var.s3_use_cloudfront && length(aws_cloudfront_distribution.main) > 0 ? aws_cloudfront_distribution.main[0].domain_name : null
 }
 
 output "cloudfront_distribution_id" {
   description = "ID of the CloudFront distribution"
-  value       = aws_cloudfront_distribution.main.id
+  value       = var.s3_use_cloudfront && length(aws_cloudfront_distribution.main) > 0 ? aws_cloudfront_distribution.main[0].id : null
 }
 
 # CodePipeline outputs
