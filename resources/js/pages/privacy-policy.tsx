@@ -1,145 +1,165 @@
 import { AppHeader } from '@/components/app-header';
 import { Footer } from '@/components/landing/footer';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 
 export default function PrivacyPolicy() {
+    const page = usePage<SharedData>();
+    const { translations } = page.props;
+
+    // Company information constants
+    const COMPANY_INFO = {
+        name: 'RentPath',
+        legalName: 'RentPath S.à r.l.',
+        address: '4, rue de Drusenheim',
+        city: 'L-3884 Schifflange',
+        country: 'Luxembourg',
+        email: 'contact@rent-path.com'
+    };
     return (
         <div className="min-h-screen">
             <AppHeader />
-            
+
             <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
                 <div className="prose prose-neutral mx-auto max-w-none dark:prose-invert">
-                    <h1 className="text-4xl font-bold text-foreground mb-4">Privacy Policy</h1>
-                    <p className="text-sm text-muted-foreground mb-8">Last updated: [Insert Date]</p>
-                    
+                    <h1 className="text-4xl font-bold text-foreground mb-4">{translate(translations, 'privacy-policy.page_title')}</h1>
+                    <p className="text-sm text-muted-foreground mb-8">{translate(translations, 'privacy-policy.last_updated')}</p>
+
                     <div className="space-y-8 text-foreground">
                         <section>
                             <p className="text-lg leading-relaxed">
-                                RentPath ("we," "our," or "us") values your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information in accordance with the General Data Protection Regulation (GDPR) and other applicable data protection laws.
+                                {translate(translations, 'privacy-policy.introduction')}
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Who We Are (Data Controller)</h2>
-                            <p className="mb-4">RentPath is the data controller responsible for your personal data.</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.who_we_are.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.who_we_are.content')}</p>
                             <div className="bg-muted/30 p-4 rounded-lg">
-                                <p className="font-semibold mb-2">Contact Details:</p>
-                                <p>RentPath<br />
-                                [Insert Legal Entity Name]<br />
-                                [Insert Business Address]<br />
-                                Email: [Insert Privacy Email Address]</p>
+                                <p className="font-semibold mb-2">{translate(translations, 'privacy-policy.sections.who_we_are.contact_details_label')}</p>
+                                <p>
+                                    {COMPANY_INFO.name}<br />
+                                    {COMPANY_INFO.legalName}<br />
+                                    {COMPANY_INFO.address}, {COMPANY_INFO.city}, {COMPANY_INFO.country}<br />
+                                </p>
                             </div>
-                            <p className="mt-4">If you have questions about this Privacy Policy or how your data is handled, you can contact us at the email above.</p>
+                            <p className="mt-4">{translate(translations, 'privacy-policy.sections.who_we_are.contact_note')}</p>
+                            <div className="mt-4 bg-muted/30 p-4 rounded-lg">
+                                {COMPANY_INFO.email}
+                            </div>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Information We Collect</h2>
-                            <p className="mb-4">We may collect and process the following categories of personal data:</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.information_we_collect.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.information_we_collect.intro')}</p>
                             <ul className="space-y-2">
-                                <li><strong>Account Information:</strong> Name, email address, phone number, login details.</li>
-                                <li><strong>Tenant Application Data:</strong> Employment history, rental history, financial details (e.g., payslips, bank statements), identification documents, references.</li>
-                                <li><strong>Property Management Data:</strong> Information about properties, leases, payments, and tenant occupancy.</li>
-                                <li><strong>Communications:</strong> Messages exchanged through the platform.</li>
-                                <li><strong>Usage Data:</strong> IP address, device information, browser type, operating system, activity logs.</li>
-                                <li><strong>Cookies & Tracking Data:</strong> Information collected through cookies and similar technologies (see Section 9).</li>
+                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.account_information')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.tenant_application_data')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.property_management_data')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.communications')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.usage_data')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.cookies_tracking_data')}</li>
                             </ul>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Lawful Bases for Processing</h2>
-                            <p className="mb-4">We process your personal data only when we have a lawful basis under GDPR:</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.lawful_bases.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.lawful_bases.intro')}</p>
                             <ul className="space-y-2">
-                                <li><strong>Contract:</strong> To provide our Services and perform agreements with landlords, property managers, and tenants.</li>
-                                <li><strong>Consent:</strong> Where you have given us explicit consent (e.g., for marketing communications, non-essential cookies).</li>
-                                <li><strong>Legal Obligation:</strong> To comply with applicable laws, tax regulations, and recordkeeping requirements.</li>
-                                <li><strong>Legitimate Interests:</strong> To improve our Services, prevent fraud, ensure security, and communicate essential updates (provided your rights do not override these interests).</li>
+                                <li>{translate(translations, 'privacy-policy.sections.lawful_bases.items.contract')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.lawful_bases.items.consent')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.lawful_bases.items.legal_obligation')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.lawful_bases.items.legitimate_interests')}</li>
                             </ul>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">How We Use Your Data</h2>
-                            <p className="mb-4">We use personal data for the following purposes:</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.how_we_use_data.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.how_we_use_data.intro')}</p>
                             <ul className="space-y-2">
-                                <li>To create and manage user accounts.</li>
-                                <li>To process tenant applications and facilitate communication between landlords, property managers, and tenants.</li>
-                                <li>To manage rental properties, occupancy, and lease agreements.</li>
-                                <li>To provide customer support and respond to inquiries.</li>
-                                <li>To improve, monitor, and secure our Services.</li>
-                                <li>To send important notifications regarding your account, applications, or legal obligations.</li>
-                                <li>To comply with regulatory and legal requirements.</li>
+                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[0]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[1]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[2]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[3]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[4]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[5]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[6]')}</li>
                             </ul>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Sharing Your Data</h2>
-                            <p className="mb-4">We do not sell your personal data. We may share it with:</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.sharing_data.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.sharing_data.intro')}</p>
                             <ul className="space-y-2">
-                                <li><strong>Landlords and property managers</strong> to process tenant applications and manage properties.</li>
-                                <li><strong>Service providers</strong> (e.g., cloud hosting, payment processors, analytics tools) under strict confidentiality agreements.</li>
-                                <li><strong>Regulatory authorities or legal bodies</strong> if required by law or to protect our rights.</li>
+                                <li>{translate(translations, 'privacy-policy.sections.sharing_data.items.landlords_property_managers')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.sharing_data.items.service_providers')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.sharing_data.items.regulatory_authorities')}</li>
                             </ul>
-                            <p className="mt-4">When we share data, we ensure appropriate contractual and technical safeguards are in place.</p>
+                            <p className="mt-4">{translate(translations, 'privacy-policy.sections.sharing_data.note')}</p>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">International Data Transfers</h2>
-                            <p className="mb-4">If we transfer personal data outside the European Economic Area (EEA), we will ensure appropriate safeguards, such as:</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.international_transfers.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.international_transfers.intro')}</p>
                             <ul className="space-y-2">
-                                <li>Transfers to countries with an <strong>adequacy decision</strong> by the European Commission.</li>
-                                <li>Use of <strong>Standard Contractual Clauses (SCCs)</strong> approved by the European Commission.</li>
+                                <li>{translate(translations, 'privacy-policy.sections.international_transfers.items.adequacy_decision')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.international_transfers.items.standard_contractual_clauses')}</li>
                             </ul>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Data Retention</h2>
-                            <p>We retain personal data only as long as necessary to fulfill the purposes described in this Policy or as required by law. When no longer needed, data will be securely deleted or anonymized.</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.data_retention.title')}</h2>
+                            <p>{translate(translations, 'privacy-policy.sections.data_retention.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Your Rights</h2>
-                            <p className="mb-4">Under GDPR, you have the following rights regarding your personal data:</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.your_rights.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.your_rights.intro')}</p>
                             <ul className="space-y-2">
-                                <li><strong>Right of Access:</strong> Request a copy of the data we hold about you.</li>
-                                <li><strong>Right to Rectification:</strong> Correct inaccurate or incomplete data.</li>
-                                <li><strong>Right to Erasure ("Right to be Forgotten"):</strong> Request deletion of your data when it is no longer necessary.</li>
-                                <li><strong>Right to Restrict Processing:</strong> Request limitation of how we use your data.</li>
-                                <li><strong>Right to Data Portability:</strong> Receive your data in a structured, commonly used, machine-readable format.</li>
-                                <li><strong>Right to Object:</strong> Object to processing based on legitimate interests or direct marketing.</li>
-                                <li><strong>Right to Withdraw Consent:</strong> Where processing is based on consent, you may withdraw it at any time.</li>
-                                <li><strong>Right to Lodge a Complaint:</strong> You may file a complaint with your local Data Protection Authority.</li>
+                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_of_access')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_rectification')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_erasure')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_restrict')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_portability')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_object')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_withdraw')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_complain')}</li>
                             </ul>
-                            <p className="mt-4">To exercise your rights, please contact us at: [Insert Privacy Email Address].</p>
+                            <p className="mt-4">{translate(translations, 'privacy-policy.sections.your_rights.exercise_rights')}</p>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Cookies & Tracking Technologies</h2>
-                            <p className="mb-4">We use cookies and similar technologies to:</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.cookies_tracking.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.cookies_tracking.intro')}</p>
                             <ul className="space-y-2">
-                                <li>Enable core site functionality.</li>
-                                <li>Improve performance and security.</li>
-                                <li>Analyze usage patterns.</li>
-                                <li>Personalize your experience.</li>
+                                <li>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[0]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[1]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[2]')}</li>
+                                <li>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[3]')}</li>
                             </ul>
-                            <p className="mt-4">For non-essential cookies, we will request your consent via a cookie banner in compliance with the ePrivacy Directive and GDPR. You can manage cookie preferences in your browser settings.</p>
+                            <p className="mt-4">{translate(translations, 'privacy-policy.sections.cookies_tracking.note')}</p>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Security</h2>
-                            <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, loss, misuse, or alteration. However, no method of transmission over the Internet is 100% secure.</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.security.title')}</h2>
+                            <p>{translate(translations, 'privacy-policy.sections.security.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Changes to This Privacy Policy</h2>
-                            <p>We may update this Privacy Policy from time to time. Any updates will be posted on this page with a revised "Last updated" date.</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.changes.title')}</h2>
+                            <p>{translate(translations, 'privacy-policy.sections.changes.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold text-foreground mb-4">Contact Us</h2>
-                            <p className="mb-4">If you have any questions, concerns, or requests regarding this Privacy Policy or your personal data, please contact us at:</p>
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.contact_us.title')}</h2>
+                            <p className="mb-4">{translate(translations, 'privacy-policy.sections.contact_us.intro')}</p>
                             <div className="bg-muted/30 p-4 rounded-lg">
-                                <p><strong>RentPath</strong><br />
-                                [Insert Legal Entity Name]<br />
-                                [Insert Business Address]<br />
-                                Email: [Insert Privacy Email Address]</p>
+                                <p>
+                                    {COMPANY_INFO.name}<br />
+                                    {COMPANY_INFO.legalName}<br />
+                                    {COMPANY_INFO.address}, {COMPANY_INFO.city}, {COMPANY_INFO.country}<br />
+                                    {COMPANY_INFO.email}
+                                </p>
                             </div>
                         </section>
                     </div>
