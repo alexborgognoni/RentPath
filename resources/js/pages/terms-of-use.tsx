@@ -1,5 +1,4 @@
-import { AppHeader } from '@/components/app-header';
-import { Footer } from '@/components/landing/footer';
+import { PublicLayout } from '@/layouts/public-layout';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 
@@ -22,9 +21,7 @@ export default function TermsOfUse() {
         privacyPolicy: '/privacy-policy'
     };
     return (
-        <div className="min-h-screen">
-            <AppHeader />
-            
+        <PublicLayout>
             <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
                 <div className="prose prose-neutral mx-auto max-w-none dark:prose-invert">
                     <h1 className="text-4xl font-bold text-foreground mb-4">{translate(translations, 'terms-of-use.page_title')}</h1>
@@ -139,8 +136,6 @@ export default function TermsOfUse() {
                     </div>
                 </div>
             </div>
-
-            <Footer />
-        </div>
+        </PublicLayout>
     );
 }
