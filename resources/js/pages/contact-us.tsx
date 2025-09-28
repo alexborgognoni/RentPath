@@ -202,7 +202,8 @@ export default function ContactUs() {
                                         
                                         <Button
                                             type="submit"
-                                            className="w-full cursor-pointer text-white"
+                                            size="lg"
+                                            className="w-full cursor-pointer text-text-primary rounded-lg bg-gradient-to-r from-primary to-secondary px-8 text-center text-lg font-semibold shadow-lg transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                                             disabled={isSubmitting}
                                         >
                                             {isSubmitting ? translate(translations, 'contact-us.form.submitting_button') : translate(translations, 'contact-us.form.submit_button')}
