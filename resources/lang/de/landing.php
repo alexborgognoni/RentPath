@@ -3,53 +3,53 @@
 return [
     // Hero Section
     'hero' => [
-        'heading_primary' => 'Mieter-Bewerbungen Optimieren,',
-        'heading_highlighted' => 'Schneller Abschließen.',
-        'subtitle' => 'Schluss mit unvollständigen Bewerbungen und endlosem Nachfassen. Laden Sie ein, verfolgen Sie und folgen Sie Interessenten sofort nach. Alles von einem intelligenten Dashboard.',
+        'heading_primary' => 'Mieterbewerbungen Vereinfachen,',
+        'heading_highlighted' => 'Schneller Platzieren.',
+        'subtitle' => 'Nie wieder unvollständige Bewerbungen oder endloses Nachhaken. Einladen, nachverfolgen und sofort reagieren – alles in einem smarten Dashboard.',
         'cta_primary_auth' => 'Zum Dashboard',
-        'cta_primary_guest' => 'Loslegen',
-        'cta_secondary' => 'Wie es Funktioniert',
+        'cta_primary_guest' => 'Jetzt Loslegen',
+        'cta_secondary' => 'So Funktionierts',
     ],
 
     // Top Features Section
     'top_features' => [
-        'heading' => 'Entwickelt für Moderne Mietbewerbungen',
+        'heading' => 'Gestaltet für moderne Verwalter und Vermieter',
         'subtitle' => 'Transformieren Sie Ihre Mieterplatzierungen mit Echtzeit-Insights, Dokumentenverwaltung und automatisierten Vermieter-Updates.',
         'complete_applications' => [
             'title' => 'Vollständige Bewerbungen',
-            'description' => 'Schluss mit dem Hinterherlaufen nach Ausweisen, Verträgen oder Referenzen — laden Sie Mieter ein und sammeln Sie Bewerbungen an einem Ort.',
+            'description' => 'Schluss mit dem Hinterherlaufen nach Ausweisen oder Verträgen — laden Sie Mieter ein und sammeln Sie Bewerbungen an einem Ort.',
         ],
         'streamlined_leasing' => [
             'title' => 'Optimierte Vermietung',
             'description' => 'Führen Sie Bewerber nahtlos zum Einzug — verkürzen Sie die Vermietungszeit und reduzieren Sie Leerstände.',
         ],
         'occupancy_overview' => [
-            'title' => 'Belegungsübersicht',
-            'description' => 'Sehen Sie, welche Einheiten leer, bewohnt sind oder Interessenten haben — und verlieren Sie nie den Überblick über Ihr Portfolio.',
+            'title' => 'Belegungs-Übersicht',
+            'description' => 'Sehen Sie welche Einheiten leer, bewohnt sind oder Interessenten haben — und verlieren Sie nie den Überblick über Ihr Portfolio.',
         ],
     ],
 
     // Demo Carousel Section
     'demo_carousel' => [
         'heading' => 'Optimiert vom Ersten Interesse bis zum Einzug',
-        'subtitle' => 'Manuelle Prüfungen, verpasste Bewerbungen, chaotische Kommunikation - Vermietungen sind ineffizient. Unsere Plattform optimiert die Mieter-Journey.',
+        'subtitle' => 'Manuelle Überprüfungen, verpasste Bewerbungen, chaotische Kommunikation - Vermietungen sind ineffizient. Unsere Plattform optimiert die Mieter-Journey.',
         'interactive_demo' => 'Interaktive Demo',
         'slides' => [
             "real_time_dashboard" => [
                 'title' => 'Echtzeit-Dashboard',
-                'description' => 'Sichtbarkeit über alle Ihre Immobilien, Verfolgung von Bewerbungen, Besichtigungen, Mietverträgen und Marketing-Bemühungen — sofort.',
+                'description' => 'Sofortige Sichtbarkeit über alle Immobilien, Bewerbungen, Besichtigungen, Verträge und Marketing.',
                 'features' => [
                     'Live-Bewerbungs-Pipeline',
                     'Miet- und Marketing-Kalender',
-                    'Benutzerfreundliche Besichtigungstools',
-                    'Schnelle Vermieter-Berichte',
+                    'Digitale Zustandsprotokolle',
+                    'Automatische Vermieter-Berichte',
                 ],
             ],
             "guided_applications" => [
-                'title' => 'Geführte Mieter-Bewerbungen',
-                'description' => 'Laden Sie Interessenten zu einem Schritt-für-Schritt-Bewerbungsprozess ein, der die Sammlung aller notwendigen Dokumente gewährleistet. Vollständige Bewerbungen, jedes Mal.',
+                'title' => 'Geleitete Mieter-Bewerbungen',
+                'description' => 'Laden Sie Interessenten zu einem Schritt-für-Schritt-Bewerbungsprozess ein, der alle erforderlichen Dokumente abfragt. Vollständige Bewerbungen – jedes Mal.',
                 'features' => [
-                    'Bewerbungs-Einladungslinks',
+                    'Einladungslinks für Interessenten',
                     'Fortschrittsvalidierung bei jedem Schritt',
                     'Checklisten für erforderliche Dokumente',
                     'Professionelle Bewerbungserfahrung',
@@ -67,21 +67,21 @@ return [
             ],
             "progress_visibility" => [
                 'title' => 'Vollständige Fortschrittssichtbarkeit',
-                'description' => 'Überwachen Sie jeden Bewerber und Mietvertragsstatus in einer Ansicht, um Engpässe zu erkennen und die Vermietung zu beschleunigen.',
+                'description' => 'Alle Bewerber und Vertragsfortschritte auf einen Blick – Engpässe erkennen, Vermietung beschleunigen.',
                 'features' => [
                     'Echtzeit-Bewerbungsstatus',
                     'Fortschrittsindikatoren pro Bewerber',
-                    'Immobilien-Mietvertragsverfolgung',
+                    'Mietvertragsverfolgung',
                     'Engpass-Identifikation',
                 ],
             ],
             "smart_followup" => [
                 'title' => 'Intelligentes Nachfass-System',
-                'description' => 'Automatisierte Erinnerungen und Nachfassungen halten Bewerber in Bewegung und reduzieren Leerstandstage.',
+                'description' => 'Automatische Erinnerungen halten Bewerber am Ball und reduzieren Leerstände.',
                 'features' => [
                     'Automatisierte Erinnerungs-E-Mails',
-                    'Bewerbungswiederherstellung für stockende Einreichungen',
-                    'Nachfass-Planung',
+                    'Abgebrochene Bewerbungen reaktivieren',
+                    'Folgeterminplanung',
                     'Konversionsoptimierung',
                 ],
             ],
@@ -110,8 +110,8 @@ return [
 
     // Value Proposition Section
     'value_proposition' => [
-        'heading_primary' => 'Nächste Generation',
-        'heading_highlighted' => 'Miet-Angebote',
+        'heading_primary' => 'Vermietungen der',
+        'heading_highlighted' => 'Nächsten Generation',
         'subtitle' => 'Erleben Sie die Zukunft der Mieterplatzierungen mit automatisierten Bewerbungen, Echtzeit-Einblicken, nahtlosen Mieter-Erfahrungen und professioneller Vermieter-Kommunikation',
         'stats' => [
             'applications' => 'Bewerbungen',
@@ -121,7 +121,7 @@ return [
         'features' => [
             'simple_tenant_invitation' => [
                 'title' => 'Einfache Mieter-Einladung',
-                'description' => 'Senden Sie professionelle Einladungslinks mit einem Klick. Schritt-für-Schritt-Formulare gewährleisten eine nahtlose Mieter-Erfahrung.',
+                'description' => 'Senden Sie professionelle Einladungslinks mit einem Klick. Schritt-für-Schritt-Berwerbungsformulare.',
                 'stats_label' => 'Einladungen Senden',
             ],
             'document_collection' => [
@@ -131,23 +131,23 @@ return [
             ],
             'complete_visibility' => [
                 'title' => 'Vollständige Sichtbarkeit',
-                'description' => 'Sehen Sie alle Immobilien und Bewerbungen in einem Dashboard. Verfolgen Sie den Fortschritt in Echtzeit und verwalten Sie Mieter effizient.',
+                'description' => 'Sehen Sie alle Immobilien und Bewerbungen in einem Dashboard. Verfolgen Sie den Fortschritt in Echtzeit.',
                 'stats_label' => 'Fortschrittsverfolgung',
             ],
             'secure_document_storage' => [
-                'title' => 'Sichere Dokumentenspeicherung',
+                'title' => 'Geschützte Dokumentenablage',
                 'description' => 'Speichern Sie Mieter-Dokumente sicher in der Cloud mit vollständigen Audit-Pfaden. Zugriff jederzeit, überall.',
                 'stats_label' => 'Sicherheit',
             ],
             'intelligent_notifications' => [
-                'title' => 'Intelligente Benachrichtigungen',
+                'title' => 'Intelligente Erinnerungen',
                 'description' => 'Smarte Benachrichtigungen, die die richtige Nachricht zum perfekten Zeitpunkt senden. Maximieren Sie Engagement und Antwortquoten.',
                 'stats_label' => 'Live-Updates',
             ],
             'digital_inspection_features' => [
-                'title' => 'Digitale Besichtigungsfunktionen',
+                'title' => 'Digitale Objektbesichtigungen',
                 'description' => 'Optimieren Sie Besichtigungen mit Foto-Dokumentation, automatisierten Berichten und vollständiger Ein-/Auszugshistorie.',
-                'stats_label' => 'Zeit Gespart',
+                'stats_label' => 'Zeitersparnis',
             ],
         ],
         'cta_subtitle' => 'Schließen Sie sich Tausenden von Immobilienverwaltern an, die ihr Geschäft transformiert haben.',
@@ -159,8 +159,8 @@ return [
 
     // Testimonials Section
     'testimonials' => [
-        'heading' => 'Vertraut von Immobilien-Profis',
-        'subtitle' => 'Sehen Sie, warum Tausende von Maklern, Immobilienverwaltern und Vermietern RentPath wählen, um Vermietungen zu optimieren.',
+        'heading' => 'Vertraut von Hunderten Immobilienprofis',
+        'subtitle' => 'Sehen Sie warum Hunderte von Maklern, Immobilienverwaltern und Vermietern RentPath wählen, um Vermietungen zu optimieren.',
         'testimonials' => [
             'amar_ramdedovic' => [
                 'role' => 'Immobilienmakler',
@@ -216,14 +216,14 @@ return [
             'admin_time_label' => 'Verwaltungszeit',
         ],
         'trial' => [
-            'heading' => 'Starten Sie Ihre Kostenlose Testversion',
+            'heading' => 'Starten Sie Kostenlos',
             'benefits' => [
-                'Unbegrenzte Mieter-Bewerbungen.',
-                'Automatisierte Dokumentensammlung.',
-                'Fortschrittsverfolgung & Benachrichtigungen.',
+                'Unbegrenzte Mieter-Bewerbungen',
+                'Automatisierte Dokumentensammlung',
+                'Fortschrittsverfolgung & Benachrichtigungen',
             ],
             'pricing' => [
-                'unit' => 'pro Makler/Monat',
+                'unit' => 'pro Nutzer/Monat',
                 'offer' => '🎉 Erhalten Sie 3 Monate KOSTENLOS bei der Anmeldung!',
             ],
         ],
@@ -233,7 +233,7 @@ return [
     'cta' => [
         'heading' => 'Bereit, das Bewerbungschaos zu Beenden?',
         'subtitle' => 'Schließen Sie sich Immobilienmaklern an, die ihren Mieter-Bewerbungsprozess optimiert haben und ihre Servicequalität mit Vermietern und Mietern verbessern.',
-        'button_text' => 'Kostenlose Testversion Starten',
+        'button_text' => 'Kostenlos Starten',
     ],
 
     // Footer
@@ -253,3 +253,4 @@ return [
         ],
     ],
 ];
+
