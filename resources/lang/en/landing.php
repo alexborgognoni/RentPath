@@ -13,7 +13,7 @@ return [
 
     // Top Features Section
     'top_features' => [
-        'heading' => 'Built for Modern Rental Applications',
+        'heading' => 'Built for Modern Property Managers',
         'subtitle' => 'Transform your tenant placements with real-time insights, document management, and automated landlord updates.',
         'complete_applications' => [
             'title' => 'Complete Applications',
@@ -160,7 +160,7 @@ return [
     // Testimonials Section
     'testimonials' => [
         'heading' => 'Trusted by Property Professionals',
-        'subtitle' => 'See why thousands of agents, property managers, and landlords choose RentPath to streamline rentals.',
+        'subtitle' => 'See why hundreds of agents, property managers, and landlords choose RentPath to streamline rentals.',
         'testimonials' => [
             'amar_ramdedovic' => [
                 'role' => 'Real Estate Agent',
@@ -218,9 +218,9 @@ return [
         'trial' => [
             'heading' => 'Start Your Free Trial',
             'benefits' => [
-                'Unlimited tenant applications.',
-                'Automated document collection.',
-                'Progress tracking & notifications.',
+                'Unlimited tenant applications',
+                'Automated document collection',
+                'Progress tracking & notifications',
             ],
             'pricing' => [
                 'unit' => 'per agent/month',
