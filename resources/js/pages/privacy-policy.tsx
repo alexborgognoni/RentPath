@@ -52,48 +52,48 @@ export default function PrivacyPolicy() {
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.information_we_collect.title')}</h2>
                             <p className="mb-4">{translate(translations, 'privacy-policy.sections.information_we_collect.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.account_information')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.tenant_application_data')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.property_management_data')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.communications')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.usage_data')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.information_we_collect.items.cookies_tracking_data')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.information_we_collect.items.account_information')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.information_we_collect.items.tenant_application_data')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.information_we_collect.items.property_management_data')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.information_we_collect.items.communications')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.information_we_collect.items.usage_data')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.information_we_collect.items.cookies_tracking_data')}</span></li>
                             </ul>
                         </section>
 
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.lawful_bases.title')}</h2>
                             <p className="mb-4">{translate(translations, 'privacy-policy.sections.lawful_bases.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'privacy-policy.sections.lawful_bases.items.contract')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.lawful_bases.items.consent')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.lawful_bases.items.legal_obligation')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.lawful_bases.items.legitimate_interests')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.lawful_bases.items.contract')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.lawful_bases.items.consent')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.lawful_bases.items.legal_obligation')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.lawful_bases.items.legitimate_interests')}</span></li>
                             </ul>
                         </section>
 
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.how_we_use_data.title')}</h2>
                             <p className="mb-4">{translate(translations, 'privacy-policy.sections.how_we_use_data.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[0]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[1]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[2]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[3]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[4]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[5]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[6]')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[0]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[1]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[2]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[3]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[4]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[5]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.how_we_use_data.items[6]')}</span></li>
                             </ul>
                         </section>
 
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.sharing_data.title')}</h2>
                             <p className="mb-4">{translate(translations, 'privacy-policy.sections.sharing_data.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'privacy-policy.sections.sharing_data.items.landlords_property_managers')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.sharing_data.items.service_providers')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.sharing_data.items.regulatory_authorities')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.sharing_data.items.landlords_property_managers')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.sharing_data.items.service_providers')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.sharing_data.items.regulatory_authorities')}</span></li>
                             </ul>
                             <p className="mt-4">{translate(translations, 'privacy-policy.sections.sharing_data.note')}</p>
                         </section>
@@ -101,9 +101,9 @@ export default function PrivacyPolicy() {
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.international_transfers.title')}</h2>
                             <p className="mb-4">{translate(translations, 'privacy-policy.sections.international_transfers.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'privacy-policy.sections.international_transfers.items.adequacy_decision')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.international_transfers.items.standard_contractual_clauses')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.international_transfers.items.adequacy_decision')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.international_transfers.items.standard_contractual_clauses')}</span></li>
                             </ul>
                         </section>
 
@@ -115,15 +115,15 @@ export default function PrivacyPolicy() {
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.your_rights.title')}</h2>
                             <p className="mb-4">{translate(translations, 'privacy-policy.sections.your_rights.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_of_access')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_rectification')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_erasure')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_restrict')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_portability')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_object')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_withdraw')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_complain')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.your_rights.items.right_of_access')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_rectification')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_erasure')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_restrict')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_portability')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_object')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_withdraw')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.your_rights.items.right_to_complain')}</span></li>
                             </ul>
                             <p className="mt-4">{translate(translations, 'privacy-policy.sections.your_rights.exercise_rights')}</p>
                         </section>
@@ -131,11 +131,11 @@ export default function PrivacyPolicy() {
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'privacy-policy.sections.cookies_tracking.title')}</h2>
                             <p className="mb-4">{translate(translations, 'privacy-policy.sections.cookies_tracking.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[0]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[1]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[2]')}</li>
-                                <li>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[3]')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[0]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[1]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[2]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'privacy-policy.sections.cookies_tracking.items[3]')}</span></li>
                             </ul>
                             <p className="mt-4">{translate(translations, 'privacy-policy.sections.cookies_tracking.note')}</p>
                         </section>
