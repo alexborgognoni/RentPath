@@ -1,7 +1,8 @@
 import { translate } from '@/utils/translate-utils';
+import { convertAndRoundUpPrice, getCurrency, getCurrencyFromStorage } from '@/utils/currency-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Clock, Database, Euro, TrendingUp } from 'lucide-react';
+import { Banknote, CheckCircle, Clock, Database, DollarSign, Euro, PoundSterling, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function BenefitsSection() {
@@ -75,7 +76,53 @@ export function BenefitsSection() {
         translate(translations, 'landing.benefits.trial.benefits.2'),
     ];
 
-    const PRICING = { price: '25', currency: PRICING_UNIT, icon: Euro };
+    // Dynamic pricing based on selected currency
+    const [currentCurrency, setCurrentCurrency] = useState(getCurrencyFromStorage());
+    const [displayPrice, setDisplayPrice] = useState('25');
+
+    const BASE_PRICE_EUR = 25; // Base price in EUR
+
+    useEffect(() => {
+        const updatePrice = () => {
+            const currency = getCurrencyFromStorage();
+            setCurrentCurrency(currency);
+
+            const convertedPrice = convertAndRoundUpPrice(BASE_PRICE_EUR, 'EUR', currency);
+            setDisplayPrice(convertedPrice.toString());
+        };
+
+        // Update price on currency change
+        const handleCurrencyChange = () => updatePrice();
+        window.addEventListener('currencyChange', handleCurrencyChange);
+
+        // Initial price update
+        updatePrice();
+
+        return () => window.removeEventListener('currencyChange', handleCurrencyChange);
+    }, []);
+
+    const currentCurrencyData = getCurrency(currentCurrency);
+
+    // Get appropriate currency icon
+    const getCurrencyIcon = () => {
+        switch (currentCurrency) {
+            case 'USD':
+                return DollarSign;
+            case 'GBP':
+                return PoundSterling;
+            case 'CHF':
+                return Banknote; // Use Banknote icon for CHF
+            case 'EUR':
+            default:
+                return Euro;
+        }
+    };
+
+    const PRICING = {
+        price: displayPrice,
+        currency: PRICING_UNIT, // Always show "per agent/month"
+        icon: getCurrencyIcon()
+    };
 
     const [shouldShake, setShouldShake] = useState(false);
 
@@ -152,9 +199,13 @@ export function BenefitsSection() {
                                 <div className="mb-6 rounded-xl border border-primary/20 bg-gradient-to-r from-primary/10 to-secondary/10 p-4">
                                     <div className="text-center">
                                         <div className="mb-2 flex items-center justify-center">
-                                            <PRICING.icon className="mr-2 h-6 w-6 text-primary" />
                                             <span className="text-3xl font-bold text-foreground">{PRICING.price}</span>
-                                            <span className="ml-2 text-muted-foreground">{PRICING.currency}</span>
+                                            {currentCurrency === 'CHF' ? (
+                                                <span className="ml-1 mr-2 text-2xl font-bold text-primary">CHF</span>
+                                            ) : (
+                                                <PRICING.icon className="pb-1 h-8 w-8 text-primary" />
+                                            )}
+                                            <span className="text-base text-muted-foreground">{PRICING.currency}</span>
                                         </div>
                                         <motion.div
                                             animate={
