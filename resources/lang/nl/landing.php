@@ -248,8 +248,9 @@ return [
             'free_trial' => 'Gratis Proefperiode',
             'help_center' => 'Help Center',
             'contact_us' => 'Contact Ons',
-            'privacy_policy' => 'Privacybeleid',
+            'privacy_policy' => 'Privacyverklaring',
             'terms_of_use' => 'Gebruiksvoorwaarden',
         ],
     ],
 ];
+

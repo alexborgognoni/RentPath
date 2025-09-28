@@ -7,8 +7,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { useState } from 'react';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 
 export default function ContactUs() {
+    const page = usePage<SharedData>();
+    const { translations } = page.props;
+
+    // Contact information constants
+    const CONTACT_INFO = {
+        email: 'contact@rent-path.com',
+        phone: '+352 661 290 897',
+        address: '4, rue de Drusenheim',
+        city: 'L-3884 Schifflange',
+        country: 'Luxembourg'
+    };
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -43,9 +57,9 @@ export default function ContactUs() {
             
             <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
-                    <h1 className="text-4xl font-bold text-foreground mb-4">Contact Us</h1>
+                    <h1 className="text-4xl font-bold text-foreground mb-4">{translate(translations, 'contact-us.page_title')}</h1>
                     <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Have a question or need help? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                        {translate(translations, 'contact-us.page_subtitle')}
                     </p>
                 </div>
 
@@ -57,14 +71,14 @@ export default function ContactUs() {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-3">
                                         <Mail className="h-5 w-5 text-primary" />
-                                        Email Us
+                                        {translate(translations, 'contact-us.contact_info.email.title')}
                                     </CardTitle>
                                     <CardDescription>
-                                        Send us an email anytime and we'll get back to you.
+                                        {translate(translations, 'contact-us.contact_info.email.description')}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="font-medium text-foreground">support@rentpath.com</p>
+                                    <p className="font-medium text-foreground">{CONTACT_INFO.email}</p>
                                 </CardContent>
                             </Card>
 
@@ -72,14 +86,14 @@ export default function ContactUs() {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-3">
                                         <Phone className="h-5 w-5 text-primary" />
-                                        Call Us
+                                        {translate(translations, 'contact-us.contact_info.phone.title')}
                                     </CardTitle>
                                     <CardDescription>
-                                        Mon-Fri from 9am to 6pm CET
+                                        {translate(translations, 'contact-us.contact_info.phone.description')}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="font-medium text-foreground">+352 XX XX XX XX</p>
+                                    <p className="font-medium text-foreground">{CONTACT_INFO.phone}</p>
                                 </CardContent>
                             </Card>
 
@@ -87,17 +101,17 @@ export default function ContactUs() {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-3">
                                         <MapPin className="h-5 w-5 text-primary" />
-                                        Visit Us
+                                        {translate(translations, 'contact-us.contact_info.address.title')}
                                     </CardTitle>
                                     <CardDescription>
-                                        Come say hello at our office headquarters.
+                                        {translate(translations, 'contact-us.contact_info.address.description')}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <p className="font-medium text-foreground">
-                                        [Insert Address]<br />
-                                        Luxembourg City<br />
-                                        Luxembourg
+                                        {CONTACT_INFO.address}<br />
+                                        {CONTACT_INFO.city}<br />
+                                        {CONTACT_INFO.country}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -108,9 +122,9 @@ export default function ContactUs() {
                     <div className="lg:col-span-2">
                         <Card className="h-full">
                             <CardHeader>
-                                <CardTitle>Send us a message</CardTitle>
+                                <CardTitle>{translate(translations, 'contact-us.form.title')}</CardTitle>
                                 <CardDescription>
-                                    Fill out the form below and we'll get back to you as soon as possible.
+                                    {translate(translations, 'contact-us.form.description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="h-full flex flex-col">
@@ -119,40 +133,40 @@ export default function ContactUs() {
                                         <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20 mb-4 mx-auto">
                                             <Mail className="h-8 w-8 text-green-600 dark:text-green-400" />
                                         </div>
-                                        <h3 className="text-lg font-semibold text-foreground mb-2">Message Sent!</h3>
+                                        <h3 className="text-lg font-semibold text-foreground mb-2">{translate(translations, 'contact-us.success.title')}</h3>
                                         <p className="text-muted-foreground mb-6">
-                                            Thank you for contacting us. We'll get back to you within 24 hours.
+                                            {translate(translations, 'contact-us.success.description')}
                                         </p>
                                         <Button
                                             onClick={() => setIsSubmitted(false)}
                                             variant="outline"
                                             className="mx-auto"
                                         >
-                                            Send Another Message
+                                            {translate(translations, 'contact-us.success.send_another_button')}
                                         </Button>
                                     </div>
                                 ) : (
                                     <form onSubmit={handleSubmit} className="flex-1 flex flex-col space-y-6">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label htmlFor="name">Name</Label>
+                                                <Label htmlFor="name">{translate(translations, 'contact-us.form.fields.name.label')}</Label>
                                                 <Input
                                                     id="name"
                                                     name="name"
                                                     type="text"
-                                                    placeholder="Your name"
+                                                    placeholder={translate(translations, 'contact-us.form.fields.name.placeholder')}
                                                     value={formData.name}
                                                     onChange={handleChange}
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label htmlFor="email">Email</Label>
+                                                <Label htmlFor="email">{translate(translations, 'contact-us.form.fields.email.label')}</Label>
                                                 <Input
                                                     id="email"
                                                     name="email"
                                                     type="email"
-                                                    placeholder="your.email@example.com"
+                                                    placeholder={translate(translations, 'contact-us.form.fields.email.placeholder')}
                                                     value={formData.email}
                                                     onChange={handleChange}
                                                     required
@@ -161,12 +175,12 @@ export default function ContactUs() {
                                         </div>
                                         
                                         <div className="space-y-2">
-                                            <Label htmlFor="subject">Subject</Label>
+                                            <Label htmlFor="subject">{translate(translations, 'contact-us.form.fields.subject.label')}</Label>
                                             <Input
                                                 id="subject"
                                                 name="subject"
                                                 type="text"
-                                                placeholder="What's this about?"
+                                                placeholder={translate(translations, 'contact-us.form.fields.subject.placeholder')}
                                                 value={formData.subject}
                                                 onChange={handleChange}
                                                 required
@@ -174,11 +188,11 @@ export default function ContactUs() {
                                         </div>
                                         
                                         <div className="space-y-2 flex-1 flex flex-col">
-                                            <Label htmlFor="message">Message</Label>
+                                            <Label htmlFor="message">{translate(translations, 'contact-us.form.fields.message.label')}</Label>
                                             <Textarea
                                                 id="message"
                                                 name="message"
-                                                placeholder="Tell us more about your question or how we can help..."
+                                                placeholder={translate(translations, 'contact-us.form.fields.message.placeholder')}
                                                 className="flex-1 min-h-[120px] resize-none"
                                                 value={formData.message}
                                                 onChange={handleChange}
@@ -191,7 +205,7 @@ export default function ContactUs() {
                                             className="w-full cursor-pointer text-white"
                                             disabled={isSubmitting}
                                         >
-                                            {isSubmitting ? 'Sending...' : 'Send Message'}
+                                            {isSubmitting ? translate(translations, 'contact-us.form.submitting_button') : translate(translations, 'contact-us.form.submit_button')}
                                         </Button>
                                     </form>
                                 )}

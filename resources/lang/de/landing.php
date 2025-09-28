@@ -3,8 +3,8 @@
 return [
     // Hero Section
     'hero' => [
-        'heading_primary' => 'Mieterbewerbungen Vereinfachen,',
-        'heading_highlighted' => 'Schneller Platzieren.',
+        'heading_primary' => 'Wohnungsbewerbungen Vereinfachen,',
+        'heading_highlighted' => 'Schneller Vermieten.',
         'subtitle' => 'Nie wieder unvollständige Bewerbungen oder endloses Nachhaken. Einladen, nachverfolgen und sofort reagieren – alles in einem smarten Dashboard.',
         'cta_primary_auth' => 'Zum Dashboard',
         'cta_primary_guest' => 'Jetzt Loslegen',
@@ -248,9 +248,8 @@ return [
             'free_trial' => 'Kostenlose Testversion',
             'help_center' => 'Hilfe-Center',
             'contact_us' => 'Kontakt',
-            'privacy_policy' => 'Datenschutzrichtlinie',
+            'privacy_policy' => 'Datenschutzerklärung',
             'terms_of_use' => 'Nutzungsbedingungen',
         ],
     ],
 ];
-
