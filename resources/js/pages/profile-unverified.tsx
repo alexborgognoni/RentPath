@@ -1,5 +1,4 @@
-import { AppHeader } from '@/components/app-header';
-import { ParallaxBackground } from '@/components/parallax-background';
+import { BaseLayout } from '@/layouts/base-layout';
 import { Head, Link } from '@inertiajs/react';
 import { AlertCircle, Clock, RefreshCw, Shield, XCircle } from 'lucide-react';
 
@@ -10,15 +9,9 @@ interface ProfileUnverifiedProps {
 
 export default function ProfileUnverified({ isRejected = false, rejectionReason }: ProfileUnverifiedProps) {
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-background lg:h-screen lg:overflow-hidden">
-            <div className="absolute inset-0 min-h-full w-full lg:h-screen">
-                <ParallaxBackground />
-            </div>
-            <div className="relative z-10 flex flex-col min-h-screen lg:h-full">
-                <AppHeader />
-                <Head title="Profile Under Review" />
-
-                <div className="flex-1 flex items-center justify-center p-4 py-8 lg:py-4">
+        <BaseLayout>
+            <Head title="Profile Under Review" />
+            <div className="flex-1 flex items-center justify-center p-4 py-8 lg:py-4">
                 <div className="mx-auto max-w-md px-6 text-center">
                     <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
                         {isRejected ? (
@@ -106,8 +99,7 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
                         </div>
                     </div>
                 </div>
-                </div>
             </div>
-        </div>
+        </BaseLayout>
     );
 }

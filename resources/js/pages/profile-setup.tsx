@@ -1,5 +1,4 @@
-import { AppHeader } from '@/components/app-header';
-import { ParallaxBackground } from '@/components/parallax-background';
+import { BaseLayout } from '@/layouts/base-layout';
 import type { PropertyManager, User } from '@/types/dashboard';
 import { Head, useForm, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -259,15 +258,9 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
     };
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-background lg:h-screen lg:overflow-hidden">
-            <div className="absolute inset-0 min-h-full w-full lg:h-screen">
-                <ParallaxBackground />
-            </div>
-            <div className="relative z-10 flex flex-col min-h-screen lg:h-full">
-                <AppHeader />
-                <Head title={isEditing ? 'Edit Profile' : 'Setup Profile'} />
-
-                <div className="flex-1 py-12 overflow-y-auto">
+        <BaseLayout>
+            <Head title={isEditing ? 'Edit Profile' : 'Setup Profile'} />
+            <div className="flex-1 py-12 overflow-y-auto">
                     <div className="mx-auto max-w-2xl px-6">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -1002,8 +995,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                         </form>
                     </motion.div>
                 </div>
-                </div>
             </div>
-        </div>
+        </BaseLayout>
     );
 }
