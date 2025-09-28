@@ -49,11 +49,11 @@ export default function TermsOfUse() {
 
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'terms-of-use.sections.accounts.title')}</h2>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'terms-of-use.sections.accounts.items[0]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.accounts.items[1]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.accounts.items[2]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.accounts.items[3]')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.accounts.items[0]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.accounts.items[1]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.accounts.items[2]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.accounts.items[3]')}</span></li>
                             </ul>
                         </section>
 
@@ -66,11 +66,11 @@ export default function TermsOfUse() {
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'terms-of-use.sections.acceptable_use.title')}</h2>
                             <p className="mb-4">{translate(translations, 'terms-of-use.sections.acceptable_use.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'terms-of-use.sections.acceptable_use.items[0]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.acceptable_use.items[1]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.acceptable_use.items[2]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.acceptable_use.items[3]')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.acceptable_use.items[0]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.acceptable_use.items[1]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.acceptable_use.items[2]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.acceptable_use.items[3]')}</span></li>
                             </ul>
                             <p className="mt-4">{translate(translations, 'terms-of-use.sections.acceptable_use.note')}</p>
                         </section>
@@ -78,10 +78,10 @@ export default function TermsOfUse() {
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'terms-of-use.sections.payments.title')}</h2>
                             <p className="mb-4">{translate(translations, 'terms-of-use.sections.payments.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'terms-of-use.sections.payments.items[0]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.payments.items[1]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.payments.items[2]')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.payments.items[0]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.payments.items[1]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.payments.items[2]')}</span></li>
                             </ul>
                         </section>
 
@@ -103,9 +103,9 @@ export default function TermsOfUse() {
                         <section>
                             <h2 className="text-2xl font-semibold text-foreground mb-4">{translate(translations, 'terms-of-use.sections.limitation_liability.title')}</h2>
                             <p className="mb-4">{translate(translations, 'terms-of-use.sections.limitation_liability.intro')}</p>
-                            <ul className="space-y-2">
-                                <li>{translate(translations, 'terms-of-use.sections.limitation_liability.items[0]')}</li>
-                                <li>{translate(translations, 'terms-of-use.sections.limitation_liability.items[1]')}</li>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.limitation_liability.items[0]')}</span></li>
+                                <li className="flex items-start gap-3"><span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span><span>{translate(translations, 'terms-of-use.sections.limitation_liability.items[1]')}</span></li>
                             </ul>
                         </section>
 
