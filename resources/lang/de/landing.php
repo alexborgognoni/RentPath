@@ -226,6 +226,7 @@ return [
                 'unit' => 'pro Nutzer/Monat',
                 'offer' => '🎉 Erhalten Sie 3 Monate KOSTENLOS bei der Anmeldung!',
             ],
+            'get_started_button' => 'Loslegen',
         ],
     ],
 

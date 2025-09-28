@@ -226,6 +226,7 @@ return [
                 'unit' => 'par agent/mois',
                 'offer' => '🎉 Obtenez 3 mois GRATUITS à l\'inscription!',
             ],
+            'get_started_button' => 'Commencer',
         ],
     ],
 

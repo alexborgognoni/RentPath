@@ -69,6 +69,7 @@ export function BenefitsSection() {
     const TRIAL_HEADING = translate(translations, 'landing.benefits.trial.heading');
     const PRICING_UNIT = translate(translations, 'landing.benefits.trial.pricing.unit');
     const PRICING_OFFER = translate(translations, 'landing.benefits.trial.pricing.offer');
+    const GET_STARTED_BUTTON = translate(translations, 'landing.benefits.trial.get_started_button');
     
     const TRIAL_BENEFITS = [
         translate(translations, 'landing.benefits.trial.benefits.0'),
@@ -229,7 +230,7 @@ export function BenefitsSection() {
                                     href="/register"
                                     className="block w-full rounded-lg bg-gradient-to-r from-primary to-secondary py-4 text-center text-lg font-bold text-white shadow-lg transition-all hover:scale-105 hover:from-primary hover:to-secondary"
                                 >
-                                    Get Started
+                                    {GET_STARTED_BUTTON}
                                 </a>
                             </div>
                         </div>
