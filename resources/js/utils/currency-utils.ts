@@ -1,9 +1,10 @@
 // Common currencies with their symbols and conversion rates (base: EUR)
+// Exchange rates updated September 2025
 export const currencies = [
     { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺', rate: 1.0 },
-    { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸', rate: 1.1 },
+    { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸', rate: 1.17 },
     { code: 'GBP', name: 'British Pound', symbol: '£', flag: '🇬🇧', rate: 0.87 },
-    { code: 'CHF', name: 'Swiss Franc', symbol: 'CHF', flag: '🇨🇭', rate: 0.98 },
+    { code: 'CHF', name: 'Swiss Franc', symbol: 'CHF', flag: '🇨🇭', rate: 0.94 },
 ] as const;
 
 export type Currency = (typeof currencies)[number];
@@ -81,6 +82,12 @@ export const setCurrencyInStorage = (currencyCode: CurrencyCode) => {
     localStorage.setItem('selectedCurrency', currencyCode);
 };
 
+// Convert and round up to nearest whole number for pricing
+export const convertAndRoundUpPrice = (basePrice: number, baseCurrency: CurrencyCode = 'EUR', targetCurrency: CurrencyCode = 'EUR') => {
+    const convertedPrice = convertCurrency(basePrice, baseCurrency, targetCurrency);
+    return Math.ceil(convertedPrice); // Always round up to nearest whole number
+};
+
 // Hook for currency conversion
 export const useCurrency = () => {
     const currentCurrency = getCurrencyFromStorage();
@@ -95,10 +102,15 @@ export const useCurrency = () => {
         return formatCurrency(amount, currentCurrency);
     };
 
+    const convertPrice = (basePrice: number, baseCurrency: CurrencyCode = 'EUR') => {
+        return convertAndRoundUpPrice(basePrice, baseCurrency, currentCurrency);
+    };
+
     return {
         currentCurrency,
         changeCurrency,
         formatPrice,
+        convertPrice,
         currencies,
         getCurrency: () => getCurrency(currentCurrency),
     };
