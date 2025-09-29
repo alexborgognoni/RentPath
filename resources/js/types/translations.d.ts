@@ -421,11 +421,200 @@ interface TermsOfUseTranslations {
     };
 }
 
+interface AuthTranslations {
+    login: {
+        title: string;
+        description: string;
+        email_label: string;
+        email_placeholder: string;
+        password_label: string;
+        password_placeholder: string;
+        remember_me: string;
+        forgot_password: string;
+        login_button: string;
+        logging_in: string;
+        no_account: string;
+        register_link: string;
+    };
+    register: {
+        title: string;
+        description: string;
+        first_name_label: string;
+        first_name_placeholder: string;
+        last_name_label: string;
+        last_name_placeholder: string;
+        email_label: string;
+        email_placeholder: string;
+        password_label: string;
+        password_placeholder: string;
+        confirm_password_label: string;
+        confirm_password_placeholder: string;
+        register_button: string;
+        registering: string;
+        already_have_account: string;
+        login_link: string;
+    };
+    forgot_password: {
+        title: string;
+        description: string;
+        email_label: string;
+        email_placeholder: string;
+        send_reset_link: string;
+        sending: string;
+        back_to_login: string;
+        success_message: string;
+    };
+}
+
+interface HeaderTranslations {
+    login: string;
+}
+
+interface SettingsTranslations {
+    menu: {
+        account: string;
+        password: string;
+        appearance: string;
+    };
+    account: {
+        title: string;
+        description: string;
+        email_address: string;
+        email_placeholder: string;
+        email_unverified: string;
+        resend_verification: string;
+        verification_sent: string;
+        save_changes: string;
+        saving: string;
+        saved_successfully: string;
+        delete_account: string;
+        delete_account_description: string;
+        delete_account_button: string;
+    };
+    password: {
+        title: string;
+        description: string;
+        change_password: string;
+        change_password_description: string;
+        current_password: string;
+        current_password_placeholder: string;
+        new_password: string;
+        new_password_placeholder: string;
+        confirm_password: string;
+        confirm_password_placeholder: string;
+        update_password: string;
+        updating: string;
+        password_updated: string;
+    };
+    appearance: {
+        title: string;
+        description: string;
+        theme: string;
+        theme_description: string;
+        light: string;
+        dark: string;
+        system: string;
+        theme_preference_saved: string;
+    };
+}
+
+interface ProfileTranslations {
+    setup: {
+        title: string;
+        edit_title: string;
+        description: string;
+        edit_description: string;
+        verification_notice: string;
+        account_type: string;
+        individual: string;
+        professional: string;
+        company_name: string;
+        company_name_placeholder: string;
+        company_website: string;
+        company_website_placeholder: string;
+        license_number: string;
+        license_number_placeholder: string;
+        phone_number: string;
+        phone_number_placeholder: string;
+        profile_picture: string;
+        upload_photo: string;
+        remove_photo: string;
+        drag_drop_photo: string;
+        photo_requirements: string;
+        submit_profile: string;
+        save_changes: string;
+        processing: string;
+        profile_submitted: string;
+        profile_updated: string;
+        first_name: string;
+        last_name: string;
+        profile_type: string;
+        individual_desc: string;
+        professional_desc: string;
+        documents: string;
+        id_document_required: string;
+        license_document_required: string;
+        upload_file: string;
+        replace_file: string;
+        drag_drop: string;
+        file_requirements: string;
+        click_upload_text: string;
+        update_profile: string;
+        submitting: string;
+        updating: string;
+        uploading: string;
+    };
+    unverified: {
+        title: string;
+        rejected_title: string;
+        description: string;
+        rejected_description: string;
+        thank_you_message: string;
+        review_feedback: string;
+        identity_verification: string;
+        identity_verification_desc: string;
+        license_review: string;
+        license_review_desc: string;
+        review_time: string;
+        review_time_desc: string;
+        update_resubmit: string;
+        edit_profile_info: string;
+        return_home: string;
+        status_pending: string;
+        status_rejected: string;
+        review_message: string;
+        rejection_title: string;
+        rejection_message: string;
+        edit_profile: string;
+        resubmit: string;
+        contact_support: string;
+        back_to_dashboard: string;
+    };
+    common: {
+        required: string;
+        optional: string;
+        cancel: string;
+        save: string;
+        edit: string;
+        delete: string;
+        upload: string;
+        remove: string;
+        close: string;
+        confirm: string;
+        continue: string;
+        back: string;
+    };
+}
+
 interface Translations {
     landing: LandingTranslations;
     "contact-us": ContactUsTranslations;
     "privacy-policy": PrivacyPolicyTranslations;
     "terms-of-use": TermsOfUseTranslations;
+    auth: AuthTranslations;
+    header: HeaderTranslations;
+    settings: SettingsTranslations;
+    profile: ProfileTranslations;
 }
 
 type JSONPathOf<T> = T extends string

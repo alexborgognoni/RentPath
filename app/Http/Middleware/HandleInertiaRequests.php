@@ -50,6 +50,8 @@ class HandleInertiaRequests extends Middleware
             'translations' => [
                 'auth' => trans('auth'),
                 'header' => trans('header'),
+                'profile' => trans('profile'),
+                'settings' => trans('settings'),
                 'landing' => trans('landing'),
                 'contact-us' => trans('contact-us'),
                 'privacy-policy' => trans('privacy-policy'),
