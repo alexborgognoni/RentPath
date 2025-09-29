@@ -1,0 +1,4 @@
+interface HeaderTranslations {
+    login: string;
+}
+
