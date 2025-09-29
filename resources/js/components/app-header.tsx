@@ -1,12 +1,12 @@
 import { CurrencySelector } from '@/components/currency-selector';
 import { LanguageSelector } from '@/components/language-selector';
 import { LogoHomeButton } from '@/components/logo-home-button';
+import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
 import { SharedData, type BreadcrumbItem } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { usePage, Link } from '@inertiajs/react';
 import { LogOut, Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { logout } from '@/routes';
 
 interface AppHeaderProps {
     title?: string;
@@ -17,6 +17,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth, translations } = page.props;
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +32,19 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
         }
         if (user?.email) return user.email[0].toUpperCase();
         return 'U';
+    };
+
+    const handleLogoutClick = () => {
+        setShowUserMenu(false);
+        setShowLogoutConfirmation(true);
+    };
+
+    const handleLogoutConfirm = () => {
+        setShowLogoutConfirmation(false);
+    };
+
+    const handleLogoutCancel = () => {
+        setShowLogoutConfirmation(false);
     };
 
     useEffect(() => {
@@ -138,15 +152,13 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                                             <span>{t(translations.header, 'settings')}</span>
                                         </a>
                                         <div className="mb-1 border-t border-border"></div>
-                                        <Link
-                                            href={logout().url}
-                                            method="post"
-                                            as="button"
+                                        <button
+                                            onClick={handleLogoutClick}
                                             className="flex w-full items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10 cursor-pointer"
                                         >
                                             <LogOut size={16} />
                                             <span>{t(translations.header, 'sign_out')}</span>
-                                        </Link>
+                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -154,6 +166,11 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                     )}
                 </div>
             </div>
+            <LogoutConfirmationPopover
+                isOpen={showLogoutConfirmation}
+                onClose={handleLogoutCancel}
+                onConfirm={handleLogoutConfirm}
+            />
         </header>
     );
 }
