@@ -15,7 +15,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
     const page = usePage<SharedData>();
-    const { auth } = page.props;
+    const { auth, translations } = page.props;
     const [showUserMenu, setShowUserMenu] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
@@ -98,7 +98,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                             href="/login"
                             className="rounded-lg bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-105"
                         >
-                            Login
+                            {t(translations.header, 'login')}
                         </a>
                     )}
 
@@ -135,7 +135,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                                             className="text-text-secondary flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background cursor-pointer"
                                         >
                                             <Settings size={16} />
-                                            <span>Settings</span>
+                                            <span>{t(translations.header, 'settings')}</span>
                                         </a>
                                         <div className="mb-1 border-t border-border"></div>
                                         <Link
@@ -145,7 +145,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                                             className="flex w-full items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10 cursor-pointer"
                                         >
                                             <LogOut size={16} />
-                                            <span>{t('signOut')}</span>
+                                            <span>{t(translations.header, 'sign_out')}</span>
                                         </Link>
                                     </div>
                                 </div>
