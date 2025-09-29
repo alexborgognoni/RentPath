@@ -1,6 +1,6 @@
 import RegisteredUserController from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
 import { login } from '@/routes';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { Building2, LoaderCircle, User } from 'lucide-react';
 import { useState } from 'react';
 
@@ -10,13 +10,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { SharedData } from '@/types';
+import { translate as t } from '@/utils/translate-utils';
 
 export default function Register() {
     const [userType, setUserType] = useState<'tenant' | 'property-manager'>('tenant');
+    const page = usePage<SharedData>();
+    const { translations } = page.props;
 
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
-            <Head title="Register" />
+        <AuthLayout title={t(translations.auth, 'register.title')} description={t(translations.auth, 'register.description')}>
+            <Head title={t(translations.auth, 'register.head_title')} />
             <Form
                 {...RegisteredUserController.store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -40,7 +44,7 @@ export default function Register() {
                                     }`}
                             >
                                 <User className="h-4 w-4" />
-                                Tenant
+                                {t(translations.auth, 'user_types.tenant')}
                             </button>
                             <button
                                 type="button"
@@ -49,13 +53,13 @@ export default function Register() {
                                     }`}
                             >
                                 <Building2 className="h-4 w-4" />
-                                Property Manager
+                                {t(translations.auth, 'user_types.property_manager')}
                             </button>
                         </div>
 
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="first_name">First name</Label>
+                                <Label htmlFor="first_name">{t(translations.auth, 'register.first_name_label')}</Label>
                                 <Input
                                     id="first_name"
                                     type="text"
@@ -64,13 +68,13 @@ export default function Register() {
                                     tabIndex={1}
                                     autoComplete="given-name"
                                     name="first_name"
-                                    placeholder="First name"
+                                    placeholder={t(translations.auth, 'register.first_name_placeholder')}
                                 />
                                 <InputError message={errors.first_name} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="last_name">Last name</Label>
+                                <Label htmlFor="last_name">{t(translations.auth, 'register.last_name_label')}</Label>
                                 <Input
                                     id="last_name"
                                     type="text"
@@ -78,13 +82,13 @@ export default function Register() {
                                     tabIndex={2}
                                     autoComplete="family-name"
                                     name="last_name"
-                                    placeholder="Last name"
+                                    placeholder={t(translations.auth, 'register.last_name_placeholder')}
                                 />
                                 <InputError message={errors.last_name} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">{t(translations.auth, 'register.email_label')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -92,13 +96,13 @@ export default function Register() {
                                     tabIndex={3}
                                     autoComplete="email"
                                     name="email"
-                                    placeholder="email@example.com"
+                                    placeholder={t(translations.auth, 'register.email_placeholder')}
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="password">{t(translations.auth, 'register.password_label')}</Label>
                                 <Input
                                     id="password"
                                     type="password"
@@ -106,13 +110,13 @@ export default function Register() {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder="Password"
+                                    placeholder={t(translations.auth, 'register.password_placeholder')}
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">Confirm password</Label>
+                                <Label htmlFor="password_confirmation">{t(translations.auth, 'register.password_confirmation_label')}</Label>
                                 <Input
                                     id="password_confirmation"
                                     type="password"
@@ -120,21 +124,21 @@ export default function Register() {
                                     tabIndex={5}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="Confirm password"
+                                    placeholder={t(translations.auth, 'register.password_confirmation_placeholder')}
                                 />
                                 <InputError message={errors.password_confirmation} />
                             </div>
 
                             <Button type="submit" className="mt-2 w-full" tabIndex={6}>
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                Create account
+                                {t(translations.auth, 'register.create_account_button')}
                             </Button>
                         </div>
 
                         <div className="text-text-secondary text-center text-sm">
-                            Already have an account?{' '}
+                            {t(translations.auth, 'register.already_have_account')}{' '}
                             <TextLink href={login()} tabIndex={7}>
-                                Log in
+                                {t(translations.auth, 'register.log_in_link')}
                             </TextLink>
                         </div>
                     </>

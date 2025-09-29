@@ -6,9 +6,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { SharedData } from '@/types';
+import { translate as t } from '@/utils/translate-utils';
 import { register } from '@/routes';
 import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { Building2, LoaderCircle, User } from 'lucide-react';
 import { useState } from 'react';
 
@@ -19,10 +21,12 @@ interface LoginProps {
 
 export default function Login({ status, canResetPassword }: LoginProps) {
     const [userType, setUserType] = useState<'tenant' | 'property-manager'>('tenant');
+    const page = usePage<SharedData>();
+    const { translations } = page.props;
 
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
-            <Head title="Log in" />
+        <AuthLayout title={t(translations.auth, 'login.title')} description={t(translations.auth, 'login.description')}>
+            <Head title={t(translations.auth, 'login.head_title')} />
 
             <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
                 {({ processing, errors }) => (
@@ -44,7 +48,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 }`}
                             >
                                 <User className="h-4 w-4" />
-                                Tenant
+                                {t(translations.auth, 'user_types.tenant')}
                             </button>
                             <button
                                 type="button"
@@ -54,13 +58,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 }`}
                             >
                                 <Building2 className="h-4 w-4" />
-                                Property Manager
+                                {t(translations.auth, 'user_types.property_manager')}
                             </button>
                         </div>
 
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">{t(translations.auth, 'login.email_label')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -69,17 +73,17 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder={t(translations.auth, 'login.email_placeholder')}
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">{t(translations.auth, 'login.password_label')}</Label>
                                     {canResetPassword && (
                                         <TextLink href={request()} className="ml-auto text-sm" tabIndex={5}>
-                                            Forgot password?
+                                            {t(translations.auth, 'login.forgot_password')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -90,26 +94,26 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder={t(translations.auth, 'login.password_placeholder')}
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="flex items-center space-x-3">
                                 <Checkbox id="remember" name="remember" tabIndex={3} />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label htmlFor="remember">{t(translations.auth, 'login.remember_me')}</Label>
                             </div>
 
                             <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                Log in
+                                {t(translations.auth, 'login.login_button')}
                             </Button>
                         </div>
 
                         <div className="text-text-secondary text-center text-sm">
-                            Don't have an account?{' '}
+                            {t(translations.auth, 'login.no_account')}{' '}
                             <TextLink href={register()} tabIndex={5}>
-                                Sign up
+                                {t(translations.auth, 'login.sign_up_link')}
                             </TextLink>
                         </div>
                     </>
