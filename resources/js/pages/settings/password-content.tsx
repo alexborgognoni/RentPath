@@ -2,14 +2,17 @@ import PasswordController from '@/actions/App/Http/Controllers/Settings/Password
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { type SharedData } from '@/types';
+import { translate as t } from '@/utils/translate-utils';
 import { Transition } from '@headlessui/react';
-import { Form } from '@inertiajs/react';
+import { Form, usePage } from '@inertiajs/react';
 import { Lock } from 'lucide-react';
 import { useRef } from 'react';
 
 export default function PasswordContent() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
+    const { translations } = usePage<SharedData>().props;
 
     return (
         <div className="space-y-6">
@@ -17,16 +20,16 @@ export default function PasswordContent() {
             <div className="mb-8">
                 <h1 className="mb-2 flex items-center text-3xl font-bold text-foreground">
                     <Lock className="mr-3 text-primary" size={32} />
-                    Password
+                    {t(translations.settings, 'password.title')}
                 </h1>
-                <p className="text-muted-foreground">Update your password to keep your account secure</p>
+                <p className="text-muted-foreground">{t(translations.settings, 'password.description')}</p>
             </div>
 
             {/* Password Settings */}
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="mb-4 text-xl font-semibold text-foreground">Change Password</h2>
+                <h2 className="mb-4 text-xl font-semibold text-foreground">{t(translations.settings, 'password.change_password')}</h2>
                 <p className="mb-6 text-sm text-muted-foreground">
-                    Ensure your account is using a long, random password to stay secure.
+                    {t(translations.settings, 'password.change_password_description')}
                 </p>
 
                 <Form
@@ -51,7 +54,7 @@ export default function PasswordContent() {
                         <>
                             <div className="grid gap-2">
                                 <Label htmlFor="current_password" className="text-sm font-medium text-foreground">
-                                    Current Password
+                                    {t(translations.settings, 'password.current_password')}
                                 </Label>
                                 <Input
                                     id="current_password"
@@ -60,14 +63,14 @@ export default function PasswordContent() {
                                     type="password"
                                     className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     autoComplete="current-password"
-                                    placeholder="Enter your current password"
+                                    placeholder={t(translations.settings, 'password.current_password_placeholder')}
                                 />
                                 <InputError message={errors.current_password} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                                    New Password
+                                    {t(translations.settings, 'password.new_password')}
                                 </Label>
                                 <Input
                                     id="password"
@@ -76,14 +79,14 @@ export default function PasswordContent() {
                                     type="password"
                                     className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     autoComplete="new-password"
-                                    placeholder="Enter your new password"
+                                    placeholder={t(translations.settings, 'password.new_password_placeholder')}
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="password_confirmation" className="text-sm font-medium text-foreground">
-                                    Confirm New Password
+                                    {t(translations.settings, 'password.confirm_password')}
                                 </Label>
                                 <Input
                                     id="password_confirmation"
@@ -91,18 +94,18 @@ export default function PasswordContent() {
                                     type="password"
                                     className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     autoComplete="new-password"
-                                    placeholder="Confirm your new password"
+                                    placeholder={t(translations.settings, 'password.confirm_password_placeholder')}
                                 />
                                 <InputError message={errors.password_confirmation} />
                             </div>
 
                             <div className="flex items-center gap-4 pt-4">
-                                <button 
+                                <button
                                     type="submit"
                                     disabled={processing}
                                     className="rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
                                 >
-                                    {processing ? 'Updating...' : 'Update Password'}
+                                    {processing ? t(translations.settings, 'password.updating') : t(translations.settings, 'password.update_password')}
                                 </button>
 
                                 <Transition
@@ -112,7 +115,7 @@ export default function PasswordContent() {
                                     leave="transition ease-in-out"
                                     leaveTo="opacity-0"
                                 >
-                                    <p className="text-sm font-medium text-success">Password updated successfully</p>
+                                    <p className="text-sm font-medium text-success">{t(translations.settings, 'password.password_updated')}</p>
                                 </Transition>
                             </div>
                         </>

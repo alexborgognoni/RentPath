@@ -1,8 +1,12 @@
+import { type SharedData } from '@/types';
+import { translate as t } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { Monitor, Moon, Palette, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function AppearanceContent() {
     const [theme, setTheme] = useState<'light' | 'system' | 'dark'>('system');
+    const { translations } = usePage<SharedData>().props;
 
     useEffect(() => {
         // Check current theme on mount
@@ -35,16 +39,16 @@ export default function AppearanceContent() {
             <div className="mb-8">
                 <h1 className="mb-2 flex items-center text-3xl font-bold text-foreground">
                     <Palette className="mr-3 text-primary" size={32} />
-                    Appearance
+                    {t(translations.settings, 'appearance.title')}
                 </h1>
-                <p className="text-muted-foreground">Customize how the interface looks and feels</p>
+                <p className="text-muted-foreground">{t(translations.settings, 'appearance.description')}</p>
             </div>
 
             {/* Theme Settings */}
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="mb-4 text-xl font-semibold text-foreground">Theme</h2>
+                <h2 className="mb-4 text-xl font-semibold text-foreground">{t(translations.settings, 'appearance.theme')}</h2>
                 <p className="mb-6 text-sm text-muted-foreground">
-                    Choose between light, system, and dark mode to customize your viewing experience.
+                    {t(translations.settings, 'appearance.theme_description')}
                 </p>
 
                 {/* Theme Toggle */}
@@ -69,7 +73,7 @@ export default function AppearanceContent() {
                         }`}
                     >
                         <Sun className="h-4 w-4" />
-                        Light
+                        {t(translations.settings, 'appearance.light')}
                     </button>
                     <button
                         type="button"
@@ -79,7 +83,7 @@ export default function AppearanceContent() {
                         }`}
                     >
                         <Moon className="h-4 w-4" />
-                        Dark
+                        {t(translations.settings, 'appearance.dark')}
                     </button>
                     <button
                         type="button"
@@ -89,12 +93,12 @@ export default function AppearanceContent() {
                         }`}
                     >
                         <Monitor className="h-4 w-4" />
-                        System
+                        {t(translations.settings, 'appearance.system')}
                     </button>
                 </div>
 
                 <div className="mt-4 text-xs text-muted-foreground">
-                    Your theme preference will be saved and applied across all pages.
+                    {t(translations.settings, 'appearance.theme_preference_saved')}
                 </div>
             </div>
         </div>

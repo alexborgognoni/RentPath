@@ -1,3 +1,6 @@
+import { type SharedData } from '@/types';
+import { translate as t } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { Lock, Palette, User } from 'lucide-react';
 
 interface SettingsNavigationProps {
@@ -6,22 +9,24 @@ interface SettingsNavigationProps {
 }
 
 export function SettingsNavigation({ currentPage, onNavigate }: SettingsNavigationProps) {
+    const { translations } = usePage<SharedData>().props;
+
     const navItems = [
         {
             key: 'account' as const,
-            title: 'Account',
+            title: t(translations.settings, 'menu.account'),
             href: '/settings/account',
             icon: User,
         },
         {
             key: 'password' as const,
-            title: 'Password',
+            title: t(translations.settings, 'menu.password'),
             href: '/settings/password',
             icon: Lock,
         },
         {
             key: 'appearance' as const,
-            title: 'Appearance',
+            title: t(translations.settings, 'menu.appearance'),
             href: '/settings/appearance',
             icon: Palette,
         },

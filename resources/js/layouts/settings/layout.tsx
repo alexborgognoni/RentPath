@@ -4,29 +4,31 @@ import { cn } from '@/lib/utils';
 import { appearance } from '@/routes';
 import { edit as editPassword } from '@/routes/password';
 import { edit } from '@/routes/profile';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type NavItem, type SharedData } from '@/types';
+import { translate as t } from '@/utils/translate-utils';
+import { Link, usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: edit(),
-        icon: null,
-    },
-    {
-        title: 'Password',
-        href: editPassword(),
-        icon: null,
-    },
-    {
-        title: 'Appearance',
-        href: appearance(),
-        icon: null,
-    },
-];
-
 export default function SettingsLayout({ children }: PropsWithChildren) {
+    const { translations } = usePage<SharedData>().props;
+
+    const sidebarNavItems: NavItem[] = [
+        {
+            title: t(translations.settings, 'menu.account'),
+            href: edit(),
+            icon: null,
+        },
+        {
+            title: t(translations.settings, 'menu.password'),
+            href: editPassword(),
+            icon: null,
+        },
+        {
+            title: t(translations.settings, 'menu.appearance'),
+            href: appearance(),
+            icon: null,
+        },
+    ];
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
         return null;
