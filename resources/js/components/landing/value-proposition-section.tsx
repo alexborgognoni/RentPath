@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Bell, Camera, Eye, FileText, Mail, Shield } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 
@@ -144,16 +144,26 @@ export function ValuePropositionSection() {
                                 setIsInView2(false);
                                 setIsInView3(false);
                             }}
-                            className="mb-16 flex items-center space-x-12"
+                            className="mb-16 flex flex-col items-center space-y-6 sm:flex-row sm:space-y-0 sm:space-x-0"
                         >
                             {STATS.map((stat, i) => (
-                                <div key={stat.id} className="group w-32 text-center">
-                                    <div className="mb-2 flex min-h-[2.25rem] items-center justify-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
-                                        {i === 0 ? count1 : i === 1 ? count2 : count3}
-                                        {stat.suffix}
+                                <React.Fragment key={stat.id}>
+                                    <div className="group w-32 text-center">
+                                        <div className="mb-2 flex min-h-[2.25rem] items-center justify-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
+                                            {i === 0 ? count1 : i === 1 ? count2 : count3}
+                                            {stat.suffix}
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">{stat.label}</div>
                                     </div>
-                                    <div className="text-sm text-muted-foreground">{stat.label}</div>
-                                </div>
+                                    {i < STATS.length - 1 && (
+                                        <>
+                                            {/* Vertical divider for desktop */}
+                                            <div className="mx-12 hidden h-16 w-px bg-border sm:block"></div>
+                                            {/* Horizontal divider for mobile */}
+                                            <div className="h-px w-24 bg-border sm:hidden"></div>
+                                        </>
+                                    )}
+                                </React.Fragment>
                             ))}
                         </motion.div>
                     </div>
