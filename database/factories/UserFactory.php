@@ -23,17 +23,9 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        // Split a fake full name into first, middle (optional), and last
-        $fullName = fake()->name();
-        $parts = explode(' ', $fullName);
-        $firstName = $parts[0];
-        $lastName = $parts[count($parts) - 1];
-        $middleName = count($parts) > 2 ? implode(' ', array_slice($parts, 1, -1)) : null;
-
         return [
-            'first_name' => $firstName,
-            'middle_name' => $middleName,
-            'last_name' => $lastName,
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
