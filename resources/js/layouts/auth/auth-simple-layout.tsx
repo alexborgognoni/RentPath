@@ -1,4 +1,5 @@
 import { LogoHomeButton } from '@/components/logo-home-button';
+import { LanguageSelector } from '@/components/language-selector';
 import { type PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {
@@ -10,6 +11,11 @@ interface AuthLayoutProps {
 export default function AuthSimpleLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
     return (
         <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
+            {/* Language Selector in top right */}
+            <div className="absolute top-6 right-6 md:top-10 md:right-10 z-50">
+                <LanguageSelector />
+            </div>
+
             <div className="absolute inset-0">
                 <div className="absolute top-20 right-20 h-64 w-64 rounded-full bg-gradient-to-br from-secondary/5 to-primary/5 blur-3xl dark:from-secondary/10 dark:to-primary/10" />
                 <div className="absolute bottom-20 left-20 h-48 w-48 rounded-full bg-gradient-to-br from-primary/5 to-secondary/5 blur-2xl dark:from-primary/10 dark:to-secondary/10" />
