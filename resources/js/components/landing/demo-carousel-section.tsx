@@ -88,15 +88,20 @@ export function DemoCarouselSection() {
 
     const NUM_SLIDES = 7;
 
-    const [activeSlide, setActiveSlide] = useState(0);
+    const [activeSlide, setActiveSlide] = useState(NUM_SLIDES); // Start from middle set
     const [isManuallyControlled, setIsManuallyControlled] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStartX, setDragStartX] = useState(0);
+    const [dragOffset, setDragOffset] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(true);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const carouselRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (intervalRef.current) clearInterval(intervalRef.current);
         const delay = isManuallyControlled ? 15000 : 5000;
         intervalRef.current = setInterval(() => {
-            setActiveSlide((prev) => (prev + 1) % NUM_SLIDES);
+            setActiveSlide((prev) => prev + 1);
             setIsManuallyControlled(false);
         }, delay);
 
@@ -105,19 +110,109 @@ export function DemoCarouselSection() {
         };
     }, [isManuallyControlled]);
 
+    // Reset position without animation when reaching edges
+    useEffect(() => {
+        if (!isTransitioning) return;
+
+        const handleTransitionEnd = () => {
+            if (activeSlide >= NUM_SLIDES * 2) {
+                setIsTransitioning(false);
+                setActiveSlide(NUM_SLIDES);
+            } else if (activeSlide < NUM_SLIDES) {
+                setIsTransitioning(false);
+                setActiveSlide(NUM_SLIDES + (activeSlide % NUM_SLIDES));
+            }
+        };
+
+        const carousel = carouselRef.current;
+        if (carousel) {
+            carousel.addEventListener('transitionend', handleTransitionEnd);
+            return () => carousel.removeEventListener('transitionend', handleTransitionEnd);
+        }
+    }, [activeSlide, isTransitioning]);
+
+    useEffect(() => {
+        if (!isTransitioning) {
+            // Re-enable transitions after a frame
+            requestAnimationFrame(() => {
+                setIsTransitioning(true);
+            });
+        }
+    }, [isTransitioning]);
+
     const nextSlide = () => {
-        setActiveSlide((prev) => (prev + 1) % NUM_SLIDES);
+        setActiveSlide((prev) => prev + 1);
         setIsManuallyControlled(true);
     };
 
     const prevSlide = () => {
-        setActiveSlide((prev) => (prev - 1 + NUM_SLIDES) % NUM_SLIDES);
+        setActiveSlide((prev) => prev - 1);
         setIsManuallyControlled(true);
     };
 
     const goToSlide = (index: number) => {
-        setActiveSlide(index);
+        setActiveSlide(NUM_SLIDES + index);
         setIsManuallyControlled(true);
+    };
+
+    // Touch/Mouse handlers for swipe
+    const handleDragStart = (clientX: number) => {
+        setIsDragging(true);
+        setDragStartX(clientX);
+        setDragOffset(0);
+    };
+
+    const handleDragMove = (clientX: number) => {
+        if (!isDragging) return;
+        const diff = clientX - dragStartX;
+        setDragOffset(diff);
+    };
+
+    const handleDragEnd = () => {
+        if (!isDragging) return;
+        setIsDragging(false);
+
+        const threshold = 50; // Minimum swipe distance
+        if (Math.abs(dragOffset) > threshold) {
+            if (dragOffset > 0) {
+                prevSlide();
+            } else {
+                nextSlide();
+            }
+        }
+        setDragOffset(0);
+    };
+
+    // Mouse events
+    const handleMouseDown = (e: React.MouseEvent) => {
+        handleDragStart(e.clientX);
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        handleDragMove(e.clientX);
+    };
+
+    const handleMouseUp = () => {
+        handleDragEnd();
+    };
+
+    const handleMouseLeave = () => {
+        if (isDragging) {
+            handleDragEnd();
+        }
+    };
+
+    // Touch events
+    const handleTouchStart = (e: React.TouchEvent) => {
+        handleDragStart(e.touches[0].clientX);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        handleDragMove(e.touches[0].clientX);
+    };
+
+    const handleTouchEnd = () => {
+        handleDragEnd();
     };
 
     return (
@@ -136,22 +231,37 @@ export function DemoCarouselSection() {
                 </div>
 
                 {/* Carousel */}
-                <div className="relative mb-20">
-                    <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card/80 to-surface/50 shadow-2xl backdrop-blur-xl">
-                        <div className="relative h-[700px] md:h-[700px] sm:h-[600px] overflow-hidden">
+                <div className="relative mb-12 md:mb-20 -mx-4 sm:mx-0">
+                    <div className="relative overflow-hidden md:rounded-3xl md:border md:border-border md:bg-gradient-to-br md:from-card/80 md:to-surface/50 md:shadow-2xl md:backdrop-blur-xl">
+                        <div
+                            ref={carouselRef}
+                            className="relative h-[650px] sm:h-[600px] md:h-[700px] overflow-hidden touch-pan-y select-none bg-background md:bg-transparent"
+                            onMouseDown={handleMouseDown}
+                            onMouseMove={handleMouseMove}
+                            onMouseUp={handleMouseUp}
+                            onMouseLeave={handleMouseLeave}
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
+                        >
                             <div
-                                className="flex h-full transition-transform duration-700 ease-out"
-                                style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                                className="flex h-full"
+                                style={{
+                                    transform: `translateX(calc(-${(activeSlide + NUM_SLIDES) * 100}% + ${dragOffset}px))`,
+                                    transition: isDragging || !isTransitioning ? 'none' : 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
+                                    cursor: isDragging ? 'grabbing' : 'grab'
+                                }}
                             >
-                                {SLIDES.map((slide) => (
-                                    <div key={slide.id} className="h-full w-full flex-shrink-0">
-                                        <div className="relative flex h-full flex-col p-4 sm:p-8 md:p-12">
-                                            <div className="relative z-10 mx-auto max-w-5xl text-center flex flex-col justify-between h-full">
+                                {/* Render slides 3 times for infinite loop effect */}
+                                {[...SLIDES, ...SLIDES, ...SLIDES].map((slide, idx) => (
+                                    <div key={`${slide.id}-${idx}`} className="h-full w-full flex-shrink-0">
+                                        <div className="relative flex h-full flex-col px-5 py-6 sm:p-8 md:p-12">
+                                            <div className="relative z-10 mx-auto max-w-5xl text-center flex flex-col justify-between h-full w-full">
                                                 {/* Top Section - Demo Screenshot */}
-                                                <div className="flex-shrink-0">
-                                                    <div className="group relative mx-auto mb-4 sm:mb-6 md:mb-8">
-                                                        <div className="mx-auto flex h-32 w-72 sm:h-40 sm:w-80 md:h-56 md:w-96 items-center justify-center rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 shadow-2xl backdrop-blur-sm transition-all duration-300 group-hover:scale-105">
-                                                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10"></div>
+                                                <div className="flex-shrink-0" id="demo-card">
+                                                    <div className="group relative mx-auto mb-6 sm:mb-6 md:mb-8">
+                                                        <div className="mx-auto flex h-full w-full sm:h-40 sm:w-80 md:h-56 md:w-96 sm:rounded-2xl sm:border sm:border-primary/30 sm:bg-gradient-to-br sm:from-primary/20 sm:via-secondary/20 sm:to-accent/20 items-center justify-center sm:shadow-2xl sm:backdrop-blur-sm transition-all duration-300 group-hover:scale-105 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 py-12">
+                                                            <div className="absolute inset-0 sm:rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10"></div>
                                                             <div className="relative">
                                                                 <div className="mx-auto mb-2 sm:mb-3 flex h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary">
                                                                     <Eye className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-white" />
@@ -162,32 +272,32 @@ export function DemoCarouselSection() {
                                                             </div>
                                                         </div>
                                                         {/* Glow Effect */}
-                                                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 opacity-50 blur-xl transition-opacity duration-300 group-hover:opacity-75"></div>
+                                                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 opacity-50 blur-xl transition-opacity duration-300 group-hover:opacity-75 hidden sm:block"></div>
                                                     </div>
                                                 </div>
 
                                                 {/* Middle Section - Title and Description (fixed height) */}
-                                                <div className="flex-grow flex flex-col justify-center min-h-[120px] sm:min-h-[140px] md:min-h-[160px]">
-                                                    <h3 className="mb-3 sm:mb-4 md:mb-6 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-tight font-bold text-transparent line-clamp-3">
+                                                <div className="flex-grow flex flex-col justify-center min-h-[120px] sm:min-h-[140px] md:min-h-[160px] mb-6">
+                                                    <h3 className="mb-3 sm:mb-4 md:mb-6 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-tight font-bold text-transparent">
                                                         {slide.title}
                                                     </h3>
-                                                    <p className="mx-auto max-w-3xl text-base sm:text-lg md:text-xl leading-relaxed text-muted-foreground px-4 line-clamp-4">
+                                                    <p className="mx-auto max-w-3xl text-base sm:text-lg md:text-xl leading-relaxed text-muted-foreground px-1">
                                                         {slide.description}
                                                     </p>
                                                 </div>
 
                                                 {/* Bottom Section - Feature Boxes (fixed height) */}
-                                                <div className="flex-shrink-0 min-h-[200px] sm:min-h-[220px] md:min-h-[240px] flex items-end">
-                                                    <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-1.5 sm:gap-2 md:gap-4 md:grid-cols-2">
+                                                <div className="flex-shrink-0">
+                                                    <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 sm:gap-2 md:gap-4 md:grid-cols-2">
                                                         {slide.features.map((feature, i) => (
                                                             <div
                                                                 key={i}
-                                                                className="group flex items-center space-x-2 sm:space-x-3 md:space-x-4 rounded-md sm:rounded-lg md:rounded-xl border border-primary/20 bg-gradient-to-r from-surface/50 to-card/50 p-2 sm:p-3 md:p-4 lg:p-5 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10"
+                                                                className="group flex items-start space-x-3 sm:space-x-3 md:space-x-4 rounded-xl sm:rounded-lg md:rounded-xl border border-primary/20 bg-gradient-to-r from-surface/50 to-card/50 p-3.5 sm:p-3 md:p-4 lg:p-5 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10"
                                                             >
-                                                                <div className="flex h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 flex-shrink-0 items-center justify-center rounded-sm sm:rounded-md md:rounded-lg bg-gradient-to-br from-primary to-secondary transition-transform duration-300 group-hover:scale-110">
-                                                                    <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4 text-white" />
+                                                                <div className="flex h-6 w-6 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 flex-shrink-0 items-center justify-center rounded-lg sm:rounded-md md:rounded-lg bg-gradient-to-br from-primary to-secondary transition-transform duration-300 group-hover:scale-110">
+                                                                    <Check className="h-3.5 w-3.5 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4 text-white" />
                                                                 </div>
-                                                                <span className="text-left text-xs sm:text-sm md:text-base font-medium text-foreground line-clamp-2">{feature}</span>
+                                                                <span className="text-left text-[15px] sm:text-sm md:text-base font-medium text-foreground leading-relaxed">{feature}</span>
                                                             </div>
                                                         ))}
                                                     </div>
@@ -197,15 +307,30 @@ export function DemoCarouselSection() {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Mobile Chevron Buttons - At center of demo card */}
+                            <button
+                                onClick={prevSlide}
+                                className="absolute left-2 top-[100px] z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20"
+                            >
+                                <ChevronLeft className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
+                            </button>
+                            <button
+                                onClick={nextSlide}
+                                className="absolute right-2 top-[100px] z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20"
+                            >
+                                <ChevronRight className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
+                            </button>
                         </div>
                     </div>
 
-                    {/* Navigation */}
+                    {/* Navigation Dots - Below content for all sizes */}
                     <div className="mt-8 flex justify-center">
-                        <div className="relative flex items-center space-x-6 rounded-full border border-border/30 bg-gradient-to-r from-primary/5 via-primary/4 via-secondary/4 to-secondary/5 px-6 py-3 shadow-lg backdrop-blur-xl">
+                        <div className="relative flex items-center rounded-full border border-border/30 bg-gradient-to-r from-primary/5 via-primary/4 via-secondary/4 to-secondary/5 px-6 py-3 shadow-lg backdrop-blur-xl">
+                            {/* Desktop Chevrons */}
                             <button
                                 onClick={prevSlide}
-                                className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20"
+                                className="hidden md:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 mr-6"
                             >
                                 <ChevronLeft className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
@@ -215,7 +340,7 @@ export function DemoCarouselSection() {
                                     <button
                                         key={index}
                                         onClick={() => goToSlide(index)}
-                                        className={`cursor-pointer transition-all duration-300 ${index === activeSlide
+                                        className={`cursor-pointer transition-all duration-300 ${index === (activeSlide % NUM_SLIDES)
                                                 ? 'h-3 w-8 rounded-full bg-gradient-to-r from-primary to-secondary shadow-sm'
                                                 : 'h-3 w-3 rounded-full bg-muted/40 backdrop-blur-sm hover:scale-125 hover:bg-muted/60'
                                             }`}
@@ -223,9 +348,10 @@ export function DemoCarouselSection() {
                                 ))}
                             </div>
 
+                            {/* Desktop Chevrons */}
                             <button
                                 onClick={nextSlide}
-                                className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20"
+                                className="hidden md:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 ml-6"
                             >
                                 <ChevronRight className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
