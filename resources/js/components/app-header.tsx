@@ -2,6 +2,7 @@ import { CurrencySelector } from '@/components/currency-selector';
 import { LanguageSelector } from '@/components/language-selector';
 import { LogoHomeButton } from '@/components/logo-home-button';
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
+import { MobileMenu } from '@/components/mobile-menu';
 import { SharedData, type BreadcrumbItem } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { usePage, Link } from '@inertiajs/react';
@@ -101,69 +102,77 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                     )}
                 </div>
 
-                {/* Right: Currency + Language + User */}
-                <div className="flex items-center space-x-4">
-                    <CurrencySelector />
-                    <LanguageSelector />
+                {/* Right: Currency + Language + User (Desktop) / Mobile Menu */}
+                <div className="flex items-center">
+                    {/* Mobile Menu - only visible on mobile */}
+                    <div className="md:hidden">
+                        <MobileMenu getUserInitials={getUserInitials} />
+                    </div>
 
-                    {/* Login Button - only show when not authenticated */}
-                    {!auth.user && (
-                        <a
-                            href="/login"
-                            className="rounded-lg bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-105"
-                        >
-                            {t(translations.header, 'login')}
-                        </a>
-                    )}
+                    {/* Desktop Controls - only visible on desktop */}
+                    <div className="hidden md:flex md:items-center md:space-x-4">
+                        <CurrencySelector />
+                        <LanguageSelector />
 
-                    {/* User Menu */}
-                    {auth.user && (
-                        <div ref={userMenuRef} className="relative">
-                            <button
-                                onClick={() => setShowUserMenu(!showUserMenu)}
-                                className="flex h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary border border-border shadow-lg transition-all hover:scale-105 hover:shadow-xl cursor-pointer"
+                        {/* Login Button - only show when not authenticated */}
+                        {!auth.user && (
+                            <a
+                                href="/login"
+                                className="rounded-lg bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-105"
                             >
-                                {(auth.user.property_manager?.profile_picture_url || auth.user.avatar) ? (
-                                    <img 
-                                        src={auth.user.property_manager?.profile_picture_url || auth.user.avatar} 
-                                        alt={auth.user.name} 
-                                        className="h-full w-full object-cover" 
-                                    />
-                                ) : (
-                                    <span className="text-sm font-semibold text-white">{getUserInitials(auth.user)}</span>
-                                )}
-                            </button>
+                                {t(translations.header, 'login')}
+                            </a>
+                        )}
 
-                            {showUserMenu && (
-                                <div className="absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
-                                    <div className="border-b border-border px-4 py-3">
-                                        <div className="min-w-0">
-                                            {auth.user.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
-                                            <p className="truncate text-xs text-muted-foreground">{auth.user.email}</p>
+                        {/* User Menu */}
+                        {auth.user && (
+                            <div ref={userMenuRef} className="relative">
+                                <button
+                                    onClick={() => setShowUserMenu(!showUserMenu)}
+                                    className="flex h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary border border-border shadow-lg transition-all hover:scale-105 hover:shadow-xl cursor-pointer"
+                                >
+                                    {(auth.user.property_manager?.profile_picture_url || auth.user.avatar) ? (
+                                        <img
+                                            src={auth.user.property_manager?.profile_picture_url || auth.user.avatar}
+                                            alt={auth.user.name}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-sm font-semibold text-white">{getUserInitials(auth.user)}</span>
+                                    )}
+                                </button>
+
+                                {showUserMenu && (
+                                    <div className="absolute right-0 z-40 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
+                                        <div className="border-b border-border px-4 py-3">
+                                            <div className="min-w-0">
+                                                {auth.user.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
+                                                <p className="truncate text-xs text-muted-foreground">{auth.user.email}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="py-1">
+                                            <a
+                                                href="/settings"
+                                                className="text-text-secondary flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background cursor-pointer"
+                                            >
+                                                <Settings size={16} />
+                                                <span>{t(translations.header, 'settings')}</span>
+                                            </a>
+                                            <div className="mb-1 border-t border-border"></div>
+                                            <button
+                                                onClick={handleLogoutClick}
+                                                className="flex w-full items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10 cursor-pointer"
+                                            >
+                                                <LogOut size={16} />
+                                                <span>{t(translations.header, 'sign_out')}</span>
+                                            </button>
                                         </div>
                                     </div>
-
-                                    <div className="py-1">
-                                        <a
-                                            href="/settings"
-                                            className="text-text-secondary flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background cursor-pointer"
-                                        >
-                                            <Settings size={16} />
-                                            <span>{t(translations.header, 'settings')}</span>
-                                        </a>
-                                        <div className="mb-1 border-t border-border"></div>
-                                        <button
-                                            onClick={handleLogoutClick}
-                                            className="flex w-full items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10 cursor-pointer"
-                                        >
-                                            <LogOut size={16} />
-                                            <span>{t(translations.header, 'sign_out')}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
             <LogoutConfirmationPopover
