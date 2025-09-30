@@ -31,19 +31,23 @@ export function TopFeaturesSection() {
             {/* Background Effects */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5"></div>
 
-            <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="relative z-10 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 {/* ROI Callout */}
-                <div className="relative mx-auto mb-20 max-w-7xl rounded-3xl border border-border bg-card/50 p-12 text-center shadow-2xl backdrop-blur-xl">
-                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/5 to-secondary/5"></div>
-                    <div className="relative z-10">
-                        <h3 className="mb-6 text-4xl leading-tight font-bold text-foreground lg:text-5xl">
+                <div className="mb-20">
+                    {/* Heading and Subtitle */}
+                    <div className="text-center px-4 sm:px-0 mb-8 sm:mb-12">
+                        <h3 className="mb-4 sm:mb-6 text-3xl sm:text-4xl leading-tight font-bold text-foreground lg:text-5xl">
                             {HEADING}
                         </h3>
-                        <p className="mx-auto mb-12 max-w-3xl text-xl leading-relaxed text-muted-foreground">
+                        <p className="mx-auto max-w-3xl text-lg sm:text-xl leading-relaxed text-muted-foreground">
                             {SUBTITLE}
                         </p>
+                    </div>
 
-                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                    {/* Desktop Card Wrapper */}
+                    <div className="hidden sm:block relative rounded-3xl border border-border bg-card/50 p-8 md:p-12 shadow-2xl backdrop-blur-xl">
+                        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/5 to-secondary/5"></div>
+                        <div className="relative z-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                             {FEATURES.map((feature, idx) => {
                                 const Icon = feature.icon;
                                 return (
@@ -59,12 +63,36 @@ export function TopFeaturesSection() {
                                             <div className="mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
                                                 {feature.title}
                                             </div>
-                                            <p className="leading-relaxed text-muted-foreground">{feature.description}</p>
+                                            <p className="text-base leading-relaxed text-muted-foreground">{feature.description}</p>
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
+                    </div>
+
+                    {/* Mobile Feature Cards - Full Width */}
+                    <div className="sm:hidden grid grid-cols-1 gap-6 px-4">
+                        {FEATURES.map((feature, idx) => {
+                            const Icon = feature.icon;
+                            return (
+                                <div
+                                    key={idx}
+                                    className="group relative rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 to-secondary/10 p-6 backdrop-blur-xl transition-all duration-500 hover:scale-105 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20"
+                                >
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
+                                    <div className="relative z-10">
+                                        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary transition-transform duration-300 group-hover:scale-110">
+                                            <Icon className="h-7 w-7 text-white" />
+                                        </div>
+                                        <div className="mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-2xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
+                                            {feature.title}
+                                        </div>
+                                        <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
