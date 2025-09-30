@@ -19,8 +19,10 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
     const { auth, translations } = page.props;
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
+    const [isHeaderVisible, setIsHeaderVisible] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
+    const lastScrollY = useRef(0);
 
     const getUserInitials = (user: { name?: string; email?: string }) => {
         if (user?.name) {
@@ -70,8 +72,37 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
         };
     }, [showUserMenu]);
 
+    // Hide/show header on scroll
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            // Show header when at top
+            if (currentScrollY < 10) {
+                setIsHeaderVisible(true);
+            }
+            // Show when scrolling up
+            else if (currentScrollY < lastScrollY.current) {
+                setIsHeaderVisible(true);
+            }
+            // Hide when scrolling down
+            else if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+                setIsHeaderVisible(false);
+            }
+
+            lastScrollY.current = currentScrollY;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     return (
-        <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+        <header
+            className={`sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md transition-transform duration-300 ease-in-out ${
+                isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+            }`}
+        >
             <div ref={containerRef} className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Left: Logo + Title */}
                 <div className="flex items-center space-x-3">

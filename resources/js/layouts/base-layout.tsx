@@ -28,13 +28,13 @@ export function BaseLayout({ children, breadcrumbs, title, showBackground = true
     }
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-background lg:h-screen lg:overflow-hidden">
+        <div className="relative flex min-h-screen w-full flex-col bg-background">
             {showBackground && (
-                <div className="absolute inset-0 min-h-full w-full lg:h-screen">
+                <div className="absolute inset-0 min-h-full w-full">
                     <ParallaxBackground />
                 </div>
             )}
-            <div className="relative z-10 flex flex-col min-h-screen lg:h-full">
+            <div className="relative z-10 flex flex-col min-h-screen">
                 <AppHeader breadcrumbs={breadcrumbs} title={title} />
                 {children}
             </div>
