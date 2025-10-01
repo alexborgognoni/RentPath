@@ -8,6 +8,12 @@ export function HeroSection() {
 
     return (
         <section className="relative overflow-hidden border-b py-24 lg:py-32">
+            {/* Blurred texture background */}
+            <div className="absolute inset-0 -z-10">
+                <div className="absolute top-0 -right-40 h-96 w-[500px] rotate-12 rounded-[40%_60%_70%_30%] bg-secondary/10 blur-3xl"></div>
+                <div className="absolute -bottom-20 -left-40 h-[400px] w-[600px] -rotate-12 rounded-[60%_40%_30%_70%] bg-primary/10 blur-3xl"></div>
+                <div className="absolute top-1/3 right-1/4 h-64 w-80 rotate-45 rounded-[50%_50%_40%_60%] bg-secondary/8 blur-3xl"></div>
+            </div>
             <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
                 {/* Heading */}
                 <motion.h1
