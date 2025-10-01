@@ -17,7 +17,7 @@ export function CtaSection() {
                 <p className="mx-auto mb-10 max-w-3xl text-xl text-muted-foreground">{SUBTITLE}</p>
                 <a
                     href={CTA_BUTTON_HREF}
-                    className="inline-flex items-center rounded-lg bg-gradient-to-r from-primary to-secondary px-10 py-4 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 hover:from-primary hover:to-secondary"
+                    className="inline-flex items-center rounded-lg bg-gradient-to-r from-primary to-secondary px-10 py-4 text-lg font-bold text-white shadow-lg md:transition-all md:hover:scale-105 md:hover:from-primary md:hover:to-secondary"
                 >
                     {CTA_BUTTON_TEXT}
                     <ArrowRight className="ml-2 h-5 w-5" />

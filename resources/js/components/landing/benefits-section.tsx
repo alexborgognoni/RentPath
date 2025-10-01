@@ -228,7 +228,7 @@ export function BenefitsSection() {
 
                                 <a
                                     href="/register"
-                                    className="block w-full rounded-lg bg-gradient-to-r from-primary to-secondary py-4 text-center text-lg font-bold text-white shadow-lg transition-all hover:scale-105 hover:from-primary hover:to-secondary"
+                                    className="block w-full rounded-lg bg-gradient-to-r from-primary to-secondary py-4 text-center text-lg font-bold text-white shadow-lg md:transition-all md:hover:scale-105 md:hover:from-primary md:hover:to-secondary"
                                 >
                                     {GET_STARTED_BUTTON}
                                 </a>

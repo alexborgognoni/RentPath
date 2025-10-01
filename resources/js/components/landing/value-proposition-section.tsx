@@ -202,8 +202,7 @@ export function ValuePropositionSection() {
                     viewport={{ once: false, amount: 0.6 }}
                 >
                     <div className="relative inline-block">
-                        <div className="absolute inset-0 animate-pulse rounded-2xl bg-gradient-to-r from-primary to-secondary opacity-75 blur-xl"></div>
-                        <motion.button className="relative transform cursor-pointer rounded-2xl bg-gradient-to-r from-primary to-secondary px-12 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-primary hover:to-secondary hover:shadow-2xl">
+                        <motion.button className="relative transform cursor-pointer rounded-2xl bg-gradient-to-r from-primary to-secondary px-12 py-4 font-bold text-white shadow-lg md:transition-all md:duration-300 md:hover:scale-105 md:hover:from-primary md:hover:to-secondary md:hover:shadow-2xl">
                             <span className="flex items-center space-x-3">
                                 <span>{translate(translations, 'landing.cta.button_text')}</span>
                                 <ArrowRight className="h-5 w-5" />
