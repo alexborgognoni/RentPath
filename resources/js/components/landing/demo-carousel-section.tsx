@@ -216,7 +216,7 @@ export function DemoCarouselSection() {
     };
 
     return (
-        <section id="problems" className="relative overflow-hidden bg-background py-24">
+        <section id="problems" className="relative overflow-hidden bg-background py-12 md:py-16 lg:py-20">
             <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5"></div>
 
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

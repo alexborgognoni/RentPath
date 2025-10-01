@@ -101,7 +101,7 @@ export function ValuePropositionSection() {
     const { count: count3, setIsInView: setIsInView3 } = useCountAnimation(STATS[2].value);
 
     return (
-        <section className="bg-background py-24">
+        <section className="bg-background py-12 md:py-16 lg:py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-20 text-center">
