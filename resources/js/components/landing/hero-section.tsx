@@ -1,10 +1,12 @@
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function HeroSection() {
     const page = usePage<SharedData>();
     const { auth, translations } = page.props;
+    const isMobile = useIsMobile();
 
     return (
         <section className="relative overflow-hidden border-b py-24 lg:py-32">
@@ -17,19 +19,19 @@ export function HeroSection() {
             <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
                 {/* Heading */}
                 <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    viewport={{ once: false, amount: 0.6 }}
+                    initial={isMobile ? false : { opacity: 0, y: 20 }}
+                    whileInView={isMobile ? false : { opacity: 1, y: 0 }}
+                    transition={isMobile ? undefined : { duration: 0.8 }}
+                    viewport={isMobile ? undefined : { once: false, amount: 0.6 }}
                     className="text-text-primary dark:text-text-primary mb-8 text-5xl leading-tight font-bold lg:text-7xl"
                 >
                     {translate(translations, 'landing.hero.heading_primary')}
                     <br />
                     <motion.span
-                        initial={{ backgroundPosition: '200% 0' }}
-                        whileInView={{ backgroundPosition: '0% 0' }}
-                        transition={{ duration: 1.5, ease: 'easeOut' }}
-                        viewport={{ once: false }}
+                        initial={isMobile ? false : { backgroundPosition: '200% 0' }}
+                        whileInView={isMobile ? false : { backgroundPosition: '0% 0' }}
+                        transition={isMobile ? undefined : { duration: 1.5, ease: 'easeOut' }}
+                        viewport={isMobile ? undefined : { once: false }}
                         className="inline-block bg-gradient-to-r from-primary to-secondary bg-[length:200%_100%] bg-clip-text text-transparent"
                     >
                         {translate(translations, 'landing.hero.heading_highlighted')}
@@ -38,10 +40,10 @@ export function HeroSection() {
 
                 {/* Subtitle */}
                 <motion.p
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 1 }}
-                    viewport={{ once: false, amount: 0.6 }}
+                    initial={isMobile ? false : { opacity: 0 }}
+                    whileInView={isMobile ? false : { opacity: 1 }}
+                    transition={isMobile ? undefined : { delay: 0.3, duration: 1 }}
+                    viewport={isMobile ? undefined : { once: false, amount: 0.6 }}
                     className="mx-auto mb-12 max-w-3xl text-xl text-muted-foreground lg:text-2xl"
                 >
                     {translate(translations, 'landing.hero.subtitle')}
@@ -49,9 +51,9 @@ export function HeroSection() {
 
                 {/* CTAs */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5, duration: 0.6 }}
+                    initial={isMobile ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+                    whileInView={isMobile ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
+                    transition={isMobile ? { duration: 0 } : { delay: 0.5, duration: 0.6 }}
                     viewport={{ once: false, amount: 0.6 }}
                     className="flex flex-col justify-center gap-6 sm:flex-row"
                 >
