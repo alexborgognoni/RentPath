@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+// Tailwind's md breakpoint (768px) - matches --bp-md in app.css
+// This hook detects screens smaller than md (mobile/tablet portrait)
 const MOBILE_BREAKPOINT = 768;
 
 export function useIsMobile() {
