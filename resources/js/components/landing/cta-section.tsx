@@ -11,7 +11,7 @@ export function CtaSection() {
     const CTA_BUTTON_HREF = '/register';
 
     return (
-        <section className="bg-background py-24">
+        <section className="bg-background py-12 md:py-16 lg:py-20">
             <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
                 <h2 className="mb-6 text-4xl font-bold text-foreground lg:text-5xl">{HEADING}</h2>
                 <p className="mx-auto mb-10 max-w-3xl text-xl text-muted-foreground">{SUBTITLE}</p>

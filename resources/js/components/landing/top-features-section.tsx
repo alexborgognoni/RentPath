@@ -27,7 +27,7 @@ export function TopFeaturesSection() {
     ];
 
     return (
-        <section className="relative overflow-hidden bg-background py-24">
+        <section className="relative overflow-hidden bg-background py-12 md:py-16 lg:py-20">
             {/* Background Effects */}
             <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5"></div>
 

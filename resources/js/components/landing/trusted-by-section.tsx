@@ -3,7 +3,7 @@ export function TrustedBySection() {
     const TRUSTED_BY_TEXT = 'Trusted by property agents across Europe.';
 
     return (
-        <section className="overflow-hidden border-b border-border bg-background py-16">
+        <section className="overflow-hidden border-b border-border bg-background py-8 md:py-12 lg:py-14">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <p className="mb-8 text-sm text-muted-foreground">{TRUSTED_BY_TEXT}</p>

@@ -9,7 +9,7 @@ export function HeroSection() {
     const isMobile = useIsMobile();
 
     return (
-        <section className="relative overflow-hidden border-b py-24 lg:py-32">
+        <section className="relative overflow-hidden border-b py-12 md:py-16 lg:py-20">
             {/* Blurred texture background */}
             <div className="absolute inset-0 -z-10">
                 <div className="absolute top-0 -right-40 h-96 w-[500px] rotate-12 rounded-[40%_60%_70%_30%] bg-secondary/10 blur-3xl"></div>
