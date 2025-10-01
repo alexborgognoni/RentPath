@@ -60,7 +60,7 @@ export function TopFeaturesSection() {
                                             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary transition-transform duration-300 group-hover:scale-110">
                                                 <Icon className="h-8 w-8 text-white" />
                                             </div>
-                                            <div className="mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
+                                            <div className="mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-center text-3xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
                                                 {feature.title}
                                             </div>
                                             <p className="text-base leading-relaxed text-muted-foreground">{feature.description}</p>
@@ -85,7 +85,7 @@ export function TopFeaturesSection() {
                                         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary transition-transform duration-300 group-hover:scale-110">
                                             <Icon className="h-7 w-7 text-white" />
                                         </div>
-                                        <div className="mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-2xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
+                                        <div className="mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-center text-2xl font-bold text-transparent transition-transform duration-300 group-hover:scale-110">
                                             {feature.title}
                                         </div>
                                         <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
