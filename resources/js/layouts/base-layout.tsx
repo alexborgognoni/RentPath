@@ -1,5 +1,4 @@
 import { AppHeader } from '@/components/app-header';
-import { ParallaxBackground } from '@/components/parallax-background';
 import { type BreadcrumbItem } from '@/types';
 import type { PropsWithChildren } from 'react';
 
@@ -14,11 +13,6 @@ export function BaseLayout({ children, breadcrumbs, title, showBackground = true
     if (variant === 'public') {
         return (
             <div className="min-h-screen">
-                {showBackground && (
-                    <div className="absolute inset-0 min-h-full w-full">
-                        <ParallaxBackground />
-                    </div>
-                )}
                 <div className="relative z-10">
                     <AppHeader breadcrumbs={breadcrumbs} title={title} />
                     {children}
@@ -29,11 +23,6 @@ export function BaseLayout({ children, breadcrumbs, title, showBackground = true
 
     return (
         <div className="relative flex min-h-screen w-full flex-col bg-background">
-            {showBackground && (
-                <div className="absolute inset-0 min-h-full w-full">
-                    <ParallaxBackground />
-                </div>
-            )}
             <div className="relative z-10 flex flex-col min-h-screen">
                 <AppHeader breadcrumbs={breadcrumbs} title={title} />
                 {children}
