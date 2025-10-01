@@ -446,10 +446,6 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             value={data.phone_prefix}
                                             onChange={(e) => setData('phone_prefix', e.target.value)}
                                             className={`w-full appearance-none overflow-hidden rounded-md border py-2 pr-10 pl-3 text-ellipsis whitespace-nowrap shadow-sm focus:ring-2 focus:ring-primary/20 focus:outline-none cursor-pointer ${getFieldClassName('phone_number')} [&>option]:cursor-pointer`}
-                                            style={{
-                                                maxHeight: '120px',
-                                                overflowY: 'auto',
-                                            }}
                                         >
                                             <option value="+93">🇦🇫 Afghanistan +93</option>
                                             <option value="+355">🇦🇱 Albania +355</option>
