@@ -146,7 +146,7 @@ export function BenefitsSection() {
                             {BENEFITS.map((benefit, idx) => {
                                 const Icon = benefit.icon;
                                 return (
-                                    <div key={idx} className="flex items-center">
+                                    <div key={idx} className="flex items-start">
                                         <div
                                             className={`mr-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${benefit.gradient}`}
                                         >
@@ -189,7 +189,7 @@ export function BenefitsSection() {
                                 {/* Benefits */}
                                 <div className="mb-4 space-y-3">
                                     {TRIAL_BENEFITS.map((text, idx) => (
-                                        <div key={idx} className="flex items-center text-muted-foreground">
+                                        <div key={idx} className="flex items-center text-left text-muted-foreground">
                                             <CheckCircle className="mr-3 h-5 w-5 flex-shrink-0 text-primary" />
                                             <span className="font-medium">{text}</span>
                                         </div>
