@@ -1,4 +1,3 @@
-import { ParallaxBackground } from '@/components/parallax-background';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -9,7 +8,6 @@ export function HeroSection() {
 
     return (
         <section className="relative overflow-hidden border-b py-24 lg:py-32">
-            <ParallaxBackground containToSection />
             <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
                 {/* Heading */}
                 <motion.h1
@@ -53,7 +51,7 @@ export function HeroSection() {
                 >
                     <a
                         href="/register"
-                        className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-8 py-4 text-center text-lg font-semibold whitespace-nowrap shadow-lg transition-all hover:scale-105"
+                        className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-8 py-4 text-center text-lg font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105"
                     >
                         {auth.user
                             ? translate(translations, 'landing.hero.cta_primary_auth')
@@ -61,7 +59,7 @@ export function HeroSection() {
                     </a>
                     <a
                         href="#problems"
-                        className="min-w-[200px] rounded-lg border border-border bg-surface px-8 py-4 text-center text-lg font-semibold whitespace-nowrap text-foreground transition-all hover:bg-surface/80"
+                        className="min-w-[200px] rounded-lg border border-border bg-surface px-8 py-4 text-center text-lg font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80"
                     >
                         {translate(translations, 'landing.hero.cta_secondary')}
                     </a>

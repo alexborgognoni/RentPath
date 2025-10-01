@@ -217,7 +217,7 @@ export function DemoCarouselSection() {
 
     return (
         <section id="problems" className="relative overflow-hidden bg-background py-24">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5"></div>
+            <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5"></div>
 
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
@@ -232,7 +232,7 @@ export function DemoCarouselSection() {
 
                 {/* Carousel */}
                 <div className="relative mb-12 md:mb-20 -mx-4 sm:mx-0">
-                    <div className="relative overflow-hidden md:rounded-3xl md:border md:border-border md:bg-gradient-to-br md:from-card/80 md:to-surface/50 md:shadow-2xl md:backdrop-blur-xl">
+                    <div className="relative overflow-hidden md:rounded-3xl md:border md:border-border md:bg-gradient-to-br md:from-card/80 md:to-surface/50 md:shadow-2xl">
                         <div
                             ref={carouselRef}
                             className="relative h-[650px] sm:h-[600px] md:h-[700px] overflow-hidden touch-pan-y select-none bg-background md:bg-transparent"
@@ -260,7 +260,7 @@ export function DemoCarouselSection() {
                                                 {/* Top Section - Demo Screenshot */}
                                                 <div className="flex-shrink-0" id="demo-card">
                                                     <div className="group relative mx-auto mb-6 sm:mb-6 md:mb-8">
-                                                        <div className="mx-auto flex h-full w-full sm:h-40 sm:w-80 md:h-56 md:w-96 sm:rounded-2xl sm:border sm:border-primary/30 sm:bg-gradient-to-br sm:from-primary/20 sm:via-secondary/20 sm:to-accent/20 items-center justify-center sm:shadow-2xl sm:backdrop-blur-sm transition-all duration-300 group-hover:scale-105 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 py-12">
+                                                        <div className="mx-auto flex h-full w-full sm:h-40 sm:w-80 md:h-56 md:w-96 sm:rounded-2xl sm:border sm:border-primary/30 sm:bg-gradient-to-br sm:from-primary/20 sm:via-secondary/20 sm:to-accent/20 items-center justify-center sm:shadow-2xl md:transition-all md:duration-300 md:group-hover:scale-105 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 py-12">
                                                             <div className="absolute inset-0 sm:rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10"></div>
                                                             <div className="relative">
                                                                 <div className="mx-auto mb-2 sm:mb-3 flex h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary">
@@ -271,8 +271,6 @@ export function DemoCarouselSection() {
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                        {/* Glow Effect */}
-                                                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 opacity-50 blur-xl transition-opacity duration-300 group-hover:opacity-75 hidden sm:block"></div>
                                                     </div>
                                                 </div>
 
@@ -292,9 +290,9 @@ export function DemoCarouselSection() {
                                                         {slide.features.map((feature, i) => (
                                                             <div
                                                                 key={i}
-                                                                className="group flex items-start space-x-3 sm:space-x-3 md:space-x-4 rounded-xl sm:rounded-lg md:rounded-xl border border-primary/20 bg-gradient-to-r from-surface/50 to-card/50 p-3.5 sm:p-3 md:p-4 lg:p-5 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10"
+                                                                className="group flex items-start space-x-3 sm:space-x-3 md:space-x-4 rounded-xl sm:rounded-lg md:rounded-xl border border-primary/20 bg-gradient-to-r from-surface/50 to-card/50 p-3.5 sm:p-3 md:p-4 lg:p-5 md:transition-all md:duration-300 md:hover:border-primary/40 md:hover:shadow-lg md:hover:shadow-primary/10"
                                                             >
-                                                                <div className="flex h-6 w-6 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 flex-shrink-0 items-center justify-center rounded-lg sm:rounded-md md:rounded-lg bg-gradient-to-br from-primary to-secondary transition-transform duration-300 group-hover:scale-110">
+                                                                <div className="flex h-6 w-6 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 flex-shrink-0 items-center justify-center rounded-lg sm:rounded-md md:rounded-lg bg-gradient-to-br from-primary to-secondary md:transition-transform md:duration-300 md:group-hover:scale-110">
                                                                     <Check className="h-3.5 w-3.5 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4 text-white" />
                                                                 </div>
                                                                 <span className="text-left text-[15px] sm:text-sm md:text-base font-medium text-foreground leading-relaxed">{feature}</span>
@@ -311,26 +309,26 @@ export function DemoCarouselSection() {
                             {/* Mobile Chevron Buttons - At center of demo card */}
                             <button
                                 onClick={prevSlide}
-                                className="absolute left-2 top-[100px] z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20"
+                                className="absolute left-2 top-[100px] z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
                             >
-                                <ChevronLeft className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
+                                <ChevronLeft className="h-5 w-5 text-foreground/80" />
                             </button>
                             <button
                                 onClick={nextSlide}
-                                className="absolute right-2 top-[100px] z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20"
+                                className="absolute right-2 top-[100px] z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
                             >
-                                <ChevronRight className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
+                                <ChevronRight className="h-5 w-5 text-foreground/80" />
                             </button>
                         </div>
                     </div>
 
                     {/* Navigation Dots - Below content for all sizes */}
                     <div className="mt-8 flex justify-center">
-                        <div className="relative flex items-center rounded-full border border-border/30 bg-gradient-to-r from-primary/5 via-primary/4 via-secondary/4 to-secondary/5 px-6 py-3 shadow-lg backdrop-blur-xl">
+                        <div className="relative flex items-center rounded-full border border-border/30 bg-gradient-to-r from-primary/5 via-primary/4 via-secondary/4 to-secondary/5 px-6 py-3 shadow-lg">
                             {/* Desktop Chevrons */}
                             <button
                                 onClick={prevSlide}
-                                className="hidden md:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 mr-6"
+                                className="hidden md:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 mr-6"
                             >
                                 <ChevronLeft className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
@@ -342,7 +340,7 @@ export function DemoCarouselSection() {
                                         onClick={() => goToSlide(index)}
                                         className={`cursor-pointer transition-all duration-300 ${index === (activeSlide % NUM_SLIDES)
                                                 ? 'h-3 w-8 rounded-full bg-gradient-to-r from-primary to-secondary shadow-sm'
-                                                : 'h-3 w-3 rounded-full bg-muted/40 backdrop-blur-sm hover:scale-125 hover:bg-muted/60'
+                                                : 'h-3 w-3 rounded-full bg-muted/40 hover:scale-125 hover:bg-muted/60'
                                             }`}
                                     />
                                 ))}
@@ -351,7 +349,7 @@ export function DemoCarouselSection() {
                             {/* Desktop Chevrons */}
                             <button
                                 onClick={nextSlide}
-                                className="hidden md:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 ml-6"
+                                className="hidden md:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 ml-6"
                             >
                                 <ChevronRight className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>

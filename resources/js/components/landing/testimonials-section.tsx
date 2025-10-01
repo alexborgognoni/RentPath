@@ -89,9 +89,9 @@ export function TestimonialsSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: index * 0.2 }}
                             viewport={{ once: false, amount: 0.3 }}
-                            className="group relative rounded-2xl border border-border bg-card/50 p-8 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl hover:shadow-primary/10"
+                            className="group relative rounded-2xl border border-border bg-card/50 p-8 shadow-lg md:transition-all md:duration-300 md:hover:shadow-xl md:hover:shadow-primary/10"
                         >
-                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                            <div className="hidden md:block absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                             <div className="relative">
                                 {/* Rating */}
