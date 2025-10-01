@@ -12,6 +12,11 @@ resource "aws_codebuild_project" "build" {
     image           = "aws/codebuild/standard:7.0" # supports PHP, Node.js
     type            = "LINUX_CONTAINER"
     privileged_mode = true # needed if you use npm/yarn builds
+
+    environment_variable {
+      name  = "VITE_APP_NAME"
+      value = var.eb_laravel_config.app_name
+    }
   }
 
   source {
