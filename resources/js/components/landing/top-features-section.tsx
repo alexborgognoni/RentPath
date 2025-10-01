@@ -31,7 +31,7 @@ export function TopFeaturesSection() {
             {/* Background Effects */}
             <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5"></div>
 
-            <div className="relative z-10 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="relative z-10 mx-auto max-w-7xl xs:px-4 sm:px-6 lg:px-8">
                 {/* ROI Callout */}
                 <div className="mb-20">
                     {/* Heading and Subtitle */}
@@ -45,9 +45,9 @@ export function TopFeaturesSection() {
                     </div>
 
                     {/* Desktop Card Wrapper */}
-                    <div className="hidden sm:block relative rounded-3xl border border-border bg-card/50 p-8 md:p-12 shadow-2xl">
+                    <div className="hidden xs:block relative rounded-3xl border border-border bg-card/50 p-8 md:p-12 shadow-2xl">
                         <div className="hidden md:block absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/5 to-secondary/5"></div>
-                        <div className="relative z-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="relative z-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
                             {FEATURES.map((feature, idx) => {
                                 const Icon = feature.icon;
                                 return (
@@ -72,7 +72,7 @@ export function TopFeaturesSection() {
                     </div>
 
                     {/* Mobile Feature Cards - Full Width */}
-                    <div className="sm:hidden grid grid-cols-1 gap-6 px-4">
+                    <div className="xs:hidden grid grid-cols-1 gap-6 px-4">
                         {FEATURES.map((feature, idx) => {
                             const Icon = feature.icon;
                             return (
