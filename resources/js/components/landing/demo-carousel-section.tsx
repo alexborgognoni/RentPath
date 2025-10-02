@@ -340,7 +340,7 @@ export function DemoCarouselSection() {
                                         onClick={() => goToSlide(index)}
                                         className={`cursor-pointer transition-all duration-300 ${index === (activeSlide % NUM_SLIDES)
                                                 ? 'h-3 w-8 rounded-full bg-gradient-to-r from-primary to-secondary shadow-sm'
-                                                : 'h-3 w-3 rounded-full bg-muted/40 hover:scale-125 hover:bg-muted/60'
+                                                : 'h-3 w-3 rounded-full bg-muted-foreground/20 hover:scale-125 hover:bg-muted-foreground/40'
                                             }`}
                                     />
                                 ))}
