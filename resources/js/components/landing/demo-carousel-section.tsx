@@ -44,6 +44,8 @@ export function DemoCarouselSection() {
                 translate(translations, `landing.demo_carousel.slides.automated_review.features[2]` as const),
                 translate(translations, `landing.demo_carousel.slides.automated_review.features[3]` as const),
             ],
+            imagePathLight: '/images/demo_features/light/demo_feature_3.png',
+            imagePathDark: '/images/demo_features/dark/demo_feature_3.png',
         },
         {
             id: 4,
@@ -55,6 +57,8 @@ export function DemoCarouselSection() {
                 translate(translations, `landing.demo_carousel.slides.progress_visibility.features[2]` as const),
                 translate(translations, `landing.demo_carousel.slides.progress_visibility.features[3]` as const),
             ],
+            imagePathLight: '/images/demo_features/light/demo_feature_4.png',
+            imagePathDark: '/images/demo_features/dark/demo_feature_4.png',
         },
         {
             id: 5,
@@ -66,6 +70,8 @@ export function DemoCarouselSection() {
                 translate(translations, `landing.demo_carousel.slides.smart_followup.features[2]` as const),
                 translate(translations, `landing.demo_carousel.slides.smart_followup.features[3]` as const),
             ],
+            imagePathLight: '/images/demo_features/light/demo_feature_5.png',
+            imagePathDark: '/images/demo_features/dark/demo_feature_5.png',
         },
         {
             id: 6,
@@ -77,6 +83,8 @@ export function DemoCarouselSection() {
                 translate(translations, `landing.demo_carousel.slides.digital_inspections.features[2]` as const),
                 translate(translations, `landing.demo_carousel.slides.digital_inspections.features[3]` as const),
             ],
+            imagePathLight: '/images/demo_features/light/demo_feature_6.png',
+            imagePathDark: '/images/demo_features/dark/demo_feature_6.png',
         },
         {
             id: 7,
@@ -88,6 +96,8 @@ export function DemoCarouselSection() {
                 translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[2]` as const),
                 translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[3]` as const),
             ],
+            imagePathLight: '/images/demo_features/light/demo_feature_7.png',
+            imagePathDark: '/images/demo_features/dark/demo_feature_7.png',
         },
     ];
 
