@@ -22,7 +22,7 @@ export function HeroSection() {
                     initial={isMobile ? false : { opacity: 0, y: 20 }}
                     whileInView={isMobile ? false : { opacity: 1, y: 0 }}
                     transition={isMobile ? undefined : { duration: 0.8 }}
-                    viewport={isMobile ? undefined : { once: false, amount: 0.6 }}
+                    viewport={isMobile ? undefined : { once: true, amount: 0.6 }}
                     className="text-text-primary dark:text-text-primary mb-8 text-5xl leading-tight font-bold lg:text-7xl"
                 >
                     {translate(translations, 'landing.hero.heading_primary')}
@@ -31,7 +31,7 @@ export function HeroSection() {
                         initial={isMobile ? false : { backgroundPosition: '200% 0' }}
                         whileInView={isMobile ? false : { backgroundPosition: '0% 0' }}
                         transition={isMobile ? undefined : { duration: 1.5, ease: 'easeOut' }}
-                        viewport={isMobile ? undefined : { once: false }}
+                        viewport={isMobile ? undefined : { once: true }}
                         className="inline-block bg-gradient-to-r from-primary to-secondary bg-[length:200%_100%] bg-clip-text text-transparent"
                     >
                         {translate(translations, 'landing.hero.heading_highlighted')}
@@ -43,7 +43,7 @@ export function HeroSection() {
                     initial={isMobile ? false : { opacity: 0 }}
                     whileInView={isMobile ? false : { opacity: 1 }}
                     transition={isMobile ? undefined : { delay: 0.3, duration: 1 }}
-                    viewport={isMobile ? undefined : { once: false, amount: 0.6 }}
+                    viewport={isMobile ? undefined : { once: true, amount: 0.6 }}
                     className="mx-auto mb-12 max-w-3xl text-xl text-muted-foreground lg:text-2xl"
                 >
                     {translate(translations, 'landing.hero.subtitle')}
@@ -51,10 +51,10 @@ export function HeroSection() {
 
                 {/* CTAs */}
                 <motion.div
-                    initial={isMobile ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-                    whileInView={isMobile ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
-                    transition={isMobile ? { duration: 0 } : { delay: 0.5, duration: 0.6 }}
-                    viewport={{ once: false, amount: 0.6 }}
+                    initial={isMobile ? false : { opacity: 0, scale: 0.95 }}
+                    whileInView={isMobile ? false : { opacity: 1, scale: 1 }}
+                    transition={isMobile ? undefined : { delay: 0.5, duration: 0.6 }}
+                    viewport={isMobile ? undefined : { once: true, amount: 0.6 }}
                     className="flex flex-col justify-center gap-6 sm:flex-row"
                 >
                     <a
