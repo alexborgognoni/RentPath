@@ -277,12 +277,12 @@ export function DemoCarouselSection() {
                             >
                                 {/* Render slides 3 times for infinite loop effect */}
                                 {[...SLIDES, ...SLIDES, ...SLIDES].map((slide, idx) => (
-                                    <div key={`${slide.id}-${idx}`} className="border-r border-border/30 last:border-r-0 grid grid-rows-subgrid row-span-3">
-                                        <div className="relative grid grid-rows-subgrid row-span-3 gap-6">
+                                    <div key={`${slide.id}-${idx}`} className="grid grid-rows-subgrid row-span-3">
+                                        <div className="relative grid grid-rows-subgrid row-span-3">
                                             {/* Mobile Layout */}
                                             <div className="relative z-10 mx-auto max-w-5xl text-center contents lg:hidden">
                                                 {/* Top Section - Demo Screenshot */}
-                                                <div ref={idx === NUM_SLIDES ? imageRowRef : null} className="flex items-end justify-center bg-background" id="demo-card">
+                                                <div ref={idx === NUM_SLIDES ? imageRowRef : null} className="flex items-end justify-center bg-background pb-6" id="demo-card">
                                                     <div className="group relative w-full">
                                                         <div
                                                             className="mx-auto flex w-full items-end justify-center overflow-hidden relative cursor-pointer bg-background"
@@ -334,7 +334,7 @@ export function DemoCarouselSection() {
                                                 </div>
 
                                                 {/* Middle Section - Title and Description */}
-                                                <div className="px-8 sm:px-11 md:px-15">
+                                                <div className="px-8 pt-8 sm:px-11 sm:pt-10 md:px-15 md:pt-12 border-r border-border/30">
                                                     <h3 className="mb-3 sm:mb-4 md:mb-6 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-2xl sm:text-3xl md:text-4xl leading-tight font-bold text-transparent">
                                                         {slide.title}
                                                     </h3>
@@ -344,7 +344,7 @@ export function DemoCarouselSection() {
                                                 </div>
 
                                                 {/* Bottom Section - Feature Boxes */}
-                                                <div className="px-8 pb-6 sm:px-11 sm:pb-8 md:px-15 md:pb-12">
+                                                <div className="px-8 py-6 sm:px-11 sm:py-6 md:px-15 md:py-6 border-r border-border/30">
                                                     <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 sm:gap-2 md:gap-4 md:grid-cols-2">
                                                         {slide.features.map((feature, i) => (
                                                             <div
