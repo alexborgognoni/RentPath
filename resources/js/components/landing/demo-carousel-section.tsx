@@ -7,6 +7,28 @@ export function DemoCarouselSection() {
     const { translations } = usePage<SharedData>().props;
     const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
+    // Handle fullscreen modal
+    useEffect(() => {
+        if (fullscreenImage) {
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+
+            // Handle Esc key
+            const handleEscape = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') {
+                    setFullscreenImage(null);
+                }
+            };
+
+            document.addEventListener('keydown', handleEscape);
+
+            return () => {
+                document.body.style.overflow = '';
+                document.removeEventListener('keydown', handleEscape);
+            };
+        }
+    }, [fullscreenImage]);
+
     const SLIDES = [
         {
             id: 1,
@@ -75,6 +97,10 @@ export function DemoCarouselSection() {
 
     useEffect(() => {
         if (intervalRef.current) clearInterval(intervalRef.current);
+
+        // Don't auto-slide when in fullscreen mode
+        if (fullscreenImage) return;
+
         const delay = isManuallyControlled ? 15000 : 5000;
         intervalRef.current = setInterval(() => {
             setActiveSlide((prev) => prev + 1);
@@ -84,7 +110,7 @@ export function DemoCarouselSection() {
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [isManuallyControlled]);
+    }, [isManuallyControlled, fullscreenImage]);
 
     // Reset position without animation when reaching edges
     useEffect(() => {
@@ -211,7 +237,7 @@ export function DemoCarouselSection() {
                     <div className="relative overflow-hidden md:rounded-3xl md:border md:border-border md:bg-gradient-to-br md:from-card/80 md:to-surface/50 md:shadow-2xl">
                         <div
                             ref={carouselRef}
-                            className="relative h-[650px] sm:h-[600px] md:h-[700px] overflow-hidden touch-pan-y select-none bg-surface md:bg-transparent"
+                            className="relative min-h-[650px] sm:min-h-[600px] md:h-[700px] overflow-hidden touch-pan-y select-none bg-surface md:bg-transparent"
                             onMouseDown={handleMouseDown}
                             onMouseMove={handleMouseMove}
                             onMouseUp={handleMouseUp}
@@ -233,7 +259,7 @@ export function DemoCarouselSection() {
                                     <div key={`${slide.id}-${idx}`} className="h-full w-full flex-shrink-0">
                                         <div className="relative flex h-full flex-col px-5 pb-6 pt-0 sm:p-8 md:p-12">
                                             {/* Mobile Layout */}
-                                            <div className="relative z-10 mx-auto max-w-5xl text-center flex flex-col justify-between h-full w-full lg:hidden">
+                                            <div className="relative z-10 mx-auto max-w-5xl text-center flex flex-col h-full w-full lg:hidden">
                                                 {/* Top Section - Demo Screenshot */}
                                                 <div className="flex-shrink-0" id="demo-card">
                                                     <div className="group relative -mx-5 mb-6 sm:mx-auto sm:mb-6 md:mb-8">
@@ -287,7 +313,7 @@ export function DemoCarouselSection() {
                                                 </div>
 
                                                 {/* Middle Section - Title and Description */}
-                                                <div className="flex-grow flex flex-col justify-center min-h-[120px] sm:min-h-[140px] md:min-h-[160px] mb-6">
+                                                <div className="flex-shrink-0 mb-6">
                                                     <h3 className="mb-3 sm:mb-4 md:mb-6 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-2xl sm:text-3xl md:text-4xl leading-tight font-bold text-transparent">
                                                         {slide.title}
                                                     </h3>
@@ -459,7 +485,7 @@ export function DemoCarouselSection() {
                 >
                     <button
                         onClick={() => setFullscreenImage(null)}
-                        className="absolute right-4 top-4 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all hover:bg-black/80"
+                        className="absolute right-4 top-4 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all hover:bg-black/80 cursor-pointer"
                     >
                         <X className="h-6 w-6 text-white" />
                     </button>
