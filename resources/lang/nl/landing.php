@@ -31,8 +31,8 @@ return [
 
     // Demo Carousel Section
     'demo_carousel' => [
-        'heading' => 'Gestroomlijnd van Eerste Interesse tot Intrek',
-        'subtitle' => 'Handmatige beoordelingen, gemiste aanvragen, rommelige communicatie - verhuur is inefficiënt. ons platform stroomlijnt de huurder reis.',
+        'heading' => 'Klik. Nodig uit. Huur.',
+        'subtitle' => 'Handmatige beoordelingen, gemiste aanvragen, rommelige communicatie - verhuur is inefficiënt. Ons platform stroomlijnt het proces van het plaatsen van huurders.',
         'interactive_demo' => 'Interactieve Demo',
         'slides' => [
             "real_time_dashboard" => [
