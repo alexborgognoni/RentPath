@@ -31,7 +31,7 @@ return [
 
     // Demo Carousel Section
     'demo_carousel' => [
-        'heading' => 'Optimiert vom Ersten Interesse bis zum Einzug',
+        'heading' => 'Klicken. Einladen. Vermieten.',
         'subtitle' => 'Manuelle Überprüfungen, verpasste Bewerbungen, chaotische Kommunikation - Vermietungen sind ineffizient. Unsere Plattform optimiert die Mieter-Journey.',
         'interactive_demo' => 'Interaktive Demo',
         'slides' => [

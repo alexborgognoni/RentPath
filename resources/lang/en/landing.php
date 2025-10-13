@@ -31,7 +31,7 @@ return [
 
     // Demo Carousel Section
     'demo_carousel' => [
-        'heading' => 'Streamlined from First Interest to Move-In',
+        'heading' => 'Click. Invite. Lease.',
         'subtitle' => 'Manual reviews, missed applications, messy communication - rentals are inefficient. Our platform streamlines the tenant journey.',
         'interactive_demo' => 'Interactive Demo',
         'slides' => [

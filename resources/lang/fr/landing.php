@@ -31,7 +31,7 @@ return [
 
     // Demo Carousel Section
     'demo_carousel' => [
-        'heading' => 'Simplifié du Premier Intérêt à l\'Emménagement',
+        'heading' => 'Cliquer. Inviter. Louer.',
         'subtitle' => 'Examens manuels, candidatures manquées, communication désordonnée - la location est inefficace. Notre plateforme simplifie le parcours locataire.',
         'interactive_demo' => 'Démo Interactive',
         'slides' => [
