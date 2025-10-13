@@ -75,36 +75,6 @@ return [
                     'Knelpunt identificatie',
                 ],
             ],
-            "smart_followup" => [
-                'title' => 'Slim Follow-up Systeem',
-                'description' => 'Geautomatiseerde herinneringen en follow-ups houden aanvragers in beweging, vermindert leegstand dagen.',
-                'features' => [
-                    'Geautomatiseerde herinnerings emails',
-                    'Aanvraag herstel voor vastgelopen inzendingen',
-                    'Follow-up planning',
-                    'Conversie optimalisatie',
-                ],
-            ],
-            "digital_inspections" => [
-                'title' => 'Digitale Eigendom Inspecties',
-                'description' => 'Leg intrek/uittrek condities digitaal vast, met foto\'s, notities en volledige geschiedenis voor transparantie en efficiëntie.',
-                'features' => [
-                    'Foto-gedocumenteerde inspecties',
-                    'Volledige inspectie geschiedenis',
-                    'Digitale rapport generatie',
-                    'Intrek & uittrek tracking',
-                ],
-            ],
-            "landlord_reporting" => [
-                'title' => 'Professionele Verhuurder Rapportage',
-                'description' => 'Houd verhuurders geïnformeerd met geautomatiseerde updates, huurder validatie en professionele rapporten.',
-                'features' => [
-                    'Geautomatiseerde rapport generatie',
-                    'Geautomatiseerde huurder validatie',
-                    'Professionele voortgang updates',
-                    'Live klant communicatie',
-                ],
-            ],
         ],
     ],
 

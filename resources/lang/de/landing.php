@@ -75,36 +75,6 @@ return [
                     'Engpass-Identifikation',
                 ],
             ],
-            "smart_followup" => [
-                'title' => 'Intelligentes Nachfass-System',
-                'description' => 'Automatische Erinnerungen halten Bewerber am Ball und reduzieren Leerstände.',
-                'features' => [
-                    'Automatisierte Erinnerungs-E-Mails',
-                    'Abgebrochene Bewerbungen reaktivieren',
-                    'Folgeterminplanung',
-                    'Konversionsoptimierung',
-                ],
-            ],
-            "digital_inspections" => [
-                'title' => 'Digitale Immobilienbesichtigungen',
-                'description' => 'Erfassen Sie Ein-/Auszugszustände digital, mit Fotos, Notizen und vollständiger Historie für Transparenz und Effizienz.',
-                'features' => [
-                    'Foto-dokumentierte Besichtigungen',
-                    'Vollständige Besichtigungshistorie',
-                    'Digitale Berichtsgenerierung',
-                    'Ein- und Auszugsverfolgung',
-                ],
-            ],
-            "landlord_reporting" => [
-                'title' => 'Professionelle Vermieter-Berichte',
-                'description' => 'Halten Sie Vermieter mit automatisierten Updates, Mietervalidierung und professionellen Berichten informiert.',
-                'features' => [
-                    'Automatisierte Berichtsgenerierung',
-                    'Automatisierte Mietervalidierung',
-                    'Professionelle Fortschrittsupdates',
-                    'Live-Kundenkommunikation',
-                ],
-            ],
         ],
     ],
 

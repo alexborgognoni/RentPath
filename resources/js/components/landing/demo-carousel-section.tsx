@@ -60,48 +60,9 @@ export function DemoCarouselSection() {
             imagePathLight: '/images/demo_features/light/demo_feature_4.png',
             imagePathDark: '/images/demo_features/dark/demo_feature_4.png',
         },
-        {
-            id: 5,
-            title: translate(translations, `landing.demo_carousel.slides.smart_followup.title` as const),
-            description: translate(translations, `landing.demo_carousel.slides.smart_followup.description` as const),
-            features: [
-                translate(translations, `landing.demo_carousel.slides.smart_followup.features[0]` as const),
-                translate(translations, `landing.demo_carousel.slides.smart_followup.features[1]` as const),
-                translate(translations, `landing.demo_carousel.slides.smart_followup.features[2]` as const),
-                translate(translations, `landing.demo_carousel.slides.smart_followup.features[3]` as const),
-            ],
-            imagePathLight: '/images/demo_features/light/demo_feature_5.png',
-            imagePathDark: '/images/demo_features/dark/demo_feature_5.png',
-        },
-        {
-            id: 6,
-            title: translate(translations, `landing.demo_carousel.slides.digital_inspections.title` as const),
-            description: translate(translations, `landing.demo_carousel.slides.digital_inspections.description` as const),
-            features: [
-                translate(translations, `landing.demo_carousel.slides.digital_inspections.features[0]` as const),
-                translate(translations, `landing.demo_carousel.slides.digital_inspections.features[1]` as const),
-                translate(translations, `landing.demo_carousel.slides.digital_inspections.features[2]` as const),
-                translate(translations, `landing.demo_carousel.slides.digital_inspections.features[3]` as const),
-            ],
-            imagePathLight: '/images/demo_features/light/demo_feature_6.png',
-            imagePathDark: '/images/demo_features/dark/demo_feature_6.png',
-        },
-        {
-            id: 7,
-            title: translate(translations, `landing.demo_carousel.slides.landlord_reporting.title` as const),
-            description: translate(translations, `landing.demo_carousel.slides.landlord_reporting.description` as const),
-            features: [
-                translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[0]` as const),
-                translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[1]` as const),
-                translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[2]` as const),
-                translate(translations, `landing.demo_carousel.slides.landlord_reporting.features[3]` as const),
-            ],
-            imagePathLight: '/images/demo_features/light/demo_feature_7.png',
-            imagePathDark: '/images/demo_features/dark/demo_feature_7.png',
-        },
     ];
 
-    const NUM_SLIDES = 7;
+    const NUM_SLIDES = 4;
 
     const [activeSlide, setActiveSlide] = useState(NUM_SLIDES); // Start from middle set
     const [isManuallyControlled, setIsManuallyControlled] = useState(false);
