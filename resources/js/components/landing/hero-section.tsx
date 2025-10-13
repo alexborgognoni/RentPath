@@ -51,10 +51,11 @@ export function HeroSection() {
 
                 {/* CTAs */}
                 <motion.div
-                    initial={isMobile ? false : { opacity: 0, scale: 0.95 }}
-                    whileInView={isMobile ? false : { opacity: 1, scale: 1 }}
-                    transition={isMobile ? undefined : { delay: 0.5, duration: 0.6 }}
-                    viewport={isMobile ? undefined : { once: true, amount: 0.6 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    initial={isMobile ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+                    whileInView={isMobile ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
+                    transition={isMobile ? { duration: 0 } : { delay: 0.5, duration: 0.6 }}
+                    viewport={{ once: true, amount: 0.6 }}
                     className="flex flex-col justify-center gap-6 sm:flex-row"
                 >
                     <a
