@@ -6,28 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 export function DemoCarouselSection() {
     const { translations } = usePage<SharedData>().props;
     const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
-
-    // Handle fullscreen modal
-    useEffect(() => {
-        if (fullscreenImage) {
-            // Prevent body scroll
-            document.body.style.overflow = 'hidden';
-
-            // Handle Esc key
-            const handleEscape = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') {
-                    setFullscreenImage(null);
-                }
-            };
-
-            document.addEventListener('keydown', handleEscape);
-
-            return () => {
-                document.body.style.overflow = '';
-                document.removeEventListener('keydown', handleEscape);
-            };
-        }
-    }, [fullscreenImage]);
+    const imageRowRef = useRef<HTMLDivElement | null>(null);
 
     const SLIDES = [
         {
@@ -94,6 +73,46 @@ export function DemoCarouselSection() {
     const [isTransitioning, setIsTransitioning] = useState(true);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const carouselRef = useRef<HTMLDivElement>(null);
+
+    // Handle fullscreen modal
+    useEffect(() => {
+        if (fullscreenImage) {
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+
+            // Handle Esc key
+            const handleEscape = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') {
+                    setFullscreenImage(null);
+                }
+            };
+
+            document.addEventListener('keydown', handleEscape);
+
+            return () => {
+                document.body.style.overflow = '';
+                document.removeEventListener('keydown', handleEscape);
+            };
+        }
+    }, [fullscreenImage]);
+
+    // Set image row height as CSS variable
+    useEffect(() => {
+        const updateImageRowHeight = () => {
+            if (imageRowRef.current && carouselRef.current) {
+                const imageRow = imageRowRef.current;
+                const rowHeight = imageRow.offsetHeight;
+                carouselRef.current.style.setProperty('--image-row-height', `${rowHeight}px`);
+            }
+        };
+
+        updateImageRowHeight();
+        window.addEventListener('resize', updateImageRowHeight);
+
+        return () => {
+            window.removeEventListener('resize', updateImageRowHeight);
+        };
+    }, [activeSlide]);
 
     useEffect(() => {
         if (intervalRef.current) clearInterval(intervalRef.current);
@@ -247,24 +266,26 @@ export function DemoCarouselSection() {
                             onTouchEnd={handleTouchEnd}
                         >
                             <div
-                                className="flex h-full"
+                                className="grid h-full grid-flow-col"
                                 style={{
-                                    transform: `translateX(calc(-${(activeSlide + NUM_SLIDES) * 100}% + ${dragOffset}px))`,
+                                    gridTemplateColumns: `repeat(${SLIDES.length * 3}, 100%)`,
+                                    gridTemplateRows: 'min-content auto min-content',
+                                    transform: `translateX(calc(-${activeSlide * 100}% + ${dragOffset}px))`,
                                     transition: isDragging || !isTransitioning ? 'none' : 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
                                     cursor: isDragging ? 'grabbing' : 'grab'
                                 }}
                             >
                                 {/* Render slides 3 times for infinite loop effect */}
                                 {[...SLIDES, ...SLIDES, ...SLIDES].map((slide, idx) => (
-                                    <div key={`${slide.id}-${idx}`} className="h-full w-full flex-shrink-0">
-                                        <div className="relative flex h-full flex-col px-5 pb-6 pt-0 sm:p-8 md:p-12">
+                                    <div key={`${slide.id}-${idx}`} className="border-r border-border/30 last:border-r-0 grid grid-rows-subgrid row-span-3">
+                                        <div className="relative grid grid-rows-subgrid row-span-3 gap-6">
                                             {/* Mobile Layout */}
-                                            <div className="relative z-10 mx-auto max-w-5xl text-center flex flex-col h-full w-full lg:hidden">
+                                            <div className="relative z-10 mx-auto max-w-5xl text-center contents lg:hidden">
                                                 {/* Top Section - Demo Screenshot */}
-                                                <div className="flex-shrink-0" id="demo-card">
-                                                    <div className="group relative -mx-5 mb-6 sm:mx-auto sm:mb-6 md:mb-8">
+                                                <div ref={idx === NUM_SLIDES ? imageRowRef : null} className="flex items-end justify-center bg-background" id="demo-card">
+                                                    <div className="group relative w-full">
                                                         <div
-                                                            className="mx-auto flex h-full w-full sm:h-52 sm:w-full sm:max-w-2xl md:h-64 items-center justify-center overflow-hidden relative cursor-pointer"
+                                                            className="mx-auto flex w-full items-end justify-center overflow-hidden relative cursor-pointer bg-background"
                                                             onClick={() => {
                                                                 if (slide.imagePathLight || slide.imagePathDark) {
                                                                     const isDark = document.documentElement.classList.contains('dark');
@@ -279,14 +300,14 @@ export function DemoCarouselSection() {
                                                                         <img
                                                                             src={slide.imagePathLight}
                                                                             alt={slide.title}
-                                                                            className="h-full w-full object-contain dark:hidden transition-all duration-300 group-hover:brightness-75"
+                                                                            className="w-full object-contain object-bottom dark:hidden transition-all duration-300 group-hover:brightness-75 bg-background"
                                                                         />
                                                                     )}
                                                                     {slide.imagePathDark && (
                                                                         <img
                                                                             src={slide.imagePathDark}
                                                                             alt={slide.title}
-                                                                            className="hidden h-full w-full object-contain dark:block transition-all duration-300 group-hover:brightness-75"
+                                                                            className="hidden w-full object-contain object-bottom dark:block transition-all duration-300 group-hover:brightness-75 bg-background"
                                                                         />
                                                                     )}
                                                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -313,7 +334,7 @@ export function DemoCarouselSection() {
                                                 </div>
 
                                                 {/* Middle Section - Title and Description */}
-                                                <div className="flex-shrink-0 mb-6">
+                                                <div className="px-8 sm:px-11 md:px-15">
                                                     <h3 className="mb-3 sm:mb-4 md:mb-6 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-2xl sm:text-3xl md:text-4xl leading-tight font-bold text-transparent">
                                                         {slide.title}
                                                     </h3>
@@ -323,7 +344,7 @@ export function DemoCarouselSection() {
                                                 </div>
 
                                                 {/* Bottom Section - Feature Boxes */}
-                                                <div className="flex-shrink-0">
+                                                <div className="px-8 pb-6 sm:px-11 sm:pb-8 md:px-15 md:pb-12">
                                                     <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 sm:gap-2 md:gap-4 md:grid-cols-2">
                                                         {slide.features.map((feature, i) => (
                                                             <div
@@ -425,16 +446,22 @@ export function DemoCarouselSection() {
                                 ))}
                             </div>
 
-                            {/* Mobile Chevron Buttons - At center of demo card */}
+                            {/* Mobile Chevron Buttons - At center of image row */}
                             <button
                                 onClick={prevSlide}
-                                className="absolute left-2 top-[60px] z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
+                                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
+                                style={{
+                                    top: 'calc(var(--image-row-height, 50%) / 2)'
+                                }}
                             >
                                 <ChevronLeft className="h-5 w-5 text-foreground/80" />
                             </button>
                             <button
                                 onClick={nextSlide}
-                                className="absolute right-2 top-[60px] z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
+                                style={{
+                                    top: 'calc(var(--image-row-height, 50%) / 2)'
+                                }}
                             >
                                 <ChevronRight className="h-5 w-5 text-foreground/80" />
                             </button>
