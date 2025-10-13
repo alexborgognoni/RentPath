@@ -3,8 +3,8 @@
 return [
     // Hero Section
     'hero' => [
-        'heading_primary' => 'Wohnungsbewerbungen Vereinfachen,',
-        'heading_highlighted' => 'Schneller Vermieten.',
+        'heading_primary' => 'Optimierte Mietberwerbungen,',
+        'heading_highlighted' => 'Vom Ersten Interesse bis zum Einzug',
         'subtitle' => 'Nie wieder unvollständige Bewerbungen oder endloses Nachhaken. Einladen, nachverfolgen und sofort reagieren – alles in einem smarten Dashboard.',
         'cta_primary_auth' => 'Zum Dashboard',
         'cta_primary_guest' => 'Jetzt Loslegen',
