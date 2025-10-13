@@ -75,36 +75,6 @@ return [
                     'Bottleneck identification',
                 ],
             ],
-            "smart_followup" => [
-                'title' => 'Smart Follow-up System',
-                'description' => 'Automated reminders and follow-ups keep applicants moving, reducing vacant days.',
-                'features' => [
-                    'Automated reminder emails',
-                    'Application recovery for stalled submissions',
-                    'Follow-up scheduling',
-                    'Conversion optimization',
-                ],
-            ],
-            "digital_inspections" => [
-                'title' => 'Digital Property Inspections',
-                'description' => 'Capture move-in/move-out conditions digitally, with photos, notes, and full history for transparency and efficiency.',
-                'features' => [
-                    'Photo-documented inspections',
-                    'Complete inspection history',
-                    'Digital report generation',
-                    'Move-in & move-out tracking',
-                ],
-            ],
-            "landlord_reporting" => [
-                'title' => 'Professional Landlord Reporting',
-                'description' => 'Keep landlords informed with automated updates, tenant validation, and professional reports.',
-                'features' => [
-                    'Automated report generation',
-                    'Automated tenant validation',
-                    'Professional progress updates',
-                    'Live client communication',
-                ],
-            ],
         ],
     ],
 

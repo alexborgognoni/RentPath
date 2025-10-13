@@ -75,36 +75,6 @@ return [
                     'Identification des zones de blocage',
                 ],
             ],
-            "smart_followup" => [
-                'title' => 'Système de Suivi Intelligent',
-                'description' => 'Les rappels et suivis automatisés maintiennent les candidats en mouvement et réduisent les périodes de vacance des logements.',
-                'features' => [
-                    'Emails de rappel automatisés',
-                    'Récupération de candidatures bloquées',
-                    'Planification de suivi',
-                    'Optimisation de conversion',
-                ],
-            ],
-            "digital_inspections" => [
-                'title' => 'Inspections Immobilières Numériques',
-                'description' => 'Capturez les conditions d\'entrée/sortie numériquement, avec photos, notes et historique complet pour d’avantage de transparence et efficacité.',
-                'features' => [
-                    'Inspections documentées par photo',
-                    'Historique complet d\'inspection',
-                    'Génération de rapports numériques',
-                    'Suivi entrée et sortie',
-                ],
-            ],
-            "landlord_reporting" => [
-                'title' => 'Reportings Propriétaires Professionnels',
-                'description' => 'Tenez les propriétaires informés avec des mises à jour automatisées, validation locataire, et rapports professionnels.',
-                'features' => [
-                    'Génération automatisée de rapports',
-                    'Validation automatisée des locataires',
-                    'Comptes rendus professionnels du progrès',
-                    'Communication client en direct',
-                ],
-            ],
         ],
     ],
 

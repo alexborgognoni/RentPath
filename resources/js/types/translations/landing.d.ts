@@ -48,21 +48,6 @@ interface LandingTranslations {
                 description: string;
                 features: [string, string, string, string];
             };
-            smart_followup: {
-                title: string;
-                description: string;
-                features: [string, string, string, string];
-            };
-            digital_inspections: {
-                title: string;
-                description: string;
-                features: [string, string, string, string];
-            };
-            landlord_reporting: {
-                title: string;
-                description: string;
-                features: [string, string, string, string];
-            };
         };
     };
     value_proposition: {
@@ -198,4 +183,3 @@ interface LandingTranslations {
         };
     };
 }
-
