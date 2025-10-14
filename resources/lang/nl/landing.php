@@ -4,7 +4,7 @@ return [
     // Hero Section
     'hero' => [
         'heading_primary' => 'Gestroomlijnde Huuraanvragen,',
-        'heading_highlighted' => 'van Eerste Interesse tot Verhuizing',
+        'heading_highlighted' => 'Van Eerste Interesse tot Verhuizing',
         'subtitle' => 'Geen incomplete aanvragen of eindeloos achtervolgen meer. Nodig uit, volg en follow-up prospects direct. Alles vanuit één intelligent dashboard.',
         'cta_primary_auth' => 'Naar Dashboard',
         'cta_primary_guest' => 'Aan de Slag',
