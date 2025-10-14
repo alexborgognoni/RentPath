@@ -170,16 +170,20 @@ export function ValuePropositionSection() {
                 </div>
 
                 {/* Feature Grid */}
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:auto-rows-fr">
                     {FEATURES.map((feature) => (
-                        <div key={feature.id} className="relative h-80 rounded-xl border border-border bg-card/50">
-                            <div className="flex h-full flex-col p-8">
+                        <div key={feature.id} className="relative rounded-xl border border-border bg-card/50">
+                            <div className="grid h-full grid-rows-[auto_1fr_auto_auto] p-8">
+                                {/* Icon */}
                                 <div className={`mb-6 flex h-16 w-16 items-center justify-center rounded-lg ${feature.iconBg}`}>{feature.icon}</div>
-                                <div className="flex-grow">
-                                    <h3 className="mb-3 line-clamp-1 text-xl font-bold text-foreground">{feature.title}</h3>
-                                    <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
+                                {/* Title and Description */}
+                                <div>
+                                    <h3 className="mb-3 text-xl font-bold text-foreground">{feature.title}</h3>
+                                    <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
                                 </div>
+                                {/* Divider */}
                                 <div className="my-4 h-px bg-border"></div>
+                                {/* Stats */}
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <div className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-lg font-bold text-transparent">
