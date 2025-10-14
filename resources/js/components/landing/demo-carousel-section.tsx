@@ -252,11 +252,11 @@ export function DemoCarouselSection() {
                 </div>
 
                 {/* Carousel */}
-                <div className="relative mb-12 md:mb-20 -mx-4 sm:mx-0">
+                <div className="relative mb-12 md:mb-20 -mx-4 md:mx-0">
                     <div className="relative overflow-hidden md:rounded-3xl md:border md:border-border md:bg-gradient-to-br md:from-card/80 md:to-surface/50 md:shadow-2xl">
                         <div
                             ref={carouselRef}
-                            className="relative min-h-[650px] sm:min-h-[600px] md:h-[700px] overflow-hidden touch-pan-y select-none bg-surface md:bg-transparent"
+                            className="relative min-h-[650px] sm:min-h-[600px] lg:h-[700px] overflow-hidden touch-pan-y select-none bg-surface lg:bg-transparent"
                             onMouseDown={handleMouseDown}
                             onMouseMove={handleMouseMove}
                             onMouseUp={handleMouseUp}
@@ -345,16 +345,16 @@ export function DemoCarouselSection() {
 
                                                 {/* Bottom Section - Feature Boxes */}
                                                 <div className="px-8 py-6 sm:px-11 sm:py-6 md:px-15 md:py-6 border-r border-border/30">
-                                                    <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 sm:gap-2 md:gap-4 md:grid-cols-2">
+                                                    <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 sm:gap-3.5 md:gap-4 md:grid-cols-2">
                                                         {slide.features.map((feature, i) => (
                                                             <div
                                                                 key={i}
-                                                                className="group flex items-start space-x-3 sm:space-x-3 md:space-x-4 rounded-xl sm:rounded-lg md:rounded-xl border border-primary/20 bg-gradient-to-r from-surface/50 to-card/50 p-3.5 sm:p-3 md:p-4 md:transition-all md:duration-300 md:hover:border-primary/40 md:hover:shadow-lg md:hover:shadow-primary/10"
+                                                                className="group flex items-center space-x-3 sm:space-x-3.5 md:space-x-4 rounded-xl border border-primary/20 bg-gradient-to-r from-surface/50 to-card/50 p-3.5 sm:p-3.5 md:p-4 md:transition-all md:duration-300 md:hover:border-primary/40 md:hover:shadow-lg md:hover:shadow-primary/10"
                                                             >
-                                                                <div className="flex h-6 w-6 sm:h-6 sm:w-6 md:h-7 md:w-7 flex-shrink-0 items-center justify-center rounded-lg sm:rounded-md md:rounded-lg bg-gradient-to-br from-primary to-secondary md:transition-transform md:duration-300 md:group-hover:scale-110">
-                                                                    <Check className="h-3.5 w-3.5 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5 text-white" />
+                                                                <div className="flex h-6 w-6 sm:h-6 sm:w-6 md:h-7 md:w-7 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary md:transition-transform md:duration-300 md:group-hover:scale-110">
+                                                                    <Check className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-white" />
                                                                 </div>
-                                                                <span className="text-left text-[15px] sm:text-sm md:text-base font-medium text-foreground leading-relaxed">{feature}</span>
+                                                                <span className="text-left text-[15px] sm:text-[15px] md:text-base font-medium text-foreground leading-relaxed">{feature}</span>
                                                             </div>
                                                         ))}
                                                     </div>
@@ -449,7 +449,7 @@ export function DemoCarouselSection() {
                             {/* Mobile Chevron Buttons - At center of image row */}
                             <button
                                 onClick={prevSlide}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
+                                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 lg:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
                                 style={{
                                     top: 'calc(var(--image-row-height, 50%) / 2)'
                                 }}
@@ -458,7 +458,7 @@ export function DemoCarouselSection() {
                             </button>
                             <button
                                 onClick={nextSlide}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 md:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 lg:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
                                 style={{
                                     top: 'calc(var(--image-row-height, 50%) / 2)'
                                 }}
@@ -474,7 +474,7 @@ export function DemoCarouselSection() {
                             {/* Desktop Chevrons */}
                             <button
                                 onClick={prevSlide}
-                                className="hidden md:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 mr-6"
+                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 mr-6"
                             >
                                 <ChevronLeft className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
@@ -495,7 +495,7 @@ export function DemoCarouselSection() {
                             {/* Desktop Chevrons */}
                             <button
                                 onClick={nextSlide}
-                                className="hidden md:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 ml-6"
+                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 ml-6"
                             >
                                 <ChevronRight className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
