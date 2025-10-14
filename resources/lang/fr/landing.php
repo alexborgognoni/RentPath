@@ -40,9 +40,9 @@ return [
                 'description' => 'Visibilité sur tous vos biens, suivi des candidatures, inspections, baux et efforts marketing — instantanément.',
                 'features' => [
                     'Pipeline de candidatures en direct',
-                    'Calendrier de baux et marketing',
-                    'Outils d\'inspection conviviaux',
-                    'Reporting rapide pour propriétaires',
+                    'Planification des suivis',
+                    'Rappels automatisés',
+                    'Rapports propriétaires simplifiés',
                 ],
             ],
             "guided_applications" => [
@@ -72,7 +72,7 @@ return [
                     'Statut de candidature en temps réel',
                     'Indicateurs de progrès par candidat',
                     'Suivi des baux immobiliers',
-                    'Identification des zones de blocage',
+                    'Détection des goulots d’étranglement',
                 ],
             ],
         ],

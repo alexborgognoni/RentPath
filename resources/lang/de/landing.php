@@ -40,9 +40,9 @@ return [
                 'description' => 'Sofortige Sichtbarkeit über alle Immobilien, Bewerbungen, Besichtigungen, Verträge und Marketing.',
                 'features' => [
                     'Live-Bewerbungs-Pipeline',
-                    'Miet- und Marketing-Kalender',
-                    'Digitale Zustandsprotokolle',
-                    'Automatische Vermieter-Berichte',
+                    'Planung von Nachverfolgungen',
+                    'Automatische Erinnerungen',
+                    'Einfache Vermieterberichte'
                 ],
             ],
             "guided_applications" => [
@@ -72,7 +72,7 @@ return [
                     'Echtzeit-Bewerbungsstatus',
                     'Fortschrittsindikatoren pro Bewerber',
                     'Mietvertragsverfolgung',
-                    'Engpass-Identifikation',
+                    'Engpasserkennung',
                 ],
             ],
         ],
