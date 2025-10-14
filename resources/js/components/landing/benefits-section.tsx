@@ -181,9 +181,9 @@ export function BenefitsSection() {
                         </div>
 
                         {/* Free Trial Box */}
-                        <div className="relative rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 to-secondary/10 p-8 shadow-xl">
-                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5"></div>
-                            <div className="relative text-center">
+                        <div className="text-center sm:relative sm:rounded-2xl sm:border sm:border-primary/20 sm:bg-gradient-to-br sm:from-primary/10 sm:to-secondary/10 sm:p-8 sm:shadow-xl">
+                            <div className="hidden sm:block absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5"></div>
+                            <div className="sm:relative">
                                 <h3 className="mb-4 text-xl font-bold text-foreground">{TRIAL_HEADING}</h3>
 
                                 {/* Benefits */}
