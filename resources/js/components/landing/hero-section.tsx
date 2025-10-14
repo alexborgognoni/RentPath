@@ -9,7 +9,7 @@ export function HeroSection() {
     const isMobile = useIsMobile();
 
     return (
-        <section className="relative overflow-hidden border-b py-12 md:py-16 lg:py-20">
+        <section className="relative overflow-hidden border-b py-8 xs:py-12 md:py-16 lg:py-20">
             {/* Blurred texture background */}
             <div className="absolute inset-0 -z-10">
                 <div className="absolute top-0 -right-40 h-96 w-[500px] rotate-12 rounded-[40%_60%_70%_30%] bg-secondary/10 blur-3xl"></div>
@@ -23,7 +23,7 @@ export function HeroSection() {
                     whileInView={isMobile ? false : { opacity: 1, y: 0 }}
                     transition={isMobile ? undefined : { duration: 0.8 }}
                     viewport={isMobile ? undefined : { once: true, amount: 0.6 }}
-                    className="text-text-primary dark:text-text-primary mb-8 text-5xl leading-tight font-bold lg:text-7xl"
+                    className="text-text-primary dark:text-text-primary mb-6 xs:mb-8 text-4xl xs:text-5xl leading-tight font-bold lg:text-7xl"
                 >
                     {translate(translations, 'landing.hero.heading_primary')}
                     <br />
@@ -44,7 +44,7 @@ export function HeroSection() {
                     whileInView={isMobile ? false : { opacity: 1 }}
                     transition={isMobile ? undefined : { delay: 0.3, duration: 1 }}
                     viewport={isMobile ? undefined : { once: true, amount: 0.6 }}
-                    className="mx-auto mb-12 max-w-3xl text-xl text-muted-foreground lg:text-2xl"
+                    className="mx-auto mb-8 xs:mb-12 max-w-3xl text-lg xs:text-xl text-muted-foreground lg:text-2xl"
                 >
                     {translate(translations, 'landing.hero.subtitle')}
                 </motion.p>
@@ -56,11 +56,11 @@ export function HeroSection() {
                     whileInView={isMobile ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
                     transition={isMobile ? { duration: 0 } : { delay: 0.5, duration: 0.6 }}
                     viewport={{ once: true, amount: 0.6 }}
-                    className="flex flex-col justify-center gap-6 sm:flex-row"
+                    className="flex flex-col justify-center gap-4 xs:gap-6 sm:flex-row"
                 >
                     <a
                         href="/register"
-                        className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-8 py-4 text-center text-lg font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105"
+                        className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-6 xs:px-8 py-3 xs:py-4 text-center text-base xs:text-lg font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105"
                     >
                         {auth.user
                             ? translate(translations, 'landing.hero.cta_primary_auth')
@@ -68,7 +68,7 @@ export function HeroSection() {
                     </a>
                     <a
                         href="#problems"
-                        className="min-w-[200px] rounded-lg border border-border bg-surface px-8 py-4 text-center text-lg font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80"
+                        className="min-w-[200px] rounded-lg border border-border bg-surface px-6 xs:px-8 py-3 xs:py-4 text-center text-base xs:text-lg font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80"
                     >
                         {translate(translations, 'landing.hero.cta_secondary')}
                     </a>
