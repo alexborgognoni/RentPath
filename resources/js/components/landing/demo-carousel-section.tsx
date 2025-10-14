@@ -364,7 +364,7 @@ export function DemoCarouselSection() {
                                             {/* Desktop Layout - Two Columns */}
                                             <div className="relative z-10 mx-auto w-full h-full hidden lg:flex flex-col">
                                                 {/* Title and Description Above */}
-                                                <div className="mb-8 text-center px-12">
+                                                <div className="mt-8 mb-8 text-center px-12">
                                                     <h3 className="mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-4xl lg:text-5xl leading-tight font-bold text-transparent">
                                                         {slide.title}
                                                     </h3>
