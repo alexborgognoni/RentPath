@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
 
 export function CookieBanner() {
+    const { translations } = usePage<SharedData>().props;
     const [isVisible, setIsVisible] = useState(false);
     const [showPreferences, setShowPreferences] = useState(false);
 
@@ -45,7 +48,7 @@ export function CookieBanner() {
     if (!isVisible) return null;
 
     if (showPreferences) {
-        return <CookiePreferences onSave={savePreferences} onBack={() => setShowPreferences(false)} />;
+        return <CookiePreferences translations={translations} onSave={savePreferences} onBack={() => setShowPreferences(false)} />;
     }
 
     return (
@@ -55,7 +58,7 @@ export function CookieBanner() {
                     <div className="p-6 sm:p-8">
                         <div className="flex items-start justify-between mb-4">
                             <h3 className="text-xl sm:text-2xl font-bold text-foreground">
-                                Cookie Settings
+                                {translate(translations, 'cookie-banner.banner.title')}
                             </h3>
                             <button
                                 onClick={acceptNecessary}
@@ -67,8 +70,7 @@ export function CookieBanner() {
                         </div>
 
                         <p className="mb-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
-                            We use cookies to enhance your browsing experience, analyze site traffic, and personalize content.
-                            By clicking "Accept All", you consent to our use of cookies.
+                            {translate(translations, 'cookie-banner.banner.description')}
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-3">
@@ -76,19 +78,19 @@ export function CookieBanner() {
                                 onClick={acceptAll}
                                 className="flex-1 rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center font-semibold text-white shadow-lg transition-all hover:shadow-xl cursor-pointer"
                             >
-                                Accept All
+                                {translate(translations, 'cookie-banner.banner.accept_all')}
                             </button>
                             <button
                                 onClick={acceptNecessary}
                                 className="flex-1 rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80 cursor-pointer"
                             >
-                                Necessary Only
+                                {translate(translations, 'cookie-banner.banner.necessary_only')}
                             </button>
                             <button
                                 onClick={() => setShowPreferences(true)}
                                 className="flex-1 rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80 cursor-pointer"
                             >
-                                Customize
+                                {translate(translations, 'cookie-banner.banner.customize')}
                             </button>
                         </div>
                     </div>
@@ -99,9 +101,11 @@ export function CookieBanner() {
 }
 
 function CookiePreferences({
+    translations,
     onSave,
     onBack
 }: {
+    translations: SharedData['translations'];
     onSave: (preferences: { necessary: boolean; analytics: boolean; marketing: boolean }) => void;
     onBack: () => void;
 }) {
@@ -125,7 +129,7 @@ function CookiePreferences({
                     <div className="p-6 sm:p-8">
                         <div className="flex items-start justify-between mb-6">
                             <h3 className="text-xl sm:text-2xl font-bold text-foreground">
-                                Cookie Preferences
+                                {translate(translations, 'cookie-banner.preferences.title')}
                             </h3>
                             <button
                                 onClick={onBack}
@@ -140,18 +144,18 @@ function CookiePreferences({
                             {/* Necessary Cookies */}
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <h4 className="font-semibold text-foreground">Necessary Cookies</h4>
-                                    <span className="text-sm text-muted-foreground">Always Active</span>
+                                    <h4 className="font-semibold text-foreground">{translate(translations, 'cookie-banner.preferences.necessary.title')}</h4>
+                                    <span className="text-sm text-muted-foreground">{translate(translations, 'cookie-banner.preferences.necessary.always_active')}</span>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    Required for the website to function properly. These cannot be disabled.
+                                    {translate(translations, 'cookie-banner.preferences.necessary.description')}
                                 </p>
                             </div>
 
                             {/* Analytics Cookies */}
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <h4 className="font-semibold text-foreground">Analytics Cookies</h4>
+                                    <h4 className="font-semibold text-foreground">{translate(translations, 'cookie-banner.preferences.analytics.title')}</h4>
                                     <button
                                         onClick={() => togglePreference('analytics')}
                                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
@@ -170,14 +174,14 @@ function CookiePreferences({
                                     </button>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    Help us understand how visitors interact with our website to improve user experience.
+                                    {translate(translations, 'cookie-banner.preferences.analytics.description')}
                                 </p>
                             </div>
 
                             {/* Marketing Cookies */}
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <h4 className="font-semibold text-foreground">Marketing Cookies</h4>
+                                    <h4 className="font-semibold text-foreground">{translate(translations, 'cookie-banner.preferences.marketing.title')}</h4>
                                     <button
                                         onClick={() => togglePreference('marketing')}
                                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
@@ -196,7 +200,7 @@ function CookiePreferences({
                                     </button>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    Used to track visitors across websites to display relevant advertisements.
+                                    {translate(translations, 'cookie-banner.preferences.marketing.description')}
                                 </p>
                             </div>
                         </div>
@@ -206,13 +210,13 @@ function CookiePreferences({
                                 onClick={() => onSave(preferences)}
                                 className="flex-1 rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center font-semibold text-white shadow-lg transition-all hover:shadow-xl cursor-pointer"
                             >
-                                Save Preferences
+                                {translate(translations, 'cookie-banner.preferences.save_preferences')}
                             </button>
                             <button
                                 onClick={onBack}
                                 className="flex-1 rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80 cursor-pointer"
                             >
-                                Back
+                                {translate(translations, 'cookie-banner.preferences.back')}
                             </button>
                         </div>
                     </div>

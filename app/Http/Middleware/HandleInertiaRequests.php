@@ -48,6 +48,7 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'locale' => app()->getLocale(),
             'translations' => [
+                'cookie-banner' => trans('cookie-banner'),
                 'auth' => trans('auth'),
                 'header' => trans('header'),
                 'profile' => trans('profile'),
