@@ -40,9 +40,9 @@ return [
                 'description' => 'Zichtbaarheid over al uw eigendommen, volgen van aanvragen, inspecties, huurcontracten en marketing inspanningen — direct.',
                 'features' => [
                     'Live aanvragen pijplijn',
-                    'Huur & marketing kalender',
-                    'Gebruiksvriendelijke inspectie tools',
-                    'Snelle verhuurder rapportage',
+                    'Planning van opvolgingen',
+                    'Geautomatiseerde herinneringen',
+                    'Eenvoudige verhuurdersrapportage',
                 ],
             ],
             "guided_applications" => [

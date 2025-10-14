@@ -40,9 +40,9 @@ return [
                 'description' => 'Visibility across all your properties, tracking applications, inspections, leases, and marketing efforts — instantly.',
                 'features' => [
                     'Live application pipeline',
-                    'Lease & marketing calendar',
-                    'User-friendly inspection tools',
-                    'Swift landlord reporting',
+                    'Follow-up Scheduling',
+                    'Automated Reminders',
+                    'Effortless landlord reporting',
                 ],
             ],
             "guided_applications" => [
