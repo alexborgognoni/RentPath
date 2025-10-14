@@ -1,4 +1,5 @@
 import { AppHeader } from '@/components/app-header';
+import { CookieBanner } from '@/components/cookie-banner';
 import { type BreadcrumbItem } from '@/types';
 import type { PropsWithChildren } from 'react';
 
@@ -17,6 +18,7 @@ export function BaseLayout({ children, breadcrumbs, title, showBackground = true
                     <AppHeader breadcrumbs={breadcrumbs} title={title} />
                     {children}
                 </div>
+                <CookieBanner />
             </div>
         );
     }
@@ -27,6 +29,7 @@ export function BaseLayout({ children, breadcrumbs, title, showBackground = true
                 <AppHeader breadcrumbs={breadcrumbs} title={title} />
                 {children}
             </div>
+            <CookieBanner />
         </div>
     );
 }
