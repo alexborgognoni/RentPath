@@ -242,7 +242,7 @@ export function DemoCarouselSection() {
 
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <div className="mb-20 text-center">
+                <div className="mb-0 xs:mb-20 text-center">
                     <h2 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">
                         {translate(translations, 'landing.demo_carousel.heading')}
                     </h2>
@@ -252,7 +252,7 @@ export function DemoCarouselSection() {
                 </div>
 
                 {/* Carousel */}
-                <div className="relative mb-12 md:mb-20 -mx-4 md:mx-0">
+                <div className="relative mb-0 xs:mb-20 -mx-4 md:mx-0">
                     <div className="relative overflow-hidden md:rounded-3xl md:border md:border-border md:bg-gradient-to-br md:from-card/80 md:to-surface/50 md:shadow-2xl">
                         <div
                             ref={carouselRef}

@@ -101,10 +101,10 @@ export function ValuePropositionSection() {
     const { count: count3, setIsInView: setIsInView3 } = useCountAnimation(STATS[2].value);
 
     return (
-        <section className="bg-background py-12 md:py-16 lg:py-20">
+        <section className="bg-background pt-0 pb-12 xs:pt-0 xs:pb-12 md:py-16 lg:py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-20 text-center">
+                <div className="mb-0 xs:mb-20 text-center">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
