@@ -33,7 +33,7 @@ export default function AuthSimpleLayout({ children, title, description }: Props
                     </div>
 
                     {/* Card wrapper for form content */}
-                    <div className="rounded-2xl border border-border bg-surface p-8 shadow-lg backdrop-blur-sm">{children}</div>
+                    <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-surface xs:p-8 xs:shadow-lg xs:backdrop-blur-sm">{children}</div>
                 </div>
             </div>
         </div>
