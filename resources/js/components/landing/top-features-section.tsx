@@ -33,7 +33,7 @@ export function TopFeaturesSection() {
 
             <div className="relative z-10 mx-auto max-w-7xl xs:px-4 sm:px-6 lg:px-8">
                 {/* ROI Callout */}
-                <div className="mb-20">
+                <div className="mb-0 xs:mb-20">
                     {/* Heading and Subtitle */}
                     <div className="text-center px-4 sm:px-0 mb-8 sm:mb-12">
                         <h3 className="mb-4 sm:mb-6 text-3xl sm:text-4xl leading-tight font-bold text-foreground lg:text-5xl">
