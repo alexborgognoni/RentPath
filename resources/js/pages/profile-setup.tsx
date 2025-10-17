@@ -269,7 +269,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="rounded-2xl border border-border bg-card p-8 shadow-lg"
+                            className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-8 xs:shadow-lg"
                         >
                             <div className="mb-8 text-center">
                                 <h1 className="mb-2 text-3xl font-bold text-foreground">{isEditing ? t(translations.profile, 'setup.edit_title') : t(translations.profile, 'setup.title')}</h1>
@@ -779,18 +779,16 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
 
                             {/* Document Uploads */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-medium text-foreground">{t(translations.profile, 'setup.documents')}</h3>
-
                                 <div>
                                     <label htmlFor="id_document" className="block text-sm font-medium text-foreground">
-                                        {t(translations.profile, 'setup.id_document_required')}
+                                        {t(translations.profile, 'setup.id_document')} <span className="text-destructive">*</span>
                                     </label>
                                     <div
                                         className={`mt-2 flex justify-center rounded-md border border-dashed px-6 pt-5 pb-6 ${isFieldRejected('id_document') || clientErrors.id_document || errors.id_document ? 'border-destructive bg-destructive/5' : 'border-border'}`}
                                         onDragOver={handleDragOver}
                                         onDrop={(e) => handleDrop(e, 'id_document')}
                                     >
-                                        <div className="space-y-1 text-center">
+                                        <div className="w-full space-y-1 text-center">
                                             <label htmlFor="id_document" className="cursor-pointer">
                                                 <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                                             </label>
@@ -826,10 +824,10 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             />
                                             <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.file_requirements')}</p>
                                             {((data.id_document && data.id_document !== 'removed') || (propertyManager?.id_document_path && data.id_document !== 'removed')) && (
-                                                <div className="mt-3 flex items-center justify-start">
-                                                    <div className="flex items-center rounded-md border border-border bg-background px-3 py-2 shadow-sm min-w-96">
+                                                <div className="mt-3 w-full overflow-hidden px-4">
+                                                    <div className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 shadow-sm min-w-0 overflow-hidden">
                                                         <p
-                                                            className="cursor-pointer truncate text-sm font-medium text-primary hover:text-primary/80 flex-1 text-center"
+                                                            className="cursor-pointer truncate text-sm font-medium text-primary hover:text-primary/80 flex-1 min-w-0 overflow-hidden"
                                                             onClick={() => {
                                                                 if (data.id_document) {
                                                                     window.open(URL.createObjectURL(data.id_document), '_blank');
@@ -839,21 +837,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                             }}
                                                             title={data.id_document?.name || propertyManager?.id_document_original_name || 'ID Document'}
                                                         >
-                                                            {data.id_document 
-                                                                ? (data.id_document.name.length > 40
-                                                                    ? data.id_document.name.substring(0, 40) + '...'
-                                                                    : data.id_document.name)
-                                                                : (propertyManager?.id_document_original_name 
-                                                                    ? (propertyManager.id_document_original_name.length > 40
-                                                                        ? propertyManager.id_document_original_name.substring(0, 40) + '...'
-                                                                        : propertyManager.id_document_original_name)
-                                                                    : 'ID Document')
-                                                            }
+                                                            {data.id_document?.name || propertyManager?.id_document_original_name || 'ID Document'}
                                                         </p>
                                                         <button
                                                             type="button"
                                                             onClick={() => setData('id_document', 'removed')}
-                                                            className="ml-2 text-destructive hover:text-destructive/80 cursor-pointer"
+                                                            className="flex-shrink-0 text-destructive hover:text-destructive/80 cursor-pointer"
                                                             title="Remove file"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -873,7 +862,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                 {selectedType === 'professional' && (
                                     <div>
                                         <label htmlFor="license_document" className="block text-sm font-medium text-foreground">
-                                            {t(translations.profile, 'setup.license_document_required')}
+                                            {t(translations.profile, 'setup.license_document')} <span className="text-destructive">*</span>
                                         </label>
                                         <div
                                             className={`mt-2 flex justify-center rounded-md border border-dashed px-6 pt-5 pb-6 ${isFieldRejected('license_document') || clientErrors.license_document || errors.license_document ? 'border-destructive bg-destructive/5' : 'border-border'}`}
@@ -916,10 +905,10 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                 />
                                                 <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.file_requirements')}</p>
                                                 {((data.license_document && data.license_document !== 'removed') || (propertyManager?.license_document_path && data.license_document !== 'removed')) && (
-                                                    <div className="mt-3 flex items-center justify-start">
-                                                        <div className="flex items-center rounded-md border border-border bg-background px-3 py-2 shadow-sm min-w-96">
+                                                    <div className="mt-3 w-full overflow-hidden px-4">
+                                                        <div className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 shadow-sm min-w-0 overflow-hidden">
                                                             <p
-                                                                className="cursor-pointer truncate text-sm font-medium text-primary hover:text-primary/80 flex-1 text-center"
+                                                                className="cursor-pointer truncate text-sm font-medium text-primary hover:text-primary/80 flex-1 min-w-0 overflow-hidden"
                                                                 onClick={() => {
                                                                     if (data.license_document) {
                                                                         window.open(URL.createObjectURL(data.license_document), '_blank');
@@ -929,21 +918,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                                 }}
                                                                 title={data.license_document?.name || propertyManager?.license_document_original_name || 'License Document'}
                                                             >
-                                                                {data.license_document 
-                                                                    ? (data.license_document.name.length > 40
-                                                                        ? data.license_document.name.substring(0, 40) + '...'
-                                                                        : data.license_document.name)
-                                                                    : (propertyManager?.license_document_original_name 
-                                                                        ? (propertyManager.license_document_original_name.length > 40
-                                                                            ? propertyManager.license_document_original_name.substring(0, 40) + '...'
-                                                                            : propertyManager.license_document_original_name)
-                                                                        : 'License Document')
-                                                                }
+                                                                {data.license_document?.name || propertyManager?.license_document_original_name || 'License Document'}
                                                             </p>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setData('license_document', 'removed')}
-                                                                className="ml-2 text-destructive hover:text-destructive/80 cursor-pointer"
+                                                                className="flex-shrink-0 text-destructive hover:text-destructive/80 cursor-pointer"
                                                                 title="Remove file"
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
