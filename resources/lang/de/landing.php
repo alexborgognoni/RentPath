@@ -130,7 +130,7 @@ return [
     // Testimonials Section
     'testimonials' => [
         'heading' => 'Vertraut von Hunderten Immobilienprofis',
-        'subtitle' => 'Sehen Sie warum Hunderte von Maklern, Immobilienverwaltern und Vermietern RentPath wählen, um Vermietungen zu optimieren.',
+        'subtitle' => 'Sehen Sie warum Hunderte von Maklern, Immobilienverwaltern und Vermietern RentPath wählen, um ihre Vermietungen zu optimieren.',
         'testimonials' => [
             'amar_ramdedovic' => [
                 'role' => 'Immobilienmakler',

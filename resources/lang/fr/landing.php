@@ -130,7 +130,7 @@ return [
     // Testimonials Section
     'testimonials' => [
         'heading' => 'Approuvé par les Professionnels de l\'Immobilier',
-        'subtitle' => 'Découvrez pourquoi des centaines d\'agents, gestionnaires immobiliers et propriétaires choisissent RentPath pour simplifier la location.',
+        'subtitle' => 'Découvrez pourquoi des centaines d\'agents, gestionnaires immobiliers et propriétaires choisissent RentPath pour simplifier leurs locations.',
         'testimonials' => [
             'amar_ramdedovic' => [
                 'role' => 'Agent Immobilier',

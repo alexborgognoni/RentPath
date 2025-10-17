@@ -130,7 +130,7 @@ return [
     // Testimonials Section
     'testimonials' => [
         'heading' => 'Trusted by Property Professionals',
-        'subtitle' => 'See why hundreds of agents, property managers, and landlords choose RentPath to streamline rentals.',
+        'subtitle' => 'See why hundreds of agents, property managers, and landlords choose RentPath to streamline their rentals.',
         'testimonials' => [
             'amar_ramdedovic' => [
                 'role' => 'Real Estate Agent',
