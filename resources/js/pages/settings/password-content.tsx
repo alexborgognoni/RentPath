@@ -26,12 +26,7 @@ export default function PasswordContent() {
             </div>
 
             {/* Password Settings */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="mb-4 text-xl font-semibold text-foreground">{t(translations.settings, 'password.change_password')}</h2>
-                <p className="mb-6 text-sm text-muted-foreground">
-                    {t(translations.settings, 'password.change_password_description')}
-                </p>
-
+            <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-6 xs:shadow-sm">
                 <Form
                     {...PasswordController.update.form()}
                     options={{

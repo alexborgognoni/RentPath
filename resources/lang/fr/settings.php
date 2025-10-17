@@ -31,8 +31,6 @@ return [
     'password' => [
         'title' => 'Mot de passe',
         'description' => 'Mettez à jour votre mot de passe pour sécuriser votre compte',
-        'change_password' => 'Changer le mot de passe',
-        'change_password_description' => 'Assurez-vous que votre compte utilise un mot de passe long et aléatoire pour rester sécurisé.',
         'current_password' => 'Mot de passe actuel',
         'current_password_placeholder' => 'Entrez votre mot de passe actuel',
         'new_password' => 'Nouveau mot de passe',

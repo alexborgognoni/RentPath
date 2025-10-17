@@ -31,8 +31,6 @@ return [
     'password' => [
         'title' => 'Passwort',
         'description' => 'Aktualisieren Sie Ihr Passwort, um Ihr Konto sicher zu halten',
-        'change_password' => 'Passwort ändern',
-        'change_password_description' => 'Stellen Sie sicher, dass Ihr Konto ein langes, zufälliges Passwort verwendet, um sicher zu bleiben.',
         'current_password' => 'Aktuelles Passwort',
         'current_password_placeholder' => 'Geben Sie Ihr aktuelles Passwort ein',
         'new_password' => 'Neues Passwort',
