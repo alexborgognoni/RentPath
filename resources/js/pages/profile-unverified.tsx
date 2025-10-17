@@ -17,7 +17,7 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
             <Head title={isRejected ? t(translations.profile, 'unverified.rejected_title') : t(translations.profile, 'unverified.title')} />
             <div className="flex-1 flex items-center justify-center p-4 py-8 lg:py-4">
                 <div className="mx-auto max-w-md px-6 text-center">
-                    <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
+                    <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-8 xs:shadow-lg">
                         {isRejected ? (
                             <>
                                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
