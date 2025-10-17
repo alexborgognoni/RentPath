@@ -14,7 +14,7 @@ return [
     // Top Features Section
     'top_features' => [
         'heading' => 'Gestaltet für moderne Verwalter und Vermieter',
-        'subtitle' => 'Transformieren Sie Ihre Mieterplatzierungen mit Echtzeit-Insights, Dokumentenverwaltung und automatisierten Vermieter-Updates.',
+        'subtitle' => 'Optimieren Sie die Mietervermittlung durch reibungslose Bewerbungsprozesse, automatisierte Profilbewertungen und effiziente Nachverfolgungen.',
         'complete_applications' => [
             'title' => 'Vollständige Bewerbungen',
             'description' => 'Schluss mit dem Hinterherlaufen nach Ausweisen oder Verträgen — laden Sie Mieter ein und sammeln Sie Bewerbungen an einem Ort.',
@@ -32,7 +32,7 @@ return [
     // Demo Carousel Section
     'demo_carousel' => [
         'heading' => 'Klicken. Einladen. Vermieten.',
-        'subtitle' => 'Manuelle Überprüfungen, verpasste Bewerbungen, chaotische Kommunikation - Vermietungen sind ineffizient. Unsere Plattform optimiert die Mieter-Journey.',
+        'subtitle' => 'Keine manuellen Überprüfungen, verpasste Bewerbungen, oder chaotische Kommunikation. Unsere Plattform optimiert die Mieter-Journey.',
         'interactive_demo' => 'Interaktive Demo',
         'slides' => [
             "real_time_dashboard" => [
@@ -82,7 +82,7 @@ return [
     'value_proposition' => [
         'heading_primary' => 'Vermietungen der',
         'heading_highlighted' => 'Nächsten Generation',
-        'subtitle' => 'Erleben Sie die Zukunft der Mieterplatzierungen mit automatisierten Bewerbungen, Echtzeit-Einblicken, nahtlosen Mieter-Erfahrungen und professioneller Vermieter-Kommunikation',
+        'subtitle' => 'Erleben Sie die Zukunft der Mietvermittlung.',
         'stats' => [
             'applications' => 'Bewerbungen',
             'conversion_rate' => 'Konversionsrate',

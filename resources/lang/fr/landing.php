@@ -14,7 +14,7 @@ return [
     // Top Features Section
     'top_features' => [
         'heading' => 'Conçu pour la Gestion Locative d’Aujourd’hui',
-        'subtitle' => 'Transformez vos placements locatifs avec des aperçus en temps réel, la gestion documentaire, et des comptes rendus automatisés pour les propriétaires.',
+        'subtitle' => 'Transformez la gestion des locataires grâce à des candidatures fluides, des évaluations de profils automatisées et des suivis simplifiés.',
         'complete_applications' => [
             'title' => 'Candidatures Complètes',
             'description' => 'Fini de courir après les pièces d\'identité, contrats ou références — invitez les locataires et collectez les candidatures en un seul endroit.',
@@ -82,7 +82,7 @@ return [
     'value_proposition' => [
         'heading_primary' => 'La Location',
         'heading_highlighted' => 'Nouvelle Génération',
-        'subtitle' => 'Découvrez l\'avenir des placements locataires avec candidatures automatisées, insights en temps réel, expériences locataires fluides et communications propriétaires professionnelles',
+        'subtitle' => 'Découvrez l\'avenir du placement locatif.',
         'stats' => [
             'applications' => 'Candidatures',
             'conversion_rate' => 'Taux de Conversion',
