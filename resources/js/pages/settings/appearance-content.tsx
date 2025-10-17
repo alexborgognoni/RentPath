@@ -45,7 +45,7 @@ export default function AppearanceContent() {
             </div>
 
             {/* Theme Settings */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-6 xs:shadow-sm">
                 <h2 className="mb-4 text-xl font-semibold text-foreground">{t(translations.settings, 'appearance.theme')}</h2>
                 <p className="mb-6 text-sm text-muted-foreground">
                     {t(translations.settings, 'appearance.theme_description')}
