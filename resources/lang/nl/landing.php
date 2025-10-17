@@ -13,8 +13,8 @@ return [
 
     // Top Features Section
     'top_features' => [
-        'heading' => 'Gebouwd voor Moderne Huur Aanvragen',
-        'subtitle' => 'Transformeer uw huurder plaatsingen met real-time inzichten, documentbeheer en geautomatiseerde verhuurder updates.',
+        'heading' => 'Gebouwd voor Modern Vastgoedbeheer',
+        'subtitle' => 'Transformeer huurderplaatsing met naadloze aanvragen, geautomatiseerde profielevaluaties en gestroomlijnde opvolging.',
         'complete_applications' => [
             'title' => 'Volledige Aanvragen',
             'description' => 'Geen achtervolging van ID\'s, contracten of referenties meer — nodig huurders uit en verzamel aanvragen op één plek.',
@@ -32,7 +32,7 @@ return [
     // Demo Carousel Section
     'demo_carousel' => [
         'heading' => 'Klik. Nodig uit. Huur.',
-        'subtitle' => 'Handmatige beoordelingen, gemiste aanvragen, rommelige communicatie - verhuur is inefficiënt. Ons platform stroomlijnt het proces van het plaatsen van huurders.',
+        'subtitle' => 'Handmatige beoordelingen, gemiste aanvragen, rommelige communicatie - verhuur is inefficiënt. Ons platform stroomlijnt de huurdertraject.',
         'interactive_demo' => 'Interactieve Demo',
         'slides' => [
             "real_time_dashboard" => [
@@ -80,9 +80,9 @@ return [
 
     // Value Proposition Section
     'value_proposition' => [
-        'heading_primary' => 'Volgende Generatie',
-        'heading_highlighted' => 'Huur Deals',
-        'subtitle' => 'Ervaar de toekomst van huurder plaatsingen met geautomatiseerde aanvragen, real-time inzichten, naadloze huurder ervaringen en professionele verhuurder communicatie',
+        'heading_primary' => 'Verhuur van de',
+        'heading_highlighted' => 'Volgende Generatie',
+        'subtitle' => 'Ervaar de toekomst van huurderplaatsing.',
         'stats' => [
             'applications' => 'Aanvragen',
             'conversion_rate' => 'Conversie Percentage',
@@ -129,8 +129,8 @@ return [
 
     // Testimonials Section
     'testimonials' => [
-        'heading' => 'Vertrouwd door Eigendom Professionals',
-        'subtitle' => 'Zie waarom duizenden makelaars, eigendom beheerders en verhuurders RentPath kiezen om verhuur te stroomlijnen.',
+        'heading' => 'Vertrouwd door Vastgoedprofessionals',
+        'subtitle' => 'Ontdek waarom honderden makelaars, vastgoedbeheerders en verhuurders RentPath kiezen om hun verhuur te stroomlijnen.',
         'testimonials' => [
             'amar_ramdedovic' => [
                 'role' => 'Makelaar',
