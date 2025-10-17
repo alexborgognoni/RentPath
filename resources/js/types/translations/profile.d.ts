@@ -31,9 +31,8 @@ interface ProfileTranslations {
         profile_type: string;
         individual_desc: string;
         professional_desc: string;
-        documents: string;
-        id_document_required: string;
-        license_document_required: string;
+        id_document: string;
+        license_document: string;
         upload_file: string;
         replace_file: string;
         drag_drop: string;
