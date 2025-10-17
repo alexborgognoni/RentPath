@@ -30,7 +30,7 @@ export default function ProfileContent({ mustVerifyEmail, status }: ProfileConte
             </div>
 
             {/* Email Address Card */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-6 xs:shadow-sm">
                 <h2 className="mb-4 text-xl font-semibold text-foreground">{t(translations.settings, 'account.email_address')}</h2>
 
                 <Form
@@ -103,7 +103,7 @@ export default function ProfileContent({ mustVerifyEmail, status }: ProfileConte
             </div>
 
             {/* Delete Account Card */}
-            <div className="rounded-2xl border border-destructive/20 bg-card p-6 shadow-sm">
+            <div className="xs:rounded-2xl xs:border xs:border-destructive/20 xs:bg-card xs:p-6 xs:shadow-sm">
                 <h2 className="mb-4 flex items-center text-xl font-semibold text-destructive">
                     <Trash2 className="mr-3" size={24} />
                     {t(translations.settings, 'account.delete_account')}
