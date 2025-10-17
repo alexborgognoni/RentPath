@@ -72,7 +72,7 @@ export function LogoutConfirmationPopover({ isOpen, onClose, onConfirm }: Logout
                         <p className="mb-6 text-sm text-muted-foreground">{t(translations.header, 'logout_confirmation.message')}</p>
 
                         <div className="flex justify-end gap-3">
-                            <Button onClick={onClose} className="cursor-pointer bg-background px-4 py-2 text-white">
+                            <Button variant="outline" onClick={onClose} className="cursor-pointer px-4 py-2">
                                 {t(translations.header, 'logout_confirmation.cancel')}
                             </Button>
                             <Button variant="destructive" onClick={handleLogout} className="cursor-pointer px-4 py-2">
