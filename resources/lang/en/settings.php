@@ -31,8 +31,6 @@ return [
     'password' => [
         'title' => 'Password',
         'description' => 'Update your password to keep your account secure',
-        'change_password' => 'Change Password',
-        'change_password_description' => 'Ensure your account is using a long, random password to stay secure.',
         'current_password' => 'Current Password',
         'current_password_placeholder' => 'Enter your current password',
         'new_password' => 'New Password',

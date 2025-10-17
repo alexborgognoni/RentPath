@@ -22,8 +22,6 @@ interface SettingsTranslations {
     password: {
         title: string;
         description: string;
-        change_password: string;
-        change_password_description: string;
         current_password: string;
         current_password_placeholder: string;
         new_password: string;

@@ -31,8 +31,6 @@ return [
     'password' => [
         'title' => 'Wachtwoord',
         'description' => 'Update uw wachtwoord om uw account veilig te houden',
-        'change_password' => 'Wachtwoord wijzigen',
-        'change_password_description' => 'Zorg ervoor dat uw account een lang, willekeurig wachtwoord gebruikt om veilig te blijven.',
         'current_password' => 'Huidig wachtwoord',
         'current_password_placeholder' => 'Voer uw huidige wachtwoord in',
         'new_password' => 'Nieuw wachtwoord',

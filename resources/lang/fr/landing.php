@@ -5,7 +5,7 @@ return [
     'hero' => [
         'heading_primary' => 'Candidatures Locataires Simplifiées,',
         'heading_highlighted' => 'Du Premier Intérêt à L\'Emménagement',
-        'subtitle' => 'Fini les candidatures incomplètes et les relances interminables. Invitez, suivez et assurez le suivi des prospects instantanément. Le tout à partir d\'un tableau de bord intelligent.',
+        'subtitle' => 'Fini les candidatures incomplètes et les relances interminables. Invitez, suivez et assurez le suivi des prospects instantanément.',
         'cta_primary_auth' => 'Aller au Tableau de Bord',
         'cta_primary_guest' => 'S\'Inscrire',
         'cta_secondary' => 'Comment Ça Marche',

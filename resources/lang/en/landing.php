@@ -5,7 +5,7 @@ return [
     'hero' => [
         'heading_primary' => 'Streamlined Tenant Applications,',
         'heading_highlighted' => 'From First Interest to Move-In',
-        'subtitle' => 'No more incomplete applications or endless chasing. Invite, track, and follow up on leads instantly. All from one intelligent Dashboard.',
+        'subtitle' => 'No more incomplete applications or endless chasing. Invite, track, and follow up on leads instantly.',
         'cta_primary_auth' => 'Go to Dashboard',
         'cta_primary_guest' => 'Get Started',
         'cta_secondary' => 'See How It Works',
@@ -14,10 +14,10 @@ return [
     // Top Features Section
     'top_features' => [
         'heading' => 'Built for Modern Property Managers',
-        'subtitle' => 'Transform your tenant placements with real-time insights, document management, and automated landlord updates.',
+        'subtitle' => 'Transform tenant placements with seamless applications, automated profile reviews and follow-ups.',
         'complete_applications' => [
             'title' => 'Complete Applications',
-            'description' => 'No more chasing IDs, contracts, or references — invite tenants and collect applications in one place.',
+            'description' => 'Stop chasing documents or references. Invite tenants & collect applications in one place.',
         ],
         'streamlined_leasing' => [
             'title' => 'Streamlined Leasing',
@@ -32,7 +32,7 @@ return [
     // Demo Carousel Section
     'demo_carousel' => [
         'heading' => 'Click. Invite. Lease.',
-        'subtitle' => 'Manual reviews, missed applications, messy communication - rentals are inefficient. Our platform streamlines the tenant journey.',
+        'subtitle' => 'No manual reviews, missed applications, and messy communication. Our platform streamlines the tenant journey.',
         'interactive_demo' => 'Interactive Demo',
         'slides' => [
             "real_time_dashboard" => [
@@ -47,7 +47,7 @@ return [
             ],
             "guided_applications" => [
                 'title' => 'Guided Tenant Applications',
-                'description' => 'Invite leads to a step-by-step application flow that ensures all necessary documents are collected. Complete applications, every time.',
+                'description' => 'Invite leads to a step-by-step application flow that ensures complete information, every time.',
                 'features' => [
                     'Application invite links',
                     'Progress validation at each step',
@@ -82,7 +82,7 @@ return [
     'value_proposition' => [
         'heading_primary' => 'Next-Generation',
         'heading_highlighted' => 'Rental Deals',
-        'subtitle' => 'Experience the future of tenant placements with automated applications, real time insights, seamless tenant experiences and professional landlord communications',
+        'subtitle' => 'Experience the future of tenant placements.',
         'stats' => [
             'applications' => 'Applications',
             'conversion_rate' => 'Conversion Rate',
