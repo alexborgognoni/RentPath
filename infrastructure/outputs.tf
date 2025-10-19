@@ -26,14 +26,24 @@ output "rds_port" {
 }
 
 # S3 outputs
-output "s3_bucket_name" {
-  description = "Name of the main S3 bucket"
-  value       = aws_s3_bucket.main.bucket
+output "s3_private_bucket_name" {
+  description = "Name of the private S3 bucket"
+  value       = aws_s3_bucket.private.bucket
 }
 
-output "s3_bucket_arn" {
-  description = "ARN of the main S3 bucket"
-  value       = aws_s3_bucket.main.arn
+output "s3_private_bucket_arn" {
+  description = "ARN of the private S3 bucket"
+  value       = aws_s3_bucket.private.arn
+}
+
+output "s3_public_bucket_name" {
+  description = "Name of the public S3 bucket"
+  value       = aws_s3_bucket.public.bucket
+}
+
+output "s3_public_bucket_arn" {
+  description = "ARN of the public S3 bucket"
+  value       = aws_s3_bucket.public.arn
 }
 
 output "s3_backup_bucket_name" {
@@ -42,14 +52,29 @@ output "s3_backup_bucket_name" {
 }
 
 # CloudFront outputs
-output "cloudfront_domain_name" {
-  description = "Domain name of the CloudFront distribution"
-  value       = var.s3_use_cloudfront && length(aws_cloudfront_distribution.main) > 0 ? aws_cloudfront_distribution.main[0].domain_name : null
+output "cloudfront_private_domain_name" {
+  description = "Domain name of the private CloudFront distribution (requires signed URLs)"
+  value       = aws_cloudfront_distribution.private.domain_name
 }
 
-output "cloudfront_distribution_id" {
-  description = "ID of the CloudFront distribution"
-  value       = var.s3_use_cloudfront && length(aws_cloudfront_distribution.main) > 0 ? aws_cloudfront_distribution.main[0].id : null
+output "cloudfront_private_distribution_id" {
+  description = "ID of the private CloudFront distribution"
+  value       = aws_cloudfront_distribution.private.id
+}
+
+output "cloudfront_public_domain_name" {
+  description = "Domain name of the public CloudFront distribution"
+  value       = aws_cloudfront_distribution.public.domain_name
+}
+
+output "cloudfront_public_distribution_id" {
+  description = "ID of the public CloudFront distribution"
+  value       = aws_cloudfront_distribution.public.id
+}
+
+output "cloudfront_private_key_secret_name" {
+  description = "Secrets Manager secret name containing CloudFront private key for signed URLs"
+  value       = aws_secretsmanager_secret.cloudfront_private_key.name
 }
 
 # CodePipeline outputs

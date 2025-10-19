@@ -106,34 +106,22 @@ class PropertyManager extends Model
      */
     public function getProfilePictureUrlAttribute(): ?string
     {
-        if (!$this->profile_picture_path) {
-            return null;
-        }
-        
-        return \Illuminate\Support\Facades\Storage::url($this->profile_picture_path);
+        return \App\Helpers\StorageHelper::url($this->profile_picture_path, 'public');
     }
 
     /**
-     * Get the URL for the ID document.
+     * Get the URL for the ID document (5-minute signed URL).
      */
     public function getIdDocumentUrlAttribute(): ?string
     {
-        if (!$this->id_document_path) {
-            return null;
-        }
-
-        return \Illuminate\Support\Facades\Storage::temporaryUrl($this->id_document_path, now()->addMinutes(30));
+        return \App\Helpers\StorageHelper::url($this->id_document_path, 'private', 5);
     }
 
     /**
-     * Get the URL for the license document.
+     * Get the URL for the license document (5-minute signed URL).
      */
     public function getLicenseDocumentUrlAttribute(): ?string
     {
-        if (!$this->license_document_path) {
-            return null;
-        }
-
-        return \Illuminate\Support\Facades\Storage::temporaryUrl($this->license_document_path, now()->addMinutes(30));
+        return \App\Helpers\StorageHelper::url($this->license_document_path, 'private', 5);
     }
 }

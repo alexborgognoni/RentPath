@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StorageHelper;
 use App\Models\PropertyManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,19 +71,28 @@ class PropertyManagerController extends Controller
 
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
-            $validated['profile_picture_path'] = $request->file('profile_picture')
-                ->store('property-managers/profile-pictures', ['disk' => 's3', 'visibility' => 'public']);
+            $validated['profile_picture_path'] = StorageHelper::store(
+                $request->file('profile_picture'),
+                'property-managers/profile-pictures',
+                'public'
+            );
         }
 
         if ($request->hasFile('id_document')) {
-            $validated['id_document_path'] = $request->file('id_document')
-                ->store('property-managers/id-documents', ['disk' => 's3', 'visibility' => 'private']);
+            $validated['id_document_path'] = StorageHelper::store(
+                $request->file('id_document'),
+                'property-managers/id-documents',
+                'private'
+            );
             $validated['id_document_original_name'] = $request->file('id_document')->getClientOriginalName();
         }
 
         if ($request->hasFile('license_document')) {
-            $validated['license_document_path'] = $request->file('license_document')
-                ->store('property-managers/license-documents', ['disk' => 's3', 'visibility' => 'private']);
+            $validated['license_document_path'] = StorageHelper::store(
+                $request->file('license_document'),
+                'property-managers/license-documents',
+                'private'
+            );
             $validated['license_document_original_name'] = $request->file('license_document')->getClientOriginalName();
         }
 
@@ -163,21 +173,30 @@ class PropertyManagerController extends Controller
 
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
-            $validated['profile_picture_path'] = $request->file('profile_picture')
-                ->store('property-managers/profile-pictures', ['disk' => 's3', 'visibility' => 'public']);
+            $validated['profile_picture_path'] = StorageHelper::store(
+                $request->file('profile_picture'),
+                'property-managers/profile-pictures',
+                'public'
+            );
         } elseif ($request->input('remove_profile_picture')) {
             $validated['profile_picture_path'] = null;
         }
 
         if ($request->hasFile('id_document')) {
-            $validated['id_document_path'] = $request->file('id_document')
-                ->store('property-managers/id-documents', ['disk' => 's3', 'visibility' => 'private']);
+            $validated['id_document_path'] = StorageHelper::store(
+                $request->file('id_document'),
+                'property-managers/id-documents',
+                'private'
+            );
             $validated['id_document_original_name'] = $request->file('id_document')->getClientOriginalName();
         }
 
         if ($request->hasFile('license_document')) {
-            $validated['license_document_path'] = $request->file('license_document')
-                ->store('property-managers/license-documents', ['disk' => 's3', 'visibility' => 'private']);
+            $validated['license_document_path'] = StorageHelper::store(
+                $request->file('license_document'),
+                'property-managers/license-documents',
+                'private'
+            );
             $validated['license_document_original_name'] = $request->file('license_document')->getClientOriginalName();
         }
 
@@ -196,43 +215,31 @@ class PropertyManagerController extends Controller
     }
 
     /**
-     * Serve private documents for authenticated users.
+     * Serve documents for authenticated users.
      */
     public function serveDocument(Request $request, $type)
     {
         $user = Auth::user();
         $propertyManager = $user->propertyManager;
-        
+
         if (!$propertyManager) {
             abort(404);
         }
 
-        $documentPath = match($type) {
-            'id_document' => $propertyManager->id_document_path,
-            'license_document' => $propertyManager->license_document_path,
-            'profile_picture' => $propertyManager->profile_picture_path,
-            default => null
+        [$documentPath, $visibility] = match($type) {
+            'id_document' => [$propertyManager->id_document_path, 'private'],
+            'license_document' => [$propertyManager->license_document_path, 'private'],
+            'profile_picture' => [$propertyManager->profile_picture_path, 'public'],
+            default => [null, null]
         };
 
         if (!$documentPath) {
             abort(404);
         }
 
-        if ($type === 'profile_picture') {
-            // Public file → return URL
-            return redirect(Storage::disk('s3')->url($documentPath));
-        }
+        // Generate URL using StorageHelper (automatically handles public vs private)
+        $url = StorageHelper::url($documentPath, $visibility, 30);
 
-        // Private file → generate temporary signed URL
-        if (!Storage::disk('s3')->exists($documentPath)) {
-            abort(404);
-        }
-
-        $temporaryUrl = Storage::disk('s3')->temporaryUrl(
-            $documentPath,
-            now()->addMinutes(30)
-        );
-
-        return redirect($temporaryUrl);
+        return redirect($url);
     }
 }

@@ -74,13 +74,21 @@ locals {
     MAIL_FROM_NAME        = var.eb_laravel_config.mail_from_name
 
     # AWS Configuration (using IAM role authentication)
-    AWS_DEFAULT_REGION    = var.eb_laravel_config.aws_default_region
-    AWS_BUCKET            = aws_s3_bucket.main.bucket
+    AWS_DEFAULT_REGION          = var.eb_laravel_config.aws_default_region
     AWS_USE_PATH_STYLE_ENDPOINT = var.eb_laravel_config.aws_use_path_style_endpoint ? "true" : "false"
+
+    # Private S3 bucket (for ID documents, licenses - requires signed URLs)
+    AWS_PRIVATE_BUCKET                = aws_s3_bucket.private.bucket
+    AWS_PRIVATE_URL                   = "https://${aws_cloudfront_distribution.private.domain_name}"
+    AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID = aws_cloudfront_public_key.private_bucket_key.id
+
+    # Public S3 bucket (for property images, profile pictures - public access)
+    AWS_PUBLIC_BUCKET = aws_s3_bucket.public.bucket
+    AWS_PUBLIC_URL    = "https://${aws_cloudfront_distribution.public.domain_name}"
 
     # Force AWS SDK to use IAM role authentication
     AWS_SDK_LOAD_NONDEFAULT_CONFIG = "1"
-    AWS_EC2_METADATA_DISABLED = "false"
+    AWS_EC2_METADATA_DISABLED      = "false"
 
     # Vite Configuration
     VITE_APP_NAME         = var.eb_laravel_config.app_name

@@ -38,7 +38,7 @@ resource "aws_iam_role_policy_attachment" "eb_multicontainer_docker" {
   policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker"
 }
 
-# Custom S3 policy for Laravel application storage
+# Custom S3 policy for Laravel application storage (both private and public buckets)
 resource "aws_iam_role_policy" "eb_ec2_s3_access" {
   name = "${var.project_name}-${var.environment}-eb-ec2-s3-access"
   role = aws_iam_role.eb_ec2_role.id
@@ -58,9 +58,30 @@ resource "aws_iam_role_policy" "eb_ec2_s3_access" {
           "s3:GetBucketLocation"
         ]
         Resource = [
-          aws_s3_bucket.main.arn,
-          "${aws_s3_bucket.main.arn}/*"
+          aws_s3_bucket.private.arn,
+          "${aws_s3_bucket.private.arn}/*",
+          aws_s3_bucket.public.arn,
+          "${aws_s3_bucket.public.arn}/*"
         ]
+      }
+    ]
+  })
+}
+
+# Policy to read CloudFront private key from Secrets Manager
+resource "aws_iam_role_policy" "eb_ec2_cloudfront_key_access" {
+  name = "${var.project_name}-${var.environment}-eb-ec2-cloudfront-key"
+  role = aws_iam_role.eb_ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = aws_secretsmanager_secret.cloudfront_private_key.arn
       }
     ]
   })
