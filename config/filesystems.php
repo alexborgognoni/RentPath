@@ -55,6 +55,7 @@ return [
             'report' => false,
         ],
 
+        // Legacy s3 disk (deprecated - use s3_public or s3_private instead)
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -66,6 +67,36 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,
+        ],
+
+        // Private S3 bucket with CloudFront signed URLs
+        's3_private' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),  // Uses IAM role
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),  // Uses IAM role
+            'region' => env('AWS_DEFAULT_REGION', 'eu-central-1'),
+            'bucket' => env('AWS_PRIVATE_BUCKET'),
+            'url' => env('AWS_PRIVATE_URL'),  // CloudFront domain
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+            'visibility' => 'private',
+        ],
+
+        // Public S3 bucket with standard CloudFront URLs
+        's3_public' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),  // Uses IAM role
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),  // Uses IAM role
+            'region' => env('AWS_DEFAULT_REGION', 'eu-central-1'),
+            'bucket' => env('AWS_PUBLIC_BUCKET'),
+            'url' => env('AWS_PUBLIC_URL'),  // CloudFront domain
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+            'visibility' => 'public',
         ],
 
     ],

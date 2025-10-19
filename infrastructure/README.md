@@ -55,10 +55,9 @@ infrastructure/
 ### S3 and CloudFront
 - **Primary Bucket**: Application assets with versioning
 - **Backup Bucket**: Optional separate bucket for backups
-- **CDN**: Optional CloudFront distribution for global content delivery
-- **Security**: Configurable public access (depends on CloudFront usage)
+- **CDN**: CloudFront distribution for global content delivery
+- **Security**: Private bucket with CloudFront Origin Access Control (OAC)
 - **Lifecycle**: Automated transition to IA and Glacier storage
-- **Flexibility**: CloudFront can be enabled/disabled via `s3_use_cloudfront` variable
 
 ### CodePipeline
 - **Source**: GitHub integration via CodeStar connections
@@ -93,7 +92,7 @@ Edit `terraform.tfvars` with your specific values:
 - VPC ID and subnet IDs
 - GitHub repository and branch
 - Instance types and scaling configuration
-- S3 and CloudFront configuration (`s3_use_cloudfront`)
+- S3 versioning and backup bucket settings
 
 ### 3. Create Secrets Manually
 **⚠️ IMPORTANT: Create the app-config secret before running Terraform**
@@ -137,7 +136,7 @@ terraform apply
 The deployment will create:
 - RDS MySQL database (takes ~10-15 minutes)
 - Elastic Beanstalk application and environment
-- S3 buckets and CloudFront distribution
+- S3 buckets with CloudFront CDN
 - CodePipeline for automated deployments
 
 ### 6. Post-Deployment Setup
@@ -262,73 +261,41 @@ terraform {
 
 ## S3 and CloudFront Configuration
 
-### CloudFront Toggle (`s3_use_cloudfront`)
+The infrastructure uses CloudFront CDN for all asset delivery from S3:
 
-The infrastructure supports flexible S3 configuration with optional CloudFront CDN:
-
-#### With CloudFront Enabled (`s3_use_cloudfront = true`)
-- **S3 Access**: Public access blocked for security
-- **CDN**: CloudFront distribution with Origin Access Control (OAC)
-- **File Serving**: All public files served via CloudFront URLs
-- **Security**: Files accessible only through CloudFront, not direct S3 URLs
-- **Performance**: Global edge locations for faster content delivery
-- **Cost**: Additional CloudFront charges apply
-
-#### With CloudFront Disabled (`s3_use_cloudfront = false`) - Default
-- **S3 Access**: Direct public access allowed for public files
-- **CDN**: No CloudFront distribution created
-- **File Serving**: Files served directly from S3 URLs
-- **Security**: Public files accessible via direct S3 URLs
-- **Performance**: Single region S3 serving (faster for regional users)
-- **Cost**: No CloudFront charges
-
-#### Configuration Example
-```hcl
-# In terraform.tfvars
-s3_use_cloudfront = false  # Default: direct S3 access
-# s3_use_cloudfront = true   # Enable for global CDN
-```
-
-#### When to Use CloudFront
-**Enable CloudFront when:**
-- Global user base requiring fast content delivery
-- High traffic volumes that benefit from edge caching
-- Enhanced security requirements (no direct S3 access)
-- Complex caching rules needed
-
-**Disable CloudFront when:**
-- Regional user base (single geography)
-- Lower traffic volumes
-- Cost optimization is priority
-- Simpler architecture preferred
+### Architecture
+- **S3 Bucket**: Private bucket with all public access blocked
+- **CloudFront CDN**: Global content delivery network with Origin Access Control (OAC)
+- **Security**: Files are only accessible through CloudFront, not via direct S3 URLs
+- **Performance**: Global edge locations provide fast content delivery worldwide
+- **Caching**: Configurable cache behavior for optimal performance
 
 ### File Access Patterns
 
-#### Private Files (Always)
-- **ID Documents**: Served via temporary signed URLs
-- **License Documents**: Served via temporary signed URLs
-- **Access**: Authenticated users only, regardless of CloudFront setting
+#### Private Files
+- **ID Documents**: Served via temporary signed URLs through Laravel Storage
+- **License Documents**: Served via temporary signed URLs through Laravel Storage
+- **Access**: Authenticated users only, with time-limited access
 
-#### Public Files (Configuration Dependent)
-- **Profile Pictures**:
-  - With CloudFront: Served via CloudFront URLs
-  - Without CloudFront: Served via direct S3 URLs
-- **Access**: Public access, method depends on `s3_use_cloudfront`
+#### Public Files
+- **Profile Pictures**: Served via CloudFront URLs
+- **Other Assets**: All public assets served through CloudFront
+- **Access**: Public access through CloudFront only (direct S3 access blocked)
 
 ## Cost Optimization
 
-Current configuration is optimized for cost:
+Current configuration balances cost and performance:
 - **t3.micro RDS**: Suitable for development/small production
 - **t3.medium EB instances**: Good performance/cost balance
 - **S3 lifecycle rules**: Automatic archival to reduce storage costs
 - **Single AZ RDS**: Lower cost option (can enable Multi-AZ for HA)
-- **CloudFront**: Optional (disabled by default for cost savings)
+- **CloudFront**: Global CDN with efficient caching to minimize data transfer costs
 
 Estimated monthly costs (EU Central):
 - RDS db.t3.micro: ~$15
 - EB t3.medium (1 instance): ~$30
 - S3 storage: Variable based on usage
-- CloudFront: Variable based on traffic (only if enabled)
+- CloudFront: Variable based on traffic (~$1-10 for low to moderate traffic)
 
 ## Monitoring and Alerting
 
