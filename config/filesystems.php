@@ -85,6 +85,7 @@ return [
         ],
 
         // Public S3 bucket with standard CloudFront URLs
+        // Note: Files are stored with 'private' ACL, but accessible publicly via CloudFront
         's3_public' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),  // Uses IAM role
@@ -96,7 +97,6 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,
-            'visibility' => 'public',
         ],
 
     ],
