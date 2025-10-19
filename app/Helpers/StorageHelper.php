@@ -2,6 +2,10 @@
 
 namespace App\Helpers;
 
+use Aws\CloudFront\CloudFrontClient;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+
 class StorageHelper
 {
     /**
@@ -48,9 +52,6 @@ class StorageHelper
     /**
      * Get a URL for a stored file based on its visibility.
      *
-     * In local environment, private files use Laravel's temporaryUrl (which may not work with local disk).
-     * Consider using a route-based approach for local development.
-     *
      * @param string $path
      * @param string $visibility 'public' or 'private'
      * @param int $expiresInMinutes Only used for private files
@@ -66,20 +67,69 @@ class StorageHelper
 
         // For private files, generate signed URLs
         if ($visibility === 'private') {
-            // In local environment, local disk doesn't support temporaryUrl
-            // Return regular URL (for local dev only - production uses CloudFront signed URLs)
+            // In local environment, return regular URL
             if (app()->environment('local')) {
-                return \Illuminate\Support\Facades\Storage::disk($disk)->url($path);
+                return Storage::disk($disk)->url($path);
             }
 
             // Production: CloudFront signed URL
-            return \Illuminate\Support\Facades\Storage::disk($disk)->temporaryUrl(
-                $path,
-                now()->addMinutes($expiresInMinutes)
-            );
+            return self::getCloudFrontSignedUrl($path, $expiresInMinutes);
         }
 
         // For public files, just return the URL
-        return \Illuminate\Support\Facades\Storage::disk($disk)->url($path);
+        return Storage::disk($disk)->url($path);
+    }
+
+    /**
+     * Generate a CloudFront signed URL for private content.
+     *
+     * @param string $path
+     * @param int $expiresInMinutes
+     * @return string
+     */
+    protected static function getCloudFrontSignedUrl(string $path, int $expiresInMinutes): string
+    {
+        $cloudFrontUrl = config('filesystems.disks.s3_private.url');
+        $keyPairId = env('AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID');
+
+        if (!$cloudFrontUrl || !$keyPairId) {
+            throw new \RuntimeException('CloudFront URL or Key Pair ID not configured');
+        }
+
+        // Get the private key from Secrets Manager (cached for 1 hour)
+        $privateKey = Cache::remember('cloudfront_private_key', 3600, function () {
+            $secretsClient = new \Aws\SecretsManager\SecretsManagerClient([
+                'region' => config('filesystems.disks.s3_private.region'),
+                'version' => 'latest',
+            ]);
+
+            try {
+                $result = $secretsClient->getSecretValue([
+                    'SecretId' => env('AWS_PRIVATE_CLOUDFRONT_SECRET_NAME', 'rentpath-production-cloudfront-private-key'),
+                ]);
+
+                $secret = json_decode($result['SecretString'], true);
+                return $secret['private_key'];
+            } catch (\Exception $e) {
+                throw new \RuntimeException('Failed to retrieve CloudFront private key: ' . $e->getMessage());
+            }
+        });
+
+        // Create CloudFront client
+        $cloudFront = new CloudFrontClient([
+            'region' => config('filesystems.disks.s3_private.region'),
+            'version' => '2020-05-31',
+        ]);
+
+        // Generate signed URL
+        $resourceKey = rtrim($cloudFrontUrl, '/') . '/' . ltrim($path, '/');
+        $expires = time() + ($expiresInMinutes * 60);
+
+        return $cloudFront->getSignedUrl([
+            'url' => $resourceKey,
+            'expires' => $expires,
+            'private_key' => $privateKey,
+            'key_pair_id' => $keyPairId,
+        ]);
     }
 }

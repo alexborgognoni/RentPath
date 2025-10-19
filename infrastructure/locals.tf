@@ -78,9 +78,10 @@ locals {
     AWS_USE_PATH_STYLE_ENDPOINT = var.eb_laravel_config.aws_use_path_style_endpoint ? "true" : "false"
 
     # Private S3 bucket (for ID documents, licenses - requires signed URLs)
-    AWS_PRIVATE_BUCKET                = aws_s3_bucket.private.bucket
-    AWS_PRIVATE_URL                   = "https://${aws_cloudfront_distribution.private.domain_name}"
-    AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID = aws_cloudfront_public_key.private_bucket_key.id
+    AWS_PRIVATE_BUCKET                    = aws_s3_bucket.private.bucket
+    AWS_PRIVATE_URL                       = "https://${aws_cloudfront_distribution.private.domain_name}"
+    AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID    = aws_cloudfront_public_key.private_bucket_key.id
+    AWS_PRIVATE_CLOUDFRONT_SECRET_NAME    = aws_secretsmanager_secret.cloudfront_private_key.name
 
     # Public S3 bucket (for property images, profile pictures - public access)
     AWS_PUBLIC_BUCKET = aws_s3_bucket.public.bucket
