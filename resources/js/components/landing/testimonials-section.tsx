@@ -32,7 +32,7 @@ export function TestimonialsSection() {
             role: translate(translations, 'landing.testimonials.testimonials.amar_ramdedovic.role'),
             company: 'Valora',
             avatar: 'AR',
-            avatarUrl: 'https://i1.static.athome.eu/images/annonces2/agent/21e564872da32ef502948911aa9589583d720136.jpg',
+            avatarUrl: '/images/reviews/reviews_1.jpg',
             rating: 5,
             content: translate(translations, 'landing.testimonials.testimonials.amar_ramdedovic.content'),
         },
@@ -50,8 +50,7 @@ export function TestimonialsSection() {
             role: translate(translations, 'landing.testimonials.testimonials.philippe_hengen.role'),
             company: 'AXA',
             avatar: 'PH',
-            avatarUrl:
-                'https://media.licdn.com/dms/image/v2/C4E03AQEVIRE2F_cMfA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1650549914072?e=1760572800&v=beta&t=41c1UTxyqbx-4appS5xPil1sGV9IvGZ-28yt-KBFpHo',
+            avatarUrl: '/images/reviews/reviews_3.jpeg',
             rating: 5,
             content: translate(translations, 'landing.testimonials.testimonials.philippe_hengen.content'),
         },
