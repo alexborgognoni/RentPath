@@ -46,6 +46,14 @@ class StorageHelper
     public static function store($file, string $path, string $visibility): string
     {
         $disk = self::getDisk($visibility);
+
+        // For S3 buckets, always use 'private' visibility to avoid ACL issues
+        // We use CloudFront for public access, not S3 ACLs
+        if (in_array($disk, ['s3_public', 's3_private'])) {
+            return $file->store($path, ['disk' => $disk, 'visibility' => 'private']);
+        }
+
+        // For local disks, use the specified visibility
         return $file->store($path, $disk);
     }
 
