@@ -86,10 +86,6 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Setup Property Manager Profile" />
             <div className="min-h-screen bg-background">
-                <div className="pointer-events-none absolute inset-0">
-                    <div className="absolute top-20 right-20 h-64 w-64 rounded-full bg-gradient-to-br from-secondary/10 to-primary/10 blur-3xl dark:from-secondary/20 dark:to-primary/20" />
-                    <div className="absolute bottom-20 left-20 h-48 w-48 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 blur-2xl dark:from-primary/20 dark:to-secondary/20" />
-                </div>
                 <div className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="space-y-8">
                         {/* Header */}
