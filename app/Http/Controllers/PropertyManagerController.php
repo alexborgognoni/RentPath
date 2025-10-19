@@ -171,18 +171,55 @@ class PropertyManagerController extends Controller
 
         $validated = $request->validate($rules);
 
-        // Handle file uploads
+        Log::info('Validation passed', ['validated_keys' => array_keys($validated)]);
+        Log::info('Has profile_picture file?', ['result' => $request->hasFile('profile_picture')]);
+        Log::info('Profile picture input', ['value' => $request->input('profile_picture')]);
+
+        // Handle profile picture upload/removal
         if ($request->hasFile('profile_picture')) {
+            Log::info('Processing profile_picture upload');
+
+            // Delete old profile picture if exists
+            if ($propertyManager->profile_picture_path) {
+                $oldDisk = StorageHelper::getDisk('public');
+                if (Storage::disk($oldDisk)->exists($propertyManager->profile_picture_path)) {
+                    Storage::disk($oldDisk)->delete($propertyManager->profile_picture_path);
+                    Log::info('Deleted old profile picture', ['path' => $propertyManager->profile_picture_path]);
+                }
+            }
+
             $validated['profile_picture_path'] = StorageHelper::store(
                 $request->file('profile_picture'),
                 'property-managers/profile-pictures',
                 'public'
             );
+            Log::info('Profile picture stored', ['path' => $validated['profile_picture_path']]);
         } elseif ($request->input('remove_profile_picture')) {
+            Log::info('Removing profile picture');
+
+            // Delete the file from storage
+            if ($propertyManager->profile_picture_path) {
+                $disk = StorageHelper::getDisk('public');
+                if (Storage::disk($disk)->exists($propertyManager->profile_picture_path)) {
+                    Storage::disk($disk)->delete($propertyManager->profile_picture_path);
+                    Log::info('Deleted profile picture file', ['path' => $propertyManager->profile_picture_path]);
+                }
+            }
+
             $validated['profile_picture_path'] = null;
         }
 
+        // Handle ID document upload (also delete old one if replacing)
         if ($request->hasFile('id_document')) {
+            // Delete old document if exists
+            if ($propertyManager->id_document_path) {
+                $oldDisk = StorageHelper::getDisk('private');
+                if (Storage::disk($oldDisk)->exists($propertyManager->id_document_path)) {
+                    Storage::disk($oldDisk)->delete($propertyManager->id_document_path);
+                    Log::info('Deleted old id document', ['path' => $propertyManager->id_document_path]);
+                }
+            }
+
             $validated['id_document_path'] = StorageHelper::store(
                 $request->file('id_document'),
                 'property-managers/id-documents',
@@ -191,7 +228,17 @@ class PropertyManagerController extends Controller
             $validated['id_document_original_name'] = $request->file('id_document')->getClientOriginalName();
         }
 
+        // Handle license document upload (also delete old one if replacing)
         if ($request->hasFile('license_document')) {
+            // Delete old document if exists
+            if ($propertyManager->license_document_path) {
+                $oldDisk = StorageHelper::getDisk('private');
+                if (Storage::disk($oldDisk)->exists($propertyManager->license_document_path)) {
+                    Storage::disk($oldDisk)->delete($propertyManager->license_document_path);
+                    Log::info('Deleted old license document', ['path' => $propertyManager->license_document_path]);
+                }
+            }
+
             $validated['license_document_path'] = StorageHelper::store(
                 $request->file('license_document'),
                 'property-managers/license-documents',
