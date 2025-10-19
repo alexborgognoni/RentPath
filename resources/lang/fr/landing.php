@@ -32,7 +32,7 @@ return [
     // Demo Carousel Section
     'demo_carousel' => [
         'heading' => 'Cliquer. Inviter. Louer.',
-        'subtitle' => 'Examens manuels, candidatures manquées, communication désordonnée - la location est inefficace. Notre plateforme simplifie le parcours locataire.',
+        'subtitle' => 'Plus d\'examens manuels, de demandes manquées et de communication désordonnée. Notre plateforme simplifie le parcours locataire.',
         'interactive_demo' => 'Démo Interactive',
         'slides' => [
             "real_time_dashboard" => [
