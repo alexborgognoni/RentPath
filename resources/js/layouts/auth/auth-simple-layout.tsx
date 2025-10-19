@@ -16,11 +16,6 @@ export default function AuthSimpleLayout({ children, title, description }: Props
                 <LanguageSelector />
             </div>
 
-            <div className="absolute inset-0">
-                <div className="absolute top-20 right-20 h-64 w-64 rounded-full bg-gradient-to-br from-secondary/5 to-primary/5 blur-3xl dark:from-secondary/10 dark:to-primary/10" />
-                <div className="absolute bottom-20 left-20 h-48 w-48 rounded-full bg-gradient-to-br from-primary/5 to-secondary/5 blur-2xl dark:from-primary/10 dark:to-secondary/10" />
-            </div>
-
             <div className="relative w-full max-w-sm">
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col items-center gap-4">
