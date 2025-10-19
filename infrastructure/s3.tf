@@ -392,7 +392,7 @@ resource "aws_cloudfront_distribution" "public" {
   })
 }
 
-# S3 bucket policy for public bucket (CloudFront OAC only)
+# S3 bucket policy for public bucket (CloudFront OAC + Backend IAM role)
 resource "aws_s3_bucket_policy" "public" {
   bucket = aws_s3_bucket.public.id
 
@@ -412,6 +412,23 @@ resource "aws_s3_bucket_policy" "public" {
             "AWS:SourceArn" = aws_cloudfront_distribution.public.arn
           }
         }
+      },
+      {
+        Sid    = "AllowBackendIAMRole"
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_iam_role.eb_ec2_role.arn
+        }
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "${aws_s3_bucket.public.arn}/*",
+          aws_s3_bucket.public.arn
+        ]
       }
     ]
   })
