@@ -508,7 +508,6 @@ export function DemoCarouselSection() {
             {fullscreenImage && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
-                    onClick={() => setFullscreenImage(null)}
                 >
                     <button
                         onClick={() => setFullscreenImage(null)}
