@@ -286,14 +286,7 @@ export function DemoCarouselSection() {
                                                 <div ref={idx === NUM_SLIDES ? imageRowRef : null} className="flex items-end justify-center bg-background pb-6" id="demo-card">
                                                     <div className="group relative w-full">
                                                         <div
-                                                            className="mx-auto flex w-full items-end justify-center overflow-hidden relative cursor-pointer bg-background"
-                                                            onClick={() => {
-                                                                if (slide.imagePathLight || slide.imagePathDark) {
-                                                                    const isDark = document.documentElement.classList.contains('dark');
-                                                                    const imagePath = isDark ? slide.imagePathDark : slide.imagePathLight;
-                                                                    if (imagePath) setFullscreenImage(imagePath);
-                                                                }
-                                                            }}
+                                                            className="mx-auto flex w-full items-end justify-center overflow-hidden relative bg-background"
                                                         >
                                                             {slide.imagePathLight || slide.imagePathDark ? (
                                                                 <>
@@ -311,7 +304,23 @@ export function DemoCarouselSection() {
                                                                             className="hidden w-full object-contain object-bottom dark:block transition-all duration-300 group-hover:brightness-75 bg-background"
                                                                         />
                                                                     )}
-                                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                                                    {/* Mobile: Always visible maximize icon */}
+                                                                    <div
+                                                                        className="absolute bottom-4 right-4 flex md:hidden"
+                                                                        onClick={() => {
+                                                                            if (slide.imagePathLight || slide.imagePathDark) {
+                                                                                const isDark = document.documentElement.classList.contains('dark');
+                                                                                const imagePath = isDark ? slide.imagePathDark : slide.imagePathLight;
+                                                                                if (imagePath) setFullscreenImage(imagePath);
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary/40 bg-gradient-to-r from-background/80 to-background/80 shadow-inner backdrop-blur-md cursor-pointer">
+                                                                            <Maximize2 className="h-5 w-5 text-foreground/80" />
+                                                                        </div>
+                                                                    </div>
+                                                                    {/* Desktop: Hover to show maximize icon */}
+                                                                    <div className="absolute inset-0 hidden md:flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                                                                         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm">
                                                                             <Maximize2 className="h-8 w-8 text-white" />
                                                                         </div>
@@ -450,7 +459,7 @@ export function DemoCarouselSection() {
                             {/* Mobile Chevron Buttons - At center of image row */}
                             <button
                                 onClick={prevSlide}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 lg:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
+                                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 lg:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-primary/40 bg-gradient-to-r from-background/80 to-background/80 shadow-inner backdrop-blur-md"
                                 style={{
                                     top: 'calc(var(--image-row-height, 50%) / 2)'
                                 }}
@@ -459,7 +468,7 @@ export function DemoCarouselSection() {
                             </button>
                             <button
                                 onClick={nextSlide}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 lg:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 lg:hidden group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-primary/40 bg-gradient-to-r from-background/80 to-background/80 shadow-inner backdrop-blur-md"
                                 style={{
                                     top: 'calc(var(--image-row-height, 50%) / 2)'
                                 }}
@@ -475,7 +484,7 @@ export function DemoCarouselSection() {
                             {/* Desktop Chevrons */}
                             <button
                                 onClick={prevSlide}
-                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 mr-6"
+                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-primary/40 bg-background/80 shadow-inner backdrop-blur-md transition-all duration-300 hover:scale-110 hover:bg-background/90 mr-6"
                             >
                                 <ChevronLeft className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
@@ -496,7 +505,7 @@ export function DemoCarouselSection() {
                             {/* Desktop Chevrons */}
                             <button
                                 onClick={nextSlide}
-                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 ml-6"
+                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-primary/40 bg-background/80 shadow-inner backdrop-blur-md transition-all duration-300 hover:scale-110 hover:bg-background/90 ml-6"
                             >
                                 <ChevronRight className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
