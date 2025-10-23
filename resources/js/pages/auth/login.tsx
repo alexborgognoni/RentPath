@@ -104,7 +104,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 <Label htmlFor="remember">{t(translations.auth, 'login.remember_me')}</Label>
                             </div>
 
-                            <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
+                            <Button type="submit" className="mt-4 w-full cursor-pointer" tabIndex={4} disabled={processing}>
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                 {t(translations.auth, 'login.login_button')}
                             </Button>
