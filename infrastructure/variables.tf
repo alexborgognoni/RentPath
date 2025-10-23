@@ -141,24 +141,24 @@ variable "eb_laravel_config" {
   description = "Laravel application configuration (non-sensitive)"
   type = object({
     # Application Configuration
-    app_name                = string
-    app_env                 = string
-    app_debug               = bool
-    app_locale              = string
-    app_fallback_locale     = string
-    app_faker_locale        = string
-    app_maintenance_driver  = string
-    php_cli_server_workers  = number
+    app_name               = string
+    app_env                = string
+    app_debug              = bool
+    app_locale             = string
+    app_fallback_locale    = string
+    app_faker_locale       = string
+    app_maintenance_driver = string
+    php_cli_server_workers = number
     bcrypt_rounds          = number
 
     # Database Configuration (non-sensitive)
     db_connection = string
 
     # Logging Configuration
-    log_channel             = string
-    log_stack              = string
+    log_channel              = string
+    log_stack                = string
     log_deprecations_channel = string
-    log_level              = string
+    log_level                = string
 
     # Session Configuration
     session_driver   = string
@@ -169,10 +169,10 @@ variable "eb_laravel_config" {
 
     # Cache and Queue Configuration
     broadcast_connection = string
-    filesystem_disk     = string
-    queue_connection    = string
-    cache_store        = string
-    cache_prefix       = string
+    filesystem_disk      = string
+    queue_connection     = string
+    cache_store          = string
+    cache_prefix         = string
 
     # Redis Configuration
     redis_client = string
@@ -188,7 +188,7 @@ variable "eb_laravel_config" {
     mail_from_name    = string
 
     # AWS Configuration (non-sensitive)
-    aws_default_region           = string
+    aws_default_region          = string
     aws_use_path_style_endpoint = bool
   })
 }
@@ -197,30 +197,36 @@ variable "eb_laravel_config" {
 variable "domain_name" {
   description = "Domain name for the application"
   type        = string
-  default     = "rent-path.com"
 }
 
-# Email configuration
+# Email Configuration
 variable "mx_record_value" {
-  description = "MX record value for email routing"
+  description = "MX record value for email routing (including priority)"
   type        = string
-  default     = "0 rentpath-com01b.mail.protection.outlook.com"
 }
 
-variable "dkim_selector" {
-  description = "DKIM selector for email authentication"
+# Microsoft 365 DKIM Configuration
+variable "dkim_selector1_cname" {
+  description = "CNAME target for DKIM selector1 record"
   type        = string
-  default     = "20241225054753pm"
 }
 
-variable "dkim_public_key" {
-  description = "DKIM public key for email authentication"
+variable "dkim_selector2_cname" {
+  description = "CNAME target for DKIM selector2 record"
   type        = string
-  default     = "k=rsa;p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6WRnNRirDbZHgg4WZ+WzQrgKX/t5RTuDIxOE88cbdnjiB4YALm7PNHx6qRJXGe8PgONg4XStdswUCSw/FU/2Mj+HcCbUi369X4UUFL5fl0Rh6P5fV2LAvVL4b28Te0QshW887rjXLiM7JEVGFQmz1ptSweXULHFdjn5KGNxWJRwIDAQAB"
 }
 
-variable "pm_bounces_cname" {
-  description = "CNAME target for pm-bounces subdomain"
+variable "spf_record" {
+  description = "SPF record for email authentication (provider-specific)"
   type        = string
-  default     = "pm.mtasv.net"
+}
+
+variable "autodiscover_cname" {
+  description = "CNAME target for autodiscover (email client auto-configuration)"
+  type        = string
+}
+
+variable "dmarc_reporting_email" {
+  description = "Email address to receive DMARC reports (DMARC record will be auto-generated)"
+  type        = string
 }
