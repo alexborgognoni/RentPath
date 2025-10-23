@@ -129,7 +129,7 @@ export default function Register() {
                                 <InputError message={errors.password_confirmation} />
                             </div>
 
-                            <Button type="submit" className="mt-2 w-full" tabIndex={6}>
+                            <Button type="submit" className="mt-2 w-full cursor-pointer" tabIndex={6}>
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                 {t(translations.auth, 'register.create_account_button')}
                             </Button>
