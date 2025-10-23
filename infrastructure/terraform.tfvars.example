@@ -94,7 +94,7 @@ eb_laravel_config = {
   mail_scheme       = "null"
   mail_host         = "127.0.0.1"  # Your SMTP server host
   mail_port         = 587
-  mail_from_address = "hello@rentpath.com"
+  mail_from_address = "hello@rentpath.app"
   mail_from_name    = "RentPath"
 
   # AWS Configuration (non-sensitive)

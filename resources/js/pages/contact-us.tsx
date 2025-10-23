@@ -15,7 +15,7 @@ export default function ContactUs() {
 
     // Contact information constants
     const CONTACT_INFO = {
-        email: 'contact@rent-path.com',
+        email: 'contact@rentpath.app',
         phone: '+352 661 290 897',
         address: '4, rue de Drusenheim',
         city: 'L-3884 Schifflange',

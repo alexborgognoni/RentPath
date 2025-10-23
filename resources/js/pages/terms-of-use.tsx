@@ -13,7 +13,7 @@ export default function TermsOfUse() {
         address: '4, rue de Drusenheim',
         city: 'L-3884 Schifflange',
         country: 'Luxembourg',
-        email: 'contact@rent-path.com'
+        email: 'contact@rentpath.app'
     };
 
     // Links constants
