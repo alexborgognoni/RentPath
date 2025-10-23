@@ -194,7 +194,7 @@ return [
             ],
             'pricing' => [
                 'unit' => 'per agent/month',
-                'offer' => '🎉 Get 3 months FREE when you sign up!',
+                'offer' => '🎉 Get 1 month FREE when you sign up!',
             ],
             'get_started_button' => 'Get Started',
         ],

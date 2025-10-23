@@ -194,7 +194,7 @@ return [
             ],
             'pricing' => [
                 'unit' => 'par agent/mois',
-                'offer' => '🎉 Obtenez 3 mois GRATUITS à l\'inscription!',
+                'offer' => '🎉 Obtenez 1 mois GRATUIT à l\'inscription!',
             ],
             'get_started_button' => 'Commencer',
         ],
