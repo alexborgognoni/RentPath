@@ -129,7 +129,7 @@ return [
 
     // Testimonials Section
     'testimonials' => [
-        'heading' => 'Vertrouwd door Vastgoedprofessionals',
+        'heading' => 'Vertrouwd door Vastgoed­professionals',
         'subtitle' => 'Ontdek waarom honderden makelaars, vastgoedbeheerders en verhuurders RentPath kiezen om hun verhuur te stroomlijnen.',
         'testimonials' => [
             'amar_ramdedovic' => [
