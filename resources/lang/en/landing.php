@@ -17,7 +17,7 @@ return [
         'subtitle' => 'Transform tenant placements with seamless applications, automated profile reviews and follow-ups.',
         'complete_applications' => [
             'title' => 'Complete Applications',
-            'description' => 'Stop chasing documents or references. Invite tenants & collect applications in one place.',
+            'description' => 'Stop chasing documents or references — invite tenants & collect applications in one place.',
         ],
         'streamlined_leasing' => [
             'title' => 'Streamlined Leasing',
