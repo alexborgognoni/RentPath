@@ -88,21 +88,47 @@ resource "aws_route53_record" "mx_record" {
   records = [var.mx_record_value]
 }
 
-# DKIM TXT record for email authentication
-resource "aws_route53_record" "dkim_record" {
+# DKIM CNAME records for Microsoft 365 email authentication
+resource "aws_route53_record" "dkim_selector1" {
   zone_id = aws_route53_zone.main.zone_id
-  name    = "${var.dkim_selector}._domainkey.${var.domain_name}"
-  type    = "TXT"
-  ttl     = 300
-  records = [var.dkim_public_key]
-}
-
-# CNAME record for email bounce handling
-resource "aws_route53_record" "pm_bounces" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "pm-bounces.${var.domain_name}"
+  name    = "selector1._domainkey.${var.domain_name}"
   type    = "CNAME"
   ttl     = 300
-  records = [var.pm_bounces_cname]
+  records = [var.dkim_selector1_cname]
+}
+
+resource "aws_route53_record" "dkim_selector2" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "selector2._domainkey.${var.domain_name}"
+  type    = "CNAME"
+  ttl     = 300
+  records = [var.dkim_selector2_cname]
+}
+
+# SPF TXT record for email authentication
+resource "aws_route53_record" "spf" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = var.domain_name
+  type    = "TXT"
+  ttl     = 300
+  records = [var.spf_record]
+}
+
+# Autodiscover CNAME for Microsoft 365 email client configuration
+resource "aws_route53_record" "autodiscover" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "autodiscover.${var.domain_name}"
+  type    = "CNAME"
+  ttl     = 300
+  records = [var.autodiscover_cname]
+}
+
+# DMARC TXT record for email authentication policy
+resource "aws_route53_record" "dmarc" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "_dmarc.${var.domain_name}"
+  type    = "TXT"
+  ttl     = 300
+  records = ["v=DMARC1; p=none; rua=mailto:${var.dmarc_reporting_email}; pct=100"]
 }
 

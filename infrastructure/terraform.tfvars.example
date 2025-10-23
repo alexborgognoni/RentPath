@@ -103,6 +103,30 @@ eb_laravel_config = {
 }
 
 # ==============================================================================
+# DOMAIN CONFIGURATION
+# ==============================================================================
+domain_name = "yourdomain.com"
+
+# ==============================================================================
+# EMAIL DNS CONFIGURATION (Microsoft 365 / GoDaddy)
+# ==============================================================================
+# Get these values from your email provider's DNS settings in GoDaddy
+# For Microsoft 365:
+mx_record_value       = "0 yourdomain-com.mail.protection.outlook.com."
+dkim_selector1_cname  = "selector1-yourdomain-com._domainkey.XXXXXXXXX.k-v1.dkim.mail.microsoft"
+dkim_selector2_cname  = "selector2-yourdomain-com._domainkey.XXXXXXXXX.k-v1.dkim.mail.microsoft"
+spf_record            = "v=spf1 include:spf.protection.outlook.com -all"
+autodiscover_cname    = "autodiscover.outlook.com"
+dmarc_reporting_email = "admin@yourdomain.com"  # Email to receive DMARC reports
+
+# For Google Workspace:
+# mx_record_value       = "1 aspmx.l.google.com."
+# dkim_selector1_cname  = "google._domainkey.XXXXXXXXX.ghs.googlehosted.com"
+# spf_record            = "v=spf1 include:_spf.google.com -all"
+# autodiscover_cname    = "Not applicable for Google Workspace"
+# dmarc_reporting_email = "admin@yourdomain.com"
+
+# ==============================================================================
 # ENVIRONMENT-SPECIFIC EXAMPLES:
 # ==============================================================================
 
