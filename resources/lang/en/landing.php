@@ -3,7 +3,7 @@
 return [
     // Hero Section
     'hero' => [
-        'heading_primary' => 'Streamlined Tenant Applications,',
+        'heading_primary' => 'Streamlined Rental Applications',
         'heading_highlighted' => 'From First Interest to Move-In',
         'subtitle' => 'No more incomplete applications or endless chasing. Invite, track, and follow up on leads instantly.',
         'cta_primary_auth' => 'Go to Dashboard',

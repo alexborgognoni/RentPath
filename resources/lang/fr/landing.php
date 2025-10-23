@@ -3,7 +3,7 @@
 return [
     // Hero Section
     'hero' => [
-        'heading_primary' => 'Candidatures Locataires Simplifiées,',
+        'heading_primary' => 'Candidatures Locataires Simplifiées',
         'heading_highlighted' => 'Du Premier Intérêt à L\'Emménagement',
         'subtitle' => 'Fini les candidatures incomplètes et les relances interminables. Invitez, suivez et assurez le suivi des prospects instantanément.',
         'cta_primary_auth' => 'Aller au Tableau de Bord',

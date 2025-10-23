@@ -3,7 +3,7 @@
 return [
     // Hero Section
     'hero' => [
-        'heading_primary' => 'Optimierte Mietberwerbungen,',
+        'heading_primary' => 'Optimierte Miet­bewerbungen',
         'heading_highlighted' => 'Vom Ersten Interesse bis zum Einzug',
         'subtitle' => 'Keine unvollständigen Bewerbungen oder endloses Nachhaken mehr. Leads einladen, verfolgen und in Echtzeit verwalten.',
         'cta_primary_auth' => 'Zum Dashboard',
