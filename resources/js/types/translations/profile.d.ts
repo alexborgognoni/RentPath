@@ -14,6 +14,7 @@ interface ProfileTranslations {
         company_website_placeholder: string;
         license_number: string;
         license_number_placeholder: string;
+        license_number_tooltip: string;
         phone_number: string;
         phone_number_placeholder: string;
         profile_picture: string;

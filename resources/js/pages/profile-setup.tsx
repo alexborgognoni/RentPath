@@ -4,7 +4,7 @@ import { type SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { Head, useForm, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Building, ChevronDown, Trash2, Upload, User as UserIcon } from 'lucide-react';
+import { AlertCircle, Building, ChevronDown, Info, Trash2, Upload, User as UserIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface ProfileSetupProps {
@@ -19,6 +19,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
     const { translations } = usePage<SharedData>().props;
     const [selectedType, setSelectedType] = useState<'individual' | 'professional'>(propertyManager?.type || 'individual');
     const [clientErrors, setClientErrors] = useState<{[key: string]: string}>({});
+    const [showLicenseTooltip, setShowLicenseTooltip] = useState(false);
     
     // Track original values for change detection
     const originalValues = {
@@ -41,6 +42,20 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         id_document: null as File | null,
         license_document: null as File | null,
     });
+
+    // Close tooltip on scroll (mobile)
+    useEffect(() => {
+        const handleScroll = () => {
+            if (showLicenseTooltip) {
+                setShowLicenseTooltip(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, true);
+        return () => {
+            window.removeEventListener('scroll', handleScroll, true);
+        };
+    }, [showLicenseTooltip]);
 
     // Set default phone country based on user location or ensure form data is properly initialized
     useEffect(() => {
@@ -761,8 +776,27 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     </div>
 
                                     <div>
-                                        <label htmlFor="license_number" className="block text-sm font-medium text-foreground">
-                                            {t(translations.profile, 'setup.license_number')} <span className="text-destructive">*</span>
+                                        <label htmlFor="license_number" className="flex items-center gap-2 text-sm font-medium text-foreground">
+                                            <span>
+                                                {t(translations.profile, 'setup.license_number')} <span className="text-destructive">*</span>
+                                            </span>
+                                            <div className="group relative inline-block">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowLicenseTooltip(!showLicenseTooltip)}
+                                                    onMouseEnter={() => setShowLicenseTooltip(true)}
+                                                    onMouseLeave={() => setShowLicenseTooltip(false)}
+                                                    className="cursor-pointer"
+                                                >
+                                                    <Info className="h-4 w-4 text-primary" />
+                                                </button>
+                                                <div className={`absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-3 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border border-border z-10 transition-opacity duration-200 ${showLicenseTooltip ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+                                                    <p className="leading-relaxed">
+                                                        {t(translations.profile, 'setup.license_number_tooltip')}
+                                                    </p>
+                                                    <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-border"></div>
+                                                </div>
+                                            </div>
                                         </label>
                                         <input
                                             type="text"
