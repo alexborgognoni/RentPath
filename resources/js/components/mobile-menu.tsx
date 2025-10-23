@@ -253,7 +253,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                 <>
                                     <a
                                         href="/login"
-                                        className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-white shadow-xs transition-all hover:scale-105"
+                                        className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-base font-semibold text-white shadow-xs transition-all hover:scale-105"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         {t(translations.header, 'login')}
@@ -344,14 +344,14 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                         {/* Settings/Sign Out Section - Bottom (logged in) */}
                         {auth.user && (
                             <div className="space-y-2 pt-4">
-                                <Button variant="outline" className="w-full justify-start h-9" asChild>
+                                <Button variant="outline" className="w-full justify-start h-11 text-base" asChild>
                                     <a href="/settings" onClick={() => setIsOpen(false)}>
-                                        <Settings size={18} />
+                                        <Settings size={20} />
                                         <span>{t(translations.header, 'settings')}</span>
                                     </a>
                                 </Button>
-                                <Button variant="destructive" className="w-full justify-start h-9" onClick={handleLogoutClick}>
-                                    <LogOut size={18} />
+                                <Button variant="destructive" className="w-full justify-start h-11 text-base" onClick={handleLogoutClick}>
+                                    <LogOut size={20} />
                                     <span>{t(translations.header, 'sign_out')}</span>
                                 </Button>
                             </div>
