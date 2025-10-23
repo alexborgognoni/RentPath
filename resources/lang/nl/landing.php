@@ -194,7 +194,7 @@ return [
             ],
             'pricing' => [
                 'unit' => 'per makelaar/maand',
-                'offer' => '🎉 Krijg 3 maanden GRATIS bij aanmelding!',
+                'offer' => '🎉 Krijg 1 maand GRATIS bij aanmelding!',
             ],
             'get_started_button' => 'Aan de Slag',
         ],
