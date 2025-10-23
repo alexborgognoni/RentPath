@@ -84,6 +84,7 @@ export function DemoCarouselSection() {
             const handleEscape = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
                     setFullscreenImage(null);
+                    setIsManuallyControlled(true);
                 }
             };
 
@@ -117,8 +118,8 @@ export function DemoCarouselSection() {
     useEffect(() => {
         if (intervalRef.current) clearInterval(intervalRef.current);
 
-        // Don't auto-slide when in fullscreen mode
-        if (fullscreenImage) return;
+        // Don't auto-slide when in fullscreen mode or dragging
+        if (fullscreenImage || isDragging) return;
 
         const delay = isManuallyControlled ? 15000 : 5000;
         intervalRef.current = setInterval(() => {
@@ -129,7 +130,7 @@ export function DemoCarouselSection() {
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [isManuallyControlled, fullscreenImage]);
+    }, [isManuallyControlled, fullscreenImage, isDragging]);
 
     // Reset position without animation when reaching edges
     useEffect(() => {
@@ -510,7 +511,10 @@ export function DemoCarouselSection() {
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
                 >
                     <button
-                        onClick={() => setFullscreenImage(null)}
+                        onClick={() => {
+                            setFullscreenImage(null);
+                            setIsManuallyControlled(true);
+                        }}
                         className="absolute right-4 top-4 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all hover:bg-black/80 cursor-pointer"
                     >
                         <X className="h-6 w-6 text-white" />
