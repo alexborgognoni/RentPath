@@ -288,7 +288,7 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
                                             onChange={handleFileChange('id_document')}
                                             className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-white hover:file:bg-primary/90"
                                         />{' '}
-                                        <p className="mt-1 text-xs text-muted-foreground">Max size: 5MB. Formats: PDF, JPG, PNG</p>{' '}
+                                        <p className="mt-1 text-xs text-muted-foreground">Max size: 20MB. Formats: PDF, JPG, PNG</p>{' '}
                                     </div>{' '}
                                     {/* License Document */}{' '}
                                     {formData.type === 'professional' && (
@@ -301,7 +301,7 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
                                                 onChange={handleFileChange('license_document')}
                                                 className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-white hover:file:bg-primary/90"
                                             />{' '}
-                                            <p className="mt-1 text-xs text-muted-foreground">Max size: 5MB. Formats: PDF, JPG, PNG</p>{' '}
+                                            <p className="mt-1 text-xs text-muted-foreground">Max size: 20MB. Formats: PDF, JPG, PNG</p>{' '}
                                         </div>
                                     )}{' '}
                                 </div>{' '}

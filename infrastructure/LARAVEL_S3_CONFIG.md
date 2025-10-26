@@ -242,7 +242,7 @@ class PropertyManagerController extends Controller
     public function uploadIdDocument(Request $request, PropertyManager $propertyManager)
     {
         $request->validate([
-            'id_document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',  // 5MB
+            'id_document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:20480',  // 20MB
         ]);
 
         $path = Storage::disk('s3_private')->putFile(
