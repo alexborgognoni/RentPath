@@ -919,7 +919,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             onDragOver={handleDragOver}
                                             onDrop={(e) => handleDrop(e, 'license_document')}
                                         >
-                                            <div className="space-y-1 text-center">
+                                            <div className="w-full space-y-1 text-center">
                                                 <label htmlFor="license_document" className="cursor-pointer">
                                                     <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                                                 </label>
