@@ -132,6 +132,11 @@ class PropertyManagerController extends Controller
     {
         Log::info('Profile update request received', $request->all());
 
+        // Log raw file upload info from $_FILES
+        if (!empty($_FILES)) {
+            Log::info('Raw $_FILES data', $_FILES);
+        }
+
         // Log file upload errors before validation
         foreach (['profile_picture', 'id_document', 'license_document'] as $field) {
             if ($request->hasFile($field)) {
