@@ -333,14 +333,14 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             id="profile_picture"
                                             name="profile_picture"
                                             type="file"
-                                            accept=".jpg,.jpeg,.png"
+                                            accept=".jpg,.jpeg,.png,.webp"
                                             className="sr-only"
                                             onChange={(e) => {
                                                 const file = e.target.files?.[0];
                                                 if (file) {
-                                                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                                                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
                                                     if (!validTypes.includes(file.type)) {
-                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be a JPG or PNG file'}));
+                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be a JPG, PNG, or WEBP file'}));
                                                         setData('profile_picture', null);
                                                         e.target.value = '';
                                                         return;
