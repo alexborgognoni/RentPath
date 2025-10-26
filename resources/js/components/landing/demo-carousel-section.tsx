@@ -484,7 +484,7 @@ export function DemoCarouselSection() {
                             {/* Desktop Chevrons */}
                             <button
                                 onClick={prevSlide}
-                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-primary/40 bg-background/80 shadow-inner backdrop-blur-md transition-all duration-300 hover:scale-110 hover:bg-background/90 mr-6"
+                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 mr-6"
                             >
                                 <ChevronLeft className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
@@ -505,7 +505,7 @@ export function DemoCarouselSection() {
                             {/* Desktop Chevrons */}
                             <button
                                 onClick={nextSlide}
-                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-primary/40 bg-background/80 shadow-inner backdrop-blur-md transition-all duration-300 hover:scale-110 hover:bg-background/90 ml-6"
+                                className="hidden lg:flex group h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-border/20 bg-gradient-to-r from-primary/10 to-secondary/10 shadow-inner backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:from-primary/20 hover:to-secondary/20 ml-6"
                             >
                                 <ChevronRight className="h-5 w-5 text-foreground/80 transition-colors duration-300 group-hover:text-primary" />
                             </button>
