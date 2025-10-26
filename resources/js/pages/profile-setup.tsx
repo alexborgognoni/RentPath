@@ -188,15 +188,9 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         console.log('- license_document:', data.license_document, 'Type:', data.license_document?.constructor?.name);
 
         if (isEditing) {
-            // Add method spoofing for PUT request
-            const formDataWithMethod = {
-                ...formData,
-                _method: 'PUT'
-            };
-            
             try {
-                console.log('About to call router.post() with method spoofing');
-                router.post('/edit-profile', formDataWithMethod, {
+                console.log('About to call router.post() for edit-profile');
+                router.post('/edit-profile', formData, {
                     forceFormData: true,
                     onSuccess: (page) => {
                         console.log('Update successful', page);
@@ -207,7 +201,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                     onStart: () => console.log('Update started'),
                     onFinish: () => console.log('Update finished'),
                 });
-                console.log('router.post() with method spoofing call completed');
+                console.log('router.post() call completed');
             } catch (error) {
                 console.error('Error calling router.post():', error);
             }
