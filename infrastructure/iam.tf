@@ -260,14 +260,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
       {
         Effect = "Allow"
         Action = [
-          "elasticbeanstalk:CreateApplicationVersion",
-          "elasticbeanstalk:DescribeApplicationVersions",
-          "elasticbeanstalk:DescribeApplications",
-          "elasticbeanstalk:DescribeEnvironments",
-          "elasticbeanstalk:DescribeEnvironmentHealth",
-          "elasticbeanstalk:DescribeInstancesHealth",
-          "elasticbeanstalk:DescribeEnvironmentResources",
-          "elasticbeanstalk:UpdateEnvironment"
+          "elasticbeanstalk:*"
         ]
         Resource = "*"
       },
