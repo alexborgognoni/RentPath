@@ -56,7 +56,7 @@ class PropertyManagerController extends Controller
             'type' => ['required', Rule::in(['individual', 'professional'])],
             'phone_country_code' => 'required|string|max:10',
             'phone_number' => 'required|string|max:20',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png|max:5120',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
             'id_document' => 'required|file|mimes:pdf,jpeg,png,jpg|max:20480',
         ];
 
@@ -142,7 +142,7 @@ class PropertyManagerController extends Controller
             'type' => ['required', Rule::in(['individual', 'professional'])],
             'phone_country_code' => 'required|string|max:10',
             'phone_number' => 'required|string|max:20',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png|max:5120',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
         ];
 
         // Only require documents if they don't already exist
