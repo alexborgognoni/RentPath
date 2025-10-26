@@ -131,9 +131,27 @@ class PropertyManagerController extends Controller
     public function update(Request $request)
     {
         Log::info('Profile update request received', $request->all());
-        
+
+        // Log file upload errors before validation
+        foreach (['profile_picture', 'id_document', 'license_document'] as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                Log::info("$field upload info", [
+                    'error' => $file->getError(),
+                    'error_message' => $file->getErrorMessage(),
+                    'size' => $file->getSize(),
+                    'mime' => $file->getMimeType(),
+                    'original_name' => $file->getClientOriginalName(),
+                ]);
+            } elseif ($request->has($field)) {
+                Log::warning("$field not detected as file in request", [
+                    'input_value' => $request->input($field),
+                ]);
+            }
+        }
+
         $propertyManager = Auth::user()->propertyManager;
-        
+
         if (!$propertyManager) {
             return redirect()->route('property-manager.create');
         }
