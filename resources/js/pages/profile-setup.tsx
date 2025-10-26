@@ -254,6 +254,10 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                 setClientErrors(prev => ({...prev, [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be a PDF, PNG, or JPEG file`}));
                 return;
             }
+            if (file.size > 20 * 1024 * 1024) {
+                setClientErrors(prev => ({...prev, [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be less than 20MB`}));
+                return;
+            }
             setData(fieldName, file);
             clearFieldError(fieldName);
         }
@@ -337,6 +341,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                     const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
                                                     if (!validTypes.includes(file.type)) {
                                                         setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be a JPG or PNG file'}));
+                                                        setData('profile_picture', null);
+                                                        e.target.value = '';
+                                                        return;
+                                                    }
+                                                    if (file.size > 5 * 1024 * 1024) {
+                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be less than 5MB'}));
                                                         setData('profile_picture', null);
                                                         e.target.value = '';
                                                         return;
@@ -857,6 +867,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                             e.target.value = '';
                                                             return;
                                                         }
+                                                        if (file.size > 20 * 1024 * 1024) {
+                                                            setClientErrors(prev => ({...prev, id_document: 'ID document must be less than 20MB'}));
+                                                            setData('id_document', null);
+                                                            e.target.value = '';
+                                                            return;
+                                                        }
                                                     }
                                                     setData('id_document', file || null);
                                                     clearFieldError('id_document');
@@ -934,6 +950,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                             const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
                                                             if (!validTypes.includes(file.type)) {
                                                                 setClientErrors(prev => ({...prev, license_document: 'License document must be a PDF, PNG, or JPEG file'}));
+                                                                setData('license_document', null);
+                                                                e.target.value = '';
+                                                                return;
+                                                            }
+                                                            if (file.size > 20 * 1024 * 1024) {
+                                                                setClientErrors(prev => ({...prev, license_document: 'License document must be less than 20MB'}));
                                                                 setData('license_document', null);
                                                                 e.target.value = '';
                                                                 return;

@@ -56,15 +56,15 @@ class PropertyManagerController extends Controller
             'type' => ['required', Rule::in(['individual', 'professional'])],
             'phone_country_code' => 'required|string|max:10',
             'phone_number' => 'required|string|max:20',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'id_document' => 'required|file|mimes:pdf,jpeg,png,jpg|max:5120',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png|max:5120',
+            'id_document' => 'required|file|mimes:pdf,jpeg,png,jpg|max:20480',
         ];
 
         if ($request->input('type') === 'professional') {
             $rules['company_name'] = 'required|string|max:255';
             $rules['company_website'] = 'nullable|url|max:255';
             $rules['license_number'] = 'required|string|max:255';
-            $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:5120';
+            $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
 
         $validated = $request->validate($rules);
@@ -142,31 +142,31 @@ class PropertyManagerController extends Controller
             'type' => ['required', Rule::in(['individual', 'professional'])],
             'phone_country_code' => 'required|string|max:10',
             'phone_number' => 'required|string|max:20',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png|max:5120',
         ];
 
         // Only require documents if they don't already exist
         if (!$propertyManager->id_document_path) {
-            $rules['id_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:5120';
+            $rules['id_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
         } else {
-            $rules['id_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120';
+            $rules['id_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
 
         if ($request->input('type') === 'professional') {
             $rules['company_name'] = 'required|string|max:255';
             $rules['company_website'] = 'nullable|url|max:255';
             $rules['license_number'] = 'required|string|max:255';
-            
+
             if (!$propertyManager->license_document_path) {
-                $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:5120';
+                $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
             } else {
-                $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120';
+                $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
             }
         } else {
             $rules['company_name'] = 'nullable|string|max:255';
             $rules['company_website'] = 'nullable|url|max:255';
             $rules['license_number'] = 'nullable|string|max:255';
-            $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120';
+            $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
 
         $validated = $request->validate($rules);
