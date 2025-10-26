@@ -59,8 +59,7 @@ resource "aws_db_instance" "main" {
 
   # Performance and monitoring
   parameter_group_name = aws_db_parameter_group.main.name
-  monitoring_interval  = 60
-  monitoring_role_arn  = aws_iam_role.rds_monitoring.arn
+  monitoring_interval  = 0
 
   # High availability
   multi_az = var.rds_multi_az
