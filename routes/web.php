@@ -111,7 +111,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('profile.unverified');
     Route::get('edit-profile', [PropertyManagerController::class, 'edit'])
         ->name('property-manager.edit');
-    Route::put('edit-profile', [PropertyManagerController::class, 'update'])
+    Route::post('edit-profile', [PropertyManagerController::class, 'update'])
         ->name('property-manager.update');
     Route::get('property-manager/document/{type}', [PropertyManagerController::class, 'serveDocument'])
         ->name('property-manager.document');
