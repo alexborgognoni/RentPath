@@ -13,7 +13,7 @@ resource "aws_codepipeline" "main" {
   name           = "${var.project_name}-${var.environment}"
   role_arn       = aws_iam_role.codepipeline_role.arn
   pipeline_type  = "V2"
-  execution_mode = "QUEUED"
+  execution_mode = "SUPERSEDED"
 
   artifact_store {
     location = "elasticbeanstalk-${var.aws_region}-${data.aws_caller_identity.current.account_id}"
@@ -36,7 +36,7 @@ resource "aws_codepipeline" "main" {
         FullRepositoryId     = var.github_repo
         BranchName           = var.github_branch
         OutputArtifactFormat = "CODE_ZIP"
-        DetectChanges        = "false"
+        DetectChanges        = "true"
       }
     }
   }
