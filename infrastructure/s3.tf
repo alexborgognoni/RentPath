@@ -161,8 +161,9 @@ resource "aws_cloudfront_distribution" "private" {
     origin_id                = "S3-${aws_s3_bucket.private.bucket}"
   }
 
-  enabled = true
-  comment = "Private CDN for ${var.project_name} ${var.environment} (requires signed URLs)"
+  enabled     = true
+  comment     = "Private CDN for ${var.project_name} ${var.environment} (requires signed URLs)"
+  price_class = "PriceClass_100"
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
@@ -355,8 +356,9 @@ resource "aws_cloudfront_distribution" "public" {
     origin_id                = "S3-${aws_s3_bucket.public.bucket}"
   }
 
-  enabled = true
-  comment = "Public CDN for ${var.project_name} ${var.environment}"
+  enabled     = true
+  comment     = "Public CDN for ${var.project_name} ${var.environment}"
+  price_class = "PriceClass_100"
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
