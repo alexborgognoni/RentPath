@@ -2,7 +2,7 @@ import RegisteredUserController from '@/actions/App/Http/Controllers/Auth/Regist
 import { login } from '@/routes';
 import { Form, Head, usePage } from '@inertiajs/react';
 import { Building2, LoaderCircle, User } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -14,7 +14,7 @@ import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 
 export default function Register() {
-    const [userType, setUserType] = useState<'tenant' | 'property-manager'>('tenant');
+    // const [userType, setUserType] = useState<'tenant' | 'property-manager'>('tenant');
     const page = usePage<SharedData>();
     const { translations } = page.props;
 
@@ -112,6 +112,14 @@ export default function Register() {
                                     name="password"
                                     placeholder={t(translations.auth, 'register.password_placeholder')}
                                 />
+                                <input
+                                    type="password"
+                                    name="fake_password_remembered"
+                                    autoComplete="new-password"
+                                    // className="absolute opacity-0 h-0 w-0 border-0 p-0 m-0"
+                                    className="absolute opacity-0 pointer-events-none"
+                                    readOnly
+                                />
                                 <InputError message={errors.password} />
                             </div>
 
@@ -125,6 +133,14 @@ export default function Register() {
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder={t(translations.auth, 'register.password_confirmation_placeholder')}
+                                />
+                                <input
+                                    type="password"
+                                    name="fake_password_confirmation"
+                                    autoComplete="new-password"
+                                    // className="absolute opacity-0 h-0 w-0 border-0 p-0 m-0"
+                                    className="absolute opacity-0 pointer-events-none"
+                                    readOnly
                                 />
                                 <InputError message={errors.password_confirmation} />
                             </div>
