@@ -160,7 +160,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                             <div ref={userMenuRef} className="relative">
                                 <button
                                     onClick={() => setShowUserMenu(!showUserMenu)}
-                                    className="flex h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary border border-border shadow-lg transition-all hover:scale-105 hover:shadow-xl cursor-pointer"
+                                    className="flex h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary border border-border shadow-lg cursor-pointer"
                                 >
                                     {(auth.user.property_manager?.profile_picture_url || auth.user.avatar) ? (
                                         <img
