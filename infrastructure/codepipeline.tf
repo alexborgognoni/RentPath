@@ -10,10 +10,9 @@ resource "aws_codestarconnections_connection" "github" {
 
 # CodePipeline
 resource "aws_codepipeline" "main" {
-  name           = "${var.project_name}-${var.environment}"
-  role_arn       = aws_iam_role.codepipeline_role.arn
-  pipeline_type  = "V2"
-  execution_mode = "SUPERSEDED"
+  name          = "${var.project_name}-${var.environment}"
+  role_arn      = aws_iam_role.codepipeline_role.arn
+  pipeline_type = "V1"
 
   artifact_store {
     location = "elasticbeanstalk-${var.aws_region}-${data.aws_caller_identity.current.account_id}"
@@ -74,21 +73,6 @@ resource "aws_codepipeline" "main" {
       configuration = {
         ApplicationName = aws_elastic_beanstalk_application.main.name
         EnvironmentName = aws_elastic_beanstalk_environment.main.name
-      }
-    }
-  }
-
-  # Trigger configuration
-  trigger {
-    provider_type = "CodeStarSourceConnection"
-
-    git_configuration {
-      source_action_name = "Source"
-
-      push {
-        branches {
-          includes = [var.github_branch]
-        }
       }
     }
   }
