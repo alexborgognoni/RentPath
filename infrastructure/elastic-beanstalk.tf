@@ -182,5 +182,24 @@ resource "aws_elastic_beanstalk_environment" "main" {
     value     = "HTTP"
   }
 
+  # CloudWatch Logs streaming
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "StreamLogs"
+    value     = "true"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "DeleteOnTerminate"
+    value     = "false"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "RetentionInDays"
+    value     = "7"
+  }
+
   tags = local.common_tags
 }
