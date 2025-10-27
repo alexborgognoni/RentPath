@@ -44,8 +44,6 @@ class PropertyManagerController extends Controller
     {
         $user = Auth::user();
 
-        Log::info('Profile setup submission received', $request->all());
-
         // Check if user already has a property manager profile
         if (Auth::user()->propertyManager) {
             return redirect()->route('dashboard')
@@ -130,31 +128,6 @@ class PropertyManagerController extends Controller
      */
     public function update(Request $request)
     {
-        Log::info('Profile update request received', $request->all());
-
-        // Log raw file upload info from $_FILES
-        if (!empty($_FILES)) {
-            Log::info('Raw $_FILES data', $_FILES);
-        }
-
-        // Log file upload errors before validation
-        foreach (['profile_picture', 'id_document', 'license_document'] as $field) {
-            if ($request->hasFile($field)) {
-                $file = $request->file($field);
-                Log::info("$field upload info", [
-                    'error' => $file->getError(),
-                    'error_message' => $file->getErrorMessage(),
-                    'size' => $file->getSize(),
-                    'mime' => $file->getMimeType(),
-                    'original_name' => $file->getClientOriginalName(),
-                ]);
-            } elseif ($request->has($field)) {
-                Log::warning("$field not detected as file in request", [
-                    'input_value' => $request->input($field),
-                ]);
-            }
-        }
-
         $propertyManager = Auth::user()->propertyManager;
 
         if (!$propertyManager) {
@@ -194,20 +167,13 @@ class PropertyManagerController extends Controller
 
         $validated = $request->validate($rules);
 
-        Log::info('Validation passed', ['validated_keys' => array_keys($validated)]);
-        Log::info('Has profile_picture file?', ['result' => $request->hasFile('profile_picture')]);
-        Log::info('Profile picture input', ['value' => $request->input('profile_picture')]);
-
         // Handle profile picture upload/removal
         if ($request->hasFile('profile_picture')) {
-            Log::info('Processing profile_picture upload');
-
             // Delete old profile picture if exists
             if ($propertyManager->profile_picture_path) {
                 $oldDisk = StorageHelper::getDisk('public');
                 if (Storage::disk($oldDisk)->exists($propertyManager->profile_picture_path)) {
                     Storage::disk($oldDisk)->delete($propertyManager->profile_picture_path);
-                    Log::info('Deleted old profile picture', ['path' => $propertyManager->profile_picture_path]);
                 }
             }
 
@@ -216,16 +182,12 @@ class PropertyManagerController extends Controller
                 'property-managers/profile-pictures',
                 'public'
             );
-            Log::info('Profile picture stored', ['path' => $validated['profile_picture_path']]);
         } elseif ($request->input('remove_profile_picture')) {
-            Log::info('Removing profile picture');
-
             // Delete the file from storage
             if ($propertyManager->profile_picture_path) {
                 $disk = StorageHelper::getDisk('public');
                 if (Storage::disk($disk)->exists($propertyManager->profile_picture_path)) {
                     Storage::disk($disk)->delete($propertyManager->profile_picture_path);
-                    Log::info('Deleted profile picture file', ['path' => $propertyManager->profile_picture_path]);
                 }
             }
 
@@ -239,7 +201,6 @@ class PropertyManagerController extends Controller
                 $oldDisk = StorageHelper::getDisk('private');
                 if (Storage::disk($oldDisk)->exists($propertyManager->id_document_path)) {
                     Storage::disk($oldDisk)->delete($propertyManager->id_document_path);
-                    Log::info('Deleted old id document', ['path' => $propertyManager->id_document_path]);
                 }
             }
 
@@ -258,7 +219,6 @@ class PropertyManagerController extends Controller
                 $oldDisk = StorageHelper::getDisk('private');
                 if (Storage::disk($oldDisk)->exists($propertyManager->license_document_path)) {
                     Storage::disk($oldDisk)->delete($propertyManager->license_document_path);
-                    Log::info('Deleted old license document', ['path' => $propertyManager->license_document_path]);
                 }
             }
 
