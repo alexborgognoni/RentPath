@@ -60,7 +60,7 @@ class PropertyManagerController extends Controller
 
         if ($request->input('type') === 'professional') {
             $rules['company_name'] = 'required|string|max:255';
-            $rules['company_website'] = 'nullable|url|max:255';
+            $rules['company_website'] = 'nullable|string|max:255';
             $rules['license_number'] = 'required|string|max:255';
             $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
@@ -75,7 +75,6 @@ class PropertyManagerController extends Controller
             'id_document.mimes' => 'ID document must be in PDF, JPEG, PNG, or JPG format.',
             'id_document.max' => 'ID document must be smaller than 20MB.',
             'company_name.required' => 'Company name is required for professional accounts.',
-            'company_website.url' => 'Please enter a valid website URL.',
             'license_number.required' => 'License number is required for professional accounts.',
             'license_document.required' => 'Please upload your license document.',
             'license_document.file' => 'License document must be a valid file.',
@@ -84,6 +83,27 @@ class PropertyManagerController extends Controller
         ];
 
         $validated = $request->validate($rules, $messages);
+
+        // Normalize and validate company website
+        if (!empty($validated['company_website'])) {
+            $website = trim($validated['company_website']);
+
+            // Remove protocol if present
+            $website = preg_replace('/^https?:\/\//i', '', $website);
+
+            // Remove www. if present
+            $website = preg_replace('/^www\./i', '', $website);
+
+            // Validate domain format
+            if (!preg_match('/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/', $website)) {
+                return back()->withErrors([
+                    'company_website' => 'Please enter a valid domain (e.g., example.com).'
+                ])->withInput();
+            }
+
+            // Store normalized version (domain only)
+            $validated['company_website'] = $website;
+        }
 
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
@@ -168,7 +188,7 @@ class PropertyManagerController extends Controller
 
         if ($request->input('type') === 'professional') {
             $rules['company_name'] = 'required|string|max:255';
-            $rules['company_website'] = 'nullable|url|max:255';
+            $rules['company_website'] = 'nullable|string|max:255';
             $rules['license_number'] = 'required|string|max:255';
 
             if (!$propertyManager->license_document_path) {
@@ -178,7 +198,7 @@ class PropertyManagerController extends Controller
             }
         } else {
             $rules['company_name'] = 'nullable|string|max:255';
-            $rules['company_website'] = 'nullable|url|max:255';
+            $rules['company_website'] = 'nullable|string|max:255';
             $rules['license_number'] = 'nullable|string|max:255';
             $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
@@ -193,7 +213,6 @@ class PropertyManagerController extends Controller
             'id_document.mimes' => 'ID document must be in PDF, JPEG, PNG, or JPG format.',
             'id_document.max' => 'ID document must be smaller than 20MB.',
             'company_name.required' => 'Company name is required for professional accounts.',
-            'company_website.url' => 'Please enter a valid website URL.',
             'license_number.required' => 'License number is required for professional accounts.',
             'license_document.required' => 'Please upload your license document.',
             'license_document.file' => 'License document must be a valid file.',
@@ -202,6 +221,27 @@ class PropertyManagerController extends Controller
         ];
 
         $validated = $request->validate($rules, $messages);
+
+        // Normalize and validate company website
+        if (!empty($validated['company_website'])) {
+            $website = trim($validated['company_website']);
+
+            // Remove protocol if present
+            $website = preg_replace('/^https?:\/\//i', '', $website);
+
+            // Remove www. if present
+            $website = preg_replace('/^www\./i', '', $website);
+
+            // Validate domain format
+            if (!preg_match('/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/', $website)) {
+                return back()->withErrors([
+                    'company_website' => 'Please enter a valid domain (e.g., example.com).'
+                ])->withInput();
+            }
+
+            // Store normalized version (domain only)
+            $validated['company_website'] = $website;
+        }
 
         // Handle profile picture upload/removal
         if ($request->hasFile('profile_picture')) {
