@@ -117,113 +117,80 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        console.log('Processing state:', processing);
-        
         if (processing) {
-            console.log('Form already processing, blocking submission');
             return;
         }
 
-        // For editing, use current data values (should be populated by useEffect)
-        // Prepare form data with all required fields
+        // Determine the actual type being submitted
+        const submittedType = data.type || selectedType;
+
+        // Prepare form data
         const formData: Record<string, any> = {
-            type: data.type || selectedType,
-            phone_country_code: data.phone_prefix || (propertyManager?.phone_country_code || '+1'),
-            phone_number: data.phone_number || (propertyManager?.phone_number || ''),
+            type: submittedType,
+            phone_country_code: data.phone_prefix || '+1',
+            phone_number: data.phone_number || '',
             remove_profile_picture: data.profile_picture === 'removed',
-            // Always include professional fields
-            company_name: data.company_name || (propertyManager?.company_name || ''),
-            company_website: data.company_website || (propertyManager?.company_website || ''),
-            license_number: data.license_number || (propertyManager?.license_number || ''),
         };
 
-        // Only include files if they exist (don't send null)
-        if (data.profile_picture && data.profile_picture !== 'removed') {
+        // Add professional fields if professional type
+        if (submittedType === 'professional') {
+            formData.company_name = data.company_name || '';
+            formData.company_website = data.company_website || '';
+            formData.license_number = data.license_number || '';
+        }
+
+        // Add files if they exist
+        if (data.profile_picture && data.profile_picture !== 'removed' && data.profile_picture instanceof File) {
             formData.profile_picture = data.profile_picture;
         }
-        if (data.id_document && data.id_document !== 'removed') {
+        if (data.id_document && data.id_document !== 'removed' && data.id_document instanceof File) {
             formData.id_document = data.id_document;
         }
-        if (data.license_document && data.license_document !== 'removed') {
+        if (data.license_document && data.license_document !== 'removed' && data.license_document instanceof File) {
             formData.license_document = data.license_document;
         }
 
-        // Basic frontend validation using data instead of formData
+        // Client-side validation
         const newClientErrors: {[key: string]: string} = {};
 
         if (!data.phone_number || data.phone_number.trim() === '') {
             newClientErrors.phone_number = 'Phone number is required';
         }
 
-        // Document validation - always require if no existing document
-        if ((!data.id_document || data.id_document === 'removed') && (!propertyManager?.id_document_path || data.id_document === 'removed')) {
+        // ID document required if no existing one
+        if ((!data.id_document || data.id_document === 'removed') && !propertyManager?.id_document_path) {
             newClientErrors.id_document = 'ID document is required';
         }
 
-        if (selectedType === 'professional') {
+        // Professional-specific validation
+        if (submittedType === 'professional') {
             if (!data.company_name || data.company_name.trim() === '') {
                 newClientErrors.company_name = 'Company name is required for professional accounts';
             }
             if (!data.license_number || data.license_number.trim() === '') {
                 newClientErrors.license_number = 'License number is required for professional accounts';
             }
-            if ((!data.license_document || data.license_document === 'removed') && (!propertyManager?.license_document_path || data.license_document === 'removed')) {
+            // License document required if no existing one
+            if ((!data.license_document || data.license_document === 'removed') && !propertyManager?.license_document_path) {
                 newClientErrors.license_document = 'License document is required for professional accounts';
             }
         }
 
         setClientErrors(newClientErrors);
-        
+
         if (Object.keys(newClientErrors).length > 0) {
             return;
         }
 
-        // Debug: Log the actual data state to see if form fields are updating it
-        console.log('Current data state:', data);
-        console.log('Submitting form data:', formData);
-        console.log('Is editing:', isEditing);
-        console.log('Files being sent:');
-        console.log('- profile_picture:', data.profile_picture, 'Type:', data.profile_picture?.constructor?.name);
-        console.log('- id_document:', data.id_document, 'Type:', data.id_document?.constructor?.name);
-        console.log('- license_document:', data.license_document, 'Type:', data.license_document?.constructor?.name);
+        // Submit form
+        const endpoint = isEditing ? '/edit-profile' : '/profile/setup';
 
-        if (isEditing) {
-            try {
-                console.log('About to call router.post() for edit-profile');
-                router.post('/edit-profile', formData, {
-                    forceFormData: true,
-                    onSuccess: (page) => {
-                        console.log('Update successful', page);
-                    },
-                    onError: (errors) => {
-                        console.error('Update errors:', errors);
-                    },
-                    onStart: () => console.log('Update started'),
-                    onFinish: () => console.log('Update finished'),
-                });
-                console.log('router.post() call completed');
-            } catch (error) {
-                console.error('Error calling router.post():', error);
-            }
-        } else {
-            try {
-                console.log('About to call router.post()');
-                router.post('/profile/setup', formData, {
-                    forceFormData: true,
-                    onSuccess: (page) => {
-                        console.log('Submission successful', page);
-                    },
-                    onError: (errors) => {
-                        console.error('Submission errors:', errors);
-                    },
-                    onStart: () => console.log('Submission started'),
-                    onFinish: () => console.log('Submission finished'),
-                });
-                console.log('router.post() call completed');
-            } catch (error) {
-                console.error('Error calling router.post():', error);
-            }
-        }
+        router.post(endpoint, formData, {
+            forceFormData: true,
+            onError: (errors) => {
+                console.error('Submission errors:', errors);
+            },
+        });
     };
 
     const handleTypeChange = (type: 'individual' | 'professional') => {
