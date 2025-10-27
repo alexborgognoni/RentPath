@@ -57,6 +57,12 @@ resource "aws_elastic_beanstalk_environment" "main" {
   }
 
   setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "EC2KeyName"
+    value     = "aws-eb"
+  }
+
+  setting {
     namespace = "aws:autoscaling:asg"
     name      = "MinSize"
     value     = tostring(var.eb_min_size)
