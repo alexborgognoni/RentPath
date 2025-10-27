@@ -169,6 +169,13 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
             if (!data.company_name || data.company_name.trim() === '') {
                 newClientErrors.company_name = 'Company name is required for professional accounts.';
             }
+            // Validate company website if provided
+            if (data.company_website && data.company_website.trim() !== '') {
+                const websiteError = validateWebsite(data.company_website);
+                if (websiteError) {
+                    newClientErrors.company_website = websiteError;
+                }
+            }
             if (!data.license_number || data.license_number.trim() === '') {
                 newClientErrors.license_number = 'License number is required for professional accounts.';
             }
@@ -249,6 +256,28 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                 return newErrors;
             });
         }
+    };
+
+    const validateWebsite = (website: string): string | null => {
+        if (!website || website.trim() === '') {
+            return null; // Empty is valid (optional field)
+        }
+
+        let domain = website.trim();
+
+        // Remove protocol if present
+        domain = domain.replace(/^https?:\/\//i, '');
+
+        // Remove www. if present
+        domain = domain.replace(/^www\./i, '');
+
+        // Validate domain format
+        const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+        if (!domainRegex.test(domain)) {
+            return 'Please enter a valid domain (e.g., example.com).';
+        }
+
+        return null;
     };
 
     const isFieldRejected = (fieldName: string) => {
@@ -780,13 +809,25 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             id="company_website"
                                             value={data.company_website}
                                             onChange={(e) => {
-                                                setData('company_website', e.target.value);
-                                                clearFieldError('company_website');
+                                                const value = e.target.value;
+                                                setData('company_website', value);
+
+                                                // Real-time validation
+                                                const error = validateWebsite(value);
+                                                if (error) {
+                                                    setClientErrors(prev => ({...prev, company_website: error}));
+                                                } else {
+                                                    clearFieldError('company_website');
+                                                }
                                             }}
                                             className={getFieldClassName('company_website')}
                                             placeholder="example.com"
                                         />
-                                        {errors.company_website && <p className="mt-1 text-sm text-destructive">{errors.company_website}</p>}
+                                        {(clientErrors.company_website || errors.company_website) && (
+                                            <p className="mt-1 text-sm text-destructive">
+                                                {clientErrors.company_website || errors.company_website}
+                                            </p>
+                                        )}
                                     </div>
 
                                     <div>
