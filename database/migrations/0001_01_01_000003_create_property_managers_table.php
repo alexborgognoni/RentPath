@@ -22,11 +22,16 @@ return new class extends Migration
             $table->string('company_name')->nullable();
             $table->string('company_website')->nullable();
             $table->string('license_number')->nullable();
+            $table->string('phone_country_code', 10)->nullable();
             $table->string('phone_number')->nullable();
             $table->string('profile_picture_path')->nullable();
             $table->string('id_document_path')->nullable();
+            $table->string('id_document_original_name')->nullable();
             $table->string('license_document_path')->nullable();
+            $table->string('license_document_original_name')->nullable();
             $table->timestamp('profile_verified_at')->nullable();
+            $table->text('rejection_reason')->nullable();
+            $table->json('rejected_fields')->nullable();
 
             $table->timestamps();
 
