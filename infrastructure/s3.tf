@@ -164,6 +164,7 @@ resource "aws_cloudfront_distribution" "private" {
   enabled     = true
   comment     = "Private CDN for ${var.project_name} ${var.environment} (requires signed URLs)"
   price_class = "PriceClass_100"
+  aliases     = ["assets.${var.domain_name}"]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
@@ -194,12 +195,16 @@ resource "aws_cloudfront_distribution" "private" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = aws_acm_certificate.cloudfront_cert.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   tags = merge(local.common_tags, {
     Name = "${var.project_name}-${var.environment}-private-cdn"
   })
+
+  depends_on = [aws_acm_certificate_validation.cloudfront_cert]
 }
 
 # S3 bucket policy for private bucket (CloudFront OAC + Backend IAM Role)
@@ -359,6 +364,7 @@ resource "aws_cloudfront_distribution" "public" {
   enabled     = true
   comment     = "Public CDN for ${var.project_name} ${var.environment}"
   price_class = "PriceClass_100"
+  aliases     = ["cdn.${var.domain_name}"]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
@@ -386,12 +392,16 @@ resource "aws_cloudfront_distribution" "public" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = aws_acm_certificate.cloudfront_cert.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   tags = merge(local.common_tags, {
     Name = "${var.project_name}-${var.environment}-public-cdn"
   })
+
+  depends_on = [aws_acm_certificate_validation.cloudfront_cert]
 }
 
 # S3 bucket policy for public bucket (CloudFront OAC + Backend IAM role)
