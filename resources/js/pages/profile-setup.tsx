@@ -4,8 +4,9 @@ import { type SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { Head, useForm, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Building, ChevronDown, Info, Trash2, Upload, User as UserIcon } from 'lucide-react';
+import { AlertCircle, Building, ChevronDown, Info, Trash2, Upload, User as UserIcon, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface ProfileSetupProps {
     user: User;
@@ -20,6 +21,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
     const [selectedType, setSelectedType] = useState<'individual' | 'professional'>(propertyManager?.type || 'individual');
     const [clientErrors, setClientErrors] = useState<{[key: string]: string}>({});
     const [showLicenseTooltip, setShowLicenseTooltip] = useState(false);
+    const [generalError, setGeneralError] = useState<string | null>(null);
     
     // Track original values for change detection
     const originalValues = {
@@ -182,6 +184,9 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
             return;
         }
 
+        // Clear previous errors
+        setGeneralError(null);
+
         // Submit form
         const endpoint = isEditing ? '/edit-profile' : '/profile/setup';
 
@@ -189,6 +194,18 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
             forceFormData: true,
             onError: (errors) => {
                 console.error('Submission errors:', errors);
+                // Get all error messages
+                const errorMessages = Object.values(errors).flat();
+                if (errorMessages.length > 0) {
+                    setGeneralError(errorMessages.join(' '));
+                } else {
+                    setGeneralError('An unexpected error occurred. Please try again.');
+                }
+                // Scroll to top to show the error banner
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+            onSuccess: () => {
+                setGeneralError(null);
             },
         });
     };
@@ -266,6 +283,29 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                 </p>
                             {!isEditing && (
                                 <p className="mt-2 text-sm text-muted-foreground">{t(translations.profile, 'setup.verification_notice')}</p>
+                            )}
+
+                            {/* Error Banner */}
+                            {generalError && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="mt-6"
+                                >
+                                    <Alert variant="destructive" className="relative">
+                                        <AlertCircle className="h-4 w-4" />
+                                        <AlertTitle>Error</AlertTitle>
+                                        <AlertDescription>{generalError}</AlertDescription>
+                                        <button
+                                            onClick={() => setGeneralError(null)}
+                                            className="absolute right-2 top-2 rounded-sm opacity-70 transition-opacity hover:opacity-100"
+                                        >
+                                            <X className="h-4 w-4" />
+                                            <span className="sr-only">Close</span>
+                                        </button>
+                                    </Alert>
+                                </motion.div>
                             )}
 
                             {/* Profile Picture Upload */}
