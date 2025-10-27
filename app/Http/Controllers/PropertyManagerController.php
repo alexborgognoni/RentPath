@@ -65,7 +65,25 @@ class PropertyManagerController extends Controller
             $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
 
-        $validated = $request->validate($rules);
+        $messages = [
+            'phone_number.required' => 'Please enter your phone number.',
+            'profile_picture.image' => 'Profile picture must be an image file.',
+            'profile_picture.mimes' => 'Profile picture must be in JPEG, PNG, or WEBP format.',
+            'profile_picture.max' => 'Profile picture must be smaller than 5MB.',
+            'id_document.required' => 'Please upload your ID document.',
+            'id_document.file' => 'ID document must be a valid file.',
+            'id_document.mimes' => 'ID document must be in PDF, JPEG, PNG, or JPG format.',
+            'id_document.max' => 'ID document must be smaller than 20MB.',
+            'company_name.required' => 'Company name is required for professional accounts.',
+            'company_website.url' => 'Please enter a valid website URL.',
+            'license_number.required' => 'License number is required for professional accounts.',
+            'license_document.required' => 'Please upload your license document.',
+            'license_document.file' => 'License document must be a valid file.',
+            'license_document.mimes' => 'License document must be in PDF, JPEG, PNG, or JPG format.',
+            'license_document.max' => 'License document must be smaller than 20MB.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
 
         // Handle file uploads
         if ($request->hasFile('profile_picture')) {
@@ -165,7 +183,25 @@ class PropertyManagerController extends Controller
             $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
 
-        $validated = $request->validate($rules);
+        $messages = [
+            'phone_number.required' => 'Please enter your phone number.',
+            'profile_picture.image' => 'Profile picture must be an image file.',
+            'profile_picture.mimes' => 'Profile picture must be in JPEG, PNG, or WEBP format.',
+            'profile_picture.max' => 'Profile picture must be smaller than 5MB.',
+            'id_document.required' => 'Please upload your ID document.',
+            'id_document.file' => 'ID document must be a valid file.',
+            'id_document.mimes' => 'ID document must be in PDF, JPEG, PNG, or JPG format.',
+            'id_document.max' => 'ID document must be smaller than 20MB.',
+            'company_name.required' => 'Company name is required for professional accounts.',
+            'company_website.url' => 'Please enter a valid website URL.',
+            'license_number.required' => 'License number is required for professional accounts.',
+            'license_document.required' => 'Please upload your license document.',
+            'license_document.file' => 'License document must be a valid file.',
+            'license_document.mimes' => 'License document must be in PDF, JPEG, PNG, or JPG format.',
+            'license_document.max' => 'License document must be smaller than 20MB.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
 
         // Handle profile picture upload/removal
         if ($request->hasFile('profile_picture')) {
