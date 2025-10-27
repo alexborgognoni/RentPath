@@ -154,25 +154,25 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         const newClientErrors: {[key: string]: string} = {};
 
         if (!data.phone_number || data.phone_number.trim() === '') {
-            newClientErrors.phone_number = 'Phone number is required';
+            newClientErrors.phone_number = 'Please enter your phone number.';
         }
 
         // ID document required if no existing one
         if ((!data.id_document || data.id_document === 'removed') && !propertyManager?.id_document_path) {
-            newClientErrors.id_document = 'ID document is required';
+            newClientErrors.id_document = 'Please upload your ID document.';
         }
 
         // Professional-specific validation
         if (submittedType === 'professional') {
             if (!data.company_name || data.company_name.trim() === '') {
-                newClientErrors.company_name = 'Company name is required for professional accounts';
+                newClientErrors.company_name = 'Company name is required for professional accounts.';
             }
             if (!data.license_number || data.license_number.trim() === '') {
-                newClientErrors.license_number = 'License number is required for professional accounts';
+                newClientErrors.license_number = 'License number is required for professional accounts.';
             }
             // License document required if no existing one
             if ((!data.license_document || data.license_document === 'removed') && !propertyManager?.license_document_path) {
-                newClientErrors.license_document = 'License document is required for professional accounts';
+                newClientErrors.license_document = 'Please upload your license document.';
             }
         }
 
@@ -212,11 +212,11 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
             const file = files[0];
             const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
             if (!validTypes.includes(file.type)) {
-                setClientErrors(prev => ({...prev, [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be a PDF, PNG, or JPEG file`}));
+                setClientErrors(prev => ({...prev, [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be in PDF, JPEG, PNG, or JPG format.`}));
                 return;
             }
             if (file.size > 20 * 1024 * 1024) {
-                setClientErrors(prev => ({...prev, [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be less than 20MB`}));
+                setClientErrors(prev => ({...prev, [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be smaller than 20MB.`}));
                 return;
             }
             setData(fieldName, file);
@@ -301,13 +301,13 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                 if (file) {
                                                     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
                                                     if (!validTypes.includes(file.type)) {
-                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be a JPG, PNG, or WEBP file'}));
+                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be in JPEG, PNG, or WEBP format.'}));
                                                         setData('profile_picture', null);
                                                         e.target.value = '';
                                                         return;
                                                     }
                                                     if (file.size > 5 * 1024 * 1024) {
-                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be less than 5MB'}));
+                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be smaller than 5MB.'}));
                                                         setData('profile_picture', null);
                                                         e.target.value = '';
                                                         return;
@@ -823,13 +823,13 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                     if (file) {
                                                         const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
                                                         if (!validTypes.includes(file.type)) {
-                                                            setClientErrors(prev => ({...prev, id_document: 'ID document must be a PDF, PNG, or JPEG file'}));
+                                                            setClientErrors(prev => ({...prev, id_document: 'ID document must be in PDF, JPEG, PNG, or JPG format.'}));
                                                             setData('id_document', null);
                                                             e.target.value = '';
                                                             return;
                                                         }
                                                         if (file.size > 20 * 1024 * 1024) {
-                                                            setClientErrors(prev => ({...prev, id_document: 'ID document must be less than 20MB'}));
+                                                            setClientErrors(prev => ({...prev, id_document: 'ID document must be smaller than 20MB.'}));
                                                             setData('id_document', null);
                                                             e.target.value = '';
                                                             return;
@@ -910,13 +910,13 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         if (file) {
                                                             const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
                                                             if (!validTypes.includes(file.type)) {
-                                                                setClientErrors(prev => ({...prev, license_document: 'License document must be a PDF, PNG, or JPEG file'}));
+                                                                setClientErrors(prev => ({...prev, license_document: 'License document must be in PDF, JPEG, PNG, or JPG format.'}));
                                                                 setData('license_document', null);
                                                                 e.target.value = '';
                                                                 return;
                                                             }
                                                             if (file.size > 20 * 1024 * 1024) {
-                                                                setClientErrors(prev => ({...prev, license_document: 'License document must be less than 20MB'}));
+                                                                setClientErrors(prev => ({...prev, license_document: 'License document must be smaller than 20MB.'}));
                                                                 setData('license_document', null);
                                                                 e.target.value = '';
                                                                 return;
