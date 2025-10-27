@@ -11,7 +11,7 @@ resource "aws_route53_zone" "main" {
   }
 }
 
-# ACM Certificate for the domain
+# ACM Certificate for the domain (eu-central-1 for Elastic Beanstalk)
 resource "aws_acm_certificate" "domain_cert" {
   domain_name               = var.domain_name
   subject_alternative_names = ["*.${var.domain_name}"]
@@ -23,6 +23,25 @@ resource "aws_acm_certificate" "domain_cert" {
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-certificate"
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
+}
+
+# ACM Certificate for CloudFront (MUST be in us-east-1)
+resource "aws_acm_certificate" "cloudfront_cert" {
+  provider                  = aws.us_east_1
+  domain_name               = var.domain_name
+  subject_alternative_names = ["*.${var.domain_name}"]
+  validation_method         = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-cloudfront-certificate"
     Project     = var.project_name
     Environment = var.environment
     ManagedBy   = "terraform"
@@ -50,6 +69,13 @@ resource "aws_route53_record" "cert_validation" {
 # Certificate validation completion
 resource "aws_acm_certificate_validation" "domain_cert" {
   certificate_arn         = aws_acm_certificate.domain_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+}
+
+# CloudFront certificate validation (uses same DNS records)
+resource "aws_acm_certificate_validation" "cloudfront_cert" {
+  provider                = aws.us_east_1
+  certificate_arn         = aws_acm_certificate.cloudfront_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
@@ -130,5 +156,30 @@ resource "aws_route53_record" "dmarc" {
   type    = "TXT"
   ttl     = 300
   records = ["v=DMARC1; p=none; rua=mailto:${var.dmarc_reporting_email}; pct=100"]
+}
+
+# CloudFront CDN subdomains
+resource "aws_route53_record" "cdn_public" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "cdn.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.public.domain_name
+    zone_id                = aws_cloudfront_distribution.public.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "cdn_private" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "assets.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.private.domain_name
+    zone_id                = aws_cloudfront_distribution.private.hosted_zone_id
+    evaluate_target_health = false
+  }
 }
 

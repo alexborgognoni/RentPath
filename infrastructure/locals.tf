@@ -79,13 +79,13 @@ locals {
 
     # Private S3 bucket (for ID documents, licenses - requires signed URLs)
     AWS_PRIVATE_BUCKET                    = aws_s3_bucket.private.bucket
-    AWS_PRIVATE_URL                       = "https://${aws_cloudfront_distribution.private.domain_name}"
+    AWS_PRIVATE_URL                       = "https://assets.${var.domain_name}"
     AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID    = aws_cloudfront_public_key.private_bucket_key.id
     AWS_PRIVATE_CLOUDFRONT_SECRET_NAME    = aws_secretsmanager_secret.cloudfront_private_key.name
 
     # Public S3 bucket (for property images, profile pictures - public access)
     AWS_PUBLIC_BUCKET = aws_s3_bucket.public.bucket
-    AWS_PUBLIC_URL    = "https://${aws_cloudfront_distribution.public.domain_name}"
+    AWS_PUBLIC_URL    = "https://cdn.${var.domain_name}"
 
     # Force AWS SDK to use IAM role authentication
     AWS_SDK_LOAD_NONDEFAULT_CONFIG = "1"
