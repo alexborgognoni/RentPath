@@ -776,12 +776,15 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             {t(translations.profile, 'setup.company_website')}
                                         </label>
                                         <input
-                                            type="url"
+                                            type="text"
                                             id="company_website"
                                             value={data.company_website}
-                                            onChange={(e) => setData('company_website', e.target.value)}
+                                            onChange={(e) => {
+                                                setData('company_website', e.target.value);
+                                                clearFieldError('company_website');
+                                            }}
                                             className={getFieldClassName('company_website')}
-                                            placeholder="https://example.com"
+                                            placeholder="example.com"
                                         />
                                         {errors.company_website && <p className="mt-1 text-sm text-destructive">{errors.company_website}</p>}
                                     </div>
