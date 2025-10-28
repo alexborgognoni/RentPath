@@ -77,6 +77,10 @@ locals {
     AWS_DEFAULT_REGION          = var.eb_laravel_config.aws_default_region
     AWS_USE_PATH_STYLE_ENDPOINT = var.eb_laravel_config.aws_use_path_style_endpoint ? "true" : "false"
 
+    # Filesystem disk configuration
+    FILESYSTEM_DISK_PUBLIC  = "s3_public"
+    FILESYSTEM_DISK_PRIVATE = "s3_private"
+
     # Private S3 bucket (for ID documents, licenses - requires signed URLs)
     AWS_PRIVATE_BUCKET                    = aws_s3_bucket.private.bucket
     AWS_PRIVATE_URL                       = "https://assets.${var.domain_name}"

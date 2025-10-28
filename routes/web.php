@@ -31,6 +31,17 @@ Route::post('/locale', function (Request $request) {
     return response()->json(['locale' => session('locale')]);
 });
 
+// Serve private files with signed URLs (mimics CloudFront signed URLs in production)
+Route::get('/private-storage/{path}', function ($path) {
+    $disk = \App\Helpers\StorageHelper::getDisk('private');
+
+    if (!Storage::disk($disk)->exists($path)) {
+        abort(404);
+    }
+
+    return Storage::disk($disk)->response($path);
+})->where('path', '.*')->middleware('signed')->name('private.storage');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function (Request $request) {
         $user = $request->user();
