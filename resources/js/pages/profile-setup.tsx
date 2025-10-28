@@ -159,9 +159,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
             newClientErrors.phone_number = 'Please enter your phone number.';
         }
 
-        // ID document required if no existing one
-        if ((!data.id_document || data.id_document === 'removed') && !propertyManager?.id_document_path) {
-            newClientErrors.id_document = 'Please upload your ID document.';
+        // Individual-specific validation
+        if (submittedType === 'individual') {
+            // ID document required if no existing one
+            if ((!data.id_document || data.id_document === 'removed') && !propertyManager?.id_document_path) {
+                newClientErrors.id_document = 'Please upload your ID document.';
+            }
         }
 
         // Professional-specific validation
@@ -874,10 +877,11 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
 
                             {/* Document Uploads */}
                             <div className="space-y-4">
-                                <div>
-                                    <label htmlFor="id_document" className="block text-sm font-medium text-foreground">
-                                        {t(translations.profile, 'setup.id_document')} <span className="text-destructive">*</span>
-                                    </label>
+                                {selectedType === 'individual' && (
+                                    <div>
+                                        <label htmlFor="id_document" className="block text-sm font-medium text-foreground">
+                                            {t(translations.profile, 'setup.id_document')} <span className="text-destructive">*</span>
+                                        </label>
                                     <div
                                         className={`mt-2 flex justify-center rounded-md border border-dashed px-6 pt-5 pb-6 ${isFieldRejected('id_document') || clientErrors.id_document || errors.id_document ? 'border-destructive bg-destructive/5' : 'border-border'}`}
                                         onDragOver={handleDragOver}
@@ -953,12 +957,13 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             )}
                                         </div>
                                     </div>
-                                    {(clientErrors.id_document || errors.id_document) && (
-                                        <p className="mt-1 text-sm text-destructive">
-                                            {clientErrors.id_document || errors.id_document}
-                                        </p>
-                                    )}
-                                </div>
+                                        {(clientErrors.id_document || errors.id_document) && (
+                                            <p className="mt-1 text-sm text-destructive">
+                                                {clientErrors.id_document || errors.id_document}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
 
                                 {selectedType === 'professional' && (
                                     <div>

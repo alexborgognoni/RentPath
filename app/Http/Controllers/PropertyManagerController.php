@@ -55,10 +55,11 @@ class PropertyManagerController extends Controller
             'phone_country_code' => 'required|string|max:10',
             'phone_number' => 'required|string|max:20',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
-            'id_document' => 'required|file|mimes:pdf,jpeg,png,jpg|max:20480',
         ];
 
-        if ($request->input('type') === 'professional') {
+        if ($request->input('type') === 'individual') {
+            $rules['id_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
+        } elseif ($request->input('type') === 'professional') {
             $rules['company_name'] = 'required|string|max:255';
             $rules['company_website'] = 'nullable|string|max:255';
             $rules['license_number'] = 'required|string|max:255';
@@ -179,28 +180,24 @@ class PropertyManagerController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
         ];
 
-        // Only require documents if they don't already exist
-        if (!$propertyManager->id_document_path) {
-            $rules['id_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-        } else {
-            $rules['id_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
-        }
-
-        if ($request->input('type') === 'professional') {
+        if ($request->input('type') === 'individual') {
+            // Only require ID document if it doesn't already exist
+            if (!$propertyManager->id_document_path) {
+                $rules['id_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
+            } else {
+                $rules['id_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
+            }
+        } elseif ($request->input('type') === 'professional') {
             $rules['company_name'] = 'required|string|max:255';
             $rules['company_website'] = 'nullable|string|max:255';
             $rules['license_number'] = 'required|string|max:255';
 
+            // Only require license document if it doesn't already exist
             if (!$propertyManager->license_document_path) {
                 $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
             } else {
                 $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
             }
-        } else {
-            $rules['company_name'] = 'nullable|string|max:255';
-            $rules['company_website'] = 'nullable|string|max:255';
-            $rules['license_number'] = 'nullable|string|max:255';
-            $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
 
         $messages = [
