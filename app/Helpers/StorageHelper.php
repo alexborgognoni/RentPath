@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Storage;
 class StorageHelper
 {
     /**
-     * Get the appropriate disk based on visibility and environment.
+     * Get the appropriate disk based on visibility and configuration.
      *
-     * In local environment, uses Laravel's local 'public' and 'private' disks.
-     * In production/staging, uses S3 buckets via 's3_public' and 's3_private'.
+     * Uses environment variables FILESYSTEM_DISK_PUBLIC and FILESYSTEM_DISK_PRIVATE
+     * to determine which disk to use.
      *
      * @param string $visibility 'public' or 'private'
      * @return string The disk name
@@ -23,15 +23,13 @@ class StorageHelper
             throw new \InvalidArgumentException("Invalid visibility: {$visibility}. Must be 'public' or 'private'.");
         }
 
-        // In local environment, use local disks
-        if (app()->environment('local')) {
-            return $visibility; // 'public' or 'private' local disks
-        }
+        // Default to S3 disks in production, local disks in local environment
+        $defaultPublic = app()->environment('local') ? 'public' : 's3_public';
+        $defaultPrivate = app()->environment('local') ? 'private' : 's3_private';
 
-        // In production/staging, use S3 buckets
         return match($visibility) {
-            'public' => 's3_public',
-            'private' => 's3_private',
+            'public' => env('FILESYSTEM_DISK_PUBLIC', $defaultPublic),
+            'private' => env('FILESYSTEM_DISK_PRIVATE', $defaultPrivate),
         };
     }
 
@@ -46,10 +44,11 @@ class StorageHelper
     public static function store($file, string $path, string $visibility): string
     {
         $disk = self::getDisk($visibility);
+        $diskConfig = config("filesystems.disks.{$disk}");
 
         // For S3 buckets, always use 'private' visibility to avoid ACL issues
         // We use CloudFront for public access, not S3 ACLs
-        if (in_array($disk, ['s3_public', 's3_private'])) {
+        if ($diskConfig['driver'] === 's3') {
             return $file->store($path, ['disk' => $disk, 'visibility' => 'private']);
         }
 
@@ -75,13 +74,17 @@ class StorageHelper
 
         // For private files, generate signed URLs
         if ($visibility === 'private') {
-            // In local environment, return regular URL
-            if (app()->environment('local')) {
-                return Storage::disk($disk)->url($path);
+            // Production: CloudFront signed URLs
+            if (env('AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID')) {
+                return self::getCloudFrontSignedUrl($path, $expiresInMinutes);
             }
 
-            // Production: CloudFront signed URL
-            return self::getCloudFrontSignedUrl($path, $expiresInMinutes);
+            // Local: Laravel signed URLs (mimics CloudFront behavior)
+            return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'private.storage',
+                now()->addMinutes($expiresInMinutes),
+                ['path' => $path]
+            );
         }
 
         // For public files, just return the URL
