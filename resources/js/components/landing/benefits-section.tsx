@@ -81,7 +81,7 @@ export function BenefitsSection() {
     const [currentCurrency, setCurrentCurrency] = useState(getCurrencyFromStorage());
     const [displayPrice, setDisplayPrice] = useState('25');
 
-    const BASE_PRICE_EUR = 25; // Base price in EUR
+    const BASE_PRICE_EUR = 50; // Base price in EUR
 
     useEffect(() => {
         const updatePrice = () => {
