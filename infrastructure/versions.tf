@@ -1,14 +1,13 @@
 terraform {
   required_version = ">= 1.0"
 
-  # # Terraform Cloud backend configuration
-  # cloud {
-  #   organization = "your-organization-name"  # Replace with your Terraform Cloud organization
-  #
-  #   workspaces {
-  #     name = "rentpath-production"
-  #   }
-  # }
+  # S3 backend configuration
+  backend "s3" {
+    bucket  = "rentpath-terraform-state"
+    key     = "production/terraform.tfstate"
+    region  = "eu-central-1"
+    encrypt = true
+  }
 
   required_providers {
     aws = {
