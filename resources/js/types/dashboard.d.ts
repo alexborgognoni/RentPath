@@ -38,19 +38,40 @@ export interface Property {
     postal_code: string;
     country: string;
     description?: string;
-    image_url?: string;
-    image_path?: string;
-    type: 'apartment' | 'house' | 'condo' | 'townhouse' | 'studio' | 'loft' | 'room' | 'office' | 'garage' | 'storage' | 'warehouse' | 'retail' | 'commercial';
+    type: 'apartment' | 'house' | 'room' | 'commercial' | 'industrial' | 'parking';
+    subtype: 'studio' | 'loft' | 'duplex' | 'triplex' | 'penthouse' | 'serviced' | 'detached' | 'semi-detached' | 'villa' | 'bungalow' | 'private_room' | 'student_room' | 'co-living' | 'office' | 'retail' | 'warehouse' | 'factory' | 'garage' | 'indoor_spot' | 'outdoor_spot';
+    // Property specifications
     bedrooms: number;
     bathrooms: number;
-    parking_spots: number;
-    size?: number;
-    size_unit: 'square_meters' | 'square_feet';
+    parking_spots_interior: number;
+    parking_spots_exterior: number;
+    size?: number; // in square meters
+    balcony_size?: number;
+    land_size?: number; // only for houses
+    floor_level?: number;
+    has_elevator: boolean;
+    year_built?: number;
+    // Energy / building
+    energy_class?: 'A+' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+    thermal_insulation_class?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+    heating_type?: 'gas' | 'electric' | 'district' | 'wood' | 'heat_pump' | 'other';
+    // Kitchen
+    kitchen_equipped: boolean;
+    kitchen_separated: boolean;
+    // Extras / amenities
+    has_cellar: boolean;
+    has_laundry: boolean;
+    has_fireplace: boolean;
+    has_air_conditioning: boolean;
+    has_garden: boolean;
+    has_rooftop: boolean;
+    extras?: Record<string, any>; // JSON field for uncommon features
+    // Rental information
     available_date?: string;
     rent_amount: number;
     rent_currency: 'eur' | 'usd' | 'gbp' | 'chf';
-    invite_token: string;
-    is_active: boolean;
+    // Property status
+    status: 'inactive' | 'available' | 'application_received' | 'under_review' | 'visit_scheduled' | 'approved' | 'leased' | 'maintenance' | 'archived';
     tenant_count?: number; // This will be computed/added by backend
     created_at: string;
     updated_at: string;
@@ -59,6 +80,19 @@ export interface Property {
     formatted_size?: string;
     // Relationships
     property_manager?: PropertyManager;
+    images?: PropertyImage[];
+}
+
+export interface PropertyImage {
+    id: number;
+    property_id: number;
+    image_path: string;
+    sort_order: number;
+    is_main: boolean;
+    created_at: string;
+    updated_at: string;
+    // Computed
+    image_url?: string;
 }
 
 export interface DashboardData {
@@ -88,18 +122,41 @@ export interface PropertyFormData {
     postal_code: string;
     country: string;
     description?: string;
-    image_url?: string;
-    image_path?: string;
     type: Property['type'];
+    subtype: Property['subtype'];
+    // Property specifications
     bedrooms: number;
     bathrooms: number;
-    parking_spots: number;
-    size?: number;
-    size_unit: Property['size_unit'];
+    parking_spots_interior: number;
+    parking_spots_exterior: number;
+    size?: number; // in square meters
+    balcony_size?: number;
+    land_size?: number;
+    floor_level?: number;
+    has_elevator?: boolean;
+    year_built?: number;
+    // Energy / building
+    energy_class?: Property['energy_class'];
+    thermal_insulation_class?: Property['thermal_insulation_class'];
+    heating_type?: Property['heating_type'];
+    // Kitchen
+    kitchen_equipped?: boolean;
+    kitchen_separated?: boolean;
+    // Extras / amenities
+    has_cellar?: boolean;
+    has_laundry?: boolean;
+    has_fireplace?: boolean;
+    has_air_conditioning?: boolean;
+    has_garden?: boolean;
+    has_rooftop?: boolean;
+    extras?: Record<string, any>;
+    // Rental information
     available_date?: string;
     rent_amount: number;
     rent_currency: Property['rent_currency'];
-    is_active?: boolean;
+    // Images
+    images?: File[];
+    main_image_index?: number;
 }
 
 export interface TenantApplication {

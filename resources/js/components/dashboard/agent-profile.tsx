@@ -1,5 +1,6 @@
 import type { PropertyManager } from '@/types/dashboard';
-import { translate as t } from '@/utils/translate-utils';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { Edit, User } from 'lucide-react';
 
 interface AgentProfileProps {
@@ -8,19 +9,21 @@ interface AgentProfileProps {
 }
 
 export function AgentProfile({ agent, onEdit }: AgentProfileProps) {
+    const { translations } = usePage<SharedData>().props;
+
     return (
         <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <div className="mb-8 flex items-start justify-between">
                 <h2 className="flex items-center text-2xl font-bold text-foreground">
                     <User className="mr-3 text-primary" size={28} />
-                    {t('profile')}
+                    {translate(translations, 'dashboard.profile')}
                 </h2>
                 <button
                     onClick={onEdit}
                     className="flex cursor-pointer items-center space-x-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105"
                 >
                     <Edit size={16} />
-                    <span>{t('editProfile')}</span>
+                    <span>{translate(translations, 'dashboard.editProfile')}</span>
                 </button>
             </div>
 

@@ -57,6 +57,7 @@ class HandleInertiaRequests extends Middleware
                 'contact-us' => trans('contact-us'),
                 'privacy-policy' => trans('privacy-policy'),
                 'terms-of-use' => trans('terms-of-use'),
+                'dashboard' => trans('dashboard'),
             ],
         ];
     }

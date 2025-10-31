@@ -20,18 +20,44 @@ class Property extends Model
         'property_manager_id',
         'title',
         'description',
-        'image_path',
         'type',
+        'subtype',
+
+        // Property specifications
         'bedrooms',
         'bathrooms',
-        'parking_spots',
+        'parking_spots_interior',
+        'parking_spots_exterior',
         'size',
-        'size_unit',
+        'balcony_size',
+        'land_size',
+        'floor_level',
+        'has_elevator',
+        'year_built',
+
+        // Energy / building
+        'energy_class',
+        'thermal_insulation_class',
+        'heating_type',
+
+        // Kitchen
+        'kitchen_equipped',
+        'kitchen_separated',
+
+        // Extras / amenities
+        'has_cellar',
+        'has_laundry',
+        'has_fireplace',
+        'has_air_conditioning',
+        'has_garden',
+        'has_rooftop',
+        'extras',
+
+        // Rental information
         'available_date',
         'rent_amount',
         'rent_currency',
-        'is_active',
-        'invite_token',
+        'status',
 
         // Address fields
         'house_number',
@@ -52,34 +78,25 @@ class Property extends Model
         'available_date' => 'date',
         'rent_amount' => 'decimal:2',
         'size' => 'decimal:2',
+        'balcony_size' => 'decimal:2',
+        'land_size' => 'decimal:2',
         'bathrooms' => 'decimal:1',
         'bedrooms' => 'integer',
-        'parking_spots' => 'integer',
-        'is_active' => 'boolean',
+        'parking_spots_interior' => 'integer',
+        'parking_spots_exterior' => 'integer',
+        'floor_level' => 'integer',
+        'has_elevator' => 'boolean',
+        'year_built' => 'integer',
+        'kitchen_equipped' => 'boolean',
+        'kitchen_separated' => 'boolean',
+        'has_cellar' => 'boolean',
+        'has_laundry' => 'boolean',
+        'has_fireplace' => 'boolean',
+        'has_air_conditioning' => 'boolean',
+        'has_garden' => 'boolean',
+        'has_rooftop' => 'boolean',
+        'extras' => 'array',
     ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'invite_token',
-    ];
-
-    /**
-     * Boot the model.
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($property) {
-            if (!$property->invite_token) {
-                $property->invite_token = Str::random(32);
-            }
-        });
-    }
 
     /**
      * Get the property manager that owns the property.
@@ -90,6 +107,22 @@ class Property extends Model
     }
 
     /**
+     * Get the images for the property.
+     */
+    public function images()
+    {
+        return $this->hasMany(PropertyImage::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Get the main image for the property.
+     */
+    public function mainImage()
+    {
+        return $this->hasOne(PropertyImage::class)->where('is_main', true);
+    }
+
+    /**
      * Property type options.
      */
     public static function getTypeOptions(): array
@@ -97,29 +130,61 @@ class Property extends Model
         return [
             'apartment' => 'Apartment',
             'house' => 'House',
-            'condo' => 'Condo',
-            'townhouse' => 'Townhouse',
-            'studio' => 'Studio',
-            'loft' => 'Loft',
             'room' => 'Room',
-            'office' => 'Office',
-            'garage' => 'Garage',
-            'storage' => 'Storage',
-            'warehouse' => 'Warehouse',
-            'retail' => 'Retail',
             'commercial' => 'Commercial',
+            'industrial' => 'Industrial',
+            'parking' => 'Parking',
         ];
     }
 
     /**
-     * Size unit options.
+     * Property subtype options organized by type.
      */
-    public static function getSizeUnitOptions(): array
+    public static function getSubtypeOptions(): array
     {
         return [
-            'square_meters' => 'Square Meters (m²)',
-            'square_feet' => 'Square Feet (ft²)',
+            'apartment' => [
+                'studio' => 'Studio',
+                'loft' => 'Loft',
+                'duplex' => 'Duplex',
+                'triplex' => 'Triplex',
+                'penthouse' => 'Penthouse',
+                'serviced' => 'Serviced',
+            ],
+            'house' => [
+                'detached' => 'Detached',
+                'semi-detached' => 'Semi-detached',
+                'villa' => 'Villa',
+                'bungalow' => 'Bungalow',
+            ],
+            'room' => [
+                'private_room' => 'Private Room',
+                'student_room' => 'Student Room',
+                'co-living' => 'Co-living',
+            ],
+            'commercial' => [
+                'office' => 'Office',
+                'retail' => 'Retail',
+            ],
+            'industrial' => [
+                'warehouse' => 'Warehouse',
+                'factory' => 'Factory',
+            ],
+            'parking' => [
+                'garage' => 'Garage',
+                'indoor_spot' => 'Indoor Spot',
+                'outdoor_spot' => 'Outdoor Spot',
+            ],
         ];
+    }
+
+    /**
+     * Get subtypes for a specific type.
+     */
+    public static function getSubtypesForType(string $type): array
+    {
+        $subtypes = self::getSubtypeOptions();
+        return $subtypes[$type] ?? [];
     }
 
     /**
@@ -161,44 +226,23 @@ class Property extends Model
             return null;
         }
 
-        $unit = $this->size_unit === 'square_meters' ? 'm²' : 'ft²';
-        return number_format($this->size, 0) . ' ' . $unit;
+        return number_format($this->size, 0) . ' m²';
     }
 
     /**
-     * Get secure image URL for property owner.
+     * Scope for properties with a specific status.
      */
-    public function getSecureImageUrlAttribute(): ?string
+    public function scopeWithStatus($query, $status)
     {
-        if (!$this->image_path) {
-            return null;
-        }
-
-        return route('properties.image', ['property' => $this->id]);
+        return $query->where('status', $status);
     }
 
     /**
-     * Get temporary signed URL for sharing.
+     * Scope for available properties.
      */
-    public function getSignedImageUrl(?int $expiresInMinutes = 60): ?string
+    public function scopeAvailable($query)
     {
-        if (!$this->image_path) {
-            return null;
-        }
-
-        return \Illuminate\Support\Facades\URL::temporarySignedRoute(
-            'properties.image.signed',
-            now()->addMinutes($expiresInMinutes),
-            ['property' => $this->id]
-        );
-    }
-
-    /**
-     * Scope for active properties.
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
+        return $query->where('status', 'available');
     }
 
     /**

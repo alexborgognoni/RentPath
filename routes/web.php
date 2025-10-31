@@ -139,6 +139,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('properties.image');
     Route::get('properties/{property}/image/signed', [PropertyController::class, 'showImageSigned'])
         ->name('properties.image.signed');
+    Route::get('properties/{property}/images/{propertyImage}', [PropertyController::class, 'showPropertyImage'])
+        ->name('properties.images.show');
 
     // Image upload routes
     Route::post('api/images/upload', [ImageUploadController::class, 'upload'])

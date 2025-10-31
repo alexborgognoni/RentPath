@@ -1,5 +1,6 @@
 import type { Property } from '@/types/dashboard';
-import { translate as t } from '@/utils/translate-utils';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { Copy, ExternalLink, Users } from 'lucide-react';
 
 interface PropertyCardProps {
@@ -8,6 +9,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, onEdit }: PropertyCardProps) {
+    const { translations } = usePage<SharedData>().props;
     // Mock currency formatting for now (since backend doesn't exist yet)
     const formatCurrency = (amount: number) => `€${amount.toLocaleString()}`;
 
@@ -67,13 +69,13 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
                 {formatAddress(property)}
             </p>
             <p className="mb-4 text-lg font-bold text-primary">
-                {formatCurrency(property.rent_amount)}/{t('month')}
+                {formatCurrency(property.rent_amount)}/{translate(translations, 'dashboard.month')}
             </p>
 
             <div className="mb-6 flex items-center justify-between text-sm text-muted-foreground">
                 <div className="flex flex-col space-y-1">
                     <span className="font-medium">
-                        {property.bedrooms || 'N/A'} {t('bedrooms')} • {property.bathrooms || 'N/A'} {t('bathrooms')}
+                        {property.bedrooms || 'N/A'} {translate(translations, 'dashboard.bedrooms')} • {property.bathrooms || 'N/A'} {translate(translations, 'dashboard.bathrooms')}
                     </span>
                     {property.size && (
                         <span className="font-medium text-muted-foreground/70">
@@ -94,7 +96,7 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
                         className="flex flex-1 items-center justify-center space-x-2 rounded-xl border border-border bg-muted py-3 font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/80"
                     >
                         <Copy size={16} />
-                        <span>{t('copyApplicationLink')}</span>
+                        <span>{translate(translations, 'dashboard.copyApplicationLink')}</span>
                     </button>
                     {onEdit && (
                         <button
