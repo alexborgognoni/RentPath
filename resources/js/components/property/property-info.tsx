@@ -1,6 +1,23 @@
 import type { Property } from '@/types/dashboard';
-import { motion } from 'framer-motion';
-import { Bath, Bed, Calendar, FileText, Grid2X2, Home, Maximize, X } from 'lucide-react';
+import {
+    Bath,
+    Bed,
+    Calendar,
+    Camera,
+    Car,
+    Flame,
+    FileText,
+    Grid2X2,
+    Home,
+    Maximize,
+    X,
+    Zap,
+    Wind,
+    Warehouse,
+    Trees,
+    UtensilsCrossed,
+    Building,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface PropertyInfoProps {
@@ -32,27 +49,30 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
         }
     }, [isFullscreen]);
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('nl-NL', {
+    const formatCurrency = (amount: number, currency: string) => {
+        const currencyMap: Record<string, string> = {
+            eur: 'EUR',
+            usd: 'USD',
+            gbp: 'GBP',
+            chf: 'CHF',
+        };
+
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'EUR',
+            currency: currencyMap[currency] || 'EUR',
         }).format(amount);
     };
 
-    const totalRent = property.rent_amount; // No separate charges in new structure
+    // Get main image or first image
+    const mainImage = property.images?.find((img) => img.is_main) || property.images?.[0];
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
-        >
+        <div className="space-y-8">
             {/* Hero Image */}
-            {property.image_url && (
+            {mainImage && (
                 <div className="relative overflow-hidden rounded-2xl shadow-xl">
                     <img
-                        src={property.image_url}
+                        src={mainImage.image_url || ''}
                         alt={property.title}
                         className="h-[480px] w-full object-cover"
                     />
@@ -70,13 +90,11 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-6 flex items-center justify-between">
                     <div className="flex-1">
-                        <h1 className="mb-2 text-3xl font-bold text-foreground">
-                            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                                {property.title}
-                            </span>
-                        </h1>
+                        <h1 className="mb-2 text-3xl font-bold text-foreground">{property.title}</h1>
                         <p className="text-muted-foreground">
-                            {property.address}
+                            {property.house_number} {property.street_name}
+                            {property.street_line2 && `, ${property.street_line2}`}, {property.city}{' '}
+                            {property.postal_code}
                         </p>
                     </div>
 
@@ -84,11 +102,9 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                     <div className="ml-6 rounded-xl border border-success/30 bg-success/10 p-4">
                         <div className="text-center">
                             <div className="text-2xl font-bold text-success">
-                                {formatCurrency(totalRent)}
+                                {formatCurrency(property.rent_amount, property.rent_currency)}
                             </div>
-                            <div className="text-xs font-medium text-success/80">
-                                per month
-                            </div>
+                            <div className="text-xs font-medium text-success/80">per month</div>
                         </div>
                     </div>
                 </div>
@@ -111,9 +127,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-center space-x-3">
                             <Bed size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
-                                <p className="mb-1 text-sm font-bold text-foreground">
-                                    {property.bedrooms || 'N/A'}
-                                </p>
+                                <p className="mb-1 text-sm font-bold text-foreground">{property.bedrooms || 0}</p>
                                 <p className="text-xs text-muted-foreground">Bedrooms</p>
                             </div>
                         </div>
@@ -123,9 +137,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-center space-x-3">
                             <Bath size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
-                                <p className="mb-1 text-sm font-bold text-foreground">
-                                    {property.bathrooms || 'N/A'}
-                                </p>
+                                <p className="mb-1 text-sm font-bold text-foreground">{property.bathrooms || 0}</p>
                                 <p className="text-xs text-muted-foreground">Bathrooms</p>
                             </div>
                         </div>
@@ -136,7 +148,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <Grid2X2 size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground">
-                                    {property.size ? `${property.size} ${property.size_unit === 'square_meters' ? 'm²' : 'ft²'}` : 'N/A'}
+                                    {property.size ? `${property.size} m²` : 'N/A'}
                                 </p>
                                 <p className="text-xs text-muted-foreground">Size</p>
                             </div>
@@ -149,7 +161,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground">
                                     {property.available_date
-                                        ? new Date(property.available_date).toLocaleDateString('nl-NL')
+                                        ? new Date(property.available_date).toLocaleDateString('en-US')
                                         : 'N/A'}
                                 </p>
                                 <p className="text-xs text-muted-foreground">Available</p>
@@ -162,7 +174,6 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
             {/* Description */}
             {property.description && (
                 <div className="rounded-2xl border border-border bg-card shadow-sm">
-                    {/* Description Header */}
                     <div className="border-b border-border p-6">
                         <h2 className="flex items-center text-xl font-bold text-foreground">
                             <FileText className="mr-3 text-primary" size={24} />
@@ -170,40 +181,257 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         </h2>
                     </div>
 
-                    {/* Description Content */}
                     <div className="p-6">
                         <div className="prose prose-neutral max-w-none dark:prose-invert">
-                            <div 
-                                className="text-muted-foreground leading-relaxed"
-                                dangerouslySetInnerHTML={{
-                                    __html: property.description
-                                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
-                                        .replace(/\*(.*?)\*/g, '<em class="text-foreground/90 italic">$1</em>')
-                                        .replace(/^# (.*$)/gm, '<h1 class="text-xl font-bold text-foreground mb-4">$1</h1>')
-                                        .replace(/^## (.*$)/gm, '<h2 class="text-lg font-bold text-foreground mb-3">$2</h2>')
-                                        .replace(/^### (.*$)/gm, '<h3 class="text-base font-semibold text-foreground mb-2">$3</h3>')
-                                        .replace(/^- (.*)$/gm, '<li class="text-muted-foreground text-sm">$1</li>')
-                                        .replace(/(<li.*<\/li>)/gs, '<ul class="space-y-2 ml-6 mb-4 list-disc text-sm">$1</ul>')
-                                        .replace(/\n\n/g, '</p><p class="text-muted-foreground leading-relaxed mb-4 text-sm">')
-                                        .replace(/^(?!<[h|u|l])/gm, '<p class="text-muted-foreground leading-relaxed mb-4 text-sm">')
-                                        .replace(/(?<!>)$/gm, '</p>')
-                                        .replace(/<p class="[^"]*"><\/p>/g, '')
-                                }}
-                            />
+                            <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                                {property.description}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Additional Details */}
+            <div className="rounded-2xl border border-border bg-card shadow-sm">
+                <div className="border-b border-border p-6">
+                    <h2 className="flex items-center text-xl font-bold text-foreground">
+                        <Building className="mr-3 text-primary" size={24} />
+                        Property Details
+                    </h2>
+                </div>
+
+                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Parking */}
+                    {(property.parking_spots_interior > 0 || property.parking_spots_exterior > 0) && (
+                        <div className="flex items-start space-x-3">
+                            <Car size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Parking</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {property.parking_spots_interior > 0 &&
+                                        `${property.parking_spots_interior} Indoor`}
+                                    {property.parking_spots_interior > 0 &&
+                                        property.parking_spots_exterior > 0 &&
+                                        ', '}
+                                    {property.parking_spots_exterior > 0 &&
+                                        `${property.parking_spots_exterior} Outdoor`}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Balcony */}
+                    {property.balcony_size && (
+                        <div className="flex items-start space-x-3">
+                            <Grid2X2 size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Balcony</p>
+                                <p className="text-sm text-muted-foreground">{property.balcony_size} m²</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Land Size */}
+                    {property.land_size && (
+                        <div className="flex items-start space-x-3">
+                            <Trees size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Land Size</p>
+                                <p className="text-sm text-muted-foreground">{property.land_size} m²</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Floor Level */}
+                    {property.floor_level !== null && property.floor_level !== undefined && (
+                        <div className="flex items-start space-x-3">
+                            <Building size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Floor</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Level {property.floor_level}
+                                    {property.has_elevator && ' (Elevator available)'}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Year Built */}
+                    {property.year_built && (
+                        <div className="flex items-start space-x-3">
+                            <Calendar size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Year Built</p>
+                                <p className="text-sm text-muted-foreground">{property.year_built}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Energy Class */}
+                    {property.energy_class && (
+                        <div className="flex items-start space-x-3">
+                            <Zap size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Energy Class</p>
+                                <p className="text-sm text-muted-foreground">{property.energy_class}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Thermal Insulation */}
+                    {property.thermal_insulation_class && (
+                        <div className="flex items-start space-x-3">
+                            <Wind size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Thermal Insulation</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Class {property.thermal_insulation_class}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Heating Type */}
+                    {property.heating_type && (
+                        <div className="flex items-start space-x-3">
+                            <Flame size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Heating</p>
+                                <p className="text-sm text-muted-foreground capitalize">
+                                    {property.heating_type.replace('_', ' ')}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Kitchen */}
+                    {(property.kitchen_equipped || property.kitchen_separated) && (
+                        <div className="flex items-start space-x-3">
+                            <UtensilsCrossed size={18} className="text-primary mt-1" />
+                            <div>
+                                <p className="text-sm font-semibold text-foreground">Kitchen</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {property.kitchen_equipped && 'Equipped'}
+                                    {property.kitchen_equipped && property.kitchen_separated && ', '}
+                                    {property.kitchen_separated && 'Separated'}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Amenities */}
+            {(property.has_cellar ||
+                property.has_laundry ||
+                property.has_fireplace ||
+                property.has_air_conditioning ||
+                property.has_garden ||
+                property.has_rooftop) && (
+                <div className="rounded-2xl border border-border bg-card shadow-sm">
+                    <div className="border-b border-border p-6">
+                        <h2 className="flex items-center text-xl font-bold text-foreground">
+                            <Warehouse className="mr-3 text-primary" size={24} />
+                            Amenities
+                        </h2>
+                    </div>
+
+                    <div className="p-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {property.has_cellar && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">Cellar</span>
+                                </div>
+                            )}
+                            {property.has_laundry && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">Laundry</span>
+                                </div>
+                            )}
+                            {property.has_fireplace && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">Fireplace</span>
+                                </div>
+                            )}
+                            {property.has_air_conditioning && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">Air Conditioning</span>
+                                </div>
+                            )}
+                            {property.has_garden && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">Garden</span>
+                                </div>
+                            )}
+                            {property.has_rooftop && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">Rooftop Access</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Property Images Gallery */}
+            {property.images && property.images.length > 0 && (
+                <div className="rounded-2xl border border-border bg-card shadow-sm">
+                    <div className="border-b border-border p-6">
+                        <h2 className="flex items-center text-xl font-bold text-foreground">
+                            <Camera className="mr-3 text-primary" size={24} />
+                            Property Images
+                        </h2>
+                    </div>
+
+                    <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {property.images.map((image, index) => (
+                                <div
+                                    key={image.id}
+                                    className="relative group overflow-hidden rounded-lg cursor-pointer"
+                                    onClick={() => {
+                                        setIsFullscreen(true);
+                                        // Could add logic to show specific image in fullscreen
+                                    }}
+                                >
+                                    <img
+                                        src={image.image_url || ''}
+                                        alt={`${property.title} - Image ${index + 1}`}
+                                        className="w-full h-64 object-cover transition-transform group-hover:scale-105"
+                                    />
+                                    {image.is_main && (
+                                        <div className="absolute top-2 left-2 bg-primary text-white px-2 py-1 rounded text-xs font-medium">
+                                            Main Image
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-background/0 group-hover:bg-background/10 transition-colors flex items-center justify-center">
+                                        <Maximize
+                                            size={32}
+                                            className="text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
             )}
 
             {/* Fullscreen Modal */}
-            {isFullscreen && property.image_url && (
+            {isFullscreen && mainImage && (
                 <div
                     className="fixed inset-0 z-[99999] flex items-center justify-center bg-background/95 backdrop-blur-md"
                     onClick={toggleFullscreen}
                 >
                     <div className="relative flex h-full w-full items-center justify-center">
                         <img
-                            src={property.image_url}
+                            src={mainImage.image_url || ''}
                             alt={property.title}
                             className="max-h-full max-w-full object-contain"
                             onClick={(e) => e.stopPropagation()}
@@ -217,6 +445,6 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                     </div>
                 </div>
             )}
-        </motion.div>
+        </div>
     );
 }

@@ -8,6 +8,7 @@ interface Translations {
     settings: SettingsTranslations;
     profile: ProfileTranslations;
     'cookie-banner': CookieBannerTranslations;
+    dashboard: DashboardTranslations;
 }
 
 type JSONPathOf<T> = T extends string
