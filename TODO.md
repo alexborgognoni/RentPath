@@ -2,6 +2,8 @@
 
 - [ ] Properties dashboard
 - [ ] Property create needs better per-type validation
+- [ ] Add public_apply_url_enabled
+- [ ] Proper test property seeder
 
 - [ ] Fix translation types
 - [ ] Refactor frontend

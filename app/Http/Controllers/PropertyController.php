@@ -347,9 +347,12 @@ class PropertyController extends Controller
      */
     public function findByToken(string $token)
     {
-        $property = Property::where('invite_token', $token)
-            ->where('is_active', true)
-            ->firstOrFail();
+        $property = Property::where('invite_token', $token)->firstOrFail();
+
+        // Check if token is valid
+        if (!$property->hasValidInviteToken()) {
+            abort(403, 'Invite link has expired or is invalid');
+        }
 
         return response()->json([
             'id' => $property->id,
@@ -361,17 +364,77 @@ class PropertyController extends Controller
             'state' => $property->state,
             'postal_code' => $property->postal_code,
             'country' => $property->country,
-            'image_url' => $property->image_url,
             'type' => $property->type,
             'bedrooms' => $property->bedrooms,
             'bathrooms' => $property->bathrooms,
             'size' => $property->size,
-            'size_unit' => $property->size_unit,
             'rent_amount' => $property->rent_amount,
             'rent_currency' => $property->rent_currency,
             'formatted_rent' => $property->formatted_rent,
             'formatted_size' => $property->formatted_size,
             'tenant_count' => 0, // Always 0 for now
+        ]);
+    }
+
+    /**
+     * Generate a new invite token for the property.
+     */
+    public function generateInviteToken(Request $request, Property $property)
+    {
+        // Ensure user owns this property
+        $propertyManager = Auth::user()->propertyManager;
+        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'expiration_days' => 'nullable|integer|min:1|max:365',
+        ]);
+
+        $expirationDays = $validated['expiration_days'] ?? 30;
+        $token = $property->generateInviteToken($expirationDays);
+
+        return response()->json([
+            'token' => $token,
+            'expires_at' => $property->invite_token_expires_at,
+            'invite_url' => route('property.show', ['property' => $property->id]) . '?token=' . $token,
+        ]);
+    }
+
+    /**
+     * Invalidate the current invite token.
+     */
+    public function invalidateInviteToken(Property $property)
+    {
+        // Ensure user owns this property
+        $propertyManager = Auth::user()->propertyManager;
+        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+            abort(403);
+        }
+
+        $property->invalidateInviteToken();
+
+        return response()->json([
+            'message' => 'Invite token invalidated successfully',
+        ]);
+    }
+
+    /**
+     * Toggle public apply URL access.
+     */
+    public function togglePublicAccess(Property $property)
+    {
+        // Ensure user owns this property
+        $propertyManager = Auth::user()->propertyManager;
+        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+            abort(403);
+        }
+
+        $property->public_apply_url_enabled = !$property->public_apply_url_enabled;
+        $property->save();
+
+        return response()->json([
+            'public_apply_url_enabled' => $property->public_apply_url_enabled,
         ]);
     }
 

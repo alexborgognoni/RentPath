@@ -1,4 +1,5 @@
-import { AppLayout } from '@/layouts/app-layout';
+import { ManagerLayout } from '@/layouts/manager-layout';
+import { type BreadcrumbItem } from '@/types';
 import type { Property, PropertyFormData } from '@/types/dashboard';
 import { type SharedData } from '@/types';
 import { Head, useForm, router, usePage } from '@inertiajs/react';
@@ -20,6 +21,12 @@ export default function PropertyCreate({ property, isEditing = false }: Property
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [mainImageIndex, setMainImageIndex] = useState<number>(0);
     const [subtypeOptions, setSubtypeOptions] = useState<{value: string; label: string}[]>([]);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Dashboard', href: '/dashboard' },
+        { title: 'Properties', href: '/dashboard' },
+        { title: isEditing ? 'Edit Property' : 'Add Property' },
+    ];
 
     const { data, setData, post, put, processing, errors, progress } = useForm<PropertyFormData>({
         // Basic info
@@ -313,7 +320,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
     };
 
     return (
-        <AppLayout>
+        <ManagerLayout breadcrumbs={breadcrumbs}>
             <Head title={isEditing ? 'Edit Property' : 'Add New Property'} />
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -1103,6 +1110,6 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                             )}
                         </form>
             </motion.div>
-        </AppLayout>
+        </ManagerLayout>
     );
 }

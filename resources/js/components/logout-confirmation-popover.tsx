@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { logout } from '@/routes';
 import { type SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';
@@ -45,7 +44,7 @@ export function LogoutConfirmationPopover({ isOpen, onClose, onConfirm }: Logout
 
     const handleLogout = () => {
         onConfirm?.();
-        router.post(logout());
+        router.post('/logout');
     };
 
     if (!isOpen) return null;

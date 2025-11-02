@@ -17,13 +17,44 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
     const [filtersOpen, setFiltersOpen] = useState(true);
     const [filters, setFilters] = useState<PropertyFilterState>({
         search: '',
+        status: '',
+        type: '',
+        minRent: '',
+        maxRent: '',
         bedrooms: '',
-        bathrooms: '',
-        minPrice: '',
-        maxPrice: '',
+        city: '',
         minSize: '',
         maxSize: '',
+        floor: '',
+        hasElevator: null,
+        yearBuiltMin: '',
+        yearBuiltMax: '',
+        hasGarden: null,
+        hasRooftop: null,
+        hasAirConditioning: null,
+        hasFireplace: null,
+        hasLaundry: null,
+        hasCellar: null,
+        energyClass: '',
+        heatingType: '',
+        parkingInterior: '',
+        parkingExterior: '',
+        kitchenEquipped: null,
+        kitchenSeparated: null,
+        subtype: '',
+        availableFrom: '',
     });
+
+    // Extract unique cities from properties
+    const cities = useMemo(() => {
+        const uniqueCities = new Set<string>();
+        properties.forEach(property => {
+            if (property.city) {
+                uniqueCities.add(property.city);
+            }
+        });
+        return Array.from(uniqueCities).sort();
+    }, [properties]);
 
     // Filter properties based on current filters
     const filteredProperties = useMemo(() => {
@@ -38,46 +69,105 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                 if (!matchesSearch) return false;
             }
 
-            // Bedrooms filter
+            // Status filter
+            if (filters.status && property.status !== filters.status) {
+                return false;
+            }
+
+            // Type filter
+            if (filters.type && property.type !== filters.type) {
+                return false;
+            }
+
+            // City filter
+            if (filters.city && property.city !== filters.city) {
+                return false;
+            }
+
+            // Bedrooms filter (at least)
             if (filters.bedrooms) {
                 const bedroomCount = parseInt(filters.bedrooms);
-                if (bedroomCount === 5) {
-                    // 5+ bedrooms
-                    if ((property.bedrooms || 0) < 5) return false;
-                } else {
-                    if (property.bedrooms !== bedroomCount) return false;
-                }
+                if ((property.bedrooms || 0) < bedroomCount) return false;
             }
 
-            // Bathrooms filter
-            if (filters.bathrooms) {
-                const bathroomCount = parseInt(filters.bathrooms);
-                if (bathroomCount === 4) {
-                    // 4+ bathrooms
-                    if ((property.bathrooms || 0) < 4) return false;
-                } else {
-                    if (property.bathrooms !== bathroomCount) return false;
-                }
+            // Rent range filter
+            if (filters.minRent) {
+                const minRent = parseFloat(filters.minRent);
+                if (property.rent_amount < minRent) return false;
             }
-
-            // Price range filter
-            if (filters.minPrice) {
-                const minPrice = parseInt(filters.minPrice);
-                if (property.rent_amount < minPrice) return false;
-            }
-            if (filters.maxPrice) {
-                const maxPrice = parseInt(filters.maxPrice);
-                if (property.rent_amount > maxPrice) return false;
+            if (filters.maxRent) {
+                const maxRent = parseFloat(filters.maxRent);
+                if (property.rent_amount > maxRent) return false;
             }
 
             // Size range filter
             if (filters.minSize) {
-                const minSize = parseInt(filters.minSize);
+                const minSize = parseFloat(filters.minSize);
                 if (!property.size || property.size < minSize) return false;
             }
             if (filters.maxSize) {
-                const maxSize = parseInt(filters.maxSize);
+                const maxSize = parseFloat(filters.maxSize);
                 if (!property.size || property.size > maxSize) return false;
+            }
+
+            // Floor filter
+            if (filters.floor) {
+                const floor = parseInt(filters.floor);
+                if (property.floor_level !== floor) return false;
+            }
+
+            // Elevator filter
+            if (filters.hasElevator !== null && property.has_elevator !== filters.hasElevator) {
+                return false;
+            }
+
+            // Year built filter
+            if (filters.yearBuiltMin) {
+                const yearMin = parseInt(filters.yearBuiltMin);
+                if (!property.year_built || property.year_built < yearMin) return false;
+            }
+            if (filters.yearBuiltMax) {
+                const yearMax = parseInt(filters.yearBuiltMax);
+                if (!property.year_built || property.year_built > yearMax) return false;
+            }
+
+            // Amenities filters
+            if (filters.hasGarden !== null && property.has_garden !== filters.hasGarden) return false;
+            if (filters.hasRooftop !== null && property.has_rooftop !== filters.hasRooftop) return false;
+            if (filters.hasAirConditioning !== null && property.has_air_conditioning !== filters.hasAirConditioning) return false;
+            if (filters.hasFireplace !== null && property.has_fireplace !== filters.hasFireplace) return false;
+            if (filters.hasLaundry !== null && property.has_laundry !== filters.hasLaundry) return false;
+            if (filters.hasCellar !== null && property.has_cellar !== filters.hasCellar) return false;
+
+            // Energy class filter
+            if (filters.energyClass && property.energy_class !== filters.energyClass) {
+                return false;
+            }
+
+            // Heating type filter
+            if (filters.heatingType && property.heating_type !== filters.heatingType) {
+                return false;
+            }
+
+            // Parking filters
+            if (filters.parkingInterior) {
+                const parkingInt = parseInt(filters.parkingInterior);
+                if ((property.parking_spots_interior || 0) < parkingInt) return false;
+            }
+            if (filters.parkingExterior) {
+                const parkingExt = parseInt(filters.parkingExterior);
+                if ((property.parking_spots_exterior || 0) < parkingExt) return false;
+            }
+
+            // Kitchen filters
+            if (filters.kitchenEquipped !== null && property.kitchen_equipped !== filters.kitchenEquipped) return false;
+            if (filters.kitchenSeparated !== null && property.kitchen_separated !== filters.kitchenSeparated) return false;
+
+            // Availability filter
+            if (filters.availableFrom) {
+                const filterDate = new Date(filters.availableFrom);
+                const propertyDate = property.available_date ? new Date(property.available_date) : null;
+                if (!propertyDate || propertyDate > filterDate) return false;
             }
 
             return true;
@@ -120,7 +210,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                 </div>
                 {filtersOpen && (
                     <div className="border-t border-border p-4">
-                        <PropertyFilters onFilterChange={setFilters} />
+                        <PropertyFilters onFilterChange={setFilters} cities={cities} />
                     </div>
                 )}
             </div>

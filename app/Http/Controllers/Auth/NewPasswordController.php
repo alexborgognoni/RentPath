@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -20,8 +21,13 @@ class NewPasswordController extends Controller
     /**
      * Show the password reset page.
      */
-    public function create(Request $request): Response
+    public function create(Request $request): Response|RedirectResponse
     {
+        // If already authenticated, redirect to their dashboard
+        if (Auth::check()) {
+            return redirect()->away(userDefaultDashboard(Auth::user()));
+        }
+
         return Inertia::render('auth/reset-password', [
             'email' => $request->email,
             'token' => $request->route('token'),

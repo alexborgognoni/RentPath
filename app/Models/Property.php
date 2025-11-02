@@ -67,6 +67,11 @@ class Property extends Model
         'state',
         'postal_code',
         'country',
+
+        // Public access and invite tokens
+        'public_apply_url_enabled',
+        'invite_token',
+        'invite_token_expires_at',
     ];
 
     /**
@@ -96,6 +101,8 @@ class Property extends Model
         'has_garden' => 'boolean',
         'has_rooftop' => 'boolean',
         'extras' => 'array',
+        'public_apply_url_enabled' => 'boolean',
+        'invite_token_expires_at' => 'datetime',
     ];
 
     /**
@@ -259,5 +266,63 @@ class Property extends Model
     public function scopeOfType($query, $type)
     {
         return $query->where('type', $type);
+    }
+
+    /**
+     * Generate a new invite token that expires in the given number of days.
+     */
+    public function generateInviteToken(int $expirationDays = 30): string
+    {
+        $this->invite_token = Str::random(64);
+        $this->invite_token_expires_at = now()->addDays($expirationDays);
+        $this->save();
+
+        return $this->invite_token;
+    }
+
+    /**
+     * Check if the invite token is valid and not expired.
+     */
+    public function hasValidInviteToken(): bool
+    {
+        if (!$this->invite_token) {
+            return false;
+        }
+
+        if (!$this->invite_token_expires_at) {
+            return false;
+        }
+
+        return $this->invite_token_expires_at->isFuture();
+    }
+
+    /**
+     * Invalidate the current invite token.
+     */
+    public function invalidateInviteToken(): void
+    {
+        $this->invite_token = null;
+        $this->invite_token_expires_at = null;
+        $this->save();
+    }
+
+    /**
+     * Check if the property can be accessed publicly for applications.
+     */
+    public function isPubliclyAccessible(): bool
+    {
+        return $this->public_apply_url_enabled === true;
+    }
+
+    /**
+     * Check if the property can be accessed with the given token.
+     */
+    public function canAccessWithToken(string $token): bool
+    {
+        if ($this->invite_token !== $token) {
+            return false;
+        }
+
+        return $this->hasValidInviteToken();
     }
 }

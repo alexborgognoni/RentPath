@@ -73,6 +73,10 @@ export interface Property {
     // Property status
     status: 'inactive' | 'available' | 'application_received' | 'under_review' | 'visit_scheduled' | 'approved' | 'leased' | 'maintenance' | 'archived';
     tenant_count?: number; // This will be computed/added by backend
+    // Public access and invite tokens
+    public_apply_url_enabled: boolean;
+    invite_token?: string | null;
+    invite_token_expires_at?: string | null;
     created_at: string;
     updated_at: string;
     // Computed attributes

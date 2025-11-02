@@ -1,4 +1,4 @@
-import { AppLayout } from '@/layouts/app-layout';
+import { ManagerLayout } from '@/layouts/manager-layout';
 import { type BreadcrumbItem } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { translate as t } from '@/utils/translate-utils';
@@ -22,12 +22,13 @@ export default function PropertyPage() {
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('dashboard'), href: '/dashboard' },
+        { title: 'Properties', href: '/dashboard' },
         { title: property?.title || t('property') },
     ];
 
     if (error || !property) {
         return (
-            <AppLayout breadcrumbs={breadcrumbs}>
+            <ManagerLayout breadcrumbs={breadcrumbs}>
                 <Head title={t('propertyNotFound')} />
                 <div className="rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm mt-6">
                     <h2 className="mb-4 text-2xl font-bold text-destructive">
@@ -43,12 +44,12 @@ export default function PropertyPage() {
                         Back to Dashboard
                     </a>
                 </div>
-            </AppLayout>
+            </ManagerLayout>
         );
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <ManagerLayout breadcrumbs={breadcrumbs}>
             <Head title={property.title} />
             <div className="mt-6 mb-6 grid grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* Left Column - Main Content */}
@@ -63,6 +64,6 @@ export default function PropertyPage() {
                     </div>
                 </div>
             </div>
-        </AppLayout>
+        </ManagerLayout>
     );
 }

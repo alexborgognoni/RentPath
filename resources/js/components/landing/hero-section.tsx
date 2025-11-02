@@ -5,7 +5,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 export function HeroSection() {
     const page = usePage<SharedData>();
-    const { auth, translations } = page.props;
+    const { translations } = page.props;
     const isMobile = useIsMobile();
 
     const Heading = isMobile ? 'h1' : motion.h1;
@@ -84,9 +84,7 @@ export function HeroSection() {
                             href="/register"
                             className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-6 xs:px-8 py-3 xs:py-4 text-center text-base xs:text-lg font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105"
                         >
-                            {auth.user
-                                ? translate(translations, 'landing.hero.cta_primary_auth')
-                                : translate(translations, 'landing.hero.cta_primary_guest')}
+                            {translate(translations, 'landing.hero.cta_primary_guest')}
                         </a>
                         <a
                             href="#problems"
@@ -137,9 +135,7 @@ export function HeroSection() {
                                 href="/register"
                                 className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary lg:px-5 lg:py-3 xl:px-6 xl:py-3 text-center lg:text-lg xl:text-xl font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105"
                             >
-                                {auth.user
-                                    ? translate(translations, 'landing.hero.cta_primary_auth')
-                                    : translate(translations, 'landing.hero.cta_primary_guest')}
+                                {translate(translations, 'landing.hero.cta_primary_guest')}
                             </a>
 
                             <Subtitle

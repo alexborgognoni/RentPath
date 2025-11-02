@@ -188,17 +188,18 @@ CREATE TABLE properties (
 | **archived**        | Application closed and kept for records (cannot be modified).                                | —                                                          |
 | **deleted**         | Application removed before submission (draft cleanup).                                       | —                                                          |
 
-# Apply Links
+# Application Invite Tokens
 
-| Field                       | Type                                | Description                                                                                              |
-| --------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `id`                        | UUID / BIGINT                       | Primary key                                                                                              |
-| `property_id`               | FK → `properties.id`                | The property this link belongs to                                                                        |
-| `token`                     | string, nullable                    | Unique token used in the URL. Optional for public links; required for private/invite links               |
-| `type`                      | ENUM('public', 'private', 'invite') | Type of link: public (anyone), private (token, no email restriction), invite (token + email restriction) |
-| `email`                     | string, nullable                    | For invite links: restrict usage to this email                                                           |
-| `max_uses`                  | int, nullable                       | Optional: maximum times this link can be used (e.g., 1 for a single-invite)                              |
-| `used_count`                | int, default 0                      | Tracks how many times the link has been used                                                             |
-| `expires_at`                | datetime, nullable                  | Optional expiration date                                                                                 |
-| `status`                    | ENUM('active','revoked','expired')  | Current state of the link                                                                                |
-| `created_at` / `updated_at` | timestamps                          | Standard auditing fields                                                                                 |
+| Field                       | Type                               | Description                                                                 |
+| --------------------------- | ---------------------------------- | --------------------------------------------------------------------------- |
+| **id**                      | UUID / BIGINT                      | Primary key                                                                 |
+| **property_id**             | FK → `properties.id`               | Property this token grants access to                                        |
+| **token**                   | string, **NOT NULL**               | Unique token used in the URL (always required now)                          |
+| **type**                    | ENUM('private', 'invite')          | `private` = shareable token link, `invite` = restricted to a specific email |
+| **email**                   | string, nullable                   | Used if `type = 'invite'` to restrict by recipient                          |
+| **max_uses**                | int, nullable                      | Maximum allowed uses (e.g., 1 for one-time invites)                         |
+| **used_count**              | int, default 0                     | Current number of uses                                                      |
+| **expires_at**              | datetime, nullable                 | When the token becomes invalid                                              |
+| **status**                  | ENUM('active','revoked','expired') | Current state of the token                                                  |
+| **created_by**              | FK → `users.id`                    | Who generated the link                                                      |
+| **created_at / updated_at** | timestamps                         | Standard auditing fields                                                    |

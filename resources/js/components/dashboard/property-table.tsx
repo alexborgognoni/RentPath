@@ -1,15 +1,53 @@
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { ChevronRight, Link as LinkIcon, Pencil, Users } from 'lucide-react';
+import { ChevronRight, Link as LinkIcon, Pencil, Users, ArrowUpDown, ArrowUp, ArrowDown, Bed, Bath, Car, Maximize2 } from 'lucide-react';
 import type { Property } from '@/types/dashboard';
+import { useState, useMemo, useEffect } from 'react';
 
 interface PropertyTableProps {
     properties: Property[];
     onEditProperty: (property: Property) => void;
 }
 
+type SortColumn = 'title' | 'rent_amount' | 'status' | 'bedrooms' | 'bathrooms' | 'parking' | 'tenant_count' | 'size' | null;
+type SortDirection = 'asc' | 'desc';
+
 export function PropertyTable({ properties, onEditProperty }: PropertyTableProps) {
     const { translations } = usePage<SharedData>().props;
+    const [sortColumn, setSortColumn] = useState<SortColumn>(null);
+    const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+    const [columnWidths, setColumnWidths] = useState({
+        image: 0.8,
+        property: 2.5,
+        price: 1.2,
+        size: 0.8,
+        status: 1.2,
+        beds: 0.6,
+        baths: 0.6,
+        parking: 0.6,
+        applicants: 1,
+        actions: 1.5,
+    });
+    const [resizing, setResizing] = useState<string | null>(null);
+    const [resizeStart, setResizeStart] = useState({ x: 0, width: 0 });
+
+    const formatNumber = (num: number | string | undefined): string => {
+        if (!num) return '0';
+        // Convert to number if it's a string
+        const numValue = typeof num === 'string' ? parseFloat(num) : num;
+        if (isNaN(numValue)) return '0';
+        // Remove unnecessary decimals
+        const formatted = numValue.toFixed(2);
+        // Remove .00
+        if (formatted.endsWith('.00')) {
+            return formatted.slice(0, -3);
+        }
+        // Remove trailing 0 (e.g., .90 -> .9)
+        if (formatted.endsWith('0') && !formatted.endsWith('.00')) {
+            return formatted.slice(0, -1);
+        }
+        return formatted;
+    };
 
     const getStatusBadge = (status: string) => {
         const statusConfig: Record<string, { label: string; className: string }> = {
@@ -43,11 +81,71 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
         );
     };
 
+    const getCountryName = (countryCode: string | undefined): string => {
+        if (!countryCode) return '';
+
+        const countryNames: Record<string, string> = {
+            'CH': 'Switzerland',
+            'US': 'United States',
+            'GB': 'United Kingdom',
+            'DE': 'Germany',
+            'FR': 'France',
+            'IT': 'Italy',
+            'AT': 'Austria',
+            'BE': 'Belgium',
+            'NL': 'Netherlands',
+            'ES': 'Spain',
+            'PT': 'Portugal',
+            'SE': 'Sweden',
+            'NO': 'Norway',
+            'DK': 'Denmark',
+            'FI': 'Finland',
+            'PL': 'Poland',
+            'CZ': 'Czech Republic',
+            'HU': 'Hungary',
+            'RO': 'Romania',
+            'BG': 'Bulgaria',
+            'GR': 'Greece',
+            'IE': 'Ireland',
+            'LU': 'Luxembourg',
+            'CA': 'Canada',
+            'AU': 'Australia',
+            'NZ': 'New Zealand',
+            'JP': 'Japan',
+            'CN': 'China',
+            'KR': 'South Korea',
+            'IN': 'India',
+            'BR': 'Brazil',
+            'MX': 'Mexico',
+            'AR': 'Argentina',
+            'CL': 'Chile',
+            'ZA': 'South Africa',
+            'EG': 'Egypt',
+            'NG': 'Nigeria',
+            'KE': 'Kenya',
+            'SG': 'Singapore',
+            'TH': 'Thailand',
+            'MY': 'Malaysia',
+            'ID': 'Indonesia',
+            'PH': 'Philippines',
+            'VN': 'Vietnam',
+            'AE': 'United Arab Emirates',
+            'SA': 'Saudi Arabia',
+            'IL': 'Israel',
+            'TR': 'Turkey',
+            'RU': 'Russia',
+            'UA': 'Ukraine',
+        };
+
+        return countryNames[countryCode.toUpperCase()] || countryCode;
+    };
+
     const formatAddress = (property: Property): string => {
         const parts = [
             property.house_number,
             property.street_name,
             property.city,
+            getCountryName(property.country),
         ].filter(Boolean);
         return parts.join(', ');
     };
@@ -68,113 +166,416 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
         window.location.href = `/property/${property.id}`;
     };
 
+    const handleResizeStart = (e: React.MouseEvent, column: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setResizing(column);
+        setResizeStart({
+            x: e.clientX,
+            width: columnWidths[column as keyof typeof columnWidths],
+        });
+    };
+
+    // Add event listeners for resize
+    useEffect(() => {
+        if (!resizing) return;
+
+        const handleResizeMove = (e: MouseEvent) => {
+            const diff = e.clientX - resizeStart.x;
+            // Convert pixel difference to fr units (roughly 100px = 1fr)
+            const frDiff = diff / 100;
+            const newWidth = Math.max(0.3, resizeStart.width + frDiff);
+            setColumnWidths((prev) => ({
+                ...prev,
+                [resizing]: newWidth,
+            }));
+        };
+
+        const handleResizeEnd = () => {
+            setResizing(null);
+        };
+
+        window.addEventListener('mousemove', handleResizeMove);
+        window.addEventListener('mouseup', handleResizeEnd);
+
+        return () => {
+            window.removeEventListener('mousemove', handleResizeMove);
+            window.removeEventListener('mouseup', handleResizeEnd);
+        };
+    }, [resizing, resizeStart]);
+
+    const handleSort = (column: SortColumn) => {
+        if (sortColumn === column) {
+            // Toggle direction if same column
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            // New column, default to ascending
+            setSortColumn(column);
+            setSortDirection('asc');
+        }
+    };
+
+    const getSortIcon = (column: SortColumn) => {
+        if (sortColumn !== column) {
+            return <ArrowUpDown size={14} className="opacity-50" />;
+        }
+        return sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />;
+    };
+
+    // Sort properties
+    const sortedProperties = useMemo(() => {
+        if (!sortColumn) return properties;
+
+        return [...properties].sort((a, b) => {
+            let aValue: any;
+            let bValue: any;
+
+            switch (sortColumn) {
+                case 'title':
+                    aValue = a.title?.toLowerCase() || '';
+                    bValue = b.title?.toLowerCase() || '';
+                    break;
+                case 'rent_amount':
+                    aValue = a.rent_amount || 0;
+                    bValue = b.rent_amount || 0;
+                    break;
+                case 'status':
+                    aValue = a.status || '';
+                    bValue = b.status || '';
+                    break;
+                case 'bedrooms':
+                    aValue = a.bedrooms || 0;
+                    bValue = b.bedrooms || 0;
+                    break;
+                case 'bathrooms':
+                    aValue = a.bathrooms || 0;
+                    bValue = b.bathrooms || 0;
+                    break;
+                case 'parking':
+                    aValue = (a.parking_spots_interior || 0) + (a.parking_spots_exterior || 0);
+                    bValue = (b.parking_spots_interior || 0) + (b.parking_spots_exterior || 0);
+                    break;
+                case 'tenant_count':
+                    aValue = a.tenant_count || 0;
+                    bValue = b.tenant_count || 0;
+                    break;
+                case 'size':
+                    aValue = a.size || 0;
+                    bValue = b.size || 0;
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [properties, sortColumn, sortDirection]);
+
+    const gridTemplateColumns = `${columnWidths.image}fr ${columnWidths.property}fr ${columnWidths.price}fr ${columnWidths.size}fr ${columnWidths.status}fr ${columnWidths.beds}fr ${columnWidths.baths}fr ${columnWidths.parking}fr ${columnWidths.applicants}fr ${columnWidths.actions}fr`;
+
     return (
-        <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="overflow-hidden rounded-xl border border-border bg-card relative">
+            {/* Column Dividers - Full Height */}
+            <div className="absolute top-0 bottom-0 left-6 pointer-events-none" style={{ width: `calc(100% - 48px)` }}>
+                <div className="relative h-full" style={{ display: 'grid', gridTemplateColumns, gap: 0 }}>
+                    {/* Image divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                    {/* Property divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                    {/* Price divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                    {/* Size divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                    {/* Status divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                    {/* Beds divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                    {/* Baths divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                    {/* Parking divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                    {/* Applicants divider */}
+                    <div className="relative">
+                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                    </div>
+                </div>
+            </div>
+
             {/* Table Header */}
-            <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr_1fr_1.2fr] gap-4 border-b border-border bg-muted/50 px-6 py-4">
-                <div className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    {translate(translations, 'dashboard.columnProperty')}
+            <div className="grid border-b border-border bg-muted/50 px-6 py-4 relative z-10" style={{ gridTemplateColumns, gap: 0 }}>
+                {/* Image column - no label */}
+                <div className="relative px-2">
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'image')}
+                    />
                 </div>
-                <div className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    {translate(translations, 'dashboard.columnPrice')}
+
+                {/* Property */}
+                <div className="relative px-2">
+                    <div
+                        className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        onClick={() => handleSort('title')}
+                    >
+                        <span>{translate(translations, 'dashboard.columnProperty')}</span>
+                        {getSortIcon('title')}
+                    </div>
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'property')}
+                    />
                 </div>
-                <div className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    {translate(translations, 'dashboard.columnStatus')}
+
+                {/* Price */}
+                <div className="relative px-2">
+                    <div
+                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        onClick={() => handleSort('rent_amount')}
+                    >
+                        <span>Price</span>
+                        {getSortIcon('rent_amount')}
+                    </div>
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'price')}
+                    />
                 </div>
-                <div className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    {translate(translations, 'dashboard.columnBeds')}
+
+                {/* Size */}
+                <div className="relative px-2">
+                    <div
+                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        onClick={() => handleSort('size')}
+                    >
+                        <span>Size</span>
+                        {getSortIcon('size')}
+                    </div>
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'size')}
+                    />
                 </div>
-                <div className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    {translate(translations, 'dashboard.columnApplicants')}
+
+                {/* Status */}
+                <div className="relative px-2">
+                    <div
+                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        onClick={() => handleSort('status')}
+                    >
+                        <span>{translate(translations, 'dashboard.columnStatus')}</span>
+                        {getSortIcon('status')}
+                    </div>
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'status')}
+                    />
                 </div>
-                <div className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+
+                {/* Beds */}
+                <div className="relative px-2">
+                    <div
+                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        onClick={() => handleSort('bedrooms')}
+                    >
+                        <span>Beds</span>
+                        {getSortIcon('bedrooms')}
+                    </div>
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'beds')}
+                    />
+                </div>
+
+                {/* Baths */}
+                <div className="relative px-2">
+                    <div
+                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        onClick={() => handleSort('bathrooms')}
+                    >
+                        <span>Baths</span>
+                        {getSortIcon('bathrooms')}
+                    </div>
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'baths')}
+                    />
+                </div>
+
+                {/* Parking */}
+                <div className="relative px-2">
+                    <div
+                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        onClick={() => handleSort('parking')}
+                    >
+                        <span>Parking</span>
+                        {getSortIcon('parking')}
+                    </div>
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'parking')}
+                    />
+                </div>
+
+                {/* Applicants */}
+                <div className="relative px-2">
+                    <div
+                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        onClick={() => handleSort('tenant_count')}
+                    >
+                        <span>{translate(translations, 'dashboard.columnApplicants')}</span>
+                        {getSortIcon('tenant_count')}
+                    </div>
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        onMouseDown={(e) => handleResizeStart(e, 'applicants')}
+                    />
+                </div>
+
+                {/* Actions */}
+                <div className="px-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                     {translate(translations, 'dashboard.columnActions')}
                 </div>
             </div>
 
             {/* Table Body */}
-            <div className="divide-y divide-border">
-                {properties.map((property) => (
-                    <div
-                        key={property.id}
-                        onClick={() => handleRowClick(property)}
-                        className="grid cursor-pointer grid-cols-[2fr_1fr_1fr_0.8fr_1fr_1.2fr] gap-4 px-6 py-4 transition-colors hover:bg-muted/30"
-                    >
-                        {/* Property */}
-                        <div className="flex items-center gap-4">
-                            {(property.image_path || property.image_url) && (
-                                <img
-                                    src={property.image_path ? `/properties/${property.id}/image` : property.image_url}
-                                    alt={property.title}
-                                    className="h-12 w-12 rounded-lg border border-border object-cover"
-                                />
-                            )}
-                            <div className="min-w-0 flex-1">
+            <div className="divide-y divide-border relative z-10">
+                {sortedProperties.map((property) => {
+                    // Find the main image
+                    const mainImage = property.images?.find(img => img.is_main) || property.images?.[0];
+
+                    const totalParkingSpots = (property.parking_spots_interior || 0) + (property.parking_spots_exterior || 0);
+
+                    return (
+                        <div
+                            key={property.id}
+                            onClick={() => handleRowClick(property)}
+                            className="grid cursor-pointer px-6 py-4 transition-colors hover:bg-muted/30"
+                            style={{ gridTemplateColumns, gap: 0 }}
+                        >
+                            {/* Image */}
+                            <div className="flex items-center px-2">
+                                {mainImage ? (
+                                    <img
+                                        src={mainImage.image_url || ''}
+                                        alt={property.title}
+                                        className="h-16 w-full rounded-lg border border-border object-cover"
+                                    />
+                                ) : (
+                                    <div className="h-16 w-full rounded-lg border border-border bg-muted flex items-center justify-center">
+                                        <span className="text-xs text-muted-foreground">No image</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Property */}
+                            <div className="flex min-w-0 flex-col justify-center px-2">
                                 <div className="truncate font-semibold text-foreground">{property.title}</div>
                                 <div className="truncate text-sm text-muted-foreground">
                                     {formatAddress(property)}
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Price */}
-                        <div className="flex flex-col justify-center">
-                            <div className="font-bold text-foreground">
-                                €{property.rent_amount.toLocaleString()}
+                            {/* Price */}
+                            <div className="flex flex-col justify-center items-center px-2">
+                                <div className="font-bold text-foreground">
+                                    €{formatNumber(property.rent_amount)}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                    {translate(translations, 'dashboard.perMonth')}
+                                </div>
                             </div>
-                            <div className="text-sm text-muted-foreground">
-                                {translate(translations, 'dashboard.perMonth')}
+
+                            {/* Size */}
+                            <div className="flex flex-col justify-center items-center px-2">
+                                <div className="font-bold text-foreground">
+                                    {property.size ? formatNumber(property.size) : 'N/A'}
+                                </div>
+                                <div className="text-sm text-muted-foreground">m²</div>
+                            </div>
+
+                            {/* Status */}
+                            <div className="flex items-center justify-center px-2">
+                                {getStatusBadge(property.status || 'available')}
+                            </div>
+
+                            {/* Beds */}
+                            <div className="flex items-center justify-center gap-2 text-sm px-2">
+                                <Bed size={14} className="text-muted-foreground" />
+                                <span className="font-medium text-foreground">{formatNumber(property.bedrooms)}</span>
+                            </div>
+
+                            {/* Baths */}
+                            <div className="flex items-center justify-center gap-2 text-sm px-2">
+                                <Bath size={14} className="text-muted-foreground" />
+                                <span className="font-medium text-foreground">{formatNumber(property.bathrooms)}</span>
+                            </div>
+
+                            {/* Parking */}
+                            <div className="flex items-center justify-center gap-2 text-sm px-2">
+                                {totalParkingSpots > 0 ? (
+                                    <>
+                                        <Car size={14} className="text-muted-foreground" />
+                                        <span className="font-medium text-foreground">{totalParkingSpots}</span>
+                                    </>
+                                ) : (
+                                    <span className="font-medium text-muted-foreground">-</span>
+                                )}
+                            </div>
+
+                            {/* Applicants */}
+                            <div className="flex items-center justify-center gap-2 px-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                                    <Users size={16} className="text-muted-foreground" />
+                                </div>
+                                <span className="font-semibold text-foreground">{property.tenant_count || 0}</span>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-1 px-2">
+                                <button
+                                    onClick={(e) => handleInvite(e, property)}
+                                    className="flex items-center gap-1 rounded-lg bg-muted px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80"
+                                >
+                                    <LinkIcon size={14} />
+                                    <span>{translate(translations, 'dashboard.invite')}</span>
+                                </button>
+                                <button
+                                    onClick={(e) => handleEdit(e, property)}
+                                    className="flex items-center gap-1 rounded-lg bg-primary px-2 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+                                >
+                                    <span>{translate(translations, 'dashboard.edit')}</span>
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRowClick(property);
+                                    }}
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-muted/80"
+                                >
+                                    <ChevronRight size={16} />
+                                </button>
                             </div>
                         </div>
-
-                        {/* Status */}
-                        <div className="flex items-center">
-                            {getStatusBadge(property.status || 'available')}
-                        </div>
-
-                        {/* Beds */}
-                        <div className="flex flex-col justify-center">
-                            <div className="font-bold text-foreground">{property.bedrooms || 0}</div>
-                            <div className="text-sm text-muted-foreground">
-                                {translate(translations, 'dashboard.beds')}
-                            </div>
-                        </div>
-
-                        {/* Applicants */}
-                        <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                                <Users size={16} className="text-muted-foreground" />
-                            </div>
-                            <span className="font-semibold text-foreground">{property.tenant_count || 0}</span>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={(e) => handleInvite(e, property)}
-                                className="flex items-center gap-2 rounded-lg bg-muted px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80"
-                            >
-                                <LinkIcon size={16} />
-                                <span>{translate(translations, 'dashboard.invite')}</span>
-                            </button>
-                            <button
-                                onClick={(e) => handleEdit(e, property)}
-                                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
-                            >
-                                <span>{translate(translations, 'dashboard.edit')}</span>
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRowClick(property);
-                                }}
-                                className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-muted/80"
-                            >
-                                <ChevronRight size={20} />
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

@@ -10,9 +10,9 @@ import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { register } from '@/routes';
 import { request } from '@/routes/password';
-import { Form, Head, usePage } from '@inertiajs/react';
-import { Building2, LoaderCircle, User } from 'lucide-react';
-import { useState } from 'react';
+import { Form, Head, usePage, router } from '@inertiajs/react';
+import { LoaderCircle, Building2, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface LoginProps {
     status?: string;
@@ -20,47 +20,58 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const [userType, setUserType] = useState<'tenant' | 'property-manager'>('tenant');
     const page = usePage<SharedData>();
     const { translations } = page.props;
+
+    // Determine initial user type from localStorage or default to tenant
+    const [userType, setUserType] = useState<'tenant' | 'property-manager'>(() => {
+        const saved = localStorage.getItem('userType');
+        return (saved === 'property-manager' ? 'property-manager' : 'tenant') as 'tenant' | 'property-manager';
+    });
+
+    // Handle user type change by saving to localStorage
+    const handleUserTypeChange = (newType: 'tenant' | 'property-manager') => {
+        setUserType(newType);
+        localStorage.setItem('userType', newType);
+    };
 
     return (
         <AuthLayout title={t(translations.auth, 'login.title')} description={t(translations.auth, 'login.description')}>
             <Head title={t(translations.auth, 'login.head_title')} />
 
-            <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
+            <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6" data={{ userType }}>
                 {({ processing, errors }) => (
                     <>
                         {/* User Type Toggle */}
-                        {/* <div className="relative flex rounded-lg border border-border bg-background p-1"> */}
+                        <div className="relative flex rounded-lg border border-border bg-background p-1">
                             {/* Sliding background */}
-                        {/*     <div */}
-                        {/*         className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md bg-gradient-to-r ${userType === 'property-manager' ? 'from-secondary to-primary' : 'from-primary to-secondary'} shadow-sm transition-transform duration-400 ease-in-out ${ */}
-                        {/*             userType === 'property-manager' ? 'translate-x-[calc(100%)]' : 'translate-x-0' */}
-                        {/*         }`} */}
-                        {/*     /> */}
-                        {/**/}
-                        {/*     <button */}
-                        {/*         type="button" */}
-                        {/*         onClick={() => setUserType('tenant')} */}
-                        {/*         className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${ */}
-                        {/*             userType === 'tenant' ? 'text-white' : 'text-text-secondary hover:text-text-primary' */}
-                        {/*         }`} */}
-                        {/*     > */}
-                        {/*         <User className="h-4 w-4" /> */}
-                        {/*         {t(translations.auth, 'user_types.tenant')} */}
-                        {/*     </button> */}
-                        {/*     <button */}
-                        {/*         type="button" */}
-                        {/*         onClick={() => setUserType('property-manager')} */}
-                        {/*         className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${ */}
-                        {/*             userType === 'property-manager' ? 'text-white' : 'text-text-secondary hover:text-text-primary' */}
-                        {/*         }`} */}
-                        {/*     > */}
-                        {/*         <Building2 className="h-4 w-4" /> */}
-                        {/*         {t(translations.auth, 'user_types.property_manager')} */}
-                        {/*     </button> */}
-                        {/* </div> */}
+                            <div
+                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md bg-gradient-to-r ${userType === 'property-manager' ? 'from-secondary to-primary' : 'from-primary to-secondary'} shadow-sm transition-transform duration-400 ease-in-out ${
+                                    userType === 'property-manager' ? 'translate-x-[calc(100%+8px)]' : 'translate-x-0'
+                                }`}
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() => handleUserTypeChange('tenant')}
+                                className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
+                                    userType === 'tenant' ? 'text-white' : 'text-text-secondary hover:text-text-primary'
+                                }`}
+                            >
+                                <User className="h-4 w-4" />
+                                {t(translations.auth, 'user_types.tenant')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleUserTypeChange('property-manager')}
+                                className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
+                                    userType === 'property-manager' ? 'text-white' : 'text-text-secondary hover:text-text-primary'
+                                }`}
+                            >
+                                <Building2 className="h-4 w-4" />
+                                {t(translations.auth, 'user_types.property_manager')}
+                            </button>
+                        </div>
 
                         <div className="grid gap-6">
                             <div className="grid gap-2">
