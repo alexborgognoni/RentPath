@@ -59,11 +59,8 @@ class AuthenticatedSessionController extends Controller
                     : 'https://manager.' . config('app.domain', 'rentpath.app');
                 $redirectUrl = $managerUrl . '/dashboard';
             } else {
-                // Tenant selected
-                $tenantUrl = config('app.env') === 'local'
-                    ? 'http://tenant.' . parse_url(config('app.url'), PHP_URL_HOST) . ':' . parse_url(config('app.url'), PHP_URL_PORT)
-                    : 'https://tenant.' . config('app.domain', 'rentpath.app');
-                $redirectUrl = $tenantUrl . '/dashboard';
+                // Tenant selected - redirect to root domain dashboard
+                $redirectUrl = config('app.url') . '/dashboard';
             }
         } else {
             $redirectUrl = $intended;

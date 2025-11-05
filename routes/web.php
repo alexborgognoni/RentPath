@@ -38,11 +38,8 @@ if (!function_exists('userDefaultDashboard')) {
             return $managerUrl . '/dashboard';
         }
 
-        // Otherwise, user is a tenant
-        $tenantUrl = config('app.env') === 'local'
-            ? 'http://tenant.' . parse_url(config('app.url'), PHP_URL_HOST) . ':' . parse_url(config('app.url'), PHP_URL_PORT)
-            : 'https://tenant.' . config('app.domain', 'rentpath.app');
-        return $tenantUrl;
+        // Otherwise, user is a tenant - redirect to root domain dashboard
+        return config('app.url') . '/dashboard';
     }
 }
 
@@ -61,14 +58,6 @@ Route::get('/', function () {
             return redirect()->away(config('app.url') . '/login?intended=' . urlencode(request()->fullUrl()));
         }
         return redirect('/dashboard');
-    }
-
-    // Tenant subdomain
-    if ($subdomain === 'tenant') {
-        if (!auth()->check()) {
-            return redirect()->away(config('app.url') . '/login?intended=' . urlencode(request()->fullUrl()));
-        }
-        return Inertia::render('tenant/dashboard');
     }
 
     // Main domain - landing page
@@ -303,17 +292,18 @@ Route::domain('manager.' . env('APP_DOMAIN', 'rentpath.test'))->middleware('subd
 
 /*
 |--------------------------------------------------------------------------
-| Tenant Subdomain Routes
+| Tenant Routes (Root Domain)
 |--------------------------------------------------------------------------
 */
 
-Route::domain('tenant.' . env('APP_DOMAIN', 'rentpath.test'))->middleware('subdomain:tenant')->group(function () {
-    // Dashboard
-    Route::middleware(['auth', 'verified'])->get('dashboard', function () {
-        return Inertia::render('tenant/dashboard');
-    })->name('tenant.dashboard');
+Route::middleware('subdomain:')->group(function () {
+    // Tenant authenticated routes
+    Route::middleware(['auth', 'verified'])->group(function () {
+        // Dashboard
+        Route::get('dashboard', function () {
+            return Inertia::render('tenant/dashboard');
+        })->name('dashboard');
 
-    // Tenant logout
-    Route::middleware('auth')->post('logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
-        ->name('tenant.logout');
+        // Future tenant routes: applications, profile, settings, etc.
+    });
 });

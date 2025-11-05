@@ -71,18 +71,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Tenant Portal Domain
+    | Application Domain
     |--------------------------------------------------------------------------
     |
-    | This value determines the domain for the tenant portal subdomain.
-    | Locally, this will be 'tenant.localhost:8000' and in production
-    | 'tenant.rentpath.app'. Used for subdomain-based route separation.
+    | The base domain for the application (e.g., 'rentpath.app').
+    | Used for generating subdomain URLs and cookie configuration.
     |
     */
 
-    'tenant_domain' => env('APP_ENV') === 'local'
-        ? env('TENANT_SUBDOMAIN', 'tenant') . '.' . parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) . (parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) ? ':' . parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) : '')
-        : env('TENANT_SUBDOMAIN', 'tenant') . '.' . env('APP_DOMAIN', 'rentpath.app'),
+    'domain' => env('APP_DOMAIN', 'rentpath.app'),
 
     /*
     |--------------------------------------------------------------------------
