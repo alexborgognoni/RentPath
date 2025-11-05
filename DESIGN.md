@@ -1,205 +1,311 @@
-# Property entity
+# RentPath - Architecture Design
 
-```sql
-CREATE TABLE properties (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    property_manager_id BIGINT UNSIGNED NOT NULL,
+## Overview
 
-    -- Basic property information
-    title VARCHAR(255) NOT NULL,
-    description LONGTEXT NULL,
-    image_path VARCHAR(255) NULL,
-
-    -- Property type and subtype
-    type ENUM(
-        'apartment',
-        'house',
-        'room',
-        'commercial',
-        'industrial',
-        'parking'
-    ) NOT NULL,
-    subtype ENUM(
-        -- Apartment subtypes
-        'studio', 'loft', 'duplex', 'triplex', 'penthouse', 'serviced',
-        -- House subtypes
-        'detached', 'semi-detached', 'villa', 'bungalow',
-        -- Room subtypes
-        'private_room', 'student_room', 'co-living',
-        -- Commercial subtypes
-        'office', 'retail',
-        -- Industrial subtypes
-        'warehouse', 'factory',
-        -- Parking subtypes
-        'garage', 'indoor_spot', 'outdoor_spot'
-    ) NOT NULL,
-
-    -- Property specifications
-    bedrooms INT UNSIGNED DEFAULT 0,
-    bathrooms DECIMAL(3,1) DEFAULT 0.0,
-    parking_spots_interior INT UNSIGNED DEFAULT 0,
-    parking_spots_exterior INT UNSIGNED DEFAULT 0,
-    size DECIMAL(10,2) NULL, -- in square meters
-    balcony_size DECIMAL(10,2) NULL,
-    land_size DECIMAL(10,2) NULL, -- only for houses
-    floor_level INT NULL,
-    has_elevator BOOLEAN DEFAULT FALSE,
-    year_built YEAR NULL,
-
-    -- Energy / building
-    energy_class ENUM('A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G') NULL,
-    thermal_insulation_class ENUM('A', 'B', 'C', 'D', 'E', 'F', 'G') NULL,
-    heating_type ENUM('gas', 'electric', 'district', 'wood', 'heat_pump', 'other') NULL,
-
-    -- Kitchen
-    kitchen_equipped BOOLEAN DEFAULT FALSE,
-    kitchen_separated BOOLEAN DEFAULT FALSE,
-
-    -- Extras / amenities
-    has_cellar BOOLEAN DEFAULT FALSE,
-    has_laundry BOOLEAN DEFAULT FALSE,
-    has_fireplace BOOLEAN DEFAULT FALSE,
-    has_air_conditioning BOOLEAN DEFAULT FALSE,
-    has_garden BOOLEAN DEFAULT FALSE,
-    has_rooftop BOOLEAN DEFAULT FALSE,
-    extras JSON NULL, -- for uncommon features like sauna, home_office, etc.
-
-    -- Rental information
-    available_date DATE NULL,
-    rent_amount DECIMAL(10,2) NOT NULL,
-    rent_currency ENUM('eur', 'usd', 'gbp', 'chf') DEFAULT 'eur',
-
-    -- Property status
-    status ENUM(
-        'inactive',
-        'available',
-        'application_received',
-        'under_review',
-        'visit_scheduled',
-        'approved',
-        'leased',
-        'maintenance',
-        'archived'
-    ) NOT NULL DEFAULT 'inactive',
-
-    -- Address fields
-    house_number VARCHAR(20) NOT NULL,
-    street_name VARCHAR(255) NOT NULL,
-    street_line2 VARCHAR(255) NULL,
-    city VARCHAR(100) NOT NULL,
-    state VARCHAR(100) NULL,
-    postal_code VARCHAR(20) NOT NULL,
-    country CHAR(2) NOT NULL, -- ISO 3166-1 alpha-2
-
-    -- Metadata
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    -- Indexes
-    INDEX idx_property_manager_status(property_manager_id, status),
-    INDEX idx_city_postal(city, postal_code),
-    INDEX idx_type_subtype(type, subtype),
-    INDEX idx_available_date(available_date),
-    INDEX idx_rent_amount(rent_amount)
-);
-```
-
-### 🏢 **Property Types**
-
-| ID  | Type       | Description                                             |
-| --- | ---------- | ------------------------------------------------------- |
-| 1   | Apartment  | Multi-unit residential properties (e.g., flats, condos) |
-| 2   | House      | Standalone or semi-detached residential units           |
-| 3   | Commercial | Offices, retail spaces, or business premises            |
-| 4   | Industrial | Warehouses, factories, or workshops                     |
-| 5   | Parking    | Garages and parking spaces for rent                     |
+RentPath is a rental property management platform connecting property managers with tenants through a streamlined application process.
 
 ---
 
-| ID  | Type ID | Subtype       | Example                                          |
-| --- | ------- | ------------- | ------------------------------------------------ |
-| 1   | 1       | Studio        | Single-room apartment                            |
-| 2   | 1       | Loft          | Open-plan apartment with high ceilings           |
-| 3   | 1       | Duplex        | Two-level apartment                              |
-| 3   | 1       | Triplex       | Three-level apartment                            |
-| 4   | 1       | Penthouse     | Luxury top-floor apartment                       |
-| 5   | 1       | Serviced      | Fully furnished with cleaning/services           |
-| 6   | 2       | Detached      | Fully independent house                          |
-| 7   | 2       | Semi-detached | Shares a wall with another house                 |
-| 8   | 2       | Villa         | Large, often luxurious house                     |
-| 9   | 2       | Bungalow      | Single-story home                                |
-| 10  | 3       | Private Room  | Single room within shared property               |
-| 12  | 3       | Student Room  | Specifically in student residence or near campus |
-| 13  | 3       | Co-living     | Room in a modern communal housing setup          |
-| 14  | 4       | Office        | Workspace for businesses                         |
-| 15  | 4       | Retail        | Store or shop location                           |
-| 16  | 5       | Warehouse     | Storage or distribution building                 |
-| 17  | 5       | Factory       | Light industrial or production site              |
-| 18  | 6       | Garage        | Enclosed private parking                         |
-| 19  | 6       | Indoor Spot   | Covered or underground parking                   |
-| 20  | 6       | Outdoor Spot  | Driveway or open-lot parking                     |
+## Architecture Fundamentals
 
-# Property statuses
+### Domain Structure
 
-| Status                   | Description                                                                                | Typical Transitions                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| **inactive**             | Property exists but isn’t currently accepting applications.                                | → `available`, `maintenance`, or `archived`                      |
-| **available**            | Property is open for applications.                                                         | → `application_received`, `leased`, `inactive`, or `maintenance` |
-| **application_received** | One or more tenants have applied.                                                          | → `under_review`, `available`, or `archived`                     |
-| **under_review**         | Property manager reviewing one or more applications.                                       | → `visit_scheduled`, `approved`, `rejected`, or `available`      |
-| **visit_scheduled**      | At least one visit is confirmed between a potential tenant and the property manager/owner. | → `leased`, `available`, or `maintenance`                        |
-| **approved**             | Tenant approved, lease preparation in progress.                                            | → `leased` or `available`                                        |
-| **leased**               | Property currently rented under an active lease.                                           | → `available` (after lease end), `maintenance`, or `archived`    |
-| **maintenance**          | Property temporarily unavailable for repairs or preparation.                               | → `available` or `inactive`                                      |
-| **archived**             | Property permanently closed or deleted.                                                    | —                                                                |
+```
+rentpath.app (Root Domain)
+├─ Public pages (landing, legal, contact)
+├─ Public property previews (/property/{token})
+├─ Authentication (login, register)
+└─ Tenant portal (authenticated)
+   ├─ Dashboard
+   ├─ Applications
+   ├─ Profile & Settings
 
-# Conceptual flow
+manager.rentpath.app (Manager Subdomain)
+└─ Property manager portal (100% authenticated)
+   ├─ Dashboard
+   ├─ Property management
+   ├─ Application review
+   └─ Settings
+```
 
-| id  | action                                                                                                                                   | next step(s)      |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| 1   | property manager lists property                                                                                                          | 2                 |
-| 2   | property manager shares invite link openly or directly with potential tenants                                                            | 3                 |
-| 3   | potential tenant fills out required information, and uploads documents (if not already saved in his profile) and submits the application | 4                 |
-| 4   | property manager receives application linked to that property                                                                            | 5                 |
-| 5   | (optionally) send profile to property owner for approval                                                                                 | 6, 7              |
-| 6   | reject application, either by property owner or manager's choice                                                                         | optional: 99, 100 |
-| 7   | approve application and property manager enters his availabilies for a visit in the calendar                                             | 8                 |
-| 8   | potential tenant agrees on a visit time and date                                                                                         | 9, 10             |
-| 9   | visit completed, tenant rejects property                                                                                                 | optional: 99, 100 |
-| 10  | visit completed successfully                                                                                                             | 11                |
-| 11  | lease signing, insurance, and deposit payment                                                                                            | 12                |
-| 12  | move-in                                                                                                                                  | optional: 99, 100 |
-| 99  | application archived                                                                                                                     | -                 |
-| 100 | application deleted                                                                                                                      | -                 |
+**Key Decision**: Root domain hosts main product (public + tenant features). Manager subdomain hosts specialized authenticated portal.
 
-# Application statuses
+---
 
-| Status              | Description                                                                                  | Typical Transitions                                        |
-| ------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **draft**           | Applicant started filling out info but hasn’t submitted.                                     | → `submitted` or `deleted`                                 |
-| **submitted**       | Application received and pending review by property manager.                                 | → `under_review`, `withdrawn`, or `archived`               |
-| **under_review**    | Property manager reviewing documents, verifying identity, or discussing with property owner. | → `visit_scheduled`, `approved`, `rejected`, or `archived` |
-| **visit_scheduled** | Visit date/time agreed upon.                                                                 | → `visit_completed`, `withdrawn`, or `archived`            |
-| **visit_completed** | Visit took place; awaiting manager or applicant decision.                                    | → `approved`, `rejected`, `withdrawn`, or `archived`       |
-| **approved**        | Manager/owner approved the tenant, awaiting lease signature or deposit.                      | → `leased`, `withdrawn`, or `archived`                     |
-| **rejected**        | Application declined by manager or owner.                                                    | → `archived`                                               |
-| **withdrawn**       | Applicant voluntarily withdrew their application.                                            | → `archived`                                               |
-| **leased**          | Application led to a signed lease.                                                           | → `archived` (after lease start or end)                    |
-| **archived**        | Application closed and kept for records (cannot be modified).                                | —                                                          |
-| **deleted**         | Application removed before submission (draft cleanup).                                       | —                                                          |
+## User & Profile System
 
-# Application Invite Tokens
+### Single User Table + Optional Role Profiles
 
-| Field                       | Type                               | Description                                                                 |
-| --------------------------- | ---------------------------------- | --------------------------------------------------------------------------- |
-| **id**                      | UUID / BIGINT                      | Primary key                                                                 |
-| **property_id**             | FK → `properties.id`               | Property this token grants access to                                        |
-| **token**                   | string, **NOT NULL**               | Unique token used in the URL (always required now)                          |
-| **type**                    | ENUM('private', 'invite')          | `private` = shareable token link, `invite` = restricted to a specific email |
-| **email**                   | string, nullable                   | Used if `type = 'invite'` to restrict by recipient                          |
-| **max_uses**                | int, nullable                      | Maximum allowed uses (e.g., 1 for one-time invites)                         |
-| **used_count**              | int, default 0                     | Current number of uses                                                      |
-| **expires_at**              | datetime, nullable                 | When the token becomes invalid                                              |
-| **status**                  | ENUM('active','revoked','expired') | Current state of the token                                                  |
-| **created_by**              | FK → `users.id`                    | Who generated the link                                                      |
-| **created_at / updated_at** | timestamps                         | Standard auditing fields                                                    |
+```
+users (authentication)
+├─ email, password, first_name, last_name
+├─ email_verified_at
+└─ timestamps
+
+property_managers (optional profile, 1:1 with users)
+├─ user_id (unique)
+├─ type: individual | professional
+├─ company_name, license_number
+├─ documents (private S3)
+├─ profile_verified_at
+└─ verification status
+
+tenant_profiles (optional profile, 1:1 with users)
+├─ user_id (unique)
+├─ personal info (DOB, nationality, phone)
+├─ current address
+├─ employment (status, employer, income)
+├─ documents (ID, income proof, references)
+├─ preferences (move-in date, pets, smoker)
+├─ profile_verified_at
+└─ verification status
+```
+
+**Key Decision**: One user can have both profiles (e.g., landlord who also rents). Verification required before full access.
+
+---
+
+## Core Entities
+
+### 1. Properties
+
+**Ownership**: Belongs to `property_manager`
+
+**Key Fields**:
+- Type/subtype (apartment/studio, house/villa, room/co-living, etc.)
+- Specifications (bedrooms, bathrooms, size, floor, amenities)
+- Energy ratings (energy class, insulation, heating)
+- Rental info (rent, currency, available date)
+- Address (full address fields)
+- Status (inactive → available → application_received → ... → leased → archived)
+
+**Access Control**:
+- `public_apply_url_enabled`: Toggle for open applications
+- `invite_token`: 64-char token for private access
+- `invite_token_expires_at`: Token expiration
+
+**Images**: Multiple images via `property_images` table (has `is_main` flag, sort order)
+
+### 2. Applications
+
+**Relationships**:
+- `property_id` → Property
+- `tenant_profile_id` → Tenant Profile
+
+**Status Flow**:
+```
+draft → submitted → under_review → visit_scheduled → visit_completed
+    → approved/rejected/withdrawn → leased → archived/deleted
+```
+
+**Key Fields**:
+- Application details (move-in date, lease duration, cover letter)
+- Occupants & pets info (can override profile)
+- References & previous landlord
+- Application-specific documents (private S3)
+- Review tracking (reviewer, timestamps, notes)
+- Visit management (scheduled, completed, notes)
+- Approval tracking (approver, timestamps, notes)
+- Lease details (start/end dates, rent, deposit, signed document)
+- Audit trail (submitted_at, withdrawn_at, archived_at)
+- `invited_via_token`: Tracks which token was used
+
+**Uniqueness**: One active (non-draft, non-archived) application per tenant per property (enforced in application code).
+
+### 3. Application Invite Tokens
+
+**Purpose**: Control property access for applications
+
+**Token Types**:
+- `private`: Shareable link, anyone can view until expiry
+- `invite`: Email-restricted, only specific user can view
+
+**Key Fields**:
+- `property_id`: Property this grants access to
+- `token`: 64-char unique string
+- `type`: private | invite
+- `email`: Required if type=invite
+- `max_uses`: Optional usage limit
+- `used_count`: Current uses
+- `expires_at`: Token expiration
+- `status`: active | revoked | expired
+- `created_by_user_id`: Token creator
+
+---
+
+## User Flows
+
+### Property Manager Flow
+
+1. **Onboarding**:
+   - Register → Create PM profile → Upload documents → Wait for verification
+
+2. **Property Listing**:
+   - Create property → Add details & images → Generate invite token OR enable public URL
+
+3. **Application Management**:
+   - Receive applications → Review → Schedule visit → Approve/Reject → Sign lease
+
+### Tenant Flow
+
+1. **Discovery**:
+   - Click property link (from external listing or email)
+   - View property details (PUBLIC, no auth required)
+
+2. **Application**:
+   - Click "Apply" → Register/Login (if needed)
+   - Create/verify tenant profile
+   - Fill application (can save as draft)
+   - Submit application
+
+3. **Tracking**:
+   - Dashboard shows application status
+   - Receive notifications on status changes
+   - Schedule visit, sign lease
+
+---
+
+## Token Access Control
+
+### Public Shareable Token (`type=private`)
+```
+Property Manager creates token → Shares URL publicly
+→ Anyone can view property until expiry
+→ Must register/login to apply
+```
+
+### Email-Restricted Token (`type=invite`)
+```
+Property Manager creates token with email → Sends to specific person
+→ Only user with that email can view property
+→ Must login with invited email to access
+→ Tracks usage (optional max_uses)
+```
+
+---
+
+## Property Types & Subtypes
+
+### Apartment
+`studio`, `loft`, `duplex`, `triplex`, `penthouse`, `serviced`
+
+### House
+`detached`, `semi-detached`, `villa`, `bungalow`
+
+### Room
+`private_room`, `student_room`, `co-living`
+
+### Commercial
+`office`, `retail`
+
+### Industrial
+`warehouse`, `factory`
+
+### Parking
+`garage`, `indoor_spot`, `outdoor_spot`
+
+---
+
+## Status Workflows
+
+### Property Status
+
+| Status | Description | Next States |
+|--------|-------------|-------------|
+| `inactive` | Not accepting applications | available, maintenance, archived |
+| `available` | Open for applications | application_received, leased, inactive, maintenance |
+| `application_received` | Has pending applications | under_review, available, archived |
+| `under_review` | Reviewing applications | visit_scheduled, approved, rejected, available |
+| `visit_scheduled` | Visit confirmed | leased, available, maintenance |
+| `approved` | Tenant approved | leased, available |
+| `leased` | Currently rented | available, maintenance, archived |
+| `maintenance` | Under repair | available, inactive |
+| `archived` | Permanently closed | — |
+
+### Application Status
+
+| Status | Description | Next States |
+|--------|-------------|-------------|
+| `draft` | Started, not submitted | submitted, deleted |
+| `submitted` | Awaiting review | under_review, withdrawn, archived |
+| `under_review` | Being reviewed | visit_scheduled, approved, rejected, archived |
+| `visit_scheduled` | Visit agreed | visit_completed, withdrawn, archived |
+| `visit_completed` | Visit done | approved, rejected, withdrawn, archived |
+| `approved` | Tenant approved | leased, withdrawn, archived |
+| `rejected` | Application declined | archived |
+| `withdrawn` | Tenant withdrew | archived |
+| `leased` | Lease signed | archived |
+| `archived` | Closed, kept for records | — |
+| `deleted` | Draft cleanup | — |
+
+---
+
+## Storage Architecture
+
+### StorageHelper Pattern
+
+**Local Development**:
+- Public: `public` disk (direct URLs)
+- Private: `private` disk (Laravel signed routes)
+
+**Production**:
+- Public: `s3_public` → CloudFront URLs
+- Private: `s3_private` → CloudFront signed URLs (24h expiry)
+  - CloudFront private key from AWS Secrets Manager (cached 1 hour)
+
+### File Types
+
+| Type | Visibility | Max Size | Formats |
+|------|-----------|----------|---------|
+| Profile pictures | Public | 5MB | JPEG, PNG, WEBP |
+| ID documents | Private | 20MB | PDF, JPEG, PNG |
+| License documents | Private | 20MB | PDF, JPEG, PNG |
+| Property images | Private | 10MB | JPEG, PNG, WEBP |
+| Income proof | Private | 20MB | PDF, JPEG, PNG |
+| Reference letters | Private | 20MB | PDF |
+| Lease documents | Private | 20MB | PDF |
+
+---
+
+## Security & Verification
+
+### Profile Verification
+
+**Property Managers**: Must verify before creating properties
+**Tenants**: Must verify before submitting applications
+
+**Process**:
+1. Upload required documents
+2. Admin reviews (sets `profile_verified_at`)
+3. If rejected: `verification_rejection_reason` + `verification_rejected_fields`
+4. User can edit and resubmit
+
+### Authorization
+
+- Property CRUD: Only owner can edit/delete
+- Application access: Only tenant who created + PM of property
+- Documents: CloudFront signed URLs or Laravel signed routes
+- Token validation: Check expiry, status, email match (if invite type)
+
+---
+
+## Key Design Principles
+
+1. **Flexible Role System**: Users can be both tenant and property manager
+2. **Public Entry, Auth to Act**: View properties without account, must register to apply
+3. **Draft Support**: Save progress on profiles and applications
+4. **Comprehensive Audit Trail**: Track all status changes with timestamps
+5. **Token-Based Access**: Control property visibility (public vs. private invites)
+6. **Document Privacy**: All sensitive documents in private storage with signed URLs
+7. **Verification Gates**: Both tenants and PMs must verify before full access
+
+---
+
+## Technology Stack
+
+**Backend**: Laravel 12 (PHP 8.3) + Inertia.js
+**Frontend**: React 19 + TypeScript + Tailwind CSS 4
+**Database**: MySQL 8.0
+**Storage**: S3 + CloudFront (signed URLs)
+**Infrastructure**: AWS Elastic Beanstalk, RDS, CodePipeline
+**IaC**: Terraform
