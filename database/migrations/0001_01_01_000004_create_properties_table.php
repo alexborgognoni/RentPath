@@ -84,6 +84,13 @@ return new class extends Migration
                 'archived'
             ])->default('inactive');
 
+            // Public access control
+            $table->boolean('public_apply_url_enabled')->default(false);
+
+            // Invite token fields
+            $table->string('invite_token', 64)->unique()->nullable();
+            $table->timestamp('invite_token_expires_at')->nullable();
+
             // Address fields
             $table->string('house_number', 20);
             $table->string('street_name', 255);
@@ -101,6 +108,7 @@ return new class extends Migration
             $table->index(['type', 'subtype'], 'idx_type_subtype');
             $table->index('available_date', 'idx_available_date');
             $table->index('rent_amount', 'idx_rent_amount');
+            $table->index(['invite_token', 'invite_token_expires_at'], 'idx_invite_token');
         });
     }
 
