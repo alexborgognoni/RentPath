@@ -232,7 +232,7 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
                 images: selectedImage ? [selectedImage] : undefined,
             };
 
-            router.post('/properties', submitData, {
+            router.post('/properties', submitData as any, {
                 onSuccess: (page) => {
                     onClose();
                     // The server redirects to dashboard automatically

@@ -40,9 +40,9 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         license_number: propertyManager?.license_number || '',
         phone_prefix: propertyManager?.phone_country_code || '+1',
         phone_number: propertyManager?.phone_number || '',
-        profile_picture: null as File | null,
-        id_document: null as File | null,
-        license_document: null as File | null,
+        profile_picture: null as File | null | 'removed',
+        id_document: null as File | null | 'removed',
+        license_document: null as File | null | 'removed',
     });
 
     // Close tooltip on scroll (mobile)
@@ -289,7 +289,8 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
 
     const getFieldClassName = (fieldName: string) => {
         const baseClass = 'mt-2 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
-        if (isFieldRejected(fieldName) || clientErrors[fieldName] || errors[fieldName]) {
+        const formErrors = errors as Record<string, string>;
+        if (isFieldRejected(fieldName) || clientErrors[fieldName] || formErrors[fieldName]) {
             return baseClass + ' border-destructive bg-destructive/5 focus:border-destructive';
         }
         return baseClass + ' border-border bg-background focus:border-primary';
@@ -350,7 +351,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         {((data.profile_picture && data.profile_picture !== 'removed') || (propertyManager?.profile_picture_path && data.profile_picture !== 'removed')) ? (
                                             <img
                                                 src={
-                                                    data.profile_picture
+                                                    data.profile_picture && data.profile_picture instanceof File
                                                         ? URL.createObjectURL(data.profile_picture)
                                                         : propertyManager?.profile_picture_url
                                                 }
@@ -934,15 +935,15 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         <p
                                                             className="cursor-pointer truncate text-sm font-medium text-primary hover:text-primary/80 flex-1 min-w-0 overflow-hidden"
                                                             onClick={() => {
-                                                                if (data.id_document) {
+                                                                if (data.id_document && data.id_document instanceof File) {
                                                                     window.open(URL.createObjectURL(data.id_document), '_blank');
                                                                 } else if (propertyManager?.id_document_path) {
                                                                     window.open('/property-manager/document/id_document', '_blank');
                                                                 }
                                                             }}
-                                                            title={data.id_document?.name || propertyManager?.id_document_original_name || 'ID Document'}
+                                                            title={data.id_document instanceof File ? data.id_document?.name : propertyManager?.id_document_original_name || 'ID Document'}
                                                         >
-                                                            {data.id_document?.name || propertyManager?.id_document_original_name || 'ID Document'}
+                                                            {data.id_document instanceof File ? data.id_document?.name : propertyManager?.id_document_original_name || 'ID Document'}
                                                         </p>
                                                         <button
                                                             type="button"
@@ -1022,15 +1023,15 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                             <p
                                                                 className="cursor-pointer truncate text-sm font-medium text-primary hover:text-primary/80 flex-1 min-w-0 overflow-hidden"
                                                                 onClick={() => {
-                                                                    if (data.license_document) {
+                                                                    if (data.license_document && data.license_document instanceof File) {
                                                                         window.open(URL.createObjectURL(data.license_document), '_blank');
                                                                     } else if (propertyManager?.license_document_path) {
                                                                         window.open('/property-manager/document/license_document', '_blank');
                                                                     }
                                                                 }}
-                                                                title={data.license_document?.name || propertyManager?.license_document_original_name || 'License Document'}
+                                                                title={data.license_document instanceof File ? data.license_document?.name : propertyManager?.license_document_original_name || 'License Document'}
                                                             >
-                                                                {data.license_document?.name || propertyManager?.license_document_original_name || 'License Document'}
+                                                                {data.license_document instanceof File ? data.license_document?.name : propertyManager?.license_document_original_name || 'License Document'}
                                                             </p>
                                                             <button
                                                                 type="button"

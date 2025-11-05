@@ -110,7 +110,7 @@ export default function AgentProfilePage({ initialManager }: Props) {
                     </motion.div>
                 )}
 
-                {showPropertyForm && <PropertyForm isOpen={showPropertyForm} onClose={() => setShowPropertyForm(false)} />}
+                {showPropertyForm && <PropertyForm onClose={() => setShowPropertyForm(false)} />}
             </div>
         </AppLayout>
     );

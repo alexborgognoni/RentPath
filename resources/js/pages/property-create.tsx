@@ -28,7 +28,8 @@ export default function PropertyCreate({ property, isEditing = false }: Property
         { title: isEditing ? 'Edit Property' : 'Add Property' },
     ];
 
-    const { data, setData, post, put, processing, errors, progress } = useForm<PropertyFormData>({
+    // @ts-ignore - Complex PropertyFormData type causes issues with Inertia's FormDataType constraint
+    const { data, setData, post, put, processing, errors, progress } = useForm({
         // Basic info
         title: property?.title || '',
         description: property?.description || '',
@@ -82,7 +83,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
         available_date: property?.available_date || undefined,
 
         // Images
-        images: undefined,
+        images: (undefined as unknown) as File[] | undefined,
         main_image_index: 0,
     });
 
@@ -199,6 +200,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
         });
 
         setSelectedImages(newImages);
+        // @ts-ignore
         setData('images', newImages);
     };
 
@@ -208,6 +210,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
 
         setSelectedImages(newImages);
         setImagePreviews(newPreviews);
+        // @ts-ignore
         setData('images', newImages);
 
         // Adjust main image index if needed
@@ -313,7 +316,8 @@ export default function PropertyCreate({ property, isEditing = false }: Property
 
     const getFieldClassName = (fieldName: string) => {
         const baseClass = 'w-full rounded-lg border px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
-        if (clientErrors[fieldName] || errors[fieldName]) {
+        const formErrors = errors as Record<string, string>;
+        if (clientErrors[fieldName] || formErrors[fieldName]) {
             return baseClass + ' border-destructive bg-destructive/5 focus:border-destructive';
         }
         return baseClass + ' border-border bg-background focus:border-primary';
