@@ -1,4 +1,5 @@
 import type { Property } from '@/types/dashboard';
+import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Copy, ExternalLink, Users } from 'lucide-react';
@@ -54,12 +55,12 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             onClick={handleCardClick}
         >
             {/* Property Image */}
-            {(property.image_path || property.image_url) && (
+            {property.images && property.images.length > 0 && (
                 <div className="mb-4 overflow-hidden rounded-xl border border-border">
-                    <img 
-                        src={property.image_path ? `/properties/${property.id}/image` : property.image_url} 
-                        alt={property.title} 
-                        className="h-48 w-full object-cover" 
+                    <img
+                        src={property.images.find(img => img.is_main)?.image_url || property.images[0]?.image_url || `/properties/${property.id}/image`}
+                        alt={property.title}
+                        className="h-48 w-full object-cover"
                     />
                 </div>
             )}
@@ -79,7 +80,7 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
                     </span>
                     {property.size && (
                         <span className="font-medium text-muted-foreground/70">
-                            {property.size} {property.size_unit === 'square_meters' ? 'm²' : 'ft²'}
+                            {property.size} m²
                         </span>
                     )}
                 </div>

@@ -1,3 +1,5 @@
+import type { Translations, TranslationKey } from '@/types/translations';
+
 export const translate = (translations: Translations, key: TranslationKey): string => {
     // Safety check: ensure both parameters are provided
     if (!translations || typeof translations !== 'object') {

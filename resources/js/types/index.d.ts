@@ -1,25 +1,25 @@
-interface Auth {
+export interface Auth {
     user: User;
 }
 
-interface BreadcrumbItem {
+export interface BreadcrumbItem {
     title: string;
     href: string;
 }
 
-interface NavGroup {
+export interface NavGroup {
     title: string;
     items: NavItem[];
 }
 
-interface NavItem {
+export interface NavItem {
     title: string;
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
 }
 
-interface SharedData {
+export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
@@ -29,7 +29,7 @@ interface SharedData {
     [key: string]: unknown;
 }
 
-interface User {
+export interface User {
     id: number;
     name: string;
     email: string;

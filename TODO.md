@@ -2,9 +2,11 @@
 
 - [ ] Properties dashboard
 - [ ] Property create needs better per-type validation
-- [ ] Add public_apply_url_enabled
 - [ ] Proper test property seeder
+- [ ] Move away from aws root user api key for cli authentication
+- [ ] Add formatting
 
+- [x] Add public_apply_url_enabled
 - [ ] Fix translation types
 - [ ] Refactor frontend
 - [x] Fix aws codepipeline deployment status (switched from V2 to V1 pipeline)
