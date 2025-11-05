@@ -1,4 +1,5 @@
 import type { PropertyManager } from '@/types/dashboard';
+import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Edit, User } from 'lucide-react';

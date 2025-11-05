@@ -4,7 +4,7 @@ export interface Auth {
 
 export interface BreadcrumbItem {
     title: string;
-    href: string;
+    href?: string; // Optional - current page doesn't have a link
 }
 
 export interface NavGroup {

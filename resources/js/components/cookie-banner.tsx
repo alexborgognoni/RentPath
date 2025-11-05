@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { usePage } from '@inertiajs/react';
 import { translate } from '@/utils/translate-utils';
+import type { SharedData } from '@/types';
 
 export function CookieBanner() {
     const { translations } = usePage<SharedData>().props;

@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Banknote, CheckCircle, Clock, Database, DollarSign, Euro, PoundSterling, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import type { SharedData } from '@/types';
 
 export function BenefitsSection() {
     const { translations } = usePage<SharedData>().props;

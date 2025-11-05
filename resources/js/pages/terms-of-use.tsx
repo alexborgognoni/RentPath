@@ -1,6 +1,7 @@
 import { PublicLayout } from '@/layouts/public-layout';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
+import type { SharedData } from '@/types';
 
 export default function TermsOfUse() {
     const page = usePage<SharedData>();

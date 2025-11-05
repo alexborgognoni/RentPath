@@ -31,14 +31,11 @@ interface FormData {
     postal_code: string;
     country: string;
     description: string;
-    image_url: string;
-    image_path: string;
     type: Property['type'];
     bedrooms: number;
     bathrooms: number;
     parking_spots: number;
     size: number;
-    size_unit: Property['size_unit'];
     available_date: string;
     rent_amount: number | '';
     rent_currency: Property['rent_currency'];
@@ -55,14 +52,11 @@ const initialFormData: FormData = {
     postal_code: '',
     country: 'CH',
     description: '',
-    image_url: '',
-    image_path: '',
     type: 'apartment',
     bedrooms: 0,
     bathrooms: 0,
     parking_spots: 0,
     size: 50,
-    size_unit: 'square_meters',
     available_date: '',
     rent_amount: '',
     rent_currency: 'eur',
@@ -92,10 +86,7 @@ const currencyOptions = [
     { value: 'chf', label: 'Swiss Franc (CHF)', symbol: 'CHF' },
 ];
 
-const sizeUnitOptions = [
-    { value: 'square_meters', label: 'Square Meters (m²)', symbol: 'm²' },
-    { value: 'square_feet', label: 'Square Feet (ft²)', symbol: 'ft²' },
-];
+// Size is always in square meters (m²) per database schema
 
 export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
     const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -193,9 +184,7 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
             newErrors.size = 'Size is required and must be greater than 0';
         }
 
-        if (formData.image_url && !isValidUrl(formData.image_url)) {
-            newErrors.image_url = 'Please enter a valid image URL';
-        }
+        // Image validation is handled separately
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -220,18 +209,6 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
         setIsSubmitting(true);
 
         try {
-            // Upload image if selected
-            let imagePath = formData.image_path;
-            if (selectedImage) {
-                try {
-                    imagePath = await handleImageUpload();
-                } catch (error) {
-                    setImageError('Failed to upload image. Please try again.');
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
-
             const submitData: PropertyFormData = {
                 title: formData.title,
                 house_number: formData.house_number,
@@ -242,18 +219,17 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
                 postal_code: formData.postal_code,
                 country: formData.country,
                 description: formData.description,
-                image_url: formData.image_url,
-                image_path: imagePath || undefined,
                 type: formData.type,
+                subtype: 'studio', // Default for now - form should be updated to collect this
                 bedrooms: formData.bedrooms,
                 bathrooms: formData.bathrooms,
-                parking_spots: formData.parking_spots,
+                parking_spots_interior: formData.parking_spots,
+                parking_spots_exterior: 0,
                 size: Number(formData.size),
-                size_unit: formData.size_unit,
                 available_date: formData.available_date || undefined,
                 rent_amount: Number(formData.rent_amount),
                 rent_currency: formData.rent_currency,
-                is_active: formData.is_active,
+                images: selectedImage ? [selectedImage] : undefined,
             };
 
             router.post('/properties', submitData, {
@@ -311,7 +287,7 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
     };
 
     const getSizeUnitSymbol = () => {
-        return sizeUnitOptions.find(u => u.value === formData.size_unit)?.symbol || 'm²';
+        return 'm²'; // Size is always in square meters per database schema
     };
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -786,18 +762,8 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
                                     className="w-full rounded-lg border border-border bg-background px-4 py-3 pr-28 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     placeholder="Enter size"
                                 />
-                                <div className="absolute right-1 top-1">
-                                    <select
-                                        value={formData.size_unit}
-                                        onChange={(e) => setFormData({ ...formData, size_unit: e.target.value as Property['size_unit'] })}
-                                        className="h-10 rounded-md border-0 bg-transparent pl-2 pr-1 text-sm text-foreground focus:outline-none focus:ring-0"
-                                    >
-                                        {sizeUnitOptions.map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.symbol}
-                                            </option>
-                                        ))}
-                                    </select>
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                                    m²
                                 </div>
                             </div>
                             {errors.size && (

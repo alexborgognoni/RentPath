@@ -8,6 +8,7 @@ import { Mail, MapPin, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
+import type { SharedData } from '@/types';
 
 export default function ContactUs() {
     const page = usePage<SharedData>();

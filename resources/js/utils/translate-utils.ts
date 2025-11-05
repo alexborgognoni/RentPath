@@ -1,6 +1,6 @@
-import type { Translations, TranslationKey } from '@/types/translations';
+import type { Translations } from '@/types/translations';
 
-export const translate = (translations: Translations, key: TranslationKey): string => {
+export const translate = (translations: Translations, key: string): string => {
     // Safety check: ensure both parameters are provided
     if (!translations || typeof translations !== 'object') {
         console.error('translate() called without translations object. Did you forget to pass translations as the first argument?');

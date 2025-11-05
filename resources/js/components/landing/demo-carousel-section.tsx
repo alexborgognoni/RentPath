@@ -2,6 +2,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Check, ChevronLeft, ChevronRight, Eye, Maximize2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import type { SharedData } from '@/types';
 
 export function DemoCarouselSection() {
     const { translations } = usePage<SharedData>().props;

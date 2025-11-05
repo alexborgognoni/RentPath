@@ -2,6 +2,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
+import type { SharedData } from '@/types';
 
 interface Review {
     id: number;

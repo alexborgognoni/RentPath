@@ -1,5 +1,6 @@
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
+import type { SharedData } from '@/types';
 import { ChevronRight, Link as LinkIcon, Pencil, Users, ArrowUpDown, ArrowUp, ArrowDown, Bed, Bath, Car, Maximize2 } from 'lucide-react';
 import type { Property } from '@/types/dashboard';
 import { useState, useMemo, useEffect } from 'react';

@@ -1,5 +1,6 @@
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
+import type { SharedData } from '@/types';
 import { Search, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 

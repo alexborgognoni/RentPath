@@ -2,10 +2,10 @@ import { AgentProfile } from '@/components/dashboard/agent-profile';
 import { PropertiesSection } from '@/components/dashboard/properties-section';
 import { PropertyForm } from '@/components/property/property-form';
 import { AppLayout } from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import type { Property, PropertyManager } from '@/types/dashboard';
-import { translate as t } from '@/utils/translate-utils';
-import { Head, router } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
+import { Head, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +14,7 @@ interface Props {
 }
 
 export default function AgentProfilePage({ initialManager }: Props) {
+    const { translations } = usePage<SharedData>().props;
     const [propertyManager, setPropertyManager] = useState<PropertyManager | null>(initialManager ?? null);
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
@@ -21,8 +22,8 @@ export default function AgentProfilePage({ initialManager }: Props) {
     const [showPropertyForm, setShowPropertyForm] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('dashboard'), href: '/dashboard' },
-        { title: t('profile'), href: '/setup-profile' },
+        { title: translate(translations, 'dashboard.title'), href: '/dashboard' },
+        { title: translate(translations, 'profile.title'), href: '/setup-profile' },
     ];
 
     const fetchProfileData = async () => {
@@ -84,13 +85,13 @@ export default function AgentProfilePage({ initialManager }: Props) {
     if (loading)
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
-                <Head title={t('profile')} />
+                <Head title={translate(translations, 'profile.title')} />
             </AppLayout>
         );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={t('profile')} />
+            <Head title={translate(translations, 'profile.title')} />
             <div className="min-h-screen">
                 {error && <div className="p-4 text-destructive">{error}</div>}
 

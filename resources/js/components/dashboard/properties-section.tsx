@@ -1,6 +1,7 @@
 import { PropertyFilters, type PropertyFilterState } from '@/components/dashboard/property-filters';
 import { PropertyTable } from '@/components/dashboard/property-table';
 import type { Property } from '@/types/dashboard';
+import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Building, Filter, Home, Plus } from 'lucide-react';

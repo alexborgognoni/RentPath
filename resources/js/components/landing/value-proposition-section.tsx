@@ -3,6 +3,7 @@ import { ArrowRight, Bell, Camera, Eye, FileText, Mail, Shield } from 'lucide-re
 import React, { useEffect, useState } from 'react';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
+import type { SharedData } from '@/types';
 
 function useCountAnimation(target: number, duration: number = 2000) {
     const [count, setCount] = useState(0);

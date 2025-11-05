@@ -1,6 +1,7 @@
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { ArrowRight, Clock, Zap } from 'lucide-react';
+import type { SharedData } from '@/types';
 
 export function TopFeaturesSection() {
     const { translations } = usePage<SharedData>().props;

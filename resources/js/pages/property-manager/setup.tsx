@@ -1,8 +1,8 @@
 import { AppLayout } from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import type { PropertyManagerFormData, User } from '@/types/dashboard';
-import { translate as t } from '@/utils/translate-utils';
-import { Head, router } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
+import { Head, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Building2, Camera, FileText, Globe, Phone, Trash2, User as UserIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -12,6 +12,7 @@ interface SetupPropertyManagerPageProps {
 }
 
 export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerPageProps) {
+    const { translations } = usePage<SharedData>().props;
     const [formData, setFormData] = useState<PropertyManagerFormData & { profile_picture_preview?: string }>({
         type: 'individual',
         company_name: '',
@@ -23,7 +24,7 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('dashboard'), href: '/dashboard' },
+        { title: translate(translations, 'dashboard.title'), href: '/dashboard' },
         { title: 'Setup Property Manager Profile', href: '/setup-profile' },
     ];
 

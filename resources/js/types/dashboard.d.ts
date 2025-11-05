@@ -16,10 +16,14 @@ export interface PropertyManager {
     company_name?: string;
     company_website?: string;
     license_number?: string;
+    phone_country_code?: string;
     phone_number?: string;
     profile_picture_path?: string;
+    profile_picture_url?: string;
     id_document_path?: string;
+    id_document_original_name?: string;
     license_document_path?: string;
+    license_document_original_name?: string;
     profile_verified_at?: string;
     created_at: string;
     updated_at: string;

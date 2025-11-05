@@ -2,6 +2,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
+import type { SharedData } from '@/types';
 
 export function HeroSection() {
     const page = usePage<SharedData>();
