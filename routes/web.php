@@ -77,25 +77,6 @@ Route::get('/', function () {
 
 Route::middleware('subdomain:')->group(function () {
 
-    // Test cookie sharing
-    Route::get('/test-cookie', function (Request $request) {
-        $request->session()->put('test', 'value_from_main');
-
-        // Also set a manual cookie to test domain
-        $response = response()->json([
-            'message' => 'Cookie set on main domain',
-            'session_id' => $request->session()->getId(),
-            'session_name' => config('session.cookie'),
-            'test_value' => $request->session()->get('test'),
-            'configured_domain' => config('session.domain'),
-        ]);
-
-        // Set a test cookie with explicit domain
-        $response->cookie('manual_test', 'manual_value', 120, '/', '.localhost', false, true, false, 'lax');
-
-        return $response;
-    });
-
     // Public pages
     Route::get('/privacy-policy', function () {
         return Inertia::render('privacy-policy');
