@@ -283,6 +283,14 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             require __DIR__ . '/settings.php';
         }
     });
+
+    // Catch-all route for manager subdomain - redirects to login if not authenticated
+    Route::fallback(function () {
+        if (!auth()->check()) {
+            return redirect()->away(config('app.url') . '/login?intended=' . urlencode(request()->fullUrl()));
+        }
+        abort(404);
+    });
 });
 
 /*
