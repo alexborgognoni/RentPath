@@ -117,11 +117,11 @@ return new class extends Migration
             $table->timestamps();
 
             // Indexes for performance
-            $table->index(['property_id', 'status'], 'idx_property_status');
-            $table->index(['tenant_profile_id', 'status'], 'idx_tenant_status');
-            $table->index('status', 'idx_status');
-            $table->index('submitted_at', 'idx_submitted_at');
-            $table->index('visit_scheduled_at', 'idx_visit_scheduled');
+            $table->index(['property_id', 'status'], 'idx_applications_property_status');
+            $table->index(['tenant_profile_id', 'status'], 'idx_applications_tenant_status');
+            $table->index('status', 'idx_applications_status');
+            $table->index('submitted_at', 'idx_applications_submitted_at');
+            $table->index('visit_scheduled_at', 'idx_applications_visit_scheduled');
 
             // Unique constraint: one active application per tenant per property
             // Note: MySQL doesn't support partial indexes, so we enforce in application code

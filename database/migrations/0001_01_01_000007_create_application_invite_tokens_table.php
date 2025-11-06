@@ -51,10 +51,10 @@ return new class extends Migration
             $table->timestamps();
 
             // Indexes
-            $table->index(['property_id', 'status'], 'idx_property_status');
-            $table->index(['token', 'expires_at'], 'idx_token_lookup');
-            $table->index('email', 'idx_email');
-            $table->index('status', 'idx_status');
+            $table->index(['property_id', 'status'], 'idx_tokens_property_status');
+            $table->index(['token', 'expires_at'], 'idx_tokens_token_lookup');
+            $table->index('email', 'idx_tokens_email');
+            $table->index('status', 'idx_tokens_status');
         });
     }
 
