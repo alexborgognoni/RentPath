@@ -10,16 +10,25 @@ use App\Http\Controllers\PropertyManagerController;
 
 // Helper to check current subdomain
 if (!function_exists('currentSubdomain')) {
-    function currentSubdomain(): string {
+    function currentSubdomain(): ?string {
         $host = request()->getHost();
-        $parts = explode('.', $host);
-        // For rentpath.test (2 parts) = no subdomain
-        // For manager.rentpath.test (3 parts) = subdomain is 'manager'
-        // For localhost (1 part) = no subdomain
-        if (count($parts) > 2 && $parts[0] !== 'www') {
-            return $parts[0];
+        $baseDomain = config('app.domain');
+
+        // Build expected domain for manager subdomain
+        $managerDomain = env('MANAGER_SUBDOMAIN', 'manager') . '.' . $baseDomain;
+
+        // Check against known subdomains
+        if ($host === $managerDomain) {
+            return env('MANAGER_SUBDOMAIN', 'manager');
         }
-        return '';
+
+        // If host matches base domain, no subdomain
+        if ($host === $baseDomain) {
+            return '';
+        }
+
+        // Unknown host - return null to indicate invalid domain
+        return null;
     }
 }
 
@@ -34,7 +43,7 @@ if (!function_exists('userDefaultDashboard')) {
         if ($user->propertyManager) {
             $managerUrl = config('app.env') === 'local'
                 ? 'http://manager.' . parse_url(config('app.url'), PHP_URL_HOST) . ':' . parse_url(config('app.url'), PHP_URL_PORT)
-                : 'https://manager.' . config('app.domain', 'rentpath.app');
+                : 'https://manager.' . config('app.domain');
             return $managerUrl . '/dashboard';
         }
 
@@ -52,6 +61,11 @@ if (!function_exists('userDefaultDashboard')) {
 Route::get('/', function () {
     $subdomain = currentSubdomain();
 
+    // Unknown or invalid domain
+    if ($subdomain === null) {
+        abort(404);
+    }
+
     // Manager subdomain
     if ($subdomain === 'manager') {
         if (!auth()->check()) {
@@ -65,7 +79,7 @@ Route::get('/', function () {
         return Inertia::render('landing');
     }
 
-    // Unknown subdomain
+    // Should never reach here, but just in case
     abort(404);
 })->name('landing');
 
@@ -108,7 +122,7 @@ Route::middleware('subdomain:')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::domain('manager.' . env('APP_DOMAIN', 'rentpath.test'))->middleware('subdomain:manager')->group(function () {
+Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager')->group(function () {
 
     // Dashboard
     Route::middleware(['auth'])->get('dashboard', function (Request $request) {

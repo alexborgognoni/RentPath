@@ -67,19 +67,20 @@ return [
 
     'manager_domain' => env('APP_ENV') === 'local'
         ? env('MANAGER_SUBDOMAIN', 'manager') . '.' . parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) . (parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) ? ':' . parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) : '')
-        : env('MANAGER_SUBDOMAIN', 'manager') . '.' . env('APP_DOMAIN', 'rentpath.app'),
+        : env('MANAGER_SUBDOMAIN', 'manager') . '.' . env('APP_DOMAIN'),
 
     /*
     |--------------------------------------------------------------------------
     | Application Domain
     |--------------------------------------------------------------------------
     |
-    | The base domain for the application (e.g., 'rentpath.app').
-    | Used for generating subdomain URLs and cookie configuration.
+    | The base domain for the application (e.g., 'rentpath.app' for production,
+    | 'localhost' for local development). Used for generating subdomain URLs
+    | and cookie configuration. This should be set in your .env file.
     |
     */
 
-    'domain' => env('APP_DOMAIN', 'rentpath.app'),
+    'domain' => env('APP_DOMAIN'),
 
     /*
     |--------------------------------------------------------------------------

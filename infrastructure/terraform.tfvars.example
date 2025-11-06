@@ -54,12 +54,14 @@ eb_laravel_config = {
   # Application Configuration
   app_name                = "RentPath"
   app_env                 = "production"
+  app_domain              = "rentpath.app"      # Base domain for the application
   app_locale              = "en"
   app_fallback_locale     = "en"
   app_faker_locale        = "en_US"
   app_maintenance_driver  = "file"
   php_cli_server_workers  = 4
   bcrypt_rounds          = 12
+  manager_subdomain      = "manager"            # Manager portal subdomain prefix
 
   # Database Configuration (non-sensitive)
   db_connection = "mysql"
@@ -75,7 +77,7 @@ eb_laravel_config = {
   session_lifetime = 120
   session_encrypt  = false
   session_path     = "/"
-  session_domain   = "null"
+  session_domain   = ".rentpath.app"  # Must start with dot for subdomain cookie sharing
 
   # Cache and Queue Configuration
   broadcast_connection = "log"

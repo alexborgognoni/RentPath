@@ -22,12 +22,14 @@ locals {
     APP_KEY                 = local.app_config.APP_KEY  # Sensitive - from secret
     APP_DEBUG               = tostring(var.eb_laravel_config.app_debug)
     APP_URL                 = local.app_config.APP_URL  # Sensitive - from secret
+    APP_DOMAIN              = var.eb_laravel_config.app_domain
     APP_LOCALE              = var.eb_laravel_config.app_locale
     APP_FALLBACK_LOCALE     = var.eb_laravel_config.app_fallback_locale
     APP_FAKER_LOCALE        = var.eb_laravel_config.app_faker_locale
     APP_MAINTENANCE_DRIVER  = var.eb_laravel_config.app_maintenance_driver
     PHP_CLI_SERVER_WORKERS  = tostring(var.eb_laravel_config.php_cli_server_workers)
     BCRYPT_ROUNDS          = tostring(var.eb_laravel_config.bcrypt_rounds)
+    MANAGER_SUBDOMAIN      = var.eb_laravel_config.manager_subdomain
 
     # Logging Configuration
     LOG_CHANNEL             = var.eb_laravel_config.log_channel
@@ -96,7 +98,9 @@ locals {
     AWS_EC2_METADATA_DISABLED      = "false"
 
     # Vite Configuration
-    VITE_APP_NAME         = var.eb_laravel_config.app_name
+    VITE_APP_NAME           = var.eb_laravel_config.app_name
+    VITE_APP_DOMAIN         = var.eb_laravel_config.app_domain
+    VITE_MANAGER_SUBDOMAIN  = var.eb_laravel_config.manager_subdomain
   }
 }
 

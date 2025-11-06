@@ -15,22 +15,20 @@ class CheckSubdomain
      */
     public function handle(Request $request, Closure $next, string $expectedSubdomain): Response
     {
-        // Get host without port
         $host = $request->getHost();
-        $parts = explode('.', $host);
+        $baseDomain = config('app.domain');
 
-        // Determine current subdomain
-        // For rentpath.test (2 parts) = no subdomain
-        // For manager.rentpath.test (3 parts) = subdomain is 'manager'
-        // For localhost (1 part) = no subdomain
-        $currentSubdomain = '';
-        if (count($parts) > 2 && $parts[0] !== 'www') {
-            $currentSubdomain = $parts[0];
+        // Build the expected domain based on the subdomain parameter
+        if ($expectedSubdomain === '') {
+            // Expecting main domain (no subdomain)
+            $expectedHost = $baseDomain;
+        } else {
+            // Expecting a subdomain (e.g., manager.example.com or manager.app.example.com)
+            $expectedHost = $expectedSubdomain . '.' . $baseDomain;
         }
 
-        // Check if we're on the expected subdomain
-        // Empty string means main domain (no subdomain)
-        if ($currentSubdomain !== $expectedSubdomain) {
+        // Compare actual host against expected host
+        if ($host !== $expectedHost) {
             abort(404);
         }
 

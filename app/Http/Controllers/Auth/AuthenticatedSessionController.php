@@ -56,7 +56,7 @@ class AuthenticatedSessionController extends Controller
             if ($userTypePreference === 'property-manager') {
                 $managerUrl = config('app.env') === 'local'
                     ? 'http://manager.' . parse_url(config('app.url'), PHP_URL_HOST) . ':' . parse_url(config('app.url'), PHP_URL_PORT)
-                    : 'https://manager.' . config('app.domain', 'rentpath.app');
+                    : 'https://manager.' . config('app.domain');
                 $redirectUrl = $managerUrl . '/dashboard';
             } else {
                 // Tenant selected - redirect to root domain dashboard

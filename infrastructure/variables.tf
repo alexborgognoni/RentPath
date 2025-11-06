@@ -144,12 +144,14 @@ variable "eb_laravel_config" {
     app_name               = string
     app_env                = string
     app_debug              = bool
+    app_domain             = string
     app_locale             = string
     app_fallback_locale    = string
     app_faker_locale       = string
     app_maintenance_driver = string
     php_cli_server_workers = number
     bcrypt_rounds          = number
+    manager_subdomain      = string
 
     # Database Configuration (non-sensitive)
     db_connection = string
