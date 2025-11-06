@@ -54,33 +54,12 @@ if (!function_exists('userDefaultDashboard')) {
 
 /*
 |--------------------------------------------------------------------------
-| Root Route - handles all subdomains
+| Root Route - Landing page
 |--------------------------------------------------------------------------
 */
 
 Route::get('/', function () {
-    $subdomain = currentSubdomain();
-
-    // Unknown or invalid domain
-    if ($subdomain === null) {
-        abort(404);
-    }
-
-    // Manager subdomain
-    if ($subdomain === 'manager') {
-        if (!auth()->check()) {
-            return redirect()->away(config('app.url') . '/login?intended=' . urlencode(request()->fullUrl()));
-        }
-        return redirect('/dashboard');
-    }
-
-    // Main domain - landing page
-    if ($subdomain === '') {
-        return Inertia::render('landing');
-    }
-
-    // Should never reach here, but just in case
-    abort(404);
+    return Inertia::render('landing');
 })->name('landing');
 
 /*
@@ -89,32 +68,29 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('subdomain:')->group(function () {
+// Public pages
+Route::get('/privacy-policy', function () {
+    return Inertia::render('privacy-policy');
+})->name('privacy.policy');
 
-    // Public pages
-    Route::get('/privacy-policy', function () {
-        return Inertia::render('privacy-policy');
-    })->name('privacy.policy');
+Route::get('/terms-of-use', function () {
+    return Inertia::render('terms-of-use');
+})->name('terms.of.use');
 
-    Route::get('/terms-of-use', function () {
-        return Inertia::render('terms-of-use');
-    })->name('terms.of.use');
+Route::get('/contact-us', function () {
+    return Inertia::render('contact-us');
+})->name('contact.us');
 
-    Route::get('/contact-us', function () {
-        return Inertia::render('contact-us');
-    })->name('contact.us');
-
-    Route::post('/locale', function (Request $request) {
-        $locale = $request->input('locale');
-        if (in_array($locale, ['en', 'fr', 'de', 'nl'])) {
-            session(['locale' => $locale]);
-        }
-        return response()->json(['locale' => session('locale')]);
-    });
-
-    // Auth routes
-    require __DIR__ . '/auth.php';
+Route::post('/locale', function (Request $request) {
+    $locale = $request->input('locale');
+    if (in_array($locale, ['en', 'fr', 'de', 'nl'])) {
+        session(['locale' => $locale]);
+    }
+    return response()->json(['locale' => session('locale')]);
 });
+
+// Auth routes
+require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -309,19 +285,17 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('subdomain:')->group(function () {
-    // Tenant authenticated routes
-    Route::middleware(['auth', 'verified'])->group(function () {
-        // Dashboard
-        Route::get('dashboard', function () {
-            return Inertia::render('tenant/dashboard');
-        })->name('dashboard');
+// Tenant authenticated routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard
+    Route::get('dashboard', function () {
+        return Inertia::render('tenant/dashboard');
+    })->name('dashboard');
 
-        // Settings routes (same paths as manager, different views)
-        if (file_exists(__DIR__ . '/settings.php')) {
-            require __DIR__ . '/settings.php';
-        }
+    // Settings routes (same paths as manager, different views)
+    if (file_exists(__DIR__ . '/settings.php')) {
+        require __DIR__ . '/settings.php';
+    }
 
-        // Future tenant routes: applications, etc.
-    });
+    // Future tenant routes: applications, etc.
 });
