@@ -1,5 +1,5 @@
 import { translate } from '@/utils/translate-utils';
-import { convertAndRoundUpPrice, getCurrency, getCurrencyFromStorage } from '@/utils/currency-utils';
+import { convertAndRoundUpPrice, getCurrencyFromStorage } from '@/utils/currency-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Banknote, CheckCircle, Clock, Database, DollarSign, Euro, PoundSterling, TrendingUp } from 'lucide-react';
@@ -102,8 +102,6 @@ export function BenefitsSection() {
 
         return () => window.removeEventListener('currencyChange', handleCurrencyChange);
     }, []);
-
-    const currentCurrencyData = getCurrency(currentCurrency);
 
     // Get appropriate currency icon
     const getCurrencyIcon = () => {

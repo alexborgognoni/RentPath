@@ -1,8 +1,5 @@
-import { translate } from '@/utils/translate-utils';
-import { usePage } from '@inertiajs/react';
-import type { SharedData } from '@/types';
 import { Search, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface PropertyFiltersProps {
     onFilterChange: (filters: PropertyFilterState) => void;
@@ -43,7 +40,6 @@ export interface PropertyFilterState {
 }
 
 export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps) {
-    const { translations } = usePage<SharedData>().props;
     const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
     const [filters, setFilters] = useState<PropertyFilterState>({
         search: '',
@@ -75,6 +71,15 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
         availableFrom: '',
     });
 
+    const handleFilterChange = useCallback(
+        (key: keyof PropertyFilterState, value: string | boolean | null) => {
+            const newFilters = { ...filters, [key]: value };
+            setFilters(newFilters);
+            onFilterChange(newFilters);
+        },
+        [filters, onFilterChange]
+    );
+
     // Debounced search
     const [searchValue, setSearchValue] = useState('');
     useEffect(() => {
@@ -82,13 +87,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
             handleFilterChange('search', searchValue);
         }, 300);
         return () => clearTimeout(timer);
-    }, [searchValue]);
-
-    const handleFilterChange = (key: keyof PropertyFilterState, value: string | boolean | null) => {
-        const newFilters = { ...filters, [key]: value };
-        setFilters(newFilters);
-        onFilterChange(newFilters);
-    };
+    }, [searchValue, handleFilterChange]);
 
     const clearMoreFilters = () => {
         const clearedFilters = {

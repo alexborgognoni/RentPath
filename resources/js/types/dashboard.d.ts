@@ -69,7 +69,7 @@ export interface Property {
     has_air_conditioning: boolean;
     has_garden: boolean;
     has_rooftop: boolean;
-    extras?: Record<string, any>; // JSON field for uncommon features
+    extras?: Record<string, unknown>; // JSON field for uncommon features
     // Rental information
     available_date?: string;
     rent_amount: number;
@@ -157,7 +157,7 @@ export interface PropertyFormData {
     has_air_conditioning?: boolean;
     has_garden?: boolean;
     has_rooftop?: boolean;
-    extras?: Record<string, any>;
+    extras?: Record<string, unknown>;
     // Rental information
     available_date?: string;
     rent_amount: number;

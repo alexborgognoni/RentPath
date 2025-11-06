@@ -3,9 +3,7 @@ import { router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import {
     Bold,
-    Calendar,
     Camera,
-    FileText,
     HousePlus,
     Italic,
     Link,
@@ -14,11 +12,10 @@ import {
     Upload,
     X
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface PropertyFormProps {
     onClose: () => void;
-    onSuccess?: (property: Property) => void;
 }
 
 interface FormData {
@@ -88,11 +85,10 @@ const currencyOptions = [
 
 // Size is always in square meters (m²) per database schema
 
-export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
+export function PropertyForm({ onClose }: PropertyFormProps) {
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [hasChanges, setHasChanges] = useState(false);
     const [showDiscardDialog, setShowDiscardDialog] = useState(false);
-    const [isPreviewMode, setIsPreviewMode] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -109,6 +105,14 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
         setHasChanges(isChanged);
     }, [formData, selectedImage]);
 
+    const handleCancel = useCallback(() => {
+        if (hasChanges) {
+            setShowDiscardDialog(true);
+        } else {
+            onClose();
+        }
+    }, [hasChanges, onClose]);
+
     // Add escape key listener and disable body scroll
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
@@ -120,21 +124,13 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
         // Disable body scrolling
         document.body.style.overflow = 'hidden';
         document.addEventListener('keydown', handleEscape);
-        
+
         return () => {
             // Re-enable body scrolling
             document.body.style.overflow = 'unset';
             document.removeEventListener('keydown', handleEscape);
         };
-    }, [hasChanges]);
-
-    const handleCancel = () => {
-        if (hasChanges) {
-            setShowDiscardDialog(true);
-        } else {
-            onClose();
-        }
-    };
+    }, [handleCancel]);
 
     const handleConfirmDiscard = () => {
         setShowDiscardDialog(false);
@@ -190,14 +186,6 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
         return Object.keys(newErrors).length === 0;
     };
 
-    const isValidUrl = (string: string) => {
-        try {
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -232,8 +220,8 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
                 images: selectedImage ? [selectedImage] : undefined,
             };
 
-            router.post('/properties', submitData as any, {
-                onSuccess: (page) => {
+            router.post('/properties', submitData, {
+                onSuccess: () => {
                     onClose();
                     // The server redirects to dashboard automatically
                 },
@@ -282,13 +270,6 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
         setFormData({ ...formData, description: content });
     };
 
-    const getCurrencySymbol = () => {
-        return currencyOptions.find(c => c.value === formData.rent_currency)?.symbol || '€';
-    };
-
-    const getSizeUnitSymbol = () => {
-        return 'm²'; // Size is always in square meters per database schema
-    };
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -317,41 +298,6 @@ export function PropertyForm({ onClose, onSuccess }: PropertyFormProps) {
                 setImagePreview(e.target?.result as string);
             };
             reader.readAsDataURL(file);
-        }
-    };
-
-    const handleImageUpload = async (): Promise<string | null> => {
-        if (!selectedImage) return null;
-
-        const formData = new FormData();
-        formData.append('image', selectedImage);
-
-        try {
-            const response = await fetch('/api/images/upload', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Upload failed:', response.status, errorText);
-                throw new Error(`Upload failed with status ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            if (data.success && data.image_path) {
-                return data.image_path;
-            } else {
-                throw new Error(data.error || 'Upload failed');
-            }
-        } catch (error) {
-            console.error('Image upload error:', error);
-            throw error;
         }
     };
 

@@ -1,17 +1,14 @@
 import type { TenantApplication } from '@/types/dashboard';
 import { motion } from 'framer-motion';
-import { 
-    Building, 
-    Calendar, 
-    CheckCircle, 
-    Clock, 
-    DollarSign, 
-    Download, 
-    FileText, 
-    Mail, 
+import {
+    CheckCircle,
+    Clock,
+    Download,
+    FileText,
+    Mail,
     MessageSquare,
-    Phone, 
-    User, 
+    Phone,
+    User,
     X, 
     XCircle 
 } from 'lucide-react';

@@ -10,7 +10,7 @@ interface BaseLayoutProps extends PropsWithChildren {
     variant?: 'app' | 'public';
 }
 
-export function BaseLayout({ children, breadcrumbs, title, showBackground = true, variant = 'app' }: BaseLayoutProps) {
+export function BaseLayout({ children, breadcrumbs, title, variant = 'app' }: BaseLayoutProps) {
     if (variant === 'public') {
         return (
             <div className="min-h-screen">

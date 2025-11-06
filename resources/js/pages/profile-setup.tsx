@@ -33,7 +33,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         phone_number: propertyManager?.phone_number || '',
     };
 
-    const { data, setData, post, put, processing, errors, progress } = useForm({
+    const { data, setData, processing, errors, progress } = useForm({
         type: propertyManager?.type || 'individual',
         company_name: propertyManager?.company_name || '',
         company_website: propertyManager?.company_website || '',
@@ -97,7 +97,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                 setSelectedType(propertyManager.type || 'individual');
             }
         }
-    }, [isEditing, propertyManager]);
+    }, [isEditing, propertyManager, setData]);
 
     // Check if form has been modified
     const hasFormChanged = () => {
@@ -127,7 +127,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         const submittedType = data.type || selectedType;
 
         // Prepare form data
-        const formData: Record<string, any> = {
+        const formData: Record<string, unknown> = {
             type: submittedType,
             phone_country_code: data.phone_prefix || '+1',
             phone_number: data.phone_number || '',
@@ -275,7 +275,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         domain = domain.replace(/^www\./i, '');
 
         // Validate domain format
-        const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+        const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
         if (!domainRegex.test(domain)) {
             return 'Please enter a valid domain (e.g., example.com).';
         }

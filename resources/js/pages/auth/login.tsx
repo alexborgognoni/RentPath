@@ -43,7 +43,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 if (intendedUrl.hostname === managerDomain) {
                     return 'property-manager';
                 }
-            } catch (e) {
+            } catch {
                 // Invalid URL, continue to localStorage check
             }
         }
@@ -63,7 +63,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthLayout title={t(translations.auth, 'login.title')} description={t(translations.auth, 'login.description')}>
             <Head title={t(translations.auth, 'login.head_title')} />
 
-            <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6" data={{ userType } as any}>
+            <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6" data={{ userType }}>
                 {({ processing, errors }) => (
                     <>
                         <UserTypeToggle userType={userType} onUserTypeChange={handleUserTypeChange} />

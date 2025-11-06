@@ -1,8 +1,8 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
-import { SharedData, type BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Building2, Home, Menu } from 'lucide-react';
+import { Home, Menu } from 'lucide-react';
 import { useState, useEffect, type PropsWithChildren } from 'react';
 
 interface ManagerLayoutProps extends PropsWithChildren {

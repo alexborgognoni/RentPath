@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { currencies, getCurrency, getCurrencyFromStorage, setCurrencyInStorage, type Currency, type CurrencyCode } from '@/utils/currency-utils';
-import { usePage, Link } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { Menu, X, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';

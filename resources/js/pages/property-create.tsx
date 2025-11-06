@@ -1,10 +1,9 @@
 import { ManagerLayout } from '@/layouts/manager-layout';
 import { type BreadcrumbItem } from '@/types';
 import type { Property, PropertyFormData } from '@/types/dashboard';
-import { type SharedData } from '@/types';
-import { Head, useForm, router, usePage } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Building, Home, Upload, X, Camera, Trash2 } from 'lucide-react';
+import { AlertCircle, Home, Upload, X, Camera, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -13,8 +12,70 @@ interface PropertyCreateProps {
     isEditing?: boolean;
 }
 
+// Property type and subtype options
+const propertyTypeOptions = [
+    { value: 'apartment', label: 'Apartment' },
+    { value: 'house', label: 'House' },
+    { value: 'room', label: 'Room' },
+    { value: 'commercial', label: 'Commercial' },
+    { value: 'industrial', label: 'Industrial' },
+    { value: 'parking', label: 'Parking' },
+];
+
+const propertySubtypes: {[key: string]: {value: string; label: string}[]} = {
+    apartment: [
+        { value: 'studio', label: 'Studio' },
+        { value: 'loft', label: 'Loft' },
+        { value: 'duplex', label: 'Duplex' },
+        { value: 'triplex', label: 'Triplex' },
+        { value: 'penthouse', label: 'Penthouse' },
+        { value: 'serviced', label: 'Serviced' },
+    ],
+    house: [
+        { value: 'detached', label: 'Detached' },
+        { value: 'semi-detached', label: 'Semi-detached' },
+        { value: 'villa', label: 'Villa' },
+        { value: 'bungalow', label: 'Bungalow' },
+    ],
+    room: [
+        { value: 'private_room', label: 'Private Room' },
+        { value: 'student_room', label: 'Student Room' },
+        { value: 'co-living', label: 'Co-living' },
+    ],
+    commercial: [
+        { value: 'office', label: 'Office' },
+        { value: 'retail', label: 'Retail' },
+    ],
+    industrial: [
+        { value: 'warehouse', label: 'Warehouse' },
+        { value: 'factory', label: 'Factory' },
+    ],
+    parking: [
+        { value: 'garage', label: 'Garage' },
+        { value: 'indoor_spot', label: 'Indoor Spot' },
+        { value: 'outdoor_spot', label: 'Outdoor Spot' },
+    ],
+};
+
+const currencyOptions = [
+    { value: 'eur', label: 'Euro (€)', symbol: '€' },
+    { value: 'usd', label: 'US Dollar ($)', symbol: '$' },
+    { value: 'gbp', label: 'British Pound (£)', symbol: '£' },
+    { value: 'chf', label: 'Swiss Franc (CHF)', symbol: 'CHF' },
+];
+
+const energyClassOptions = ['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
+
+const heatingTypeOptions = [
+    { value: 'gas', label: 'Gas' },
+    { value: 'electric', label: 'Electric' },
+    { value: 'district', label: 'District Heating' },
+    { value: 'wood', label: 'Wood' },
+    { value: 'heat_pump', label: 'Heat Pump' },
+    { value: 'other', label: 'Other' },
+];
+
 export default function PropertyCreate({ property, isEditing = false }: PropertyCreateProps) {
-    const { translations } = usePage<SharedData>().props;
     const [clientErrors, setClientErrors] = useState<{[key: string]: string}>({});
     const [generalError, setGeneralError] = useState<string | null>(null);
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -28,8 +89,8 @@ export default function PropertyCreate({ property, isEditing = false }: Property
         { title: isEditing ? 'Edit Property' : 'Add Property' },
     ];
 
-    // @ts-ignore - Complex PropertyFormData type causes issues with Inertia's FormDataType constraint
-    const { data, setData, post, put, processing, errors, progress } = useForm({
+    // @ts-expect-error - Complex PropertyFormData type causes issues with Inertia's FormDataType constraint
+    const { data, setData, processing, errors, progress } = useForm({
         // Basic info
         title: property?.title || '',
         description: property?.description || '',
@@ -87,76 +148,14 @@ export default function PropertyCreate({ property, isEditing = false }: Property
         main_image_index: 0,
     });
 
-    // Property type and subtype options
-    const propertyTypeOptions = [
-        { value: 'apartment', label: 'Apartment' },
-        { value: 'house', label: 'House' },
-        { value: 'room', label: 'Room' },
-        { value: 'commercial', label: 'Commercial' },
-        { value: 'industrial', label: 'Industrial' },
-        { value: 'parking', label: 'Parking' },
-    ];
-
-    const propertySubtypes: {[key: string]: {value: string; label: string}[]} = {
-        apartment: [
-            { value: 'studio', label: 'Studio' },
-            { value: 'loft', label: 'Loft' },
-            { value: 'duplex', label: 'Duplex' },
-            { value: 'triplex', label: 'Triplex' },
-            { value: 'penthouse', label: 'Penthouse' },
-            { value: 'serviced', label: 'Serviced' },
-        ],
-        house: [
-            { value: 'detached', label: 'Detached' },
-            { value: 'semi-detached', label: 'Semi-detached' },
-            { value: 'villa', label: 'Villa' },
-            { value: 'bungalow', label: 'Bungalow' },
-        ],
-        room: [
-            { value: 'private_room', label: 'Private Room' },
-            { value: 'student_room', label: 'Student Room' },
-            { value: 'co-living', label: 'Co-living' },
-        ],
-        commercial: [
-            { value: 'office', label: 'Office' },
-            { value: 'retail', label: 'Retail' },
-        ],
-        industrial: [
-            { value: 'warehouse', label: 'Warehouse' },
-            { value: 'factory', label: 'Factory' },
-        ],
-        parking: [
-            { value: 'garage', label: 'Garage' },
-            { value: 'indoor_spot', label: 'Indoor Spot' },
-            { value: 'outdoor_spot', label: 'Outdoor Spot' },
-        ],
-    };
-
-    const currencyOptions = [
-        { value: 'eur', label: 'Euro (€)', symbol: '€' },
-        { value: 'usd', label: 'US Dollar ($)', symbol: '$' },
-        { value: 'gbp', label: 'British Pound (£)', symbol: '£' },
-        { value: 'chf', label: 'Swiss Franc (CHF)', symbol: 'CHF' },
-    ];
-
-    const energyClassOptions = ['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
-    const heatingTypeOptions = [
-        { value: 'gas', label: 'Gas' },
-        { value: 'electric', label: 'Electric' },
-        { value: 'district', label: 'District Heating' },
-        { value: 'wood', label: 'Wood' },
-        { value: 'heat_pump', label: 'Heat Pump' },
-        { value: 'other', label: 'Other' },
-    ];
-
     // Update subtypes when type changes
     useEffect(() => {
         const options = propertySubtypes[data.type] || [];
         setSubtypeOptions(options);
         if (options.length > 0 && !options.find(o => o.value === data.subtype)) {
-            setData('subtype', options[0].value as any);
+            setData('subtype', options[0].value as Property['subtype']);
         }
-    }, [data.type]);
+    }, [data.type, data.subtype, setData]);
 
     const clearFieldError = (fieldName: string) => {
         if (clientErrors[fieldName]) {
@@ -200,7 +199,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
         });
 
         setSelectedImages(newImages);
-        // @ts-ignore
+        // @ts-expect-error - images field type mismatch
         setData('images', newImages);
     };
 
@@ -210,7 +209,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
 
         setSelectedImages(newImages);
         setImagePreviews(newPreviews);
-        // @ts-ignore
+        // @ts-expect-error - images field type mismatch
         setData('images', newImages);
 
         // Adjust main image index if needed
@@ -296,7 +295,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
         const endpoint = isEditing ? `/properties/${property?.id}` : '/properties';
         const method = isEditing ? 'put' : 'post';
 
-        router[method](endpoint, formData as any, {
+        router[method](endpoint, formData, {
             forceFormData: true,
             onError: (errors) => {
                 console.error('Submission errors:', errors);
@@ -505,7 +504,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                                             id="type"
                                             value={data.type}
                                             onChange={(e) => {
-                                                setData('type', e.target.value as any);
+                                                setData('type', e.target.value as Property['type']);
                                                 clearFieldError('type');
                                             }}
                                             className={getFieldClassName('type')}
@@ -531,7 +530,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                                             id="subtype"
                                             value={data.subtype}
                                             onChange={(e) => {
-                                                setData('subtype', e.target.value as any);
+                                                setData('subtype', e.target.value as Property['subtype']);
                                                 clearFieldError('subtype');
                                             }}
                                             className={getFieldClassName('subtype')}
@@ -883,7 +882,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                                         <select
                                             id="energy_class"
                                             value={data.energy_class || ''}
-                                            onChange={(e) => setData('energy_class', e.target.value as any || undefined)}
+                                            onChange={(e) => setData('energy_class', (e.target.value as Property['energy_class']) || undefined)}
                                             className={getFieldClassName('energy_class')}
                                         >
                                             <option value="">Not specified</option>
@@ -902,7 +901,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                                         <select
                                             id="thermal_insulation_class"
                                             value={data.thermal_insulation_class || ''}
-                                            onChange={(e) => setData('thermal_insulation_class', e.target.value as any || undefined)}
+                                            onChange={(e) => setData('thermal_insulation_class', (e.target.value as Property['thermal_insulation_class']) || undefined)}
                                             className={getFieldClassName('thermal_insulation_class')}
                                         >
                                             <option value="">Not specified</option>
@@ -921,7 +920,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                                         <select
                                             id="heating_type"
                                             value={data.heating_type || ''}
-                                            onChange={(e) => setData('heating_type', e.target.value as any || undefined)}
+                                            onChange={(e) => setData('heating_type', (e.target.value as Property['heating_type']) || undefined)}
                                             className={getFieldClassName('heating_type')}
                                         >
                                             <option value="">Not specified</option>
@@ -1052,7 +1051,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                                             <div className="absolute right-1 top-1">
                                                 <select
                                                     value={data.rent_currency}
-                                                    onChange={(e) => setData('rent_currency', e.target.value as any)}
+                                                    onChange={(e) => setData('rent_currency', e.target.value as Property['rent_currency'])}
                                                     className="h-10 rounded-md border-0 bg-transparent pl-2 pr-1 text-sm text-foreground focus:outline-none focus:ring-0"
                                                 >
                                                     {currencyOptions.map((option) => (

@@ -3,10 +3,7 @@ import { LanguageSelector } from '@/components/language-selector';
 import { LogoHomeButton } from '@/components/logo-home-button';
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
 import { MobileMenu } from '@/components/mobile-menu';
-import { SharedData, type BreadcrumbItem } from '@/types';
-import { translate as t } from '@/utils/translate-utils';
-import { usePage, Link } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { type BreadcrumbItem } from '@/types';
 import { useEffect, useRef, useState } from 'react';
 
 interface AppHeaderProps {
@@ -15,8 +12,6 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
-    const page = usePage<SharedData>();
-    const { auth, translations } = page.props;
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -35,11 +30,6 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
         }
         if (user?.email) return user.email[0].toUpperCase();
         return 'U';
-    };
-
-    const handleLogoutClick = () => {
-        setShowUserMenu(false);
-        setShowLogoutConfirmation(true);
     };
 
     const handleLogoutConfirm = () => {

@@ -37,7 +37,7 @@ export default function Register() {
                 if (intendedUrl.hostname === managerDomain) {
                     return 'property-manager';
                 }
-            } catch (e) {
+            } catch {
                 // Invalid URL, continue to localStorage check
             }
         }
@@ -61,7 +61,7 @@ export default function Register() {
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
-                data={{ userType } as any}
+                data={{ userType }}
             >
                 {({ processing, errors }) => (
                     <>
