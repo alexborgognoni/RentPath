@@ -83,6 +83,8 @@ class RegisteredUserController extends Controller
         }
 
         // Fallback for non-Inertia requests
-        return ResponseFacade::redirectTo($redirectUrl);
+        return ResponseFacade::make('', 302, [
+            'Location' => $redirectUrl
+        ]);
     }
 }

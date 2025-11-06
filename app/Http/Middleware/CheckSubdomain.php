@@ -15,6 +15,7 @@ class CheckSubdomain
      */
     public function handle(Request $request, Closure $next, string $expectedSubdomain): Response
     {
+        // Get host without port
         $host = $request->getHost();
         $baseDomain = config('app.domain');
 
@@ -27,7 +28,7 @@ class CheckSubdomain
             $expectedHost = $expectedSubdomain . '.' . $baseDomain;
         }
 
-        // Compare actual host against expected host
+        // Compare actual host against expected host (getHost() already strips port)
         if ($host !== $expectedHost) {
             abort(404);
         }

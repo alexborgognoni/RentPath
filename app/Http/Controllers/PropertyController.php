@@ -124,7 +124,7 @@ class PropertyController extends Controller
         $propertyManager = Auth::user()->propertyManager;
 
         if (!$propertyManager) {
-            return redirect()->route('dashboard')
+            return redirect('/dashboard')
                 ->with('error', 'You need to set up your property manager profile first.');
         }
 
@@ -161,7 +161,7 @@ class PropertyController extends Controller
             }
         }
 
-        return redirect()->route('dashboard')
+        return redirect('/dashboard')
             ->with('success', 'Property created successfully.');
     }
 
@@ -321,7 +321,7 @@ class PropertyController extends Controller
             }
         }
 
-        return redirect()->route('dashboard')
+        return redirect('/dashboard')
             ->with('success', 'Property updated successfully.');
     }
 
@@ -338,7 +338,7 @@ class PropertyController extends Controller
 
         $property->delete();
 
-        return redirect()->route('dashboard')
+        return redirect('/dashboard')
             ->with('success', 'Property deleted successfully.');
     }
 

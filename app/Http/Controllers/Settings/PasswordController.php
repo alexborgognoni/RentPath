@@ -15,9 +15,29 @@ class PasswordController extends Controller
     /**
      * Show the user's password settings page.
      */
-    public function edit(): Response
+    public function edit(Request $request): Response
     {
-        return Inertia::render('settings/password');
+        // Determine which settings view to render based on subdomain
+        $subdomain = $this->getCurrentSubdomain($request);
+        $view = $subdomain === 'manager' ? 'settings/password' : 'tenant/settings/password';
+
+        return Inertia::render($view);
+    }
+
+    /**
+     * Get current subdomain from request
+     */
+    private function getCurrentSubdomain(Request $request): string
+    {
+        $host = $request->getHost();
+        $baseDomain = config('app.domain');
+        $managerDomain = env('MANAGER_SUBDOMAIN', 'manager') . '.' . $baseDomain;
+
+        if ($host === $managerDomain) {
+            return 'manager';
+        }
+
+        return 'tenant';
     }
 
     /**

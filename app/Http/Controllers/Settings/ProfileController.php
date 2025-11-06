@@ -18,10 +18,30 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('settings/profile', [
+        // Determine which settings view to render based on subdomain
+        $subdomain = $this->getCurrentSubdomain($request);
+        $view = $subdomain === 'manager' ? 'settings/profile' : 'tenant/settings/profile';
+
+        return Inertia::render($view, [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);
+    }
+
+    /**
+     * Get current subdomain from request
+     */
+    private function getCurrentSubdomain(Request $request): string
+    {
+        $host = $request->getHost();
+        $baseDomain = config('app.domain');
+        $managerDomain = env('MANAGER_SUBDOMAIN', 'manager') . '.' . $baseDomain;
+
+        if ($host === $managerDomain) {
+            return 'manager';
+        }
+
+        return 'tenant';
     }
 
     /**
@@ -37,7 +57,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return to_route('profile.edit');
+        return redirect('/settings/profile');
     }
 
     /**

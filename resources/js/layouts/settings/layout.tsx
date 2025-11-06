@@ -1,9 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { appearance } from '@/routes';
-import { edit as editPassword } from '@/routes/password';
-import { edit } from '@/routes/profile';
 import { type NavItem, type SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
@@ -15,17 +12,17 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const sidebarNavItems: NavItem[] = [
         {
             title: t(translations.settings, 'menu.account'),
-            href: edit(),
+            href: '/settings/profile',
             icon: null,
         },
         {
             title: t(translations.settings, 'menu.password'),
-            href: editPassword(),
+            href: '/settings/password',
             icon: null,
         },
         {
             title: t(translations.settings, 'menu.appearance'),
-            href: appearance(),
+            href: '/settings/appearance',
             icon: null,
         },
     ];

@@ -126,15 +126,24 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
 
     // Dashboard
     Route::middleware(['auth'])->get('dashboard', function (Request $request) {
+        \Log::info('Manager dashboard accessed', [
+            'host' => $request->getHost(),
+            'url' => $request->url(),
+            'user_id' => $request->user()?->id,
+            'has_property_manager' => (bool) $request->user()?->propertyManager,
+        ]);
+
         $user = $request->user();
         $propertyManager = $user->propertyManager;
 
         if (!$propertyManager) {
-            return redirect()->route('profile.setup');
+            \Log::info('Redirecting to profile setup - no property manager');
+            return redirect('/profile/setup');
         }
 
         if (!$propertyManager->isVerified()) {
-            return redirect()->route('profile.unverified');
+            \Log::info('Redirecting to unverified - property manager not verified');
+            return redirect('/profile/unverified');
         }
 
         $properties = $user->properties()
@@ -142,6 +151,7 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             ->orderBy('created_at', 'desc')
             ->get();
 
+        \Log::info('Rendering manager dashboard');
         return Inertia::render('dashboard', [
             'properties' => $properties
         ]);
@@ -155,14 +165,14 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             $propertyManager = $user->propertyManager;
 
             if (!$propertyManager) {
-                return redirect()->route('profile.setup');
+                return redirect('/profile/setup');
             }
 
             if ($propertyManager->isVerified()) {
-                return redirect()->route('dashboard');
+                return redirect('/dashboard');
             }
 
-            return redirect()->route('profile.unverified');
+            return redirect('/profile/unverified');
         })->name('profile');
 
         Route::get('profile/setup', [PropertyManagerController::class, 'create'])
@@ -176,11 +186,11 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             $propertyManager = $user->propertyManager;
 
             if (!$propertyManager) {
-                return redirect()->route('profile.setup');
+                return redirect('/profile/setup');
             }
 
             if ($propertyManager->isVerified()) {
-                return redirect()->route('dashboard');
+                return redirect('/dashboard');
             }
 
             if ($request->get('edit')) {
@@ -285,12 +295,12 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
     });
 
     // Catch-all route for manager subdomain - redirects to login if not authenticated
-    Route::fallback(function () {
+    Route::any('{any}', function () {
         if (!auth()->check()) {
             return redirect()->away(config('app.url') . '/login?intended=' . urlencode(request()->fullUrl()));
         }
         abort(404);
-    });
+    })->where('any', '.*');
 });
 
 /*
@@ -307,6 +317,11 @@ Route::middleware('subdomain:')->group(function () {
             return Inertia::render('tenant/dashboard');
         })->name('dashboard');
 
-        // Future tenant routes: applications, profile, settings, etc.
+        // Settings routes (same paths as manager, different views)
+        if (file_exists(__DIR__ . '/settings.php')) {
+            require __DIR__ . '/settings.php';
+        }
+
+        // Future tenant routes: applications, etc.
     });
 });

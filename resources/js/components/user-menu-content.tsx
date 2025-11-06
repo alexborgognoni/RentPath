@@ -2,7 +2,6 @@ import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popo
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { edit } from '@/routes/profile';
 import { type SharedData, type User } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
@@ -41,7 +40,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={edit()} as="button" prefetch onClick={cleanup}>
+                    <Link className="block w-full" href="/settings/profile" as="button" prefetch onClick={cleanup}>
                         <Settings className="mr-2" />
                         {t(translations.header, 'settings')}
                     </Link>

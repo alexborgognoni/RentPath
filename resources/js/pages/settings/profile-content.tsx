@@ -33,7 +33,7 @@ export default function ProfileContent({ mustVerifyEmail, status }: ProfileConte
                 <h2 className="mb-4 text-xl font-semibold text-foreground">{t(translations.settings, 'account.email_address')}</h2>
 
                 <Form
-                    {...ProfileController.update.form()}
+                    {...ProfileController.update['/settings/profile'].form()}
                     options={{
                         preserveScroll: true,
                     }}

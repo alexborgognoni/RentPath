@@ -30,6 +30,9 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
+# Add to /etc/hosts
+echo '127.0.0.1 rentpath.test manager.rentpath.test' | sudo tee -a /etc/hosts
+
 # Run migrations
 php artisan migrate
 
@@ -40,14 +43,14 @@ npm run build
 ### Development
 
 ```bash
-# Start all services (Laravel, queue, logs, Vite)
-composer dev
+# Start Laravel server
+php artisan serve
 
-# For mobile development (network access)
-composer dev:lan
+# In another terminal: Start Vite dev server
+npm run dev
 ```
 
-Visit `http://localhost:8000`
+Visit `http://rentpath.test:8000`
 
 ## File Upload Limits
 

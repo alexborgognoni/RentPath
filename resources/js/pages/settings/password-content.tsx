@@ -28,7 +28,7 @@ export default function PasswordContent() {
             {/* Password Settings */}
             <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-6 xs:shadow-sm">
                 <Form
-                    {...PasswordController.update.form()}
+                    {...PasswordController.update['/settings/password'].form()}
                     options={{
                         preserveScroll: true,
                     }}

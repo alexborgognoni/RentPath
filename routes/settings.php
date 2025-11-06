@@ -5,27 +5,19 @@ use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Settings routes - wrapped in auth and subdomain:manager middleware in web.php
+// Settings routes - same paths on both tenant and manager domains
+// No route names to avoid conflicts - use relative paths instead
 Route::get('settings', function () {
     return redirect('/settings/profile');
 });
 
-Route::get('settings/profile', [ProfileController::class, 'edit'])
-    ->name('profile.edit');
+Route::get('settings/profile', [ProfileController::class, 'edit']);
 
-Route::patch('settings/profile', [ProfileController::class, 'update'])
-    ->name('profile.update');
+Route::patch('settings/profile', [ProfileController::class, 'update']);
 
-Route::delete('settings/profile', [ProfileController::class, 'destroy'])
-    ->name('profile.destroy');
+Route::delete('settings/profile', [ProfileController::class, 'destroy']);
 
-Route::get('settings/password', [PasswordController::class, 'edit'])
-    ->name('password.edit');
+Route::get('settings/password', [PasswordController::class, 'edit']);
 
 Route::put('settings/password', [PasswordController::class, 'update'])
-    ->middleware('throttle:6,1')
-    ->name('password.update');
-
-Route::get('settings/appearance', function () {
-    return Inertia::render('settings/appearance');
-})->name('appearance');
+    ->middleware('throttle:6,1');

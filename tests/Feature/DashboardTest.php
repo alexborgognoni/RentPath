@@ -5,7 +5,9 @@ use App\Models\User;
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 test('guests are redirected to the login page', function () {
-    $this->get('/dashboard')->assertRedirect('/login');
+    $response = $this->get('/dashboard');
+    $response->assertRedirect();
+    expect($response->headers->get('Location'))->toStartWith('http://localhost:8000/login');
 });
 
 test('authenticated users can visit the dashboard', function () {
