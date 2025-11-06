@@ -1,6 +1,7 @@
 import AuthenticatedSessionController from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
+import UserTypeToggle from '@/components/user-type-toggle';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -10,9 +11,9 @@ import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { register } from '@/routes';
 import { request } from '@/routes/password';
-import { Form, Head, usePage, router } from '@inertiajs/react';
-import { LoaderCircle, Building2, User } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Form, Head, usePage } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface LoginProps {
     status?: string;
@@ -23,8 +24,31 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const page = usePage<SharedData>();
     const { translations } = page.props;
 
-    // Determine initial user type from localStorage or default to tenant
+    // Determine initial user type based on:
+    // 1. If redirected from manager subdomain -> property-manager
+    // 2. Otherwise use localStorage or default to tenant
     const [userType, setUserType] = useState<'tenant' | 'property-manager'>(() => {
+        // Check if there's an intended URL in query params
+        const urlParams = new URLSearchParams(window.location.search);
+        const intended = urlParams.get('intended');
+
+        // If intended URL contains manager subdomain, default to property-manager
+        if (intended) {
+            try {
+                const intendedUrl = new URL(intended);
+                const managerSubdomain = import.meta.env.VITE_MANAGER_SUBDOMAIN || 'manager';
+                const baseDomain = import.meta.env.VITE_APP_DOMAIN || window.location.hostname;
+                const managerDomain = `${managerSubdomain}.${baseDomain}`;
+
+                if (intendedUrl.hostname === managerDomain) {
+                    return 'property-manager';
+                }
+            } catch (e) {
+                // Invalid URL, continue to localStorage check
+            }
+        }
+
+        // Fall back to localStorage or default to tenant
         const saved = localStorage.getItem('userType');
         return (saved === 'property-manager' ? 'property-manager' : 'tenant') as 'tenant' | 'property-manager';
     });
@@ -42,36 +66,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6" data={{ userType } as any}>
                 {({ processing, errors }) => (
                     <>
-                        {/* User Type Toggle */}
-                        <div className="relative flex rounded-lg border border-border bg-background p-1">
-                            {/* Sliding background */}
-                            <div
-                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md bg-gradient-to-r ${userType === 'property-manager' ? 'from-secondary to-primary' : 'from-primary to-secondary'} shadow-sm transition-transform duration-400 ease-in-out ${
-                                    userType === 'property-manager' ? 'translate-x-[calc(100%+8px)]' : 'translate-x-0'
-                                }`}
-                            />
-
-                            <button
-                                type="button"
-                                onClick={() => handleUserTypeChange('tenant')}
-                                className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
-                                    userType === 'tenant' ? 'text-white' : 'text-text-secondary hover:text-text-primary'
-                                }`}
-                            >
-                                <User className="h-4 w-4" />
-                                {t(translations.auth, 'user_types.tenant')}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => handleUserTypeChange('property-manager')}
-                                className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
-                                    userType === 'property-manager' ? 'text-white' : 'text-text-secondary hover:text-text-primary'
-                                }`}
-                            >
-                                <Building2 className="h-4 w-4" />
-                                {t(translations.auth, 'user_types.property_manager')}
-                            </button>
-                        </div>
+                        <UserTypeToggle userType={userType} onUserTypeChange={handleUserTypeChange} />
 
                         <div className="grid gap-6">
                             <div className="grid gap-2">
