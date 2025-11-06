@@ -1,16 +1,16 @@
-import { translate } from '@/utils/translate-utils';
+import type { SharedData } from '@/types';
 import { convertAndRoundUpPrice, getCurrencyFromStorage } from '@/utils/currency-utils';
+import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Banknote, CheckCircle, Clock, Database, DollarSign, Euro, PoundSterling, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import type { SharedData } from '@/types';
 
 export function BenefitsSection() {
     const { translations } = usePage<SharedData>().props;
 
     const HEADING = translate(translations, 'landing.benefits.heading');
-    
+
     const FASTER_PLACEMENTS_TITLE = translate(translations, 'landing.benefits.benefits.faster_placements.title');
     const FASTER_PLACEMENTS_DESCRIPTION = translate(translations, 'landing.benefits.benefits.faster_placements.description');
     const CENTRALIZED_DATA_TITLE = translate(translations, 'landing.benefits.benefits.centralized_data.title');
@@ -71,7 +71,7 @@ export function BenefitsSection() {
     const PRICING_UNIT = translate(translations, 'landing.benefits.trial.pricing.unit');
     const PRICING_OFFER = translate(translations, 'landing.benefits.trial.pricing.offer');
     const GET_STARTED_BUTTON = translate(translations, 'landing.benefits.trial.get_started_button');
-    
+
     const TRIAL_BENEFITS = [
         translate(translations, 'landing.benefits.trial.benefits.0'),
         translate(translations, 'landing.benefits.trial.benefits.1'),
@@ -121,7 +121,7 @@ export function BenefitsSection() {
     const PRICING = {
         price: displayPrice,
         currency: PRICING_UNIT, // Always show "per agent/month"
-        icon: getCurrencyIcon()
+        icon: getCurrencyIcon(),
     };
 
     const [shouldShake, setShouldShake] = useState(false);
@@ -167,7 +167,9 @@ export function BenefitsSection() {
                         <div className="relative mb-8 rounded-2xl border border-border bg-card p-8 shadow-xl">
                             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5"></div>
                             <div className="relative">
-                                <h3 className="mb-6 text-2xl font-bold text-foreground">{translate(translations, 'landing.benefits.metrics.heading')}</h3>
+                                <h3 className="mb-6 text-2xl font-bold text-foreground">
+                                    {translate(translations, 'landing.benefits.metrics.heading')}
+                                </h3>
                                 <div className="space-y-6">
                                     {METRICS.map((metric, idx) => (
                                         <div key={idx} className="flex items-center justify-between">
@@ -181,7 +183,7 @@ export function BenefitsSection() {
 
                         {/* Free Trial Box */}
                         <div className="text-center sm:relative sm:rounded-2xl sm:border sm:border-primary/20 sm:bg-gradient-to-br sm:from-primary/10 sm:to-secondary/10 sm:p-8 sm:shadow-xl">
-                            <div className="hidden sm:block absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5"></div>
+                            <div className="absolute inset-0 hidden rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 sm:block"></div>
                             <div className="sm:relative">
                                 <h3 className="mb-4 text-xl font-bold text-foreground">{TRIAL_HEADING}</h3>
 
@@ -201,9 +203,9 @@ export function BenefitsSection() {
                                         <div className="mb-2 flex items-center justify-center">
                                             <span className="text-3xl font-bold text-foreground">{PRICING.price}</span>
                                             {currentCurrency === 'CHF' ? (
-                                                <span className="ml-1 mr-2 text-2xl font-bold text-primary">CHF</span>
+                                                <span className="mr-2 ml-1 text-2xl font-bold text-primary">CHF</span>
                                             ) : (
-                                                <PRICING.icon className="pb-1 h-8 w-8 text-primary" />
+                                                <PRICING.icon className="h-8 w-8 pb-1 text-primary" />
                                             )}
                                             <span className="text-base text-muted-foreground">{PRICING.currency}</span>
                                         </div>

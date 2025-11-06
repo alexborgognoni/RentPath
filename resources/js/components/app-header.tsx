@@ -137,11 +137,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                     </div>
                 </div>
             </div>
-            <LogoutConfirmationPopover
-                isOpen={showLogoutConfirmation}
-                onClose={handleLogoutCancel}
-                onConfirm={handleLogoutConfirm}
-            />
+            <LogoutConfirmationPopover isOpen={showLogoutConfirmation} onClose={handleLogoutCancel} onConfirm={handleLogoutConfirm} />
         </header>
     );
 }

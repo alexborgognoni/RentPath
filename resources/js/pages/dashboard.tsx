@@ -15,11 +15,7 @@ export default function Dashboard({ properties = [] }: { properties?: Property[]
     return (
         <ManagerLayout>
             <Head title="Dashboard" />
-            <PropertiesSection
-                properties={properties}
-                onAddProperty={handleAddProperty}
-                onEditProperty={handleEditProperty}
-            />
+            <PropertiesSection properties={properties} onAddProperty={handleAddProperty} onEditProperty={handleEditProperty} />
         </ManagerLayout>
     );
 }

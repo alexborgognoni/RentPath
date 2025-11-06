@@ -54,7 +54,7 @@ export function CurrencySelector() {
         <div ref={selectorRef} className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="bg-surface text-text-secondary hover:text-text-primary flex items-center space-x-2 rounded-lg border border-border px-3 py-2 text-sm font-medium transition-all duration-200 hover:bg-background cursor-pointer"
+                className="text-text-secondary hover:text-text-primary flex cursor-pointer items-center space-x-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium transition-all duration-200 hover:bg-background"
             >
                 <span>{currentCurrencyData?.flag}</span>
                 <span className="hidden sm:block">{currentCurrencyData?.code}</span>
@@ -62,13 +62,13 @@ export function CurrencySelector() {
             </button>
 
             {isOpen && (
-                <div className="bg-surface absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-lg border border-border shadow-xl">
+                <div className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
                     <div className="py-1">
                         {currencies.map((currency: Currency) => (
                             <button
                                 key={currency.code}
                                 onClick={() => handleCurrencyChange(currency.code)}
-                                className={`flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background cursor-pointer ${
+                                className={`flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background ${
                                     currentCurrency === currency.code ? 'bg-background text-primary' : 'text-text-secondary'
                                 }`}
                             >

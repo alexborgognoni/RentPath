@@ -6,10 +6,10 @@ import { useState } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
-import UserTypeToggle from '@/components/user-type-toggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import UserTypeToggle from '@/components/user-type-toggle';
 import AuthLayout from '@/layouts/auth-layout';
 import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
@@ -127,7 +127,7 @@ export default function Register() {
                                     name="fake_password_remembered"
                                     autoComplete="new-password"
                                     // className="absolute opacity-0 h-0 w-0 border-0 p-0 m-0"
-                                    className="absolute opacity-0 pointer-events-none"
+                                    className="pointer-events-none absolute opacity-0"
                                     readOnly
                                 />
                                 <InputError message={errors.password} />
@@ -149,7 +149,7 @@ export default function Register() {
                                     name="fake_password_confirmation"
                                     autoComplete="new-password"
                                     // className="absolute opacity-0 h-0 w-0 border-0 p-0 m-0"
-                                    className="absolute opacity-0 pointer-events-none"
+                                    className="pointer-events-none absolute opacity-0"
                                     readOnly
                                 />
                                 <InputError message={errors.password_confirmation} />

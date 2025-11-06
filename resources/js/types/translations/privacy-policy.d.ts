@@ -95,4 +95,3 @@ interface PrivacyPolicyTranslations {
         };
     };
 }
-

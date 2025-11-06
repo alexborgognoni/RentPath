@@ -55,11 +55,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 </button>
             </DropdownMenuItem>
 
-            <LogoutConfirmationPopover
-                isOpen={showLogoutConfirmation}
-                onClose={handleLogoutCancel}
-                onConfirm={handleLogoutConfirm}
-            />
+            <LogoutConfirmationPopover isOpen={showLogoutConfirmation} onClose={handleLogoutCancel} onConfirm={handleLogoutConfirm} />
         </>
     );
 }

@@ -1,5 +1,5 @@
-import type { PropertyManager } from '@/types/dashboard';
 import type { SharedData } from '@/types';
+import type { PropertyManager } from '@/types/dashboard';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Edit, User } from 'lucide-react';
@@ -32,7 +32,11 @@ export function AgentProfile({ agent, onEdit }: AgentProfileProps) {
                 {/* Profile Picture */}
                 <div className="flex-shrink-0">
                     {agent.profile_picture_path ? (
-                        <img src={agent.profile_picture_path} alt={agent.user?.full_name || 'Profile'} className="h-32 w-32 rounded-2xl border-4 border-secondary object-cover" />
+                        <img
+                            src={agent.profile_picture_path}
+                            alt={agent.user?.full_name || 'Profile'}
+                            className="h-32 w-32 rounded-2xl border-4 border-secondary object-cover"
+                        />
                     ) : (
                         <div className="flex h-32 w-32 items-center justify-center rounded-2xl border-4 border-secondary bg-gradient-to-br from-muted to-muted/50">
                             <span className="text-3xl font-bold text-primary">
@@ -58,9 +62,7 @@ export function AgentProfile({ agent, onEdit }: AgentProfileProps) {
                     </div>
                     <div>
                         <p className="mb-1 text-sm font-medium tracking-wide text-muted-foreground uppercase">Type</p>
-                        <p className="text-lg font-semibold text-foreground">
-                            {agent.type === 'individual' ? 'Individual' : 'Professional'}
-                        </p>
+                        <p className="text-lg font-semibold text-foreground">{agent.type === 'individual' ? 'Individual' : 'Professional'}</p>
                     </div>
                     {agent.type === 'professional' && (
                         <>

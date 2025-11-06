@@ -50,4 +50,3 @@ interface ContactUsTranslations {
         send_another_button: string;
     };
 }
-

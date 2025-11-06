@@ -9,4 +9,3 @@ interface HeaderTranslations {
         confirm: string;
     };
 }
-

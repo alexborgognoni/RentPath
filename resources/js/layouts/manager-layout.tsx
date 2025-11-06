@@ -3,7 +3,7 @@ import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popo
 import type { BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Home, Menu } from 'lucide-react';
-import { useState, useEffect, type PropsWithChildren } from 'react';
+import { useEffect, useState, type PropsWithChildren } from 'react';
 
 interface ManagerLayoutProps extends PropsWithChildren {
     breadcrumbs?: BreadcrumbItem[];
@@ -38,21 +38,13 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
             />
 
             {/* Mobile overlay */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
+            {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
             {/* Main Content */}
             <div className="flex flex-1 flex-col overflow-hidden">
                 {/* Mobile Header */}
                 <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:hidden">
-                    <button
-                        onClick={() => setSidebarOpen(true)}
-                        className="text-muted-foreground hover:text-foreground"
-                    >
+                    <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground hover:text-foreground">
                         <Menu size={24} />
                     </button>
                     <div className="flex items-center space-x-3">

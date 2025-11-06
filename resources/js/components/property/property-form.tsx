@@ -1,17 +1,7 @@
 import type { Property, PropertyFormData } from '@/types/dashboard';
 import { router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import {
-    Bold,
-    Camera,
-    HousePlus,
-    Italic,
-    Link,
-    List,
-    ListOrdered,
-    Upload,
-    X
-} from 'lucide-react';
+import { Bold, Camera, HousePlus, Italic, Link, List, ListOrdered, Upload, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 interface PropertyFormProps {
@@ -97,11 +87,12 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
 
     // Check for changes whenever formData changes
     useEffect(() => {
-        const isChanged = Object.keys(formData).some((key) => {
-            const currentValue = formData[key as keyof FormData];
-            const initialValue = initialFormData[key as keyof FormData];
-            return currentValue !== initialValue;
-        }) || selectedImage !== null;
+        const isChanged =
+            Object.keys(formData).some((key) => {
+                const currentValue = formData[key as keyof FormData];
+                const initialValue = initialFormData[key as keyof FormData];
+                return currentValue !== initialValue;
+            }) || selectedImage !== null;
         setHasChanges(isChanged);
     }, [formData, selectedImage]);
 
@@ -186,7 +177,6 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
         return Object.keys(newErrors).length === 0;
     };
 
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -255,7 +245,7 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
             setTimeout(() => {
                 const editor = document.getElementById('description-editor') as HTMLDivElement;
                 const links = editor.querySelectorAll('a');
-                links.forEach(link => {
+                links.forEach((link) => {
                     if (!link.classList.contains('text-primary')) {
                         link.classList.add('text-primary', 'hover:underline');
                     }
@@ -269,7 +259,6 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
         const content = e.currentTarget.innerHTML;
         setFormData({ ...formData, description: content });
     };
-
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -313,7 +302,7 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-background/80 p-4 backdrop-blur-sm">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -341,35 +330,23 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Property Image Upload */}
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-foreground">
-                                Property Image
-                            </label>
+                            <label className="mb-2 block text-sm font-medium text-foreground">Property Image</label>
                             <div className="relative">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageSelect}
-                                    className="hidden"
-                                    id="property-image"
-                                />
+                                <input type="file" accept="image/*" onChange={handleImageSelect} className="hidden" id="property-image" />
                                 {imagePreview ? (
-                                    <div className="relative w-full h-64 rounded-xl overflow-hidden">
-                                        <img
-                                            src={imagePreview}
-                                            alt="Property preview"
-                                            className="w-full h-full object-cover"
-                                        />
+                                    <div className="relative h-64 w-full overflow-hidden rounded-xl">
+                                        <img src={imagePreview} alt="Property preview" className="h-full w-full object-cover" />
                                         <div className="absolute top-2 right-2 flex gap-2">
                                             <button
                                                 type="button"
                                                 onClick={handleRemoveImage}
-                                                className="p-2 rounded-full bg-destructive text-white hover:bg-destructive/90 transition-colors cursor-pointer"
+                                                className="cursor-pointer rounded-full bg-destructive p-2 text-white transition-colors hover:bg-destructive/90"
                                             >
                                                 <X size={16} />
                                             </button>
                                             <label
                                                 htmlFor="property-image"
-                                                className="p-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors cursor-pointer"
+                                                className="cursor-pointer rounded-full bg-primary p-2 text-white transition-colors hover:bg-primary/90"
                                             >
                                                 <Camera size={16} />
                                             </label>
@@ -378,26 +355,17 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                 ) : (
                                     <label
                                         htmlFor="property-image"
-                                        className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-all"
+                                        className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border transition-all hover:bg-muted/50"
                                     >
                                         <div className="text-center">
-                                            <Upload
-                                                size={32}
-                                                className="text-muted-foreground mx-auto mb-2"
-                                            />
-                                            <p className="text-foreground font-medium mb-1">
-                                                Upload property image
-                                            </p>
-                                            <p className="text-muted-foreground text-sm">
-                                                Click or drag an image here
-                                            </p>
+                                            <Upload size={32} className="mx-auto mb-2 text-muted-foreground" />
+                                            <p className="mb-1 font-medium text-foreground">Upload property image</p>
+                                            <p className="text-sm text-muted-foreground">Click or drag an image here</p>
                                         </div>
                                     </label>
                                 )}
                             </div>
-                            {imageError && (
-                                <p className="mt-1 text-sm text-destructive">{imageError}</p>
-                            )}
+                            {imageError && <p className="mt-1 text-sm text-destructive">{imageError}</p>}
                         </div>
 
                         {/* Property Title */}
@@ -410,18 +378,18 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                 required
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                 placeholder="Enter property title"
                             />
-                            {errors.title && (
-                                <p className="mt-1 text-sm text-destructive">{errors.title}</p>
-                            )}
+                            {errors.title && <p className="mt-1 text-sm text-destructive">{errors.title}</p>}
                         </div>
 
                         {/* Address Fields */}
                         <div className="space-y-4">
-                            <h3 className="text-sm font-medium text-foreground">Address <span className="text-destructive">*</span></h3>
-                            
+                            <h3 className="text-sm font-medium text-foreground">
+                                Address <span className="text-destructive">*</span>
+                            </h3>
+
                             {/* Street Address Row */}
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
                                 <div>
@@ -433,14 +401,12 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                         required
                                         value={formData.house_number}
                                         onChange={(e) => setFormData({ ...formData, house_number: e.target.value })}
-                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                         placeholder="123"
                                     />
-                                    {errors.house_number && (
-                                        <p className="mt-1 text-xs text-destructive">{errors.house_number}</p>
-                                    )}
+                                    {errors.house_number && <p className="mt-1 text-xs text-destructive">{errors.house_number}</p>}
                                 </div>
-                                
+
                                 <div className="sm:col-span-3">
                                     <label className="mb-1 block text-xs font-medium text-muted-foreground">
                                         Street Name <span className="text-destructive">*</span>
@@ -450,15 +416,13 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                         required
                                         value={formData.street_name}
                                         onChange={(e) => setFormData({ ...formData, street_name: e.target.value })}
-                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                         placeholder="Main Street"
                                     />
-                                    {errors.street_name && (
-                                        <p className="mt-1 text-xs text-destructive">{errors.street_name}</p>
-                                    )}
+                                    {errors.street_name && <p className="mt-1 text-xs text-destructive">{errors.street_name}</p>}
                                 </div>
                             </div>
-                            
+
                             {/* Optional Address Line 2 */}
                             <div>
                                 <label className="mb-1 block text-xs font-medium text-muted-foreground">
@@ -468,11 +432,11 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                     type="text"
                                     value={formData.street_line2}
                                     onChange={(e) => setFormData({ ...formData, street_line2: e.target.value })}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                     placeholder="Apartment, suite, unit, etc."
                                 />
                             </div>
-                            
+
                             {/* City, State, Postal Code Row */}
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                                 <div>
@@ -484,14 +448,12 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                         required
                                         value={formData.city}
                                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                         placeholder="Zurich"
                                     />
-                                    {errors.city && (
-                                        <p className="mt-1 text-xs text-destructive">{errors.city}</p>
-                                    )}
+                                    {errors.city && <p className="mt-1 text-xs text-destructive">{errors.city}</p>}
                                 </div>
-                                
+
                                 <div>
                                     <label className="mb-1 block text-xs font-medium text-muted-foreground">
                                         State/Region <span className="text-muted-foreground">(Optional)</span>
@@ -500,11 +462,11 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                         type="text"
                                         value={formData.state}
                                         onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                         placeholder="Canton"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label className="mb-1 block text-xs font-medium text-muted-foreground">
                                         Postal Code <span className="text-destructive">*</span>
@@ -514,15 +476,13 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                         required
                                         value={formData.postal_code}
                                         onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                         placeholder="8001"
                                     />
-                                    {errors.postal_code && (
-                                        <p className="mt-1 text-xs text-destructive">{errors.postal_code}</p>
-                                    )}
+                                    {errors.postal_code && <p className="mt-1 text-xs text-destructive">{errors.postal_code}</p>}
                                 </div>
                             </div>
-                            
+
                             {/* Country */}
                             <div className="sm:w-1/3">
                                 <label className="mb-1 block text-xs font-medium text-muted-foreground">
@@ -532,7 +492,7 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                     required
                                     value={formData.country}
                                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                 >
                                     <option value="CH">Switzerland</option>
                                     <option value="DE">Germany</option>
@@ -545,17 +505,13 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                     <option value="BE">Belgium</option>
                                     <option value="ES">Spain</option>
                                 </select>
-                                {errors.country && (
-                                    <p className="mt-1 text-xs text-destructive">{errors.country}</p>
-                                )}
+                                {errors.country && <p className="mt-1 text-xs text-destructive">{errors.country}</p>}
                             </div>
                         </div>
 
                         {/* Description with WYSIWYG Editor */}
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-foreground">
-                                Description
-                            </label>
+                            <label className="mb-2 block text-sm font-medium text-foreground">Description</label>
 
                             {/* Formatting Toolbar */}
                             <div className="mb-2 flex items-center space-x-1 rounded-lg border border-border bg-background/50 p-1">
@@ -606,14 +562,14 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                 id="description-editor"
                                 contentEditable
                                 onInput={handleContentChange}
-                                className="min-h-[168px] w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 [&_a]:text-primary [&_a]:hover:underline"
-                                style={{ 
+                                className="min-h-[168px] w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none [&_a]:text-primary [&_a]:hover:underline"
+                                style={{
                                     overflowWrap: 'break-word',
-                                    wordWrap: 'break-word'
+                                    wordWrap: 'break-word',
                                 }}
                                 suppressContentEditableWarning={true}
                                 dangerouslySetInnerHTML={{
-                                    __html: formData.description || '<p class="text-muted-foreground">Describe your property...</p>'
+                                    __html: formData.description || '<p class="text-muted-foreground">Describe your property...</p>',
                                 }}
                             />
                         </div>
@@ -626,7 +582,7 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                             <select
                                 value={formData.type}
                                 onChange={(e) => setFormData({ ...formData, type: e.target.value as Property['type'] })}
-                                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                             >
                                 {propertyTypeOptions.map((option) => (
                                     <option key={option.value} value={option.value}>
@@ -648,11 +604,9 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                     max="20"
                                     value={formData.bedrooms}
                                     onChange={(e) => setFormData({ ...formData, bedrooms: parseInt(e.target.value) || 0 })}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                 />
-                                {errors.bedrooms && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.bedrooms}</p>
-                                )}
+                                {errors.bedrooms && <p className="mt-1 text-sm text-destructive">{errors.bedrooms}</p>}
                             </div>
 
                             <div>
@@ -666,28 +620,22 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                     max="10"
                                     value={formData.bathrooms}
                                     onChange={(e) => setFormData({ ...formData, bathrooms: parseFloat(e.target.value) || 0 })}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                 />
-                                {errors.bathrooms && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.bathrooms}</p>
-                                )}
+                                {errors.bathrooms && <p className="mt-1 text-sm text-destructive">{errors.bathrooms}</p>}
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium text-foreground">
-                                    Parking Spots
-                                </label>
+                                <label className="mb-2 block text-sm font-medium text-foreground">Parking Spots</label>
                                 <input
                                     type="number"
                                     min="0"
                                     max="20"
                                     value={formData.parking_spots}
                                     onChange={(e) => setFormData({ ...formData, parking_spots: parseInt(e.target.value) || 0 })}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                 />
-                                {errors.parking_spots && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.parking_spots}</p>
-                                )}
+                                {errors.parking_spots && <p className="mt-1 text-sm text-destructive">{errors.parking_spots}</p>}
                             </div>
                         </div>
 
@@ -705,16 +653,12 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                     step="0.01"
                                     value={formData.size}
                                     onChange={(e) => setFormData({ ...formData, size: parseFloat(e.target.value) || 0 })}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 pr-28 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 pr-28 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                     placeholder="Enter size"
                                 />
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                                    m²
-                                </div>
+                                <div className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-muted-foreground">m²</div>
                             </div>
-                            {errors.size && (
-                                <p className="mt-1 text-sm text-destructive">{errors.size}</p>
-                            )}
+                            {errors.size && <p className="mt-1 text-sm text-destructive">{errors.size}</p>}
                         </div>
 
                         {/* Monthly Rent */}
@@ -729,15 +673,17 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                     min="0"
                                     step="0.01"
                                     value={formData.rent_amount}
-                                    onChange={(e) => setFormData({ ...formData, rent_amount: e.target.value === '' ? '' : parseFloat(e.target.value) })}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 pr-20 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, rent_amount: e.target.value === '' ? '' : parseFloat(e.target.value) })
+                                    }
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 pr-20 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                     placeholder="0.00"
                                 />
-                                <div className="absolute right-1 top-1">
+                                <div className="absolute top-1 right-1">
                                     <select
                                         value={formData.rent_currency}
                                         onChange={(e) => setFormData({ ...formData, rent_currency: e.target.value as Property['rent_currency'] })}
-                                        className="h-10 rounded-md border-0 bg-transparent pl-2 pr-1 text-sm text-foreground focus:outline-none focus:ring-0"
+                                        className="h-10 rounded-md border-0 bg-transparent pr-1 pl-2 text-sm text-foreground focus:ring-0 focus:outline-none"
                                     >
                                         {currencyOptions.map((option) => (
                                             <option key={option.value} value={option.value}>
@@ -747,22 +693,18 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                     </select>
                                 </div>
                             </div>
-                            {errors.rent_amount && (
-                                <p className="mt-1 text-sm text-destructive">{errors.rent_amount}</p>
-                            )}
+                            {errors.rent_amount && <p className="mt-1 text-sm text-destructive">{errors.rent_amount}</p>}
                         </div>
 
                         {/* Available Date */}
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-foreground">
-                                Available Date
-                            </label>
+                            <label className="mb-2 block text-sm font-medium text-foreground">Available Date</label>
                             <div className="relative">
                                 <input
                                     type="date"
                                     value={formData.available_date}
                                     onChange={(e) => setFormData({ ...formData, available_date: e.target.value })}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -799,12 +741,8 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                         className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl"
                     >
                         <div className="text-center">
-                            <h3 className="mb-2 text-lg font-medium text-foreground">
-                                Discard Changes?
-                            </h3>
-                            <p className="mb-6 text-sm text-muted-foreground">
-                                You have unsaved changes. Are you sure you want to discard them?
-                            </p>
+                            <h3 className="mb-2 text-lg font-medium text-foreground">Discard Changes?</h3>
+                            <p className="mb-6 text-sm text-muted-foreground">You have unsaved changes. Are you sure you want to discard them?</p>
                             <div className="flex space-x-3">
                                 <button
                                     onClick={() => setShowDiscardDialog(false)}

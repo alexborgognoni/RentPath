@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import { usePage } from '@inertiajs/react';
-import { translate } from '@/utils/translate-utils';
 import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
+import { X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function CookieBanner() {
     const { translations } = usePage<SharedData>().props;
@@ -18,30 +18,39 @@ export function CookieBanner() {
     }, []);
 
     const acceptAll = () => {
-        localStorage.setItem('cookie-consent', JSON.stringify({
-            necessary: true,
-            analytics: true,
-            marketing: true,
-            timestamp: Date.now()
-        }));
+        localStorage.setItem(
+            'cookie-consent',
+            JSON.stringify({
+                necessary: true,
+                analytics: true,
+                marketing: true,
+                timestamp: Date.now(),
+            }),
+        );
         setIsVisible(false);
     };
 
     const acceptNecessary = () => {
-        localStorage.setItem('cookie-consent', JSON.stringify({
-            necessary: true,
-            analytics: false,
-            marketing: false,
-            timestamp: Date.now()
-        }));
+        localStorage.setItem(
+            'cookie-consent',
+            JSON.stringify({
+                necessary: true,
+                analytics: false,
+                marketing: false,
+                timestamp: Date.now(),
+            }),
+        );
         setIsVisible(false);
     };
 
     const savePreferences = (preferences: { necessary: boolean; analytics: boolean; marketing: boolean }) => {
-        localStorage.setItem('cookie-consent', JSON.stringify({
-            ...preferences,
-            timestamp: Date.now()
-        }));
+        localStorage.setItem(
+            'cookie-consent',
+            JSON.stringify({
+                ...preferences,
+                timestamp: Date.now(),
+            }),
+        );
         setIsVisible(false);
         setShowPreferences(false);
     };
@@ -53,43 +62,41 @@ export function CookieBanner() {
     }
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6">
+        <div className="fixed right-0 bottom-0 left-0 z-50 p-4 sm:p-6">
             <div className="mx-auto max-w-7xl">
                 <div className="relative rounded-2xl border border-border bg-card shadow-2xl">
                     <div className="p-6 sm:p-8">
-                        <div className="flex items-start justify-between mb-4">
-                            <h3 className="text-xl sm:text-2xl font-bold text-foreground">
-                                {translate(translations, 'cookie-banner.banner.title')}
-                            </h3>
+                        <div className="mb-4 flex items-start justify-between">
+                            <h3 className="text-xl font-bold text-foreground sm:text-2xl">{translate(translations, 'cookie-banner.banner.title')}</h3>
                             <button
                                 onClick={acceptNecessary}
-                                className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-muted cursor-pointer"
+                                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors hover:bg-muted"
                                 aria-label="Close"
                             >
                                 <X className="h-5 w-5 text-muted-foreground" />
                             </button>
                         </div>
 
-                        <p className="mb-6 text-base sm:text-lg text-muted-foreground leading-relaxed">
+                        <p className="mb-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
                             {translate(translations, 'cookie-banner.banner.description')}
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row">
                             <button
                                 onClick={acceptAll}
-                                className="flex-1 rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center font-semibold text-white shadow-lg transition-all hover:shadow-xl cursor-pointer"
+                                className="flex-1 cursor-pointer rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                             >
                                 {translate(translations, 'cookie-banner.banner.accept_all')}
                             </button>
                             <button
                                 onClick={acceptNecessary}
-                                className="flex-1 rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80 cursor-pointer"
+                                className="flex-1 cursor-pointer rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80"
                             >
                                 {translate(translations, 'cookie-banner.banner.necessary_only')}
                             </button>
                             <button
                                 onClick={() => setShowPreferences(true)}
-                                className="flex-1 rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80 cursor-pointer"
+                                className="flex-1 cursor-pointer rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80"
                             >
                                 {translate(translations, 'cookie-banner.banner.customize')}
                             </button>
@@ -104,7 +111,7 @@ export function CookieBanner() {
 function CookiePreferences({
     translations,
     onSave,
-    onBack
+    onBack,
 }: {
     translations: SharedData['translations'];
     onSave: (preferences: { necessary: boolean; analytics: boolean; marketing: boolean }) => void;
@@ -113,40 +120,44 @@ function CookiePreferences({
     const [preferences, setPreferences] = useState({
         necessary: true,
         analytics: true,
-        marketing: true
+        marketing: true,
     });
 
     const togglePreference = (key: 'analytics' | 'marketing') => {
-        setPreferences(prev => ({
+        setPreferences((prev) => ({
             ...prev,
-            [key]: !prev[key]
+            [key]: !prev[key],
         }));
     };
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6">
+        <div className="fixed right-0 bottom-0 left-0 z-50 p-4 sm:p-6">
             <div className="mx-auto max-w-3xl">
                 <div className="relative rounded-2xl border border-border bg-card shadow-2xl">
                     <div className="p-6 sm:p-8">
-                        <div className="flex items-start justify-between mb-6">
-                            <h3 className="text-xl sm:text-2xl font-bold text-foreground">
+                        <div className="mb-6 flex items-start justify-between">
+                            <h3 className="text-xl font-bold text-foreground sm:text-2xl">
                                 {translate(translations, 'cookie-banner.preferences.title')}
                             </h3>
                             <button
                                 onClick={onBack}
-                                className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-muted cursor-pointer"
+                                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors hover:bg-muted"
                                 aria-label="Back"
                             >
                                 <X className="h-5 w-5 text-muted-foreground" />
                             </button>
                         </div>
 
-                        <div className="space-y-4 mb-6">
+                        <div className="mb-6 space-y-4">
                             {/* Necessary Cookies */}
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h4 className="font-semibold text-foreground">{translate(translations, 'cookie-banner.preferences.necessary.title')}</h4>
-                                    <span className="text-sm text-muted-foreground">{translate(translations, 'cookie-banner.preferences.necessary.always_active')}</span>
+                                <div className="mb-2 flex items-center justify-between">
+                                    <h4 className="font-semibold text-foreground">
+                                        {translate(translations, 'cookie-banner.preferences.necessary.title')}
+                                    </h4>
+                                    <span className="text-sm text-muted-foreground">
+                                        {translate(translations, 'cookie-banner.preferences.necessary.always_active')}
+                                    </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
                                     {translate(translations, 'cookie-banner.preferences.necessary.description')}
@@ -155,14 +166,14 @@ function CookiePreferences({
 
                             {/* Analytics Cookies */}
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h4 className="font-semibold text-foreground">{translate(translations, 'cookie-banner.preferences.analytics.title')}</h4>
+                                <div className="mb-2 flex items-center justify-between">
+                                    <h4 className="font-semibold text-foreground">
+                                        {translate(translations, 'cookie-banner.preferences.analytics.title')}
+                                    </h4>
                                     <button
                                         onClick={() => togglePreference('analytics')}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                                            preferences.analytics
-                                                ? 'bg-gradient-to-r from-primary to-secondary'
-                                                : 'bg-muted'
+                                        className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors ${
+                                            preferences.analytics ? 'bg-gradient-to-r from-primary to-secondary' : 'bg-muted'
                                         }`}
                                         role="switch"
                                         aria-checked={preferences.analytics}
@@ -181,14 +192,14 @@ function CookiePreferences({
 
                             {/* Marketing Cookies */}
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h4 className="font-semibold text-foreground">{translate(translations, 'cookie-banner.preferences.marketing.title')}</h4>
+                                <div className="mb-2 flex items-center justify-between">
+                                    <h4 className="font-semibold text-foreground">
+                                        {translate(translations, 'cookie-banner.preferences.marketing.title')}
+                                    </h4>
                                     <button
                                         onClick={() => togglePreference('marketing')}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                                            preferences.marketing
-                                                ? 'bg-gradient-to-r from-primary to-secondary'
-                                                : 'bg-muted'
+                                        className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors ${
+                                            preferences.marketing ? 'bg-gradient-to-r from-primary to-secondary' : 'bg-muted'
                                         }`}
                                         role="switch"
                                         aria-checked={preferences.marketing}
@@ -206,16 +217,16 @@ function CookiePreferences({
                             </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row">
                             <button
                                 onClick={() => onSave(preferences)}
-                                className="flex-1 rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center font-semibold text-white shadow-lg transition-all hover:shadow-xl cursor-pointer"
+                                className="flex-1 cursor-pointer rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                             >
                                 {translate(translations, 'cookie-banner.preferences.save_preferences')}
                             </button>
                             <button
                                 onClick={onBack}
-                                className="flex-1 rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80 cursor-pointer"
+                                className="flex-1 cursor-pointer rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80"
                             >
                                 {translate(translations, 'cookie-banner.preferences.back')}
                             </button>

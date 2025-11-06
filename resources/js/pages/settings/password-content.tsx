@@ -56,7 +56,7 @@ export default function PasswordContent() {
                                     ref={currentPasswordInput}
                                     name="current_password"
                                     type="password"
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                     autoComplete="current-password"
                                     placeholder={t(translations.settings, 'password.current_password_placeholder')}
                                 />
@@ -72,7 +72,7 @@ export default function PasswordContent() {
                                     ref={passwordInput}
                                     name="password"
                                     type="password"
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                     autoComplete="new-password"
                                     placeholder={t(translations.settings, 'password.new_password_placeholder')}
                                 />
@@ -87,7 +87,7 @@ export default function PasswordContent() {
                                     id="password_confirmation"
                                     name="password_confirmation"
                                     type="password"
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                                     autoComplete="new-password"
                                     placeholder={t(translations.settings, 'password.confirm_password_placeholder')}
                                 />
@@ -98,9 +98,11 @@ export default function PasswordContent() {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
+                                    className="cursor-pointer rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                                 >
-                                    {processing ? t(translations.settings, 'password.updating') : t(translations.settings, 'password.update_password')}
+                                    {processing
+                                        ? t(translations.settings, 'password.updating')
+                                        : t(translations.settings, 'password.update_password')}
                                 </button>
 
                                 <Transition
@@ -110,7 +112,7 @@ export default function PasswordContent() {
                                     leave="transition ease-in-out"
                                     leaveTo="opacity-0"
                                 >
-                                    <p className="text-sm font-medium text-success">{t(translations.settings, 'password.password_updated')}</p>
+                                    <p className="text-success text-sm font-medium">{t(translations.settings, 'password.password_updated')}</p>
                                 </Transition>
                             </div>
                         </>

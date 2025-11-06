@@ -30,13 +30,9 @@ export default function PropertyPage() {
         return (
             <ManagerLayout breadcrumbs={breadcrumbs}>
                 <Head title={translate(translations, 'dashboard.propertyNotFound')} />
-                <div className="rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm mt-6">
-                    <h2 className="mb-4 text-2xl font-bold text-destructive">
-                        {error || translate(translations, 'dashboard.propertyNotFound')}
-                    </h2>
-                    <p className="mb-6 text-muted-foreground">
-                        The property you're looking for doesn't exist or you don't have access to it.
-                    </p>
+                <div className="mt-6 rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm">
+                    <h2 className="mb-4 text-2xl font-bold text-destructive">{error || translate(translations, 'dashboard.propertyNotFound')}</h2>
+                    <p className="mb-6 text-muted-foreground">The property you're looking for doesn't exist or you don't have access to it.</p>
                     <a
                         href="/dashboard"
                         className="rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105"
@@ -53,7 +49,7 @@ export default function PropertyPage() {
             <Head title={property.title} />
             <div className="mt-6 mb-6 grid grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* Left Column - Main Content */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="space-y-8 lg:col-span-2">
                     <PropertyInfo property={property} />
                 </div>
 

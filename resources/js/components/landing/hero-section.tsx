@@ -1,8 +1,8 @@
+import { useIsMobile } from '@/hooks/use-mobile';
+import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { useIsMobile } from '@/hooks/use-mobile';
-import type { SharedData } from '@/types';
 
 export function HeroSection() {
     const page = usePage<SharedData>();
@@ -27,7 +27,7 @@ export function HeroSection() {
                             transition: { duration: 0.8 },
                             viewport: { once: true, amount: 0.6 },
                         })}
-                        className="text-text-primary dark:text-text-primary mb-6 xs:mb-8 text-center text-4xl xs:text-5xl leading-tight font-bold"
+                        className="text-text-primary dark:text-text-primary mb-6 text-center text-4xl leading-tight font-bold xs:mb-8 xs:text-5xl"
                     >
                         {translate(translations, 'landing.hero.heading_primary')}
                         <br />
@@ -45,16 +45,16 @@ export function HeroSection() {
                     </Heading>
 
                     {/* Image */}
-                    <div className="relative w-full h-full mb-6 xs:mb-8">
+                    <div className="relative mb-6 h-full w-full xs:mb-8">
                         <img
                             src="/images/hero_section/hero_section_light.png"
                             alt="Hero section illustration"
-                            className="w-full h-full object-contain dark:hidden drop-shadow-lg"
+                            className="h-full w-full object-contain drop-shadow-lg dark:hidden"
                         />
                         <img
                             src="/images/hero_section/hero_section_dark.png"
                             alt="Hero section illustration"
-                            className="w-full h-full object-contain hidden dark:block drop-shadow-lg"
+                            className="hidden h-full w-full object-contain drop-shadow-lg dark:block"
                         />
                     </div>
 
@@ -66,7 +66,7 @@ export function HeroSection() {
                             transition: { delay: 0.3, duration: 1 },
                             viewport: { once: true, amount: 0.6 },
                         })}
-                        className="text-center mb-8 xs:mb-12 text-lg xs:text-xl text-muted-foreground"
+                        className="mb-8 text-center text-lg text-muted-foreground xs:mb-12 xs:text-xl"
                     >
                         {translate(translations, 'landing.hero.subtitle')}
                     </Subtitle>
@@ -83,13 +83,13 @@ export function HeroSection() {
                     >
                         <a
                             href="/register"
-                            className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-6 xs:px-8 py-3 xs:py-4 text-center text-base xs:text-lg font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105"
+                            className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center text-base font-semibold whitespace-nowrap shadow-lg xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:scale-105"
                         >
                             {translate(translations, 'landing.hero.cta_primary_guest')}
                         </a>
                         <a
                             href="#problems"
-                            className="min-w-[200px] rounded-lg border border-border bg-surface px-6 xs:px-8 py-3 xs:py-4 text-center text-base xs:text-lg font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80"
+                            className="min-w-[200px] rounded-lg border border-border bg-surface px-6 py-3 text-center text-base font-semibold whitespace-nowrap text-foreground xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:bg-surface/80"
                         >
                             {translate(translations, 'landing.hero.cta_secondary')}
                         </a>
@@ -99,7 +99,7 @@ export function HeroSection() {
                 {/* Large screens - 2x2 Grid */}
                 <div className="hidden lg:block">
                     {/* Row 1: 50/50 split */}
-                    <div className="grid grid-cols-2 gap-6 xl:gap-8 mb-6 xl:mb-8">
+                    <div className="mb-6 grid grid-cols-2 gap-6 xl:mb-8 xl:gap-8">
                         {/* Row 1, Col 1: Primary heading */}
                         <Heading
                             {...(!isMobile && {
@@ -108,33 +108,33 @@ export function HeroSection() {
                                 transition: { duration: 0.8 },
                                 viewport: { once: true, amount: 0.6 },
                             })}
-                            className="text-text-primary dark:text-text-primary text-4xl xs:text-5xl leading-tight font-bold lg:text-6xl xl:text-7xl flex items-center"
+                            className="text-text-primary dark:text-text-primary flex items-center text-4xl leading-tight font-bold xs:text-5xl lg:text-6xl xl:text-7xl"
                         >
                             {translate(translations, 'landing.hero.heading_primary')}
                         </Heading>
 
                         {/* Row 1, Col 2: Image */}
-                        <div className="relative w-full h-full lg:w-2/3 lg:mx-auto xl:w-full">
+                        <div className="relative h-full w-full lg:mx-auto lg:w-2/3 xl:w-full">
                             <img
                                 src="/images/hero_section/hero_section_light.png"
                                 alt="Hero section illustration"
-                                className="w-full h-full object-contain dark:hidden drop-shadow-lg"
+                                className="h-full w-full object-contain drop-shadow-lg dark:hidden"
                             />
                             <img
                                 src="/images/hero_section/hero_section_dark.png"
                                 alt="Hero section illustration"
-                                className="w-full h-full object-contain hidden dark:block drop-shadow-lg"
+                                className="hidden h-full w-full object-contain drop-shadow-lg dark:block"
                             />
                         </div>
                     </div>
 
                     {/* Row 2: 2/5 and 3/5 split */}
-                    <div className="grid gap-6 xl:gap-8 lg:grid-cols-2 xl:grid-cols-[2fr_3fr]">
+                    <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-[2fr_3fr] xl:gap-8">
                         {/* Row 2, Col 1: Get Started button and Subtitle */}
                         <div className="flex flex-col gap-4 xl:gap-6">
                             <a
                                 href="/register"
-                                className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary lg:px-5 lg:py-3 xl:px-6 xl:py-3 text-center lg:text-lg xl:text-xl font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105"
+                                className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary text-center font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
                             >
                                 {translate(translations, 'landing.hero.cta_primary_guest')}
                             </a>
@@ -146,7 +146,7 @@ export function HeroSection() {
                                     transition: { delay: 0.3, duration: 1 },
                                     viewport: { once: true, amount: 0.6 },
                                 })}
-                                className="text-lg xs:text-xl text-muted-foreground lg:text-xl xl:text-2xl"
+                                className="text-lg text-muted-foreground xs:text-xl lg:text-xl xl:text-2xl"
                             >
                                 {translate(translations, 'landing.hero.subtitle')}
                             </Subtitle>
@@ -161,14 +161,14 @@ export function HeroSection() {
                                     transition: { duration: 1.5, ease: 'easeOut' },
                                     viewport: { once: true },
                                 })}
-                                className="inline-block bg-gradient-to-r from-primary to-secondary bg-[length:200%_100%] bg-clip-text text-transparent text-3xl xs:text-4xl leading-tight font-bold lg:text-5xl xl:text-6xl flex items-center justify-center"
+                                className="flex inline-block items-center justify-center bg-gradient-to-r from-primary to-secondary bg-[length:200%_100%] bg-clip-text text-3xl leading-tight font-bold text-transparent xs:text-4xl lg:text-5xl xl:text-6xl"
                             >
                                 {translate(translations, 'landing.hero.heading_highlighted')}
                             </HighlightedText>
 
                             <a
                                 href="#problems"
-                                className="min-w-[200px] rounded-lg border border-border bg-surface lg:px-5 lg:py-3 xl:px-6 xl:py-3 text-center lg:text-lg xl:text-xl font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80"
+                                className="min-w-[200px] rounded-lg border border-border bg-surface text-center font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
                             >
                                 {translate(translations, 'landing.hero.cta_secondary')}
                             </a>

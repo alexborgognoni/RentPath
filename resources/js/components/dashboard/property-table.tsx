@@ -1,9 +1,9 @@
+import type { SharedData } from '@/types';
+import type { Property } from '@/types/dashboard';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import type { SharedData } from '@/types';
-import { ChevronRight, Link as LinkIcon, Users, ArrowUpDown, ArrowUp, ArrowDown, Bed, Bath, Car } from 'lucide-react';
-import type { Property } from '@/types/dashboard';
-import { useState, useMemo, useEffect } from 'react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Bath, Bed, Car, ChevronRight, Link as LinkIcon, Users } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface PropertyTableProps {
     properties: Property[];
@@ -76,9 +76,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
         const config = statusConfig[status] || statusConfig.available;
         return (
-            <span className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium ${config.className}`}>
-                {config.label}
-            </span>
+            <span className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium ${config.className}`}>{config.label}</span>
         );
     };
 
@@ -86,68 +84,63 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
         if (!countryCode) return '';
 
         const countryNames: Record<string, string> = {
-            'CH': 'Switzerland',
-            'US': 'United States',
-            'GB': 'United Kingdom',
-            'DE': 'Germany',
-            'FR': 'France',
-            'IT': 'Italy',
-            'AT': 'Austria',
-            'BE': 'Belgium',
-            'NL': 'Netherlands',
-            'ES': 'Spain',
-            'PT': 'Portugal',
-            'SE': 'Sweden',
-            'NO': 'Norway',
-            'DK': 'Denmark',
-            'FI': 'Finland',
-            'PL': 'Poland',
-            'CZ': 'Czech Republic',
-            'HU': 'Hungary',
-            'RO': 'Romania',
-            'BG': 'Bulgaria',
-            'GR': 'Greece',
-            'IE': 'Ireland',
-            'LU': 'Luxembourg',
-            'CA': 'Canada',
-            'AU': 'Australia',
-            'NZ': 'New Zealand',
-            'JP': 'Japan',
-            'CN': 'China',
-            'KR': 'South Korea',
-            'IN': 'India',
-            'BR': 'Brazil',
-            'MX': 'Mexico',
-            'AR': 'Argentina',
-            'CL': 'Chile',
-            'ZA': 'South Africa',
-            'EG': 'Egypt',
-            'NG': 'Nigeria',
-            'KE': 'Kenya',
-            'SG': 'Singapore',
-            'TH': 'Thailand',
-            'MY': 'Malaysia',
-            'ID': 'Indonesia',
-            'PH': 'Philippines',
-            'VN': 'Vietnam',
-            'AE': 'United Arab Emirates',
-            'SA': 'Saudi Arabia',
-            'IL': 'Israel',
-            'TR': 'Turkey',
-            'RU': 'Russia',
-            'UA': 'Ukraine',
+            CH: 'Switzerland',
+            US: 'United States',
+            GB: 'United Kingdom',
+            DE: 'Germany',
+            FR: 'France',
+            IT: 'Italy',
+            AT: 'Austria',
+            BE: 'Belgium',
+            NL: 'Netherlands',
+            ES: 'Spain',
+            PT: 'Portugal',
+            SE: 'Sweden',
+            NO: 'Norway',
+            DK: 'Denmark',
+            FI: 'Finland',
+            PL: 'Poland',
+            CZ: 'Czech Republic',
+            HU: 'Hungary',
+            RO: 'Romania',
+            BG: 'Bulgaria',
+            GR: 'Greece',
+            IE: 'Ireland',
+            LU: 'Luxembourg',
+            CA: 'Canada',
+            AU: 'Australia',
+            NZ: 'New Zealand',
+            JP: 'Japan',
+            CN: 'China',
+            KR: 'South Korea',
+            IN: 'India',
+            BR: 'Brazil',
+            MX: 'Mexico',
+            AR: 'Argentina',
+            CL: 'Chile',
+            ZA: 'South Africa',
+            EG: 'Egypt',
+            NG: 'Nigeria',
+            KE: 'Kenya',
+            SG: 'Singapore',
+            TH: 'Thailand',
+            MY: 'Malaysia',
+            ID: 'Indonesia',
+            PH: 'Philippines',
+            VN: 'Vietnam',
+            AE: 'United Arab Emirates',
+            SA: 'Saudi Arabia',
+            IL: 'Israel',
+            TR: 'Turkey',
+            RU: 'Russia',
+            UA: 'Ukraine',
         };
 
         return countryNames[countryCode.toUpperCase()] || countryCode;
     };
 
     const formatAddress = (property: Property): string => {
-        const parts = [
-            property.house_number,
-            property.street_name,
-            property.city,
-            getCountryName(property.country),
-        ].filter(Boolean);
+        const parts = [property.house_number, property.street_name, property.city, getCountryName(property.country)].filter(Boolean);
         return parts.join(', ');
     };
 
@@ -277,55 +270,55 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
     const gridTemplateColumns = `${columnWidths.image}fr ${columnWidths.property}fr ${columnWidths.price}fr ${columnWidths.size}fr ${columnWidths.status}fr ${columnWidths.beds}fr ${columnWidths.baths}fr ${columnWidths.parking}fr ${columnWidths.applicants}fr ${columnWidths.actions}fr`;
 
     return (
-        <div className="overflow-hidden rounded-xl border border-border bg-card relative">
+        <div className="relative overflow-hidden rounded-xl border border-border bg-card">
             {/* Column Dividers - Full Height */}
-            <div className="absolute top-0 bottom-0 left-6 pointer-events-none" style={{ width: `calc(100% - 48px)` }}>
+            <div className="pointer-events-none absolute top-0 bottom-0 left-6" style={{ width: `calc(100% - 48px)` }}>
                 <div className="relative h-full" style={{ display: 'grid', gridTemplateColumns, gap: 0 }}>
                     {/* Image divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                     {/* Property divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                     {/* Price divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                     {/* Size divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                     {/* Status divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                     {/* Beds divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                     {/* Baths divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                     {/* Parking divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                     {/* Applicants divider */}
                     <div className="relative">
-                        <div className="absolute right-0 top-0 bottom-0 w-px bg-border/50" />
+                        <div className="absolute top-0 right-0 bottom-0 w-px bg-border/50" />
                     </div>
                 </div>
             </div>
 
             {/* Table Header */}
-            <div className="grid border-b border-border bg-muted/50 px-6 py-4 relative z-10" style={{ gridTemplateColumns, gap: 0 }}>
+            <div className="relative z-10 grid border-b border-border bg-muted/50 px-6 py-4" style={{ gridTemplateColumns, gap: 0 }}>
                 {/* Image column - no label */}
                 <div className="relative px-2">
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'image')}
                     />
                 </div>
@@ -333,14 +326,14 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 {/* Property */}
                 <div className="relative px-2">
                     <div
-                        className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        className="flex cursor-pointer items-center gap-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                         onClick={() => handleSort('title')}
                     >
                         <span>{translate(translations, 'dashboard.columnProperty')}</span>
                         {getSortIcon('title')}
                     </div>
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'property')}
                     />
                 </div>
@@ -348,14 +341,14 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 {/* Price */}
                 <div className="relative px-2">
                     <div
-                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        className="flex cursor-pointer items-center justify-center gap-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                         onClick={() => handleSort('rent_amount')}
                     >
                         <span>Price</span>
                         {getSortIcon('rent_amount')}
                     </div>
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'price')}
                     />
                 </div>
@@ -363,14 +356,14 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 {/* Size */}
                 <div className="relative px-2">
                     <div
-                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        className="flex cursor-pointer items-center justify-center gap-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                         onClick={() => handleSort('size')}
                     >
                         <span>Size</span>
                         {getSortIcon('size')}
                     </div>
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'size')}
                     />
                 </div>
@@ -378,14 +371,14 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 {/* Status */}
                 <div className="relative px-2">
                     <div
-                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        className="flex cursor-pointer items-center justify-center gap-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                         onClick={() => handleSort('status')}
                     >
                         <span>{translate(translations, 'dashboard.columnStatus')}</span>
                         {getSortIcon('status')}
                     </div>
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'status')}
                     />
                 </div>
@@ -393,14 +386,14 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 {/* Beds */}
                 <div className="relative px-2">
                     <div
-                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        className="flex cursor-pointer items-center justify-center gap-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                         onClick={() => handleSort('bedrooms')}
                     >
                         <span>Beds</span>
                         {getSortIcon('bedrooms')}
                     </div>
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'beds')}
                     />
                 </div>
@@ -408,14 +401,14 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 {/* Baths */}
                 <div className="relative px-2">
                     <div
-                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        className="flex cursor-pointer items-center justify-center gap-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                         onClick={() => handleSort('bathrooms')}
                     >
                         <span>Baths</span>
                         {getSortIcon('bathrooms')}
                     </div>
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'baths')}
                     />
                 </div>
@@ -423,14 +416,14 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 {/* Parking */}
                 <div className="relative px-2">
                     <div
-                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        className="flex cursor-pointer items-center justify-center gap-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                         onClick={() => handleSort('parking')}
                     >
                         <span>Parking</span>
                         {getSortIcon('parking')}
                     </div>
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'parking')}
                     />
                 </div>
@@ -438,29 +431,29 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 {/* Applicants */}
                 <div className="relative px-2">
                     <div
-                        className="flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                        className="flex cursor-pointer items-center justify-center gap-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                         onClick={() => handleSort('tenant_count')}
                     >
                         <span>{translate(translations, 'dashboard.columnApplicants')}</span>
                         {getSortIcon('tenant_count')}
                     </div>
                     <div
-                        className="absolute right-0 top-0 bottom-0 w-2 -mr-1 cursor-col-resize hover:bg-primary/30 transition-colors z-10 pointer-events-auto"
+                        className="pointer-events-auto absolute top-0 right-0 bottom-0 z-10 -mr-1 w-2 cursor-col-resize transition-colors hover:bg-primary/30"
                         onMouseDown={(e) => handleResizeStart(e, 'applicants')}
                     />
                 </div>
 
                 {/* Actions */}
-                <div className="px-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <div className="px-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase">
                     {translate(translations, 'dashboard.columnActions')}
                 </div>
             </div>
 
             {/* Table Body */}
-            <div className="divide-y divide-border relative z-10">
+            <div className="relative z-10 divide-y divide-border">
                 {sortedProperties.map((property) => {
                     // Find the main image
-                    const mainImage = property.images?.find(img => img.is_main) || property.images?.[0];
+                    const mainImage = property.images?.find((img) => img.is_main) || property.images?.[0];
 
                     const totalParkingSpots = (property.parking_spots_interior || 0) + (property.parking_spots_exterior || 0);
 
@@ -480,7 +473,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                                         className="h-16 w-full rounded-lg border border-border object-cover"
                                     />
                                 ) : (
-                                    <div className="h-16 w-full rounded-lg border border-border bg-muted flex items-center justify-center">
+                                    <div className="flex h-16 w-full items-center justify-center rounded-lg border border-border bg-muted">
                                         <span className="text-xs text-muted-foreground">No image</span>
                                     </div>
                                 )}
@@ -489,48 +482,38 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                             {/* Property */}
                             <div className="flex min-w-0 flex-col justify-center px-2">
                                 <div className="truncate font-semibold text-foreground">{property.title}</div>
-                                <div className="truncate text-sm text-muted-foreground">
-                                    {formatAddress(property)}
-                                </div>
+                                <div className="truncate text-sm text-muted-foreground">{formatAddress(property)}</div>
                             </div>
 
                             {/* Price */}
-                            <div className="flex flex-col justify-center items-center px-2">
-                                <div className="font-bold text-foreground">
-                                    €{formatNumber(property.rent_amount)}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                    {translate(translations, 'dashboard.perMonth')}
-                                </div>
+                            <div className="flex flex-col items-center justify-center px-2">
+                                <div className="font-bold text-foreground">€{formatNumber(property.rent_amount)}</div>
+                                <div className="text-sm text-muted-foreground">{translate(translations, 'dashboard.perMonth')}</div>
                             </div>
 
                             {/* Size */}
-                            <div className="flex flex-col justify-center items-center px-2">
-                                <div className="font-bold text-foreground">
-                                    {property.size ? formatNumber(property.size) : 'N/A'}
-                                </div>
+                            <div className="flex flex-col items-center justify-center px-2">
+                                <div className="font-bold text-foreground">{property.size ? formatNumber(property.size) : 'N/A'}</div>
                                 <div className="text-sm text-muted-foreground">m²</div>
                             </div>
 
                             {/* Status */}
-                            <div className="flex items-center justify-center px-2">
-                                {getStatusBadge(property.status || 'available')}
-                            </div>
+                            <div className="flex items-center justify-center px-2">{getStatusBadge(property.status || 'available')}</div>
 
                             {/* Beds */}
-                            <div className="flex items-center justify-center gap-2 text-sm px-2">
+                            <div className="flex items-center justify-center gap-2 px-2 text-sm">
                                 <Bed size={14} className="text-muted-foreground" />
                                 <span className="font-medium text-foreground">{formatNumber(property.bedrooms)}</span>
                             </div>
 
                             {/* Baths */}
-                            <div className="flex items-center justify-center gap-2 text-sm px-2">
+                            <div className="flex items-center justify-center gap-2 px-2 text-sm">
                                 <Bath size={14} className="text-muted-foreground" />
                                 <span className="font-medium text-foreground">{formatNumber(property.bathrooms)}</span>
                             </div>
 
                             {/* Parking */}
-                            <div className="flex items-center justify-center gap-2 text-sm px-2">
+                            <div className="flex items-center justify-center gap-2 px-2 text-sm">
                                 {totalParkingSpots > 0 ? (
                                     <>
                                         <Car size={14} className="text-muted-foreground" />

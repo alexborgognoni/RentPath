@@ -15,7 +15,7 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
     return (
         <BaseLayout>
             <Head title={isRejected ? t(translations.profile, 'unverified.rejected_title') : t(translations.profile, 'unverified.title')} />
-            <div className="flex-1 flex items-center justify-center p-4 py-8 lg:py-4">
+            <div className="flex flex-1 items-center justify-center p-4 py-8 lg:py-4">
                 <div className="mx-auto max-w-md px-6 text-center">
                     <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-8 xs:shadow-lg">
                         {isRejected ? (
@@ -26,28 +26,26 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
 
                                 <h1 className="mb-4 text-2xl font-bold text-foreground">{t(translations.profile, 'unverified.rejected_title')}</h1>
 
-                                <p className="mb-6 text-muted-foreground">
-                                    {t(translations.profile, 'unverified.rejected_description')}
-                                </p>
+                                <p className="mb-6 text-muted-foreground">{t(translations.profile, 'unverified.rejected_description')}</p>
 
                                 {rejectionReason && (
                                     <div className="mb-6 rounded-lg border-l-4 border-destructive bg-destructive/10 p-4 text-left">
-                                        <h3 className="mb-2 font-semibold text-foreground">{t(translations.profile, 'unverified.review_feedback')}</h3>
+                                        <h3 className="mb-2 font-semibold text-foreground">
+                                            {t(translations.profile, 'unverified.review_feedback')}
+                                        </h3>
                                         <p className="text-sm text-foreground">{rejectionReason}</p>
                                     </div>
                                 )}
                             </>
                         ) : (
                             <>
-                                <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-                                    <Clock className="text-primary h-8 w-8" />
+                                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                                    <Clock className="h-8 w-8 text-primary" />
                                 </div>
 
                                 <h1 className="mb-2 text-3xl font-bold text-foreground">{t(translations.profile, 'unverified.title')}</h1>
 
-                                <p className="mb-6 text-muted-foreground">
-                                    {t(translations.profile, 'unverified.thank_you_message')}
-                                </p>
+                                <p className="mb-6 text-muted-foreground">{t(translations.profile, 'unverified.thank_you_message')}</p>
                             </>
                         )}
 
@@ -56,7 +54,9 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
                                 <Shield className="mt-0.5 h-5 w-5 text-primary" />
                                 <div>
                                     <h3 className="font-semibold text-foreground">{t(translations.profile, 'unverified.identity_verification')}</h3>
-                                    <p className="text-sm text-muted-foreground">{t(translations.profile, 'unverified.identity_verification_desc')}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {t(translations.profile, 'unverified.identity_verification_desc')}
+                                    </p>
                                 </div>
                             </div>
 
@@ -71,7 +71,8 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
 
                         <div className="mb-6 rounded-lg border-l-4 border-primary bg-primary/10 p-4">
                             <p className="text-sm text-foreground">
-                                <strong>{t(translations.profile, 'unverified.review_time')}</strong> {t(translations.profile, 'unverified.review_time_desc')}
+                                <strong>{t(translations.profile, 'unverified.review_time')}</strong>{' '}
+                                {t(translations.profile, 'unverified.review_time_desc')}
                             </p>
                         </div>
 

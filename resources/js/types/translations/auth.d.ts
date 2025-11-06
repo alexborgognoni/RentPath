@@ -42,4 +42,3 @@ interface AuthTranslations {
         success_message: string;
     };
 }
-

@@ -29,7 +29,14 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         <>
                             <div className="grid gap-2">
                                 <Label htmlFor="email">{t(translations.auth, 'forgot_password.email_label')}</Label>
-                                <Input id="email" type="email" name="email" autoComplete="off" autoFocus placeholder={t(translations.auth, 'forgot_password.email_placeholder')} />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    autoComplete="off"
+                                    autoFocus
+                                    placeholder={t(translations.auth, 'forgot_password.email_placeholder')}
+                                />
 
                                 <InputError message={errors.email} />
                             </div>

@@ -1,7 +1,7 @@
-import { Building2, User } from 'lucide-react';
 import { SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
 import { translate as t } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
+import { Building2, User } from 'lucide-react';
 
 interface UserTypeToggleProps {
     userType: 'tenant' | 'property-manager';

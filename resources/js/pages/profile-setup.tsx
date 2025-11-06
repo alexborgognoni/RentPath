@@ -1,12 +1,12 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BaseLayout } from '@/layouts/base-layout';
-import type { PropertyManager, User } from '@/types/dashboard';
 import { type SharedData } from '@/types';
+import type { PropertyManager, User } from '@/types/dashboard';
 import { translate as t } from '@/utils/translate-utils';
-import { Head, useForm, router, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Building, ChevronDown, Info, Trash2, Upload, User as UserIcon, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useEffect, useState } from 'react';
 
 interface ProfileSetupProps {
     user: User;
@@ -19,10 +19,10 @@ interface ProfileSetupProps {
 export default function ProfileSetup({ user, propertyManager, isEditing = false, rejectionReason, rejectedFields = [] }: ProfileSetupProps) {
     const { translations } = usePage<SharedData>().props;
     const [selectedType, setSelectedType] = useState<'individual' | 'professional'>(propertyManager?.type || 'individual');
-    const [clientErrors, setClientErrors] = useState<{[key: string]: string}>({});
+    const [clientErrors, setClientErrors] = useState<{ [key: string]: string }>({});
     const [showLicenseTooltip, setShowLicenseTooltip] = useState(false);
     const [generalError, setGeneralError] = useState<string | null>(null);
-    
+
     // Track original values for change detection
     const originalValues = {
         type: propertyManager?.type || 'individual',
@@ -64,14 +64,37 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         if (!propertyManager?.phone_country_code) {
             // Only set geolocation for new profiles
             fetch('https://ipapi.co/json/')
-                .then(response => response.json())
-                .then(data => {
-                    const countryCodeMap: {[key: string]: string} = {
-                        'US': '+1', 'CA': '+1', 'GB': '+44', 'DE': '+49', 'FR': '+33', 'IT': '+39',
-                        'ES': '+34', 'AU': '+61', 'JP': '+81', 'KR': '+82', 'CN': '+86', 'IN': '+91',
-                        'BR': '+55', 'MX': '+52', 'AR': '+54', 'RU': '+7', 'ZA': '+27', 'EG': '+20',
-                        'NG': '+234', 'KE': '+254', 'NL': '+31', 'BE': '+32', 'CH': '+41', 'AT': '+43',
-                        'SE': '+46', 'NO': '+47', 'DK': '+45', 'FI': '+358'
+                .then((response) => response.json())
+                .then((data) => {
+                    const countryCodeMap: { [key: string]: string } = {
+                        US: '+1',
+                        CA: '+1',
+                        GB: '+44',
+                        DE: '+49',
+                        FR: '+33',
+                        IT: '+39',
+                        ES: '+34',
+                        AU: '+61',
+                        JP: '+81',
+                        KR: '+82',
+                        CN: '+86',
+                        IN: '+91',
+                        BR: '+55',
+                        MX: '+52',
+                        AR: '+54',
+                        RU: '+7',
+                        ZA: '+27',
+                        EG: '+20',
+                        NG: '+234',
+                        KE: '+254',
+                        NL: '+31',
+                        BE: '+32',
+                        CH: '+41',
+                        AT: '+43',
+                        SE: '+46',
+                        NO: '+47',
+                        DK: '+45',
+                        FI: '+358',
                     };
                     const countryCode = data.country_code;
                     const phonePrefix = countryCodeMap[countryCode] || '+1';
@@ -102,7 +125,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
     // Check if form has been modified
     const hasFormChanged = () => {
         if (!isEditing) return true; // For new profiles, always allow submission
-        
+
         return (
             data.type !== originalValues.type ||
             data.company_name !== originalValues.company_name ||
@@ -153,7 +176,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         }
 
         // Client-side validation
-        const newClientErrors: {[key: string]: string} = {};
+        const newClientErrors: { [key: string]: string } = {};
 
         if (!data.phone_number || data.phone_number.trim() === '') {
             newClientErrors.phone_number = 'Please enter your phone number.';
@@ -239,11 +262,17 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
             const file = files[0];
             const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
             if (!validTypes.includes(file.type)) {
-                setClientErrors(prev => ({...prev, [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be in PDF, JPEG, PNG, or JPG format.`}));
+                setClientErrors((prev) => ({
+                    ...prev,
+                    [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be in PDF, JPEG, PNG, or JPG format.`,
+                }));
                 return;
             }
             if (file.size > 20 * 1024 * 1024) {
-                setClientErrors(prev => ({...prev, [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be smaller than 20MB.`}));
+                setClientErrors((prev) => ({
+                    ...prev,
+                    [fieldName]: `${fieldName === 'id_document' ? 'ID' : 'License'} document must be smaller than 20MB.`,
+                }));
                 return;
             }
             setData(fieldName, file);
@@ -253,7 +282,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
 
     const clearFieldError = (fieldName: string) => {
         if (clientErrors[fieldName]) {
-            setClientErrors(prev => {
+            setClientErrors((prev) => {
                 const newErrors = { ...prev };
                 delete newErrors[fieldName];
                 return newErrors;
@@ -299,21 +328,21 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
     return (
         <BaseLayout>
             <Head title={isEditing ? t(translations.profile, 'setup.edit_title') : t(translations.profile, 'setup.title')} />
-            <div className="flex-1 py-12 overflow-y-auto">
-                    <div className="mx-auto max-w-2xl px-6">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-8 xs:shadow-lg"
-                        >
-                            <div className="mb-8 text-center">
-                                <h1 className="mb-2 text-3xl font-bold text-foreground">{isEditing ? t(translations.profile, 'setup.edit_title') : t(translations.profile, 'setup.title')}</h1>
-                                <p className="text-muted-foreground">
-                                    {isEditing
-                                        ? t(translations.profile, 'setup.edit_description')
-                                        : t(translations.profile, 'setup.description')}
-                                </p>
+            <div className="flex-1 overflow-y-auto py-12">
+                <div className="mx-auto max-w-2xl px-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-8 xs:shadow-lg"
+                    >
+                        <div className="mb-8 text-center">
+                            <h1 className="mb-2 text-3xl font-bold text-foreground">
+                                {isEditing ? t(translations.profile, 'setup.edit_title') : t(translations.profile, 'setup.title')}
+                            </h1>
+                            <p className="text-muted-foreground">
+                                {isEditing ? t(translations.profile, 'setup.edit_description') : t(translations.profile, 'setup.description')}
+                            </p>
                             {!isEditing && (
                                 <p className="mt-2 text-sm text-muted-foreground">{t(translations.profile, 'setup.verification_notice')}</p>
                             )}
@@ -332,7 +361,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         <AlertDescription>{generalError}</AlertDescription>
                                         <button
                                             onClick={() => setGeneralError(null)}
-                                            className="absolute right-2 top-2 rounded-sm opacity-70 transition-opacity hover:opacity-100"
+                                            className="absolute top-2 right-2 rounded-sm opacity-70 transition-opacity hover:opacity-100"
                                         >
                                             <X className="h-4 w-4" />
                                             <span className="sr-only">Close</span>
@@ -348,7 +377,8 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         htmlFor="profile_picture"
                                         className={`relative block h-32 w-32 cursor-pointer overflow-hidden rounded-full border-4 ${isFieldRejected('profile_picture') ? 'border-destructive' : 'border-primary'} bg-muted`}
                                     >
-                                        {((data.profile_picture && data.profile_picture !== 'removed') || (propertyManager?.profile_picture_path && data.profile_picture !== 'removed')) ? (
+                                        {(data.profile_picture && data.profile_picture !== 'removed') ||
+                                        (propertyManager?.profile_picture_path && data.profile_picture !== 'removed') ? (
                                             <img
                                                 src={
                                                     data.profile_picture && data.profile_picture instanceof File
@@ -374,13 +404,19 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                 if (file) {
                                                     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
                                                     if (!validTypes.includes(file.type)) {
-                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be in JPEG, PNG, or WEBP format.'}));
+                                                        setClientErrors((prev) => ({
+                                                            ...prev,
+                                                            profile_picture: 'Profile picture must be in JPEG, PNG, or WEBP format.',
+                                                        }));
                                                         setData('profile_picture', null);
                                                         e.target.value = '';
                                                         return;
                                                     }
                                                     if (file.size > 5 * 1024 * 1024) {
-                                                        setClientErrors(prev => ({...prev, profile_picture: 'Profile picture must be smaller than 5MB.'}));
+                                                        setClientErrors((prev) => ({
+                                                            ...prev,
+                                                            profile_picture: 'Profile picture must be smaller than 5MB.',
+                                                        }));
                                                         setData('profile_picture', null);
                                                         e.target.value = '';
                                                         return;
@@ -398,11 +434,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     >
                                         <Upload className="h-4 w-4 text-white" />
                                     </label>
-                                    {((data.profile_picture && data.profile_picture !== 'removed') || (propertyManager?.profile_picture_path && data.profile_picture !== 'removed')) && (
+                                    {((data.profile_picture && data.profile_picture !== 'removed') ||
+                                        (propertyManager?.profile_picture_path && data.profile_picture !== 'removed')) && (
                                         <button
                                             type="button"
                                             onClick={() => setData('profile_picture', 'removed')}
-                                            className="absolute bottom-0 left-0 rounded-full bg-destructive p-2 shadow-lg transition-colors hover:bg-destructive/90 cursor-pointer"
+                                            className="absolute bottom-0 left-0 cursor-pointer rounded-full bg-destructive p-2 shadow-lg transition-colors hover:bg-destructive/90"
                                         >
                                             <Trash2 className="h-4 w-4 text-white" />
                                         </button>
@@ -463,12 +500,14 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                             </div>
                             {/* Profile Type Selection */}
                             <div>
-                                <label className="mb-3 block text-sm font-medium text-foreground">{t(translations.profile, 'setup.profile_type')}</label>
+                                <label className="mb-3 block text-sm font-medium text-foreground">
+                                    {t(translations.profile, 'setup.profile_type')}
+                                </label>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <button
                                         type="button"
                                         onClick={() => handleTypeChange('individual')}
-                                        className={`flex items-center rounded-lg border-2 p-4 transition-all cursor-pointer ${
+                                        className={`flex cursor-pointer items-center rounded-lg border-2 p-4 transition-all ${
                                             selectedType === 'individual'
                                                 ? 'border-primary bg-primary/10'
                                                 : 'border-border bg-background hover:bg-muted/50'
@@ -484,7 +523,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     <button
                                         type="button"
                                         onClick={() => handleTypeChange('professional')}
-                                        className={`flex items-center rounded-lg border-2 p-4 transition-all cursor-pointer ${
+                                        className={`flex cursor-pointer items-center rounded-lg border-2 p-4 transition-all ${
                                             selectedType === 'professional'
                                                 ? 'border-primary bg-primary/10'
                                                 : 'border-border bg-background hover:bg-muted/50'
@@ -510,7 +549,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         <select
                                             value={data.phone_prefix}
                                             onChange={(e) => setData('phone_prefix', e.target.value)}
-                                            className={`w-full appearance-none overflow-hidden rounded-md border py-2 pr-10 pl-3 text-ellipsis whitespace-nowrap shadow-sm focus:ring-2 focus:ring-primary/20 focus:outline-none cursor-pointer ${getFieldClassName('phone_number')} [&>option]:cursor-pointer`}
+                                            className={`w-full cursor-pointer appearance-none overflow-hidden rounded-md border py-2 pr-10 pl-3 text-ellipsis whitespace-nowrap shadow-sm focus:ring-2 focus:ring-primary/20 focus:outline-none ${getFieldClassName('phone_number')} [&>option]:cursor-pointer`}
                                         >
                                             <option value="+93">Afghanistan +93</option>
                                             <option value="+355">Albania +355</option>
@@ -757,7 +796,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             <option value="+260">Zambia +260</option>
                                             <option value="+263">Zimbabwe +263</option>
                                         </select>
-                                        <div className="pointer-events-none absolute top-2 bottom-0 right-0 flex items-center pr-2">
+                                        <div className="pointer-events-none absolute top-2 right-0 bottom-0 flex items-center pr-2">
                                             <ChevronDown className="h-4 w-4 text-muted-foreground" />
                                         </div>
                                     </div>
@@ -774,9 +813,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     />
                                 </div>
                                 {(clientErrors.phone_number || errors.phone_number) && (
-                                    <p className="mt-1 text-sm text-destructive">
-                                        {clientErrors.phone_number || errors.phone_number}
-                                    </p>
+                                    <p className="mt-1 text-sm text-destructive">{clientErrors.phone_number || errors.phone_number}</p>
                                 )}
                             </div>
 
@@ -798,9 +835,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             className={getFieldClassName('company_name')}
                                         />
                                         {(clientErrors.company_name || errors.company_name) && (
-                                            <p className="mt-1 text-sm text-destructive">
-                                                {clientErrors.company_name || errors.company_name}
-                                            </p>
+                                            <p className="mt-1 text-sm text-destructive">{clientErrors.company_name || errors.company_name}</p>
                                         )}
                                     </div>
 
@@ -819,7 +854,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                 // Real-time validation
                                                 const error = validateWebsite(value);
                                                 if (error) {
-                                                    setClientErrors(prev => ({...prev, company_website: error}));
+                                                    setClientErrors((prev) => ({ ...prev, company_website: error }));
                                                 } else {
                                                     clearFieldError('company_website');
                                                 }
@@ -828,9 +863,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             placeholder="example.com"
                                         />
                                         {(clientErrors.company_website || errors.company_website) && (
-                                            <p className="mt-1 text-sm text-destructive">
-                                                {clientErrors.company_website || errors.company_website}
-                                            </p>
+                                            <p className="mt-1 text-sm text-destructive">{clientErrors.company_website || errors.company_website}</p>
                                         )}
                                     </div>
 
@@ -849,11 +882,11 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                 >
                                                     <Info className="h-4 w-4 text-primary" />
                                                 </button>
-                                                <div className={`absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-3 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border border-border z-10 transition-opacity duration-200 ${showLicenseTooltip ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                                                    <p className="leading-relaxed">
-                                                        {t(translations.profile, 'setup.license_number_tooltip')}
-                                                    </p>
-                                                    <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-border"></div>
+                                                <div
+                                                    className={`absolute bottom-full left-1/2 z-10 mb-2 w-64 -translate-x-1/2 rounded-lg border border-border bg-popover p-3 text-xs text-popover-foreground shadow-lg transition-opacity duration-200 ${showLicenseTooltip ? 'visible opacity-100' : 'invisible opacity-0'}`}
+                                                >
+                                                    <p className="leading-relaxed">{t(translations.profile, 'setup.license_number_tooltip')}</p>
+                                                    <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 border-t-4 border-r-4 border-l-4 border-t-border border-r-transparent border-l-transparent"></div>
                                                 </div>
                                             </div>
                                         </label>
@@ -868,9 +901,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                             className={getFieldClassName('license_number')}
                                         />
                                         {(clientErrors.license_number || errors.license_number) && (
-                                            <p className="mt-1 text-sm text-destructive">
-                                                {clientErrors.license_number || errors.license_number}
-                                            </p>
+                                            <p className="mt-1 text-sm text-destructive">{clientErrors.license_number || errors.license_number}</p>
                                         )}
                                     </div>
                                 </>
@@ -883,85 +914,101 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         <label htmlFor="id_document" className="block text-sm font-medium text-foreground">
                                             {t(translations.profile, 'setup.id_document')} <span className="text-destructive">*</span>
                                         </label>
-                                    <div
-                                        className={`mt-2 flex justify-center rounded-md border border-dashed px-6 pt-5 pb-6 ${isFieldRejected('id_document') || clientErrors.id_document || errors.id_document ? 'border-destructive bg-destructive/5' : 'border-border'}`}
-                                        onDragOver={handleDragOver}
-                                        onDrop={(e) => handleDrop(e, 'id_document')}
-                                    >
-                                        <div className="w-full space-y-1 text-center">
-                                            <label htmlFor="id_document" className="cursor-pointer">
-                                                <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                            </label>
-                                            <div className="flex justify-center text-sm text-muted-foreground">
-                                                <label
-                                                    htmlFor="id_document"
-                                                    className="cursor-pointer rounded-md font-medium text-primary hover:text-primary/80"
-                                                >
-                                                    <span>{((data.id_document && data.id_document !== 'removed') || (propertyManager?.id_document_path && data.id_document !== 'removed')) ? t(translations.profile, 'setup.replace_file') : t(translations.profile, 'setup.upload_file')}</span>
+                                        <div
+                                            className={`mt-2 flex justify-center rounded-md border border-dashed px-6 pt-5 pb-6 ${isFieldRejected('id_document') || clientErrors.id_document || errors.id_document ? 'border-destructive bg-destructive/5' : 'border-border'}`}
+                                            onDragOver={handleDragOver}
+                                            onDrop={(e) => handleDrop(e, 'id_document')}
+                                        >
+                                            <div className="w-full space-y-1 text-center">
+                                                <label htmlFor="id_document" className="cursor-pointer">
+                                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                                                 </label>
-                                                <p className="pl-1">{t(translations.profile, 'setup.drag_drop')}</p>
-                                            </div>
-                                            <input
-                                                id="id_document"
-                                                name="id_document"
-                                                type="file"
-                                                accept=".pdf,.png,.jpg,.jpeg"
-                                                className="sr-only"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) {
-                                                        const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-                                                        if (!validTypes.includes(file.type)) {
-                                                            setClientErrors(prev => ({...prev, id_document: 'ID document must be in PDF, JPEG, PNG, or JPG format.'}));
-                                                            setData('id_document', null);
-                                                            e.target.value = '';
-                                                            return;
-                                                        }
-                                                        if (file.size > 20 * 1024 * 1024) {
-                                                            setClientErrors(prev => ({...prev, id_document: 'ID document must be smaller than 20MB.'}));
-                                                            setData('id_document', null);
-                                                            e.target.value = '';
-                                                            return;
-                                                        }
-                                                    }
-                                                    setData('id_document', file || null);
-                                                    clearFieldError('id_document');
-                                                }}
-                                            />
-                                            <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.file_requirements')}</p>
-                                            {((data.id_document && data.id_document !== 'removed') || (propertyManager?.id_document_path && data.id_document !== 'removed')) && (
-                                                <div className="mt-3 w-full overflow-hidden px-4">
-                                                    <div className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 shadow-sm min-w-0 overflow-hidden">
-                                                        <p
-                                                            className="cursor-pointer truncate text-sm font-medium text-primary hover:text-primary/80 flex-1 min-w-0 overflow-hidden"
-                                                            onClick={() => {
-                                                                if (data.id_document && data.id_document instanceof File) {
-                                                                    window.open(URL.createObjectURL(data.id_document), '_blank');
-                                                                } else if (propertyManager?.id_document_path) {
-                                                                    window.open('/property-manager/document/id_document', '_blank');
-                                                                }
-                                                            }}
-                                                            title={data.id_document instanceof File ? data.id_document?.name : propertyManager?.id_document_original_name || 'ID Document'}
-                                                        >
-                                                            {data.id_document instanceof File ? data.id_document?.name : propertyManager?.id_document_original_name || 'ID Document'}
-                                                        </p>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setData('id_document', 'removed')}
-                                                            className="flex-shrink-0 text-destructive hover:text-destructive/80 cursor-pointer"
-                                                            title="Remove file"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
+                                                <div className="flex justify-center text-sm text-muted-foreground">
+                                                    <label
+                                                        htmlFor="id_document"
+                                                        className="cursor-pointer rounded-md font-medium text-primary hover:text-primary/80"
+                                                    >
+                                                        <span>
+                                                            {(data.id_document && data.id_document !== 'removed') ||
+                                                            (propertyManager?.id_document_path && data.id_document !== 'removed')
+                                                                ? t(translations.profile, 'setup.replace_file')
+                                                                : t(translations.profile, 'setup.upload_file')}
+                                                        </span>
+                                                    </label>
+                                                    <p className="pl-1">{t(translations.profile, 'setup.drag_drop')}</p>
                                                 </div>
-                                            )}
+                                                <input
+                                                    id="id_document"
+                                                    name="id_document"
+                                                    type="file"
+                                                    accept=".pdf,.png,.jpg,.jpeg"
+                                                    className="sr-only"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+                                                            if (!validTypes.includes(file.type)) {
+                                                                setClientErrors((prev) => ({
+                                                                    ...prev,
+                                                                    id_document: 'ID document must be in PDF, JPEG, PNG, or JPG format.',
+                                                                }));
+                                                                setData('id_document', null);
+                                                                e.target.value = '';
+                                                                return;
+                                                            }
+                                                            if (file.size > 20 * 1024 * 1024) {
+                                                                setClientErrors((prev) => ({
+                                                                    ...prev,
+                                                                    id_document: 'ID document must be smaller than 20MB.',
+                                                                }));
+                                                                setData('id_document', null);
+                                                                e.target.value = '';
+                                                                return;
+                                                            }
+                                                        }
+                                                        setData('id_document', file || null);
+                                                        clearFieldError('id_document');
+                                                    }}
+                                                />
+                                                <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.file_requirements')}</p>
+                                                {((data.id_document && data.id_document !== 'removed') ||
+                                                    (propertyManager?.id_document_path && data.id_document !== 'removed')) && (
+                                                    <div className="mt-3 w-full overflow-hidden px-4">
+                                                        <div className="flex min-w-0 items-center gap-2 overflow-hidden rounded-md border border-border bg-background px-3 py-2 shadow-sm">
+                                                            <p
+                                                                className="min-w-0 flex-1 cursor-pointer truncate overflow-hidden text-sm font-medium text-primary hover:text-primary/80"
+                                                                onClick={() => {
+                                                                    if (data.id_document && data.id_document instanceof File) {
+                                                                        window.open(URL.createObjectURL(data.id_document), '_blank');
+                                                                    } else if (propertyManager?.id_document_path) {
+                                                                        window.open('/property-manager/document/id_document', '_blank');
+                                                                    }
+                                                                }}
+                                                                title={
+                                                                    data.id_document instanceof File
+                                                                        ? data.id_document?.name
+                                                                        : propertyManager?.id_document_original_name || 'ID Document'
+                                                                }
+                                                            >
+                                                                {data.id_document instanceof File
+                                                                    ? data.id_document?.name
+                                                                    : propertyManager?.id_document_original_name || 'ID Document'}
+                                                            </p>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setData('id_document', 'removed')}
+                                                                className="flex-shrink-0 cursor-pointer text-destructive hover:text-destructive/80"
+                                                                title="Remove file"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
                                         {(clientErrors.id_document || errors.id_document) && (
-                                            <p className="mt-1 text-sm text-destructive">
-                                                {clientErrors.id_document || errors.id_document}
-                                            </p>
+                                            <p className="mt-1 text-sm text-destructive">{clientErrors.id_document || errors.id_document}</p>
                                         )}
                                     </div>
                                 )}
@@ -985,7 +1032,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         htmlFor="license_document"
                                                         className="cursor-pointer rounded-md font-medium text-primary hover:text-primary/80"
                                                     >
-                                                        <span>{((data.license_document && data.license_document !== 'removed') || (propertyManager?.license_document_path && data.license_document !== 'removed')) ? t(translations.profile, 'setup.replace_file') : t(translations.profile, 'setup.upload_file')}</span>
+                                                        <span>
+                                                            {(data.license_document && data.license_document !== 'removed') ||
+                                                            (propertyManager?.license_document_path && data.license_document !== 'removed')
+                                                                ? t(translations.profile, 'setup.replace_file')
+                                                                : t(translations.profile, 'setup.upload_file')}
+                                                        </span>
                                                     </label>
                                                     <p className="pl-1">{t(translations.profile, 'setup.drag_drop')}</p>
                                                 </div>
@@ -1000,13 +1052,19 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         if (file) {
                                                             const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
                                                             if (!validTypes.includes(file.type)) {
-                                                                setClientErrors(prev => ({...prev, license_document: 'License document must be in PDF, JPEG, PNG, or JPG format.'}));
+                                                                setClientErrors((prev) => ({
+                                                                    ...prev,
+                                                                    license_document: 'License document must be in PDF, JPEG, PNG, or JPG format.',
+                                                                }));
                                                                 setData('license_document', null);
                                                                 e.target.value = '';
                                                                 return;
                                                             }
                                                             if (file.size > 20 * 1024 * 1024) {
-                                                                setClientErrors(prev => ({...prev, license_document: 'License document must be smaller than 20MB.'}));
+                                                                setClientErrors((prev) => ({
+                                                                    ...prev,
+                                                                    license_document: 'License document must be smaller than 20MB.',
+                                                                }));
                                                                 setData('license_document', null);
                                                                 e.target.value = '';
                                                                 return;
@@ -1017,11 +1075,12 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                     }}
                                                 />
                                                 <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.file_requirements')}</p>
-                                                {((data.license_document && data.license_document !== 'removed') || (propertyManager?.license_document_path && data.license_document !== 'removed')) && (
+                                                {((data.license_document && data.license_document !== 'removed') ||
+                                                    (propertyManager?.license_document_path && data.license_document !== 'removed')) && (
                                                     <div className="mt-3 w-full overflow-hidden px-4">
-                                                        <div className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 shadow-sm min-w-0 overflow-hidden">
+                                                        <div className="flex min-w-0 items-center gap-2 overflow-hidden rounded-md border border-border bg-background px-3 py-2 shadow-sm">
                                                             <p
-                                                                className="cursor-pointer truncate text-sm font-medium text-primary hover:text-primary/80 flex-1 min-w-0 overflow-hidden"
+                                                                className="min-w-0 flex-1 cursor-pointer truncate overflow-hidden text-sm font-medium text-primary hover:text-primary/80"
                                                                 onClick={() => {
                                                                     if (data.license_document && data.license_document instanceof File) {
                                                                         window.open(URL.createObjectURL(data.license_document), '_blank');
@@ -1029,14 +1088,20 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                                         window.open('/property-manager/document/license_document', '_blank');
                                                                     }
                                                                 }}
-                                                                title={data.license_document instanceof File ? data.license_document?.name : propertyManager?.license_document_original_name || 'License Document'}
+                                                                title={
+                                                                    data.license_document instanceof File
+                                                                        ? data.license_document?.name
+                                                                        : propertyManager?.license_document_original_name || 'License Document'
+                                                                }
                                                             >
-                                                                {data.license_document instanceof File ? data.license_document?.name : propertyManager?.license_document_original_name || 'License Document'}
+                                                                {data.license_document instanceof File
+                                                                    ? data.license_document?.name
+                                                                    : propertyManager?.license_document_original_name || 'License Document'}
                                                             </p>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setData('license_document', 'removed')}
-                                                                className="flex-shrink-0 text-destructive hover:text-destructive/80 cursor-pointer"
+                                                                className="flex-shrink-0 cursor-pointer text-destructive hover:text-destructive/80"
                                                                 title="Remove file"
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
@@ -1060,15 +1125,21 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                 <button
                                     type="submit"
                                     disabled={processing || (isEditing && !hasFormChanged())}
-                                    className="w-full rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                                    className="w-full cursor-pointer rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    {processing ? (isEditing ? t(translations.profile, 'setup.updating') : t(translations.profile, 'setup.submitting')) : isEditing ? t(translations.profile, 'setup.update_profile') : t(translations.profile, 'setup.submit_profile')}
+                                    {processing
+                                        ? isEditing
+                                            ? t(translations.profile, 'setup.updating')
+                                            : t(translations.profile, 'setup.submitting')
+                                        : isEditing
+                                          ? t(translations.profile, 'setup.update_profile')
+                                          : t(translations.profile, 'setup.submit_profile')}
                                 </button>
                                 {isEditing && (
                                     <button
                                         type="button"
                                         onClick={() => window.history.back()}
-                                        className="w-full rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground shadow-lg transition-all hover:bg-muted cursor-pointer"
+                                        className="w-full cursor-pointer rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground shadow-lg transition-all hover:bg-muted"
                                     >
                                         {t(translations.profile, 'common.cancel')}
                                     </button>
@@ -1081,7 +1152,9 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     <div className="h-2 overflow-hidden rounded-full bg-muted">
                                         <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress.percentage}%` }} />
                                     </div>
-                                    <p className="mt-1 text-sm text-muted-foreground">{t(translations.profile, 'setup.uploading')} {progress.percentage}%</p>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        {t(translations.profile, 'setup.uploading')} {progress.percentage}%
+                                    </p>
                                 </div>
                             )}
                         </form>

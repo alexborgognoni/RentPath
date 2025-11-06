@@ -1,17 +1,6 @@
 import type { TenantApplication } from '@/types/dashboard';
 import { motion } from 'framer-motion';
-import { 
-    Calendar, 
-    CheckCircle, 
-    Clock, 
-    DollarSign, 
-    FileText, 
-    Mail, 
-    Phone, 
-    User, 
-    Users, 
-    XCircle 
-} from 'lucide-react';
+import { Calendar, CheckCircle, Clock, DollarSign, FileText, Mail, Phone, User, Users, XCircle } from 'lucide-react';
 
 interface TenantApplicationsTableProps {
     tenantApplications: TenantApplication[];
@@ -33,7 +22,7 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
     };
 
     const getStatusBadge = (status: string) => {
-        const baseClasses = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium";
+        const baseClasses = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium';
         switch (status) {
             case 'approved':
                 return `${baseClasses} bg-success/10 text-success`;
@@ -57,13 +46,13 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
         return new Date(dateString).toLocaleDateString('nl-NL', {
             year: 'numeric',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
         });
     };
 
     if (tenantApplications.length === 0) {
         return (
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
@@ -71,15 +60,13 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
             >
                 <Users className="mx-auto mb-4 text-muted-foreground" size={48} />
                 <h3 className="mb-2 text-lg font-semibold text-foreground">No Applications Yet</h3>
-                <p className="text-muted-foreground">
-                    Share the property invite link to start receiving tenant applications.
-                </p>
+                <p className="text-muted-foreground">Share the property invite link to start receiving tenant applications.</p>
             </motion.div>
         );
     }
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -91,9 +78,7 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
                     <Users className="mr-3 text-primary" size={24} />
                     Tenant Applications ({tenantApplications.length})
                 </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    Review and manage tenant applications for this property
-                </p>
+                <p className="mt-1 text-sm text-muted-foreground">Review and manage tenant applications for this property</p>
             </div>
 
             {/* Applications List */}
@@ -117,9 +102,7 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-start justify-between">
                                     <div className="min-w-0 flex-1">
-                                        <h3 className="text-base font-semibold text-foreground">
-                                            {tenant.applicant_name}
-                                        </h3>
+                                        <h3 className="text-base font-semibold text-foreground">{tenant.applicant_name}</h3>
                                         <div className="mt-1 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                                             <div className="flex items-center">
                                                 <Mail size={14} className="mr-1" />
@@ -131,7 +114,7 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Status */}
                                     <div className="flex items-center space-x-2">
                                         {getStatusIcon(tenant.application_status)}
@@ -144,42 +127,34 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
                                 {/* Details Grid */}
                                 <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
                                     <div className="flex items-center text-sm">
-                                        <DollarSign size={14} className="mr-2 text-success" />
+                                        <DollarSign size={14} className="text-success mr-2" />
                                         <div>
                                             <p className="text-muted-foreground">Income</p>
-                                            <p className="font-medium text-foreground">
-                                                {formatCurrency(tenant.monthly_income)}
-                                            </p>
+                                            <p className="font-medium text-foreground">{formatCurrency(tenant.monthly_income)}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center text-sm">
                                         <User size={14} className="mr-2 text-primary" />
                                         <div>
                                             <p className="text-muted-foreground">Employment</p>
-                                            <p className="font-medium text-foreground">
-                                                {tenant.employment_status}
-                                            </p>
+                                            <p className="font-medium text-foreground">{tenant.employment_status}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center text-sm">
                                         <Calendar size={14} className="mr-2 text-secondary" />
                                         <div>
                                             <p className="text-muted-foreground">Move-in</p>
-                                            <p className="font-medium text-foreground">
-                                                {formatDate(tenant.move_in_date)}
-                                            </p>
+                                            <p className="font-medium text-foreground">{formatDate(tenant.move_in_date)}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center text-sm">
                                         <FileText size={14} className="mr-2 text-muted-foreground" />
                                         <div>
                                             <p className="text-muted-foreground">Documents</p>
-                                            <p className="font-medium text-foreground">
-                                                {tenant.documents_uploaded.length} files
-                                            </p>
+                                            <p className="font-medium text-foreground">{tenant.documents_uploaded.length} files</p>
                                         </div>
                                     </div>
                                 </div>
@@ -189,10 +164,7 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
                                     <div className="mt-3 rounded-md bg-muted/50 p-3">
                                         <p className="text-sm text-muted-foreground">
                                             <FileText size={12} className="mr-1 inline" />
-                                            {tenant.notes.length > 100 
-                                                ? `${tenant.notes.substring(0, 100)}...`
-                                                : tenant.notes
-                                            }
+                                            {tenant.notes.length > 100 ? `${tenant.notes.substring(0, 100)}...` : tenant.notes}
                                         </p>
                                     </div>
                                 )}
@@ -200,9 +172,7 @@ export function TenantApplicationsTable({ tenantApplications, onTenantSelect }: 
                                 {/* Application Date */}
                                 <div className="mt-3 text-xs text-muted-foreground">
                                     Applied on {formatDate(tenant.created_at)}
-                                    {tenant.updated_at !== tenant.created_at && (
-                                        <span> • Last updated {formatDate(tenant.updated_at)}</span>
-                                    )}
+                                    {tenant.updated_at !== tenant.created_at && <span> • Last updated {formatDate(tenant.updated_at)}</span>}
                                 </div>
                             </div>
                         </div>

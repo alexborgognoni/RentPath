@@ -1,5 +1,5 @@
-import { Search, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface PropertyFiltersProps {
     onFilterChange: (filters: PropertyFilterState) => void;
@@ -77,7 +77,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
             setFilters(newFilters);
             onFilterChange(newFilters);
         },
-        [filters, onFilterChange]
+        [filters, onFilterChange],
     );
 
     // Debounced search
@@ -118,15 +118,26 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
     };
 
     const hasActiveMoreFilters =
-        filters.minSize || filters.maxSize || filters.floor ||
-        filters.hasElevator !== null || filters.yearBuiltMin || filters.yearBuiltMax ||
-        filters.hasGarden !== null || filters.hasRooftop !== null ||
-        filters.hasAirConditioning !== null || filters.hasFireplace !== null ||
-        filters.hasLaundry !== null || filters.hasCellar !== null ||
-        filters.energyClass || filters.heatingType ||
-        filters.parkingInterior || filters.parkingExterior ||
-        filters.kitchenEquipped !== null || filters.kitchenSeparated !== null ||
-        filters.subtype || filters.availableFrom;
+        filters.minSize ||
+        filters.maxSize ||
+        filters.floor ||
+        filters.hasElevator !== null ||
+        filters.yearBuiltMin ||
+        filters.yearBuiltMax ||
+        filters.hasGarden !== null ||
+        filters.hasRooftop !== null ||
+        filters.hasAirConditioning !== null ||
+        filters.hasFireplace !== null ||
+        filters.hasLaundry !== null ||
+        filters.hasCellar !== null ||
+        filters.energyClass ||
+        filters.heatingType ||
+        filters.parkingInterior ||
+        filters.parkingExterior ||
+        filters.kitchenEquipped !== null ||
+        filters.kitchenSeparated !== null ||
+        filters.subtype ||
+        filters.availableFrom;
 
     return (
         <div className="space-y-4">
@@ -135,13 +146,13 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                 {/* Search */}
                 <div className="lg:col-span-2">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                        <Search className="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" size={18} />
                         <input
                             type="text"
                             placeholder="Search title, address, or city..."
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
-                            className="w-full rounded-lg border border-border bg-background px-10 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                            className="w-full rounded-lg border border-border bg-background px-10 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                         />
                     </div>
                 </div>
@@ -151,7 +162,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     <select
                         value={filters.status}
                         onChange={(e) => handleFilterChange('status', e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
                         <option value="">All Statuses</option>
                         <option value="available">Available</option>
@@ -167,7 +178,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     <select
                         value={filters.type}
                         onChange={(e) => handleFilterChange('type', e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
                         <option value="">All Types</option>
                         <option value="apartment">Apartment</option>
@@ -184,7 +195,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     <select
                         value={filters.bedrooms}
                         onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
                         <option value="">Any Beds</option>
                         <option value="1">At least 1 bed</option>
@@ -200,7 +211,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     <select
                         value={filters.city}
                         onChange={(e) => handleFilterChange('city', e.target.value)}
-                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
                         <option value="">All Cities</option>
                         {cities.map((city) => (
@@ -220,7 +231,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     placeholder="Min"
                     value={filters.minRent}
                     onChange={(e) => handleFilterChange('minRent', e.target.value)}
-                    className="w-32 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-32 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                 />
                 <span className="text-sm text-muted-foreground">to</span>
                 <input
@@ -228,7 +239,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     placeholder="Max"
                     value={filters.maxRent}
                     onChange={(e) => handleFilterChange('maxRent', e.target.value)}
-                    className="w-32 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-32 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                 />
                 <span className="text-sm text-muted-foreground">€/month</span>
             </div>
@@ -237,24 +248,17 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
             <div className="flex items-center justify-between border-t border-border pt-4">
                 <button
                     onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <SlidersHorizontal size={16} />
                     More Filters
-                    {hasActiveMoreFilters && (
-                        <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-white">
-                            Active
-                        </span>
-                    )}
-                    <ChevronDown
-                        size={16}
-                        className={`transition-transform ${moreFiltersOpen ? 'rotate-180' : ''}`}
-                    />
+                    {hasActiveMoreFilters && <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-white">Active</span>}
+                    <ChevronDown size={16} className={`transition-transform ${moreFiltersOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {hasActiveMoreFilters && (
                     <button
                         onClick={clearMoreFilters}
-                        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <X size={14} />
                         Clear advanced filters
@@ -270,7 +274,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         <h3 className="text-sm font-semibold text-foreground">Building Details</h3>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Min Size (m²)</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Min Size (m²)</label>
                                 <input
                                     type="number"
                                     value={filters.minSize}
@@ -279,7 +283,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Max Size (m²)</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Max Size (m²)</label>
                                 <input
                                     type="number"
                                     value={filters.maxSize}
@@ -288,7 +292,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Floor Level</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Floor Level</label>
                                 <input
                                     type="number"
                                     value={filters.floor}
@@ -297,7 +301,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Has Elevator</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Has Elevator</label>
                                 <select
                                     value={filters.hasElevator === null ? '' : filters.hasElevator.toString()}
                                     onChange={(e) => handleFilterChange('hasElevator', e.target.value === '' ? null : e.target.value === 'true')}
@@ -309,7 +313,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Year Built (Min)</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Year Built (Min)</label>
                                 <input
                                     type="number"
                                     value={filters.yearBuiltMin}
@@ -318,7 +322,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Year Built (Max)</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Year Built (Max)</label>
                                 <input
                                     type="number"
                                     value={filters.yearBuiltMax}
@@ -341,7 +345,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 { key: 'hasLaundry', label: 'Laundry' },
                                 { key: 'hasCellar', label: 'Cellar' },
                             ].map(({ key, label }) => (
-                                <label key={key} className="flex items-center gap-2 cursor-pointer">
+                                <label key={key} className="flex cursor-pointer items-center gap-2">
                                     <input
                                         type="checkbox"
                                         checked={filters[key as keyof PropertyFilterState] === true}
@@ -359,7 +363,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         <h3 className="text-sm font-semibold text-foreground">Energy & Heating</h3>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Energy Class</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Energy Class</label>
                                 <select
                                     value={filters.energyClass}
                                     onChange={(e) => handleFilterChange('energyClass', e.target.value)}
@@ -377,7 +381,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Heating Type</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Heating Type</label>
                                 <select
                                     value={filters.heatingType}
                                     onChange={(e) => handleFilterChange('heatingType', e.target.value)}
@@ -400,7 +404,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         <h3 className="text-sm font-semibold text-foreground">Parking</h3>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Interior Spots</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Interior Spots</label>
                                 <input
                                     type="number"
                                     value={filters.parkingInterior}
@@ -410,7 +414,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs text-muted-foreground mb-1">Exterior Spots</label>
+                                <label className="mb-1 block text-xs text-muted-foreground">Exterior Spots</label>
                                 <input
                                     type="number"
                                     value={filters.parkingExterior}
@@ -426,7 +430,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     <div className="space-y-3">
                         <h3 className="text-sm font-semibold text-foreground">Kitchen</h3>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                            <label className="flex items-center gap-2 cursor-pointer">
+                            <label className="flex cursor-pointer items-center gap-2">
                                 <input
                                     type="checkbox"
                                     checked={filters.kitchenEquipped === true}
@@ -435,7 +439,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                 />
                                 <span className="text-sm text-foreground">Equipped</span>
                             </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
+                            <label className="flex cursor-pointer items-center gap-2">
                                 <input
                                     type="checkbox"
                                     checked={filters.kitchenSeparated === true}
@@ -451,7 +455,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     <div className="space-y-3">
                         <h3 className="text-sm font-semibold text-foreground">Availability</h3>
                         <div>
-                            <label className="block text-xs text-muted-foreground mb-1">Available From</label>
+                            <label className="mb-1 block text-xs text-muted-foreground">Available From</label>
                             <input
                                 type="date"
                                 value={filters.availableFrom}

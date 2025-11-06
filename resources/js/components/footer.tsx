@@ -1,7 +1,7 @@
+import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Home } from 'lucide-react';
-import type { SharedData } from '@/types';
 
 export function Footer() {
     const { translations } = usePage<SharedData>().props;

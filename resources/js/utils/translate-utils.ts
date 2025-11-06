@@ -19,11 +19,11 @@ export const translate = (translations: Translations, key: string): string => {
     for (const part of parts) {
         // Handle array access like 'features[0]'
         const arrayMatch = part.match(/^([^[]+)\[(\d+)\]$/);
-        
+
         if (arrayMatch) {
             const [, arrayKey, indexStr] = arrayMatch;
             const index = parseInt(indexStr, 10);
-            
+
             if (typeof current === 'object' && current !== null && arrayKey in current) {
                 const arrayValue = (current as Record<string, unknown>)[arrayKey];
                 if (Array.isArray(arrayValue) && index >= 0 && index < arrayValue.length) {

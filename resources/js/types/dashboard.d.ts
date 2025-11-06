@@ -43,7 +43,27 @@ export interface Property {
     country: string;
     description?: string;
     type: 'apartment' | 'house' | 'room' | 'commercial' | 'industrial' | 'parking';
-    subtype: 'studio' | 'loft' | 'duplex' | 'triplex' | 'penthouse' | 'serviced' | 'detached' | 'semi-detached' | 'villa' | 'bungalow' | 'private_room' | 'student_room' | 'co-living' | 'office' | 'retail' | 'warehouse' | 'factory' | 'garage' | 'indoor_spot' | 'outdoor_spot';
+    subtype:
+        | 'studio'
+        | 'loft'
+        | 'duplex'
+        | 'triplex'
+        | 'penthouse'
+        | 'serviced'
+        | 'detached'
+        | 'semi-detached'
+        | 'villa'
+        | 'bungalow'
+        | 'private_room'
+        | 'student_room'
+        | 'co-living'
+        | 'office'
+        | 'retail'
+        | 'warehouse'
+        | 'factory'
+        | 'garage'
+        | 'indoor_spot'
+        | 'outdoor_spot';
     // Property specifications
     bedrooms: number;
     bathrooms: number;
@@ -75,7 +95,16 @@ export interface Property {
     rent_amount: number;
     rent_currency: 'eur' | 'usd' | 'gbp' | 'chf';
     // Property status
-    status: 'inactive' | 'available' | 'application_received' | 'under_review' | 'visit_scheduled' | 'approved' | 'leased' | 'maintenance' | 'archived';
+    status:
+        | 'inactive'
+        | 'available'
+        | 'application_received'
+        | 'under_review'
+        | 'visit_scheduled'
+        | 'approved'
+        | 'leased'
+        | 'maintenance'
+        | 'archived';
     tenant_count?: number; // This will be computed/added by backend
     // Public access and invite tokens
     public_apply_url_enabled: boolean;

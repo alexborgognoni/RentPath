@@ -43,4 +43,3 @@ interface SettingsTranslations {
         theme_preference_saved: string;
     };
 }
-

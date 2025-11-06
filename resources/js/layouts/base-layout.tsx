@@ -25,7 +25,7 @@ export function BaseLayout({ children, breadcrumbs, title, variant = 'app' }: Ba
 
     return (
         <div className="relative flex min-h-screen w-full flex-col bg-background">
-            <div className="relative z-10 flex flex-col min-h-screen">
+            <div className="relative z-10 flex min-h-screen flex-col">
                 <AppHeader breadcrumbs={breadcrumbs} title={title} />
                 {children}
             </div>

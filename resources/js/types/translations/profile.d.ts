@@ -85,4 +85,3 @@ interface ProfileTranslations {
         back: string;
     };
 }
-

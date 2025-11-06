@@ -1,7 +1,7 @@
 import { PropertyFilters, type PropertyFilterState } from '@/components/dashboard/property-filters';
 import { PropertyTable } from '@/components/dashboard/property-table';
-import type { Property } from '@/types/dashboard';
 import type { SharedData } from '@/types';
+import type { Property } from '@/types/dashboard';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Building, Filter, Home, Plus } from 'lucide-react';
@@ -49,7 +49,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
     // Extract unique cities from properties
     const cities = useMemo(() => {
         const uniqueCities = new Set<string>();
-        properties.forEach(property => {
+        properties.forEach((property) => {
             if (property.city) {
                 uniqueCities.add(property.city);
             }
@@ -222,12 +222,8 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                     <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
                         <Building size={40} className="text-muted-foreground" />
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-foreground">
-                        {translate(translations, 'dashboard.noPropertiesYet')}
-                    </h3>
-                    <p className="mx-auto max-w-md text-muted-foreground">
-                        {translate(translations, 'dashboard.noPropertiesDesc')}
-                    </p>
+                    <h3 className="mb-2 text-xl font-semibold text-foreground">{translate(translations, 'dashboard.noPropertiesYet')}</h3>
+                    <p className="mx-auto max-w-md text-muted-foreground">{translate(translations, 'dashboard.noPropertiesDesc')}</p>
                 </div>
             ) : filteredProperties.length === 0 ? (
                 <div className="rounded-2xl border border-border bg-card py-16 text-center">
@@ -235,9 +231,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                         <Building size={40} className="text-muted-foreground" />
                     </div>
                     <h3 className="mb-2 text-xl font-semibold text-foreground">No properties match your filters</h3>
-                    <p className="mx-auto max-w-md text-muted-foreground">
-                        Try adjusting your search criteria to find more properties.
-                    </p>
+                    <p className="mx-auto max-w-md text-muted-foreground">Try adjusting your search criteria to find more properties.</p>
                 </div>
             ) : (
                 <PropertyTable properties={filteredProperties} onEditProperty={onEditProperty} />

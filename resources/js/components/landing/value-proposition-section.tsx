@@ -1,9 +1,9 @@
+import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Bell, Camera, Eye, FileText, Mail, Shield } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { translate } from '@/utils/translate-utils';
-import { usePage } from '@inertiajs/react';
-import type { SharedData } from '@/types';
 
 function useCountAnimation(target: number, duration: number = 2000) {
     const [count, setCount] = useState(0);
@@ -53,7 +53,10 @@ export function ValuePropositionSection() {
             description: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.description'),
             icon: <Mail className="h-8 w-8 text-white" />,
             iconBg: 'bg-blue-600',
-            stats: { percentage: '1-Click', label: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.stats_label') },
+            stats: {
+                percentage: '1-Click',
+                label: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.stats_label'),
+            },
         },
         {
             id: 2,
@@ -69,7 +72,10 @@ export function ValuePropositionSection() {
             description: translate(translations, 'landing.value_proposition.features.complete_visibility.description'),
             icon: <Eye className="h-8 w-8 text-white" />,
             iconBg: 'bg-green-600',
-            stats: { percentage: translate(translations, 'landing.value_proposition.stats_percentages.real_time'), label: translate(translations, 'landing.value_proposition.features.complete_visibility.stats_label') },
+            stats: {
+                percentage: translate(translations, 'landing.value_proposition.stats_percentages.real_time'),
+                label: translate(translations, 'landing.value_proposition.features.complete_visibility.stats_label'),
+            },
         },
         {
             id: 4,
@@ -77,7 +83,10 @@ export function ValuePropositionSection() {
             description: translate(translations, 'landing.value_proposition.features.secure_document_storage.description'),
             icon: <Shield className="h-8 w-8 text-white" />,
             iconBg: 'bg-teal-600',
-            stats: { percentage: translate(translations, 'landing.value_proposition.stats_percentages.bank_level'), label: translate(translations, 'landing.value_proposition.features.secure_document_storage.stats_label') },
+            stats: {
+                percentage: translate(translations, 'landing.value_proposition.stats_percentages.bank_level'),
+                label: translate(translations, 'landing.value_proposition.features.secure_document_storage.stats_label'),
+            },
         },
         {
             id: 5,
@@ -93,7 +102,10 @@ export function ValuePropositionSection() {
             description: translate(translations, 'landing.value_proposition.features.digital_inspection_features.description'),
             icon: <Camera className="h-8 w-8 text-white" />,
             iconBg: 'bg-red-500',
-            stats: { percentage: '60%', label: translate(translations, 'landing.value_proposition.features.digital_inspection_features.stats_label') },
+            stats: {
+                percentage: '60%',
+                label: translate(translations, 'landing.value_proposition.features.digital_inspection_features.stats_label'),
+            },
         },
     ];
 
@@ -105,7 +117,7 @@ export function ValuePropositionSection() {
         <section className="bg-background pt-0 pb-12 xs:pt-0 xs:pb-12 md:py-16 lg:py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-0 xs:mb-20 text-center">
+                <div className="mb-0 text-center xs:mb-20">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -171,7 +183,7 @@ export function ValuePropositionSection() {
                 </div>
 
                 {/* Feature Grid */}
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:auto-rows-fr">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:auto-rows-fr lg:grid-cols-3">
                     {FEATURES.map((feature) => (
                         <div key={feature.id} className="relative rounded-xl border border-border bg-card/50">
                             <div className="grid h-full grid-rows-[auto_1fr_auto_auto] p-8">

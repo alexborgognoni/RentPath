@@ -1,5 +1,5 @@
-import type { Property } from '@/types/dashboard';
 import type { SharedData } from '@/types';
+import type { Property } from '@/types/dashboard';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Copy, ExternalLink, Users } from 'lucide-react';
@@ -16,16 +16,12 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
 
     // Format address from separate fields
     const formatAddress = (property: Property): string => {
-        const parts = [
-            property.house_number,
-            property.street_name,
-            property.street_line2,
-        ].filter(Boolean);
-        
+        const parts = [property.house_number, property.street_name, property.street_line2].filter(Boolean);
+
         const streetAddress = parts.join(' ');
         const cityPart = [property.city, property.state].filter(Boolean).join(', ');
         const fullAddress = [streetAddress, cityPart, property.postal_code].filter(Boolean).join(', ');
-        
+
         return fullAddress;
     };
 
@@ -58,7 +54,11 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             {property.images && property.images.length > 0 && (
                 <div className="mb-4 overflow-hidden rounded-xl border border-border">
                     <img
-                        src={property.images.find(img => img.is_main)?.image_url || property.images[0]?.image_url || `/properties/${property.id}/image`}
+                        src={
+                            property.images.find((img) => img.is_main)?.image_url ||
+                            property.images[0]?.image_url ||
+                            `/properties/${property.id}/image`
+                        }
                         alt={property.title}
                         className="h-48 w-full object-cover"
                     />
@@ -66,9 +66,7 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             )}
 
             <h3 className="mb-2 text-xl font-bold text-foreground">{property.title}</h3>
-            <p className="mb-3 text-muted-foreground">
-                {formatAddress(property)}
-            </p>
+            <p className="mb-3 text-muted-foreground">{formatAddress(property)}</p>
             <p className="mb-4 text-lg font-bold text-primary">
                 {formatCurrency(property.rent_amount)}/{translate(translations, 'dashboard.month')}
             </p>
@@ -76,13 +74,10 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             <div className="mb-6 flex items-center justify-between text-sm text-muted-foreground">
                 <div className="flex flex-col space-y-1">
                     <span className="font-medium">
-                        {property.bedrooms || 'N/A'} {translate(translations, 'dashboard.bedrooms')} • {property.bathrooms || 'N/A'} {translate(translations, 'dashboard.bathrooms')}
+                        {property.bedrooms || 'N/A'} {translate(translations, 'dashboard.bedrooms')} • {property.bathrooms || 'N/A'}{' '}
+                        {translate(translations, 'dashboard.bathrooms')}
                     </span>
-                    {property.size && (
-                        <span className="font-medium text-muted-foreground/70">
-                            {property.size} m²
-                        </span>
-                    )}
+                    {property.size && <span className="font-medium text-muted-foreground/70">{property.size} m²</span>}
                 </div>
                 <span className="flex items-center rounded-full border border-border bg-muted px-3 py-1 text-muted-foreground">
                     <Users size={16} className="mr-1" />

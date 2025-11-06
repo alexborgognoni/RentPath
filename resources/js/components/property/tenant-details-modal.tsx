@@ -1,17 +1,6 @@
 import type { TenantApplication } from '@/types/dashboard';
 import { motion } from 'framer-motion';
-import {
-    CheckCircle,
-    Clock,
-    Download,
-    FileText,
-    Mail,
-    MessageSquare,
-    Phone,
-    User,
-    X, 
-    XCircle 
-} from 'lucide-react';
+import { CheckCircle, Clock, Download, FileText, Mail, MessageSquare, Phone, User, X, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface TenantDetailsModalProps {
@@ -45,7 +34,7 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
             weekday: 'long',
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
         });
     };
 
@@ -79,12 +68,12 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
         id: 'Identity Document',
         income: 'Income Verification',
         employment: 'Employment Letter',
-        references: 'References'
+        references: 'References',
     };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -111,13 +100,11 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-4">
                             <div className={`flex items-center space-x-2 ${getStatusColor(tenant.application_status)}`}>
                                 {getStatusIcon(tenant.application_status)}
-                                <span className="font-semibold capitalize">
-                                    {tenant.application_status.replace('_', ' ')}
-                                </span>
+                                <span className="font-semibold capitalize">{tenant.application_status.replace('_', ' ')}</span>
                             </div>
                             <button
                                 onClick={onClose}
@@ -134,15 +121,19 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
                     <div className="mb-8 rounded-xl border border-border bg-background/50 p-6">
                         <h3 className="mb-4 text-lg font-semibold text-foreground">Application Progress</h3>
                         <div className="flex items-center space-x-4">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success text-white">
+                            <div className="bg-success flex h-8 w-8 items-center justify-center rounded-full text-white">
                                 <CheckCircle size={16} />
                             </div>
-                            <div className="h-2 flex-1 rounded-full bg-success"></div>
-                            <div className={`flex h-8 w-8 items-center justify-center rounded-full ${tenant.application_status !== 'pending' ? 'bg-success text-white' : 'bg-muted text-muted-foreground'}`}>
+                            <div className="bg-success h-2 flex-1 rounded-full"></div>
+                            <div
+                                className={`flex h-8 w-8 items-center justify-center rounded-full ${tenant.application_status !== 'pending' ? 'bg-success text-white' : 'bg-muted text-muted-foreground'}`}
+                            >
                                 <Clock size={16} />
                             </div>
                             <div className={`h-2 flex-1 rounded-full ${tenant.application_status === 'approved' ? 'bg-success' : 'bg-muted'}`}></div>
-                            <div className={`flex h-8 w-8 items-center justify-center rounded-full ${tenant.application_status === 'approved' ? 'bg-success text-white' : 'bg-muted text-muted-foreground'}`}>
+                            <div
+                                className={`flex h-8 w-8 items-center justify-center rounded-full ${tenant.application_status === 'approved' ? 'bg-success text-white' : 'bg-muted text-muted-foreground'}`}
+                            >
                                 <CheckCircle size={16} />
                             </div>
                         </div>
@@ -164,9 +155,7 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-sm font-medium text-muted-foreground">Monthly Income</label>
-                                    <p className="text-lg font-semibold text-success">
-                                        {formatCurrency(tenant.monthly_income)}
-                                    </p>
+                                    <p className="text-success text-lg font-semibold">{formatCurrency(tenant.monthly_income)}</p>
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-muted-foreground">Employment Status</label>
@@ -202,7 +191,10 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
                                     <label className="text-sm font-medium text-muted-foreground">Documents Uploaded</label>
                                     <div className="mt-2 space-y-2">
                                         {tenant.documents_uploaded.map((docType) => (
-                                            <div key={docType} className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2">
+                                            <div
+                                                key={docType}
+                                                className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2"
+                                            >
                                                 <div className="flex items-center space-x-2">
                                                     <FileText size={16} className="text-primary" />
                                                     <span className="text-sm font-medium text-foreground">
@@ -230,7 +222,7 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="Add notes about this application..."
-                            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                             rows={4}
                         />
                     </div>
@@ -242,7 +234,7 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
                                 <button
                                     onClick={() => handleStatusUpdate('approved')}
                                     disabled={updating}
-                                    className="flex items-center rounded-xl bg-success px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+                                    className="bg-success flex items-center rounded-xl px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                                 >
                                     <CheckCircle className="mr-2" size={16} />
                                     {updating ? 'Updating...' : 'Approve Application'}
@@ -250,7 +242,7 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
                                 <button
                                     onClick={() => handleStatusUpdate('under_review')}
                                     disabled={updating}
-                                    className="flex items-center rounded-xl bg-warning px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+                                    className="bg-warning flex items-center rounded-xl px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                                 >
                                     <Clock className="mr-2" size={16} />
                                     {updating ? 'Updating...' : 'Mark Under Review'}
@@ -265,13 +257,13 @@ export function TenantDetailsModal({ tenant, onClose, onUpdateStatus }: TenantDe
                                 </button>
                             </>
                         )}
-                        
+
                         {tenant.application_status === 'under_review' && (
                             <>
                                 <button
                                     onClick={() => handleStatusUpdate('approved')}
                                     disabled={updating}
-                                    className="flex items-center rounded-xl bg-success px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+                                    className="bg-success flex items-center rounded-xl px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                                 >
                                     <CheckCircle className="mr-2" size={16} />
                                     {updating ? 'Updating...' : 'Approve Application'}

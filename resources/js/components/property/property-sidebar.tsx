@@ -1,17 +1,6 @@
 import type { Property } from '@/types/dashboard';
 import { router } from '@inertiajs/react';
-import {
-    Check,
-    Copy,
-    Edit,
-    FileText,
-    Link2,
-    RefreshCw,
-    Settings,
-    Share,
-    Trash2,
-    Users
-} from 'lucide-react';
+import { Check, Copy, Edit, FileText, Link2, RefreshCw, Settings, Share, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 
 interface PropertySidebarProps {
@@ -28,10 +17,10 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
     const formatCurrency = (amount: number, currency: string) => {
         const currencyMap: Record<string, string> = {
-            'eur': 'EUR',
-            'usd': 'USD',
-            'gbp': 'GBP',
-            'chf': 'CHF',
+            eur: 'EUR',
+            usd: 'USD',
+            gbp: 'GBP',
+            chf: 'CHF',
         };
 
         return new Intl.NumberFormat('en-US', {
@@ -169,11 +158,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
         const config = statusConfig[property.status] || statusConfig.inactive;
 
-        return (
-            <span className={`rounded-full px-2 py-1 text-xs font-medium ${config.className}`}>
-                {config.label}
-            </span>
-        );
+        return <span className={`rounded-full px-2 py-1 text-xs font-medium ${config.className}`}>{config.label}</span>;
     };
 
     return (
@@ -188,9 +173,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Monthly Rent</span>
-                        <span className="font-semibold text-foreground">
-                            {formatCurrency(property.rent_amount, property.rent_currency)}
-                        </span>
+                        <span className="font-semibold text-foreground">{formatCurrency(property.rent_amount, property.rent_currency)}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -218,7 +201,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                 <div className="space-y-3">
                     <button
                         onClick={handleEdit}
-                        className="flex w-full items-center rounded-lg border border-border bg-background/50 px-4 py-3 text-sm font-medium text-foreground transition-all hover:bg-background hover:scale-105 cursor-pointer"
+                        className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-3 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
                     >
                         <Edit className="mr-3" size={16} />
                         Edit Property
@@ -241,9 +224,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     </div>
                     <button
                         onClick={handleTogglePublicAccess}
-                        className={`relative h-6 w-11 rounded-full transition-colors ${
-                            publicAccessEnabled ? 'bg-primary' : 'bg-muted'
-                        }`}
+                        className={`relative h-6 w-11 rounded-full transition-colors ${publicAccessEnabled ? 'bg-primary' : 'bg-muted'}`}
                     >
                         <span
                             className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
@@ -263,7 +244,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                         <button
                             onClick={handleGenerateToken}
                             disabled={generatingToken}
-                            className="mb-3 flex w-full items-center justify-center rounded-lg border border-border bg-background/50 px-4 py-3 text-sm font-medium text-foreground transition-all hover:bg-background disabled:opacity-50 cursor-pointer"
+                            className="mb-3 flex w-full cursor-pointer items-center justify-center rounded-lg border border-border bg-background/50 px-4 py-3 text-sm font-medium text-foreground transition-all hover:bg-background disabled:opacity-50"
                         >
                             <RefreshCw className={`mr-2 ${generatingToken ? 'animate-spin' : ''}`} size={16} />
                             {inviteToken ? 'Regenerate Invite Link' : 'Generate Invite Link'}
@@ -274,7 +255,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                 {/* Copy Invite Link Button */}
                                 <button
                                     onClick={handleCopyInviteLink}
-                                    className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition-all hover:bg-primary/90 cursor-pointer"
+                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition-all hover:bg-primary/90"
                                 >
                                     {copiedToken ? (
                                         <>
@@ -291,7 +272,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
                                 {/* Token Expiration Info */}
                                 {tokenExpiresAt && (
-                                    <p className="text-xs text-muted-foreground text-center">
+                                    <p className="text-center text-xs text-muted-foreground">
                                         Expires: {new Date(tokenExpiresAt).toLocaleDateString()}
                                     </p>
                                 )}
@@ -299,7 +280,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                 {/* Invalidate Token Button */}
                                 <button
                                     onClick={handleInvalidateToken}
-                                    className="flex w-full items-center justify-center rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-xs font-medium text-destructive transition-all hover:bg-destructive/20 cursor-pointer"
+                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-xs font-medium text-destructive transition-all hover:bg-destructive/20"
                                 >
                                     <Trash2 className="mr-2" size={14} />
                                     Invalidate Link
@@ -310,9 +291,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                 )}
 
                 {publicAccessEnabled && (
-                    <p className="text-xs text-muted-foreground">
-                        Anyone with the property link can apply. No invite token needed.
-                    </p>
+                    <p className="text-xs text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>
                 )}
             </div>
 
@@ -323,13 +302,11 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     Danger Zone
                 </h3>
 
-                <p className="mb-4 text-sm text-muted-foreground">
-                    Deleting this property will permanently remove all associated data.
-                </p>
+                <p className="mb-4 text-sm text-muted-foreground">Deleting this property will permanently remove all associated data.</p>
 
                 <button
                     onClick={handleDelete}
-                    className="flex w-full items-center justify-center rounded-lg border border-destructive bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive transition-all hover:bg-destructive/20 cursor-pointer"
+                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-destructive bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive transition-all hover:bg-destructive/20"
                 >
                     <Trash2 className="mr-2" size={16} />
                     Delete Property

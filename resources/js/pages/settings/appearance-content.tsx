@@ -10,9 +10,9 @@ export default function AppearanceContent() {
 
     useEffect(() => {
         // Check current theme on mount
-        const savedTheme = localStorage.getItem('theme') as 'light' | 'system' | 'dark' || 'system';
+        const savedTheme = (localStorage.getItem('theme') as 'light' | 'system' | 'dark') || 'system';
         setTheme(savedTheme);
-        
+
         if (savedTheme === 'system') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             document.documentElement.classList.toggle('dark', prefersDark);
@@ -24,7 +24,7 @@ export default function AppearanceContent() {
     const handleThemeChange = (newTheme: 'light' | 'system' | 'dark') => {
         setTheme(newTheme);
         localStorage.setItem('theme', newTheme);
-        
+
         if (newTheme === 'system') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             document.documentElement.classList.toggle('dark', prefersDark);
@@ -47,28 +47,27 @@ export default function AppearanceContent() {
             {/* Theme Settings */}
             <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-6 xs:shadow-sm">
                 <h2 className="mb-4 text-xl font-semibold text-foreground">{t(translations.settings, 'appearance.theme')}</h2>
-                <p className="mb-6 text-sm text-muted-foreground">
-                    {t(translations.settings, 'appearance.theme_description')}
-                </p>
+                <p className="mb-6 text-sm text-muted-foreground">{t(translations.settings, 'appearance.theme_description')}</p>
 
                 {/* Theme Toggle */}
                 <div className="relative flex rounded-lg border border-border bg-background p-1">
                     {/* Full-width gradient background with clip-path window */}
                     <div
-                        className="absolute top-1 bottom-1 left-1 right-1 rounded-md bg-gradient-to-r from-primary to-secondary shadow-sm transition-all duration-400 ease-in-out"
+                        className="absolute top-1 right-1 bottom-1 left-1 rounded-md bg-gradient-to-r from-primary to-secondary shadow-sm transition-all duration-400 ease-in-out"
                         style={{
-                            clipPath: theme === 'light' 
-                                ? 'inset(0 66.67% 0 0 round 6px)' 
-                                : theme === 'dark'
-                                ? 'inset(0 33.33% 0 33.33% round 6px)'
-                                : 'inset(0 0 0 66.67% round 6px)'
+                            clipPath:
+                                theme === 'light'
+                                    ? 'inset(0 66.67% 0 0 round 6px)'
+                                    : theme === 'dark'
+                                      ? 'inset(0 33.33% 0 33.33% round 6px)'
+                                      : 'inset(0 0 0 66.67% round 6px)',
                         }}
                     />
 
                     <button
                         type="button"
                         onClick={() => handleThemeChange('light')}
-                        className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 cursor-pointer ${
+                        className={`relative flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
                             theme === 'light' ? 'text-white' : 'text-text-secondary hover:text-text-primary'
                         }`}
                     >
@@ -78,7 +77,7 @@ export default function AppearanceContent() {
                     <button
                         type="button"
                         onClick={() => handleThemeChange('dark')}
-                        className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 cursor-pointer ${
+                        className={`relative flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
                             theme === 'dark' ? 'text-white' : 'text-text-secondary hover:text-text-primary'
                         }`}
                     >
@@ -88,7 +87,7 @@ export default function AppearanceContent() {
                     <button
                         type="button"
                         onClick={() => handleThemeChange('system')}
-                        className={`relative flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 cursor-pointer ${
+                        className={`relative flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
                             theme === 'system' ? 'text-white' : 'text-text-secondary hover:text-text-primary'
                         }`}
                     >
@@ -97,9 +96,7 @@ export default function AppearanceContent() {
                     </button>
                 </div>
 
-                <div className="mt-4 text-xs text-muted-foreground">
-                    {t(translations.settings, 'appearance.theme_preference_saved')}
-                </div>
+                <div className="mt-4 text-xs text-muted-foreground">{t(translations.settings, 'appearance.theme_preference_saved')}</div>
             </div>
         </div>
     );

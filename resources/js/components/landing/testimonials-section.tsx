@@ -1,8 +1,8 @@
+import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
-import type { SharedData } from '@/types';
 
 interface Review {
     id: number;
@@ -91,17 +91,17 @@ export function TestimonialsSection() {
                             viewport={{ once: false, amount: 0.3 }}
                             className="group relative rounded-2xl border border-border bg-card/50 p-8 shadow-lg md:transition-all md:duration-300 md:hover:shadow-xl md:hover:shadow-primary/10 lg:h-full"
                         >
-                            <div className="hidden md:block absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                            <div className="absolute inset-0 hidden rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block" />
 
-                            <div className="relative flex flex-col h-full">
+                            <div className="relative flex h-full flex-col">
                                 {/* Rating */}
                                 <div className="mb-4 flex space-x-1">{renderStars(review.rating)}</div>
 
                                 {/* Content */}
-                                <p className="mb-6 leading-relaxed text-foreground flex-grow">"{review.content}"</p>
+                                <p className="mb-6 flex-grow leading-relaxed text-foreground">"{review.content}"</p>
 
                                 {/* Author */}
-                                <div className="flex items-center space-x-4 mt-auto">
+                                <div className="mt-auto flex items-center space-x-4">
                                     <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary font-semibold text-white">
                                         {review.avatarUrl ? (
                                             <img src={review.avatarUrl} alt={review.name} className="h-full w-full object-cover" />
@@ -112,7 +112,8 @@ export function TestimonialsSection() {
                                     <div>
                                         <div className="font-semibold text-foreground">{review.name}</div>
                                         <div className="text-sm text-muted-foreground">
-                                            {review.role} {review.company && ` ${translate(translations, 'landing.testimonials.at_keyword')} ${review.company}`}
+                                            {review.role}{' '}
+                                            {review.company && ` ${translate(translations, 'landing.testimonials.at_keyword')} ${review.company}`}
                                         </div>
                                     </div>
                                 </div>

@@ -3,7 +3,7 @@ import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
 import { Building2, ChevronLeft, ChevronRight, ChevronsUpDown, Home, LogOut, Settings, X } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface AppSidebarProps {
     sidebarOpen: boolean;
@@ -61,7 +61,7 @@ export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setS
 
     return (
         <aside
-            className={`fixed inset-y-0 left-0 z-50 transform bg-card border-r border-border transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+            className={`fixed inset-y-0 left-0 z-50 transform border-r border-border bg-card transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 ${
                 sidebarOpen ? 'translate-x-0' : '-translate-x-full'
             } ${sidebarCollapsed ? 'w-16' : 'w-64'}`}
         >
@@ -74,15 +74,12 @@ export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setS
                         </div>
                         {!sidebarCollapsed && <span className="text-lg font-bold text-foreground">RentPath</span>}
                     </div>
-                    <button
-                        onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden text-muted-foreground hover:text-foreground"
-                    >
+                    <button onClick={() => setSidebarOpen(false)} className="text-muted-foreground hover:text-foreground lg:hidden">
                         <X size={20} />
                     </button>
                     <button
                         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        className="hidden lg:block text-muted-foreground hover:text-foreground"
+                        className="hidden text-muted-foreground hover:text-foreground lg:block"
                     >
                         {sidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                     </button>
@@ -110,7 +107,7 @@ export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setS
                 <div className="border-t border-border p-4">
                     {/* Language Selector */}
                     {!sidebarCollapsed && (
-                        <div className="mb-3 pb-3 border-b border-border">
+                        <div className="mb-3 border-b border-border pb-3">
                             <LanguageSelector />
                         </div>
                     )}
@@ -134,9 +131,7 @@ export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setS
                             {!sidebarCollapsed && (
                                 <>
                                     <div className="flex-1 text-left">
-                                        {auth.user?.name && (
-                                            <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>
-                                        )}
+                                        {auth.user?.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
                                         <p className="truncate text-xs text-muted-foreground">{auth.user?.email}</p>
                                     </div>
                                     <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground" />
@@ -145,7 +140,9 @@ export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setS
                         </button>
 
                         {showUserMenu && (
-                            <div className={`absolute z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl ${sidebarCollapsed ? 'left-full ml-2 bottom-0' : 'bottom-full mb-2 left-0'}`}>
+                            <div
+                                className={`absolute z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl ${sidebarCollapsed ? 'bottom-0 left-full ml-2' : 'bottom-full left-0 mb-2'}`}
+                            >
                                 <div className="border-b border-border px-4 py-3">
                                     <div className="min-w-0">
                                         {auth.user?.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
@@ -156,7 +153,7 @@ export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setS
                                 <div className="py-1">
                                     <Link
                                         href="/settings"
-                                        className="text-text-secondary flex w-full items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background cursor-pointer"
+                                        className="text-text-secondary flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background"
                                     >
                                         <Settings size={16} />
                                         <span>{t(translations.header, 'settings')}</span>
@@ -164,7 +161,7 @@ export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setS
                                     <div className="mb-1 border-t border-border"></div>
                                     <button
                                         onClick={handleLogout}
-                                        className="flex w-full items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10 cursor-pointer"
+                                        className="flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10"
                                     >
                                         <LogOut size={16} />
                                         <span>{t(translations.header, 'sign_out')}</span>
