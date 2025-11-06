@@ -61,10 +61,10 @@ export default function Register() {
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
-                data={{ userType }}
             >
                 {({ processing, errors }) => (
                     <>
+                        <input type="hidden" name="userType" value={userType} />
                         <UserTypeToggle userType={userType} onUserTypeChange={handleUserTypeChange} />
 
                         <div className="grid gap-6">

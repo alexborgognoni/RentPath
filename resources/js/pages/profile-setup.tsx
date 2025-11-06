@@ -150,29 +150,28 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         const submittedType = data.type || selectedType;
 
         // Prepare form data
-        const formData: Record<string, unknown> = {
-            type: submittedType,
-            phone_country_code: data.phone_prefix || '+1',
-            phone_number: data.phone_number || '',
-            remove_profile_picture: data.profile_picture === 'removed',
-        };
+        const formData = new FormData();
+        formData.append('type', submittedType);
+        formData.append('phone_country_code', data.phone_prefix || '+1');
+        formData.append('phone_number', data.phone_number || '');
+        formData.append('remove_profile_picture', data.profile_picture === 'removed' ? '1' : '0');
 
         // Add professional fields if professional type
         if (submittedType === 'professional') {
-            formData.company_name = data.company_name || '';
-            formData.company_website = data.company_website || '';
-            formData.license_number = data.license_number || '';
+            formData.append('company_name', data.company_name || '');
+            formData.append('company_website', data.company_website || '');
+            formData.append('license_number', data.license_number || '');
         }
 
         // Add files if they exist
         if (data.profile_picture && data.profile_picture !== 'removed' && data.profile_picture instanceof File) {
-            formData.profile_picture = data.profile_picture;
+            formData.append('profile_picture', data.profile_picture);
         }
         if (data.id_document && data.id_document !== 'removed' && data.id_document instanceof File) {
-            formData.id_document = data.id_document;
+            formData.append('id_document', data.id_document);
         }
         if (data.license_document && data.license_document !== 'removed' && data.license_document instanceof File) {
-            formData.license_document = data.license_document;
+            formData.append('license_document', data.license_document);
         }
 
         // Client-side validation
@@ -224,7 +223,6 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         const endpoint = isEditing ? '/edit-profile' : '/profile/setup';
 
         router.post(endpoint, formData, {
-            forceFormData: true,
             onError: (errors) => {
                 console.error('Submission errors:', errors);
                 // Get all error messages

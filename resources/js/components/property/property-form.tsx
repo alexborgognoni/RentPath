@@ -1,4 +1,4 @@
-import type { Property, PropertyFormData } from '@/types/dashboard';
+import type { Property } from '@/types/dashboard';
 import { router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Bold, Camera, HousePlus, Italic, Link, List, ListOrdered, Upload, X } from 'lucide-react';
@@ -187,30 +187,31 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
         setIsSubmitting(true);
 
         try {
-            const submitData: PropertyFormData = {
-                title: formData.title,
-                house_number: formData.house_number,
-                street_name: formData.street_name,
-                street_line2: formData.street_line2 || undefined,
-                city: formData.city,
-                state: formData.state || undefined,
-                postal_code: formData.postal_code,
-                country: formData.country,
-                description: formData.description,
-                type: formData.type,
-                subtype: 'studio', // Default for now - form should be updated to collect this
-                bedrooms: formData.bedrooms,
-                bathrooms: formData.bathrooms,
-                parking_spots_interior: formData.parking_spots,
-                parking_spots_exterior: 0,
-                size: Number(formData.size),
-                available_date: formData.available_date || undefined,
-                rent_amount: Number(formData.rent_amount),
-                rent_currency: formData.rent_currency,
-                images: selectedImage ? [selectedImage] : undefined,
-            };
+            const data = new FormData();
+            data.append('title', formData.title);
+            data.append('house_number', formData.house_number);
+            data.append('street_name', formData.street_name);
+            if (formData.street_line2) data.append('street_line2', formData.street_line2);
+            data.append('city', formData.city);
+            if (formData.state) data.append('state', formData.state);
+            data.append('postal_code', formData.postal_code);
+            data.append('country', formData.country);
+            data.append('description', formData.description);
+            data.append('type', formData.type);
+            data.append('subtype', 'studio'); // Default for now - form should be updated to collect this
+            data.append('bedrooms', formData.bedrooms.toString());
+            data.append('bathrooms', formData.bathrooms.toString());
+            data.append('parking_spots_interior', formData.parking_spots.toString());
+            data.append('parking_spots_exterior', '0');
+            data.append('size', formData.size.toString());
+            if (formData.available_date) data.append('available_date', formData.available_date);
+            data.append('rent_amount', formData.rent_amount.toString());
+            data.append('rent_currency', formData.rent_currency);
+            if (selectedImage) {
+                data.append('images[]', selectedImage);
+            }
 
-            router.post('/properties', submitData, {
+            router.post('/properties', data, {
                 onSuccess: () => {
                     onClose();
                     // The server redirects to dashboard automatically

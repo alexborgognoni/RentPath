@@ -63,9 +63,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthLayout title={t(translations.auth, 'login.title')} description={t(translations.auth, 'login.description')}>
             <Head title={t(translations.auth, 'login.head_title')} />
 
-            <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6" data={{ userType }}>
+            <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
                 {({ processing, errors }) => (
                     <>
+                        <input type="hidden" name="userType" value={userType} />
                         <UserTypeToggle userType={userType} onUserTypeChange={handleUserTypeChange} />
 
                         <div className="grid gap-6">
