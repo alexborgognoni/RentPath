@@ -108,8 +108,7 @@ export interface Property {
     tenant_count?: number; // This will be computed/added by backend
     // Application access control and invite tokens
     requires_invite: boolean;
-    invite_token?: string | null;
-    invite_token_expires_at?: string | null;
+    default_token?: { token: string; used_count: number } | null;
     created_at: string;
     updated_at: string;
     // Computed attributes

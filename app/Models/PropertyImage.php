@@ -33,31 +33,10 @@ class PropertyImage extends Model
     ];
 
     /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
-    protected $appends = [
-        'image_url',
-    ];
-
-    /**
      * Get the property that owns the image.
      */
     public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);
-    }
-
-    /**
-     * Get the image URL attribute.
-     */
-    public function getImageUrlAttribute(): ?string
-    {
-        if (!$this->image_path) {
-            return null;
-        }
-
-        return route('properties.images.show', ['property' => $this->property_id, 'propertyImage' => $this->id]);
     }
 }

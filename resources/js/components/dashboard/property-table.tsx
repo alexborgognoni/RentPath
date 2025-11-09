@@ -1,5 +1,6 @@
 import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { copyToClipboard } from '@/utils/clipboard';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { ArrowDown, ArrowUp, ArrowUpDown, Bath, Bed, Car, ChevronRight, Link as LinkIcon, Users } from 'lucide-react';
@@ -144,10 +145,13 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
         return parts.join(', ');
     };
 
-    const handleInvite = (e: React.MouseEvent, property: Property) => {
+    const handleInvite = async (e: React.MouseEvent, property: Property) => {
         e.stopPropagation();
-        const applicationUrl = `${window.location.origin}/invite/${property.invite_token}`;
-        navigator.clipboard.writeText(applicationUrl);
+        const rootDomain = window.location.origin.replace('manager.', '');
+        const applicationUrl = property.default_token
+            ? `${rootDomain}/properties/${property.id}?token=${property.default_token.token}`
+            : `${rootDomain}/properties/${property.id}`;
+        await copyToClipboard(applicationUrl);
         // TODO: Add toast notification
     };
 

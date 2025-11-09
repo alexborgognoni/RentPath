@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyManagerController;
+use App\Http\Controllers\PropertyViewController;
 
 // Helper to check current subdomain
 if (!function_exists('currentSubdomain')) {
@@ -81,6 +82,22 @@ Route::get('/contact-us', function () {
     return Inertia::render('contact-us');
 })->name('contact.us');
 
+// Property viewing (public or token-protected)
+Route::get('/properties/{property}', [PropertyViewController::class, 'show'])
+    ->name('tenant.properties.show');
+
+Route::get('/properties/{property}/images/{imageId}', [PropertyViewController::class, 'showImage'])
+    ->name('tenant.properties.images.show');
+
+// Private storage route for serving signed URLs (tenant side)
+Route::get('/private-storage/{path}', function ($path) {
+    $disk = \App\Helpers\StorageHelper::getDisk('private');
+    if (!Storage::disk($disk)->exists($path)) {
+        abort(404);
+    }
+    return Storage::disk($disk)->response($path);
+})->where('path', '.*')->middleware('signed')->name('tenant.private.storage');
+
 Route::post('/locale', function (Request $request) {
     $locale = $request->input('locale');
     if (in_array($locale, ['en', 'fr', 'de', 'nl'])) {
@@ -125,7 +142,25 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
         $properties = $user->properties()
             ->with('images')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($property) {
+                $propertyArray = $property->toArray();
+
+                // Transform images to include URLs
+                if ($property->images) {
+                    $propertyArray['images'] = $property->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image_url' => \App\Helpers\StorageHelper::url($image->image_path, 'private', 1440),
+                            'image_path' => $image->image_path,
+                            'is_main' => $image->is_main,
+                            'sort_order' => $image->sort_order,
+                        ];
+                    })->sortBy('sort_order')->values()->toArray();
+                }
+
+                return $propertyArray;
+            });
 
         \Log::info('Rendering manager dashboard');
         return Inertia::render('dashboard', [
@@ -216,8 +251,6 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
         Route::put('properties/{property}', [PropertyController::class, 'update'])
             ->name('properties.update');
 
-        Route::patch('properties/{property}', [PropertyController::class, 'update']);
-
         Route::delete('properties/{property}', [PropertyController::class, 'destroy'])
             ->name('properties.destroy');
 
@@ -234,16 +267,23 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
         Route::post('properties/{property}/toggle-public-access', [PropertyController::class, 'togglePublicAccess'])
             ->name('properties.togglePublicAccess');
 
-        // Image routes
-        Route::get('properties/{property}/image', [PropertyController::class, 'showImage'])
-            ->name('properties.image');
+        // Invite token management
+        Route::post('properties/{property}/regenerate-default-token', [PropertyController::class, 'regenerateDefaultToken'])
+            ->name('properties.regenerateDefaultToken');
 
-        Route::get('properties/{property}/image/signed', [PropertyController::class, 'showImageSigned'])
-            ->name('properties.image.signed');
+        Route::get('properties/{property}/invite-tokens', [PropertyController::class, 'getInviteTokens'])
+            ->name('properties.getInviteTokens');
 
-        Route::get('properties/{property}/images/{propertyImage}', [PropertyController::class, 'showPropertyImage'])
-            ->name('properties.images.show');
+        Route::post('properties/{property}/invite-tokens', [PropertyController::class, 'createCustomToken'])
+            ->name('properties.createCustomToken');
 
+        Route::put('properties/{property}/invite-tokens/{tokenId}', [PropertyController::class, 'updateCustomToken'])
+            ->name('properties.updateCustomToken');
+
+        Route::delete('properties/{property}/invite-tokens/{tokenId}', [PropertyController::class, 'deleteCustomToken'])
+            ->name('properties.deleteCustomToken');
+
+        // Image upload/delete routes (legacy - not currently used)
         Route::post('api/images/upload', [ImageUploadController::class, 'upload'])
             ->name('images.upload');
 

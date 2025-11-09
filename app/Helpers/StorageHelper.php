@@ -80,8 +80,16 @@ class StorageHelper
             }
 
             // Local: Laravel signed URLs (mimics CloudFront behavior)
+            // Use appropriate route based on current subdomain
+            $currentHost = request()->getHost();
+            $managerHost = env('MANAGER_SUBDOMAIN', 'manager') . '.' . config('app.domain');
+
+            $routeName = ($currentHost === $managerHost)
+                ? 'private.storage'
+                : 'tenant.private.storage';
+
             return \Illuminate\Support\Facades\URL::temporarySignedRoute(
-                'private.storage',
+                $routeName,
                 now()->addMinutes($expiresInMinutes),
                 ['path' => $path]
             );

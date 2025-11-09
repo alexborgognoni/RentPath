@@ -1,7 +1,9 @@
 import type { Property } from '@/types/dashboard';
+import { copyToClipboard } from '@/utils/clipboard';
 import { router } from '@inertiajs/react';
 import { Check, Copy, Edit, FileText, Link2, RefreshCw, Settings, Share, Trash2, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { InviteTokensModal } from './invite-tokens-modal';
 
 interface PropertySidebarProps {
     property: Property;
@@ -10,10 +12,29 @@ interface PropertySidebarProps {
 
 export function PropertySidebar({ property, tenantCount }: PropertySidebarProps) {
     const [requiresInvite, setRequiresInvite] = useState(property.requires_invite ?? true);
-    const [inviteToken, setInviteToken] = useState(property.invite_token || null);
-    const [tokenExpiresAt, setTokenExpiresAt] = useState(property.invite_token_expires_at || null);
+    const [defaultToken, setDefaultToken] = useState<{ token: string; used_count: number } | null>(property.default_token || null);
     const [copiedToken, setCopiedToken] = useState(false);
-    const [generatingToken, setGeneratingToken] = useState(false);
+    const [regeneratingToken, setRegeneratingToken] = useState(false);
+
+    // Check URL params on mount to open modal if ?manageTokens=true
+    const [showTokensModal, setShowTokensModal] = useState(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('manageTokens') === 'true';
+    });
+
+    // Update URL when modal state changes
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        if (showTokensModal) {
+            params.set('manageTokens', 'true');
+        } else {
+            params.delete('manageTokens');
+        }
+
+        const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+    }, [showTokensModal]);
 
     const formatCurrency = (amount: number, currency: string) => {
         const currencyMap: Record<string, string> = {
@@ -56,63 +77,59 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             if (response.ok) {
                 const data = await response.json();
                 setRequiresInvite(data.requires_invite);
+
+                // If enabling and default token was created/returned, update state
+                if (data.default_token) {
+                    setDefaultToken({
+                        token: data.default_token.token,
+                        used_count: data.default_token.used_count,
+                    });
+                } else {
+                    setDefaultToken(null);
+                }
             }
         } catch (error) {
             console.error('Failed to toggle invite requirement:', error);
         }
     };
 
-    const handleGenerateToken = async () => {
-        setGeneratingToken(true);
+    const handleRegenerateDefaultToken = async () => {
+        setRegeneratingToken(true);
         try {
-            const response = await fetch(`/properties/${property.id}/invite-token`, {
+            const response = await fetch(`/properties/${property.id}/regenerate-default-token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
                 },
-                body: JSON.stringify({ expiration_days: 30 }),
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setInviteToken(data.token);
-                setTokenExpiresAt(data.expires_at);
+                setDefaultToken({
+                    token: data.token,
+                    used_count: data.used_count,
+                });
             }
         } catch (error) {
-            console.error('Failed to generate token:', error);
+            console.error('Failed to regenerate token:', error);
         } finally {
-            setGeneratingToken(false);
+            setRegeneratingToken(false);
         }
     };
 
-    const handleCopyInviteLink = () => {
-        if (inviteToken) {
-            const inviteUrl = `${window.location.origin}/property/${property.id}?token=${inviteToken}`;
-            navigator.clipboard.writeText(inviteUrl);
+    const handleCopyInviteLink = async () => {
+        if (!defaultToken?.token) {
+            return;
+        }
+
+        const rootDomain = window.location.origin.replace('manager.', '');
+        const inviteUrl = `${rootDomain}/properties/${property.id}?token=${defaultToken.token}`;
+
+        const success = await copyToClipboard(inviteUrl);
+        if (success) {
             setCopiedToken(true);
             setTimeout(() => setCopiedToken(false), 2000);
-        }
-    };
-
-    const handleInvalidateToken = async () => {
-        if (confirm('Are you sure you want to invalidate the current invite link?')) {
-            try {
-                const response = await fetch(`/properties/${property.id}/invite-token`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                    },
-                });
-
-                if (response.ok) {
-                    setInviteToken(null);
-                    setTokenExpiresAt(null);
-                }
-            } catch (error) {
-                console.error('Failed to invalidate token:', error);
-            }
         }
     };
 
@@ -237,22 +254,22 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                 {requiresInvite && (
                     <>
                         <p className="mb-4 text-xs text-muted-foreground">
-                            Invite required. Generate an invite link to share with specific applicants.
+                            Invite required. Share the default invite link or create custom links with specific restrictions.
                         </p>
 
-                        {/* Generate/Regenerate Token Button */}
-                        <button
-                            onClick={handleGenerateToken}
-                            disabled={generatingToken}
-                            className="mb-3 flex w-full cursor-pointer items-center justify-center rounded-lg border border-border bg-background/50 px-4 py-3 text-sm font-medium text-foreground transition-all hover:bg-background disabled:opacity-50"
-                        >
-                            <RefreshCw className={`mr-2 ${generatingToken ? 'animate-spin' : ''}`} size={16} />
-                            {inviteToken ? 'Regenerate Invite Link' : 'Generate Invite Link'}
-                        </button>
-
-                        {inviteToken && (
+                        {defaultToken && (
                             <div className="space-y-3">
-                                {/* Copy Invite Link Button */}
+                                {/* Default Token Info */}
+                                <div className="rounded-lg border border-border bg-background/30 p-3">
+                                    <div className="mb-2 flex items-center justify-between">
+                                        <span className="text-xs font-medium text-muted-foreground">Default Invite Link</span>
+                                        <span className="text-xs text-muted-foreground">
+                                            Used {defaultToken.used_count} {defaultToken.used_count === 1 ? 'time' : 'times'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Copy Default Invite Link Button */}
                                 <button
                                     onClick={handleCopyInviteLink}
                                     className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition-all hover:bg-primary/90"
@@ -265,34 +282,35 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     ) : (
                                         <>
                                             <Copy className="mr-2" size={16} />
-                                            Copy Invite Link
+                                            Copy Default Link
                                         </>
                                     )}
                                 </button>
 
-                                {/* Token Expiration Info */}
-                                {tokenExpiresAt && (
-                                    <p className="text-center text-xs text-muted-foreground">
-                                        Expires: {new Date(tokenExpiresAt).toLocaleDateString()}
-                                    </p>
-                                )}
-
-                                {/* Invalidate Token Button */}
+                                {/* Regenerate Default Token Button */}
                                 <button
-                                    onClick={handleInvalidateToken}
-                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-xs font-medium text-destructive transition-all hover:bg-destructive/20"
+                                    onClick={handleRegenerateDefaultToken}
+                                    disabled={regeneratingToken}
+                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-border bg-background/50 px-4 py-2 text-xs font-medium text-foreground transition-all hover:bg-background disabled:opacity-50"
                                 >
-                                    <Trash2 className="mr-2" size={14} />
-                                    Invalidate Link
+                                    <RefreshCw className={`mr-2 ${regeneratingToken ? 'animate-spin' : ''}`} size={14} />
+                                    Regenerate Default Link
+                                </button>
+
+                                {/* Manage Custom Tokens Button */}
+                                <button
+                                    onClick={() => setShowTokensModal(true)}
+                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition-all hover:bg-primary/20"
+                                >
+                                    <Settings className="mr-2" size={14} />
+                                    Manage Custom Invite Links
                                 </button>
                             </div>
                         )}
                     </>
                 )}
 
-                {!requiresInvite && (
-                    <p className="text-xs text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>
-                )}
+                {!requiresInvite && <p className="text-xs text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>}
             </div>
 
             {/* Danger Zone */}
@@ -312,6 +330,9 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     Delete Property
                 </button>
             </div>
+
+            {/* Invite Tokens Modal */}
+            <InviteTokensModal propertyId={property.id} isOpen={showTokensModal} onClose={() => setShowTokensModal(false)} />
         </div>
     );
 }

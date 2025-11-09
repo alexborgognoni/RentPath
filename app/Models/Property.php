@@ -122,6 +122,14 @@ class Property extends Model
     }
 
     /**
+     * Get the invite tokens for the property.
+     */
+    public function inviteTokens()
+    {
+        return $this->hasMany(ApplicationInviteToken::class);
+    }
+
+    /**
      * Get the main image for the property.
      */
     public function mainImage()
@@ -317,13 +325,78 @@ class Property extends Model
 
     /**
      * Check if the property can be accessed with the given token.
+     * Now checks ApplicationInviteToken table instead of property.invite_token.
      */
     public function canAccessWithToken(string $token): bool
     {
-        if ($this->invite_token !== $token) {
+        $inviteToken = $this->inviteTokens()->where('token', $token)->first();
+
+        if (!$inviteToken) {
             return false;
         }
 
-        return $this->hasValidInviteToken();
+        return $inviteToken->canBeUsed();
+    }
+
+    /**
+     * Get or create the default invite token for this property.
+     */
+    public function getOrCreateDefaultToken(): ApplicationInviteToken
+    {
+        $defaultToken = $this->inviteTokens()->default()->first();
+
+        if (!$defaultToken) {
+            $defaultToken = $this->inviteTokens()->create([
+                'name' => 'Default',
+                'token' => ApplicationInviteToken::generateToken(),
+                'type' => 'private',
+                'max_uses' => null,
+                'expires_at' => null,
+            ]);
+        }
+
+        return $defaultToken;
+    }
+
+    /**
+     * Regenerate the default invite token.
+     */
+    public function regenerateDefaultToken(): ApplicationInviteToken
+    {
+        $defaultToken = $this->inviteTokens()->default()->first();
+
+        if ($defaultToken) {
+            $defaultToken->update([
+                'token' => ApplicationInviteToken::generateToken(),
+                'used_count' => 0, // Reset usage count
+            ]);
+        } else {
+            $defaultToken = $this->getOrCreateDefaultToken();
+        }
+
+        return $defaultToken;
+    }
+
+    /**
+     * Get the default invite token (read-only, doesn't create).
+     */
+    public function getDefaultToken(): ?ApplicationInviteToken
+    {
+        return $this->inviteTokens()->default()->first();
+    }
+
+    /**
+     * Create a custom invite token.
+     */
+    public function createCustomToken(array $data): ApplicationInviteToken
+    {
+        return $this->inviteTokens()->create([
+            'name' => $data['name'] ?? null,
+            'token' => ApplicationInviteToken::generateToken(),
+            'type' => $data['type'] ?? 'private',
+            'email' => $data['email'] ?? null,
+            'max_uses' => $data['max_uses'] ?? null,
+            'expires_at' => $data['expires_at'] ?? null,
+        ]);
     }
 }

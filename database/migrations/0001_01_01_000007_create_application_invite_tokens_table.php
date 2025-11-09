@@ -20,6 +20,8 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             // Token details
+            $table->string('name')->nullable()
+                ->comment('Optional name for the token (e.g., "Open House Link")');
             $table->string('token', 64)->unique();
 
             // Token type
@@ -40,21 +42,12 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable()
                 ->comment('When the token becomes invalid');
 
-            // Status
-            $table->enum('status', ['active', 'revoked', 'expired'])->default('active');
-
-            // Creator tracking
-            $table->foreignId('created_by_user_id')
-                ->constrained('users')
-                ->onDelete('cascade');
-
             $table->timestamps();
 
-            // Indexes
-            $table->index(['property_id', 'status'], 'idx_tokens_property_status');
-            $table->index(['token', 'expires_at'], 'idx_tokens_token_lookup');
-            $table->index('email', 'idx_tokens_email');
-            $table->index('status', 'idx_tokens_status');
+            // Indexes for performance
+            $table->index('property_id');
+            $table->index(['token', 'expires_at']);
+            $table->index('email');
         });
     }
 

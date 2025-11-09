@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StorageHelper;
 use App\Models\Property;
 use App\Models\PropertyImage;
 use Illuminate\Http\Request;
@@ -151,7 +152,7 @@ class PropertyController extends Controller
         // Handle image uploads
         if (!empty($images)) {
             foreach ($images as $index => $image) {
-                $path = $image->store('properties/' . $property->id, 'properties');
+                $path = StorageHelper::store($image, 'properties/' . $property->id, 'private');
 
                 $property->images()->create([
                     'image_path' => $path,
@@ -179,11 +180,34 @@ class PropertyController extends Controller
         // Load property images
         $property->load('images');
 
-        // Set tenant count (will be implemented later)
-        $property->tenant_count = 0;
+        // Transform images to include URLs
+        $imagesWithUrls = $property->images->map(function ($image) {
+            return [
+                'id' => $image->id,
+                'image_url' => StorageHelper::url($image->image_path, 'private', 1440),
+                'image_path' => $image->image_path,
+                'is_main' => $image->is_main,
+                'sort_order' => $image->sort_order,
+            ];
+        })->sortBy('sort_order')->values();
+
+        // Build property data
+        $propertyData = $property->toArray();
+        $propertyData['images'] = $imagesWithUrls;
+        $propertyData['tenant_count'] = 0; // Will be implemented later
+
+        // Add default token if requires_invite is enabled
+        $propertyData['default_token'] = null;
+        if ($property->requires_invite) {
+            $defaultTokenModel = $property->getOrCreateDefaultToken();
+            $propertyData['default_token'] = [
+                'token' => $defaultTokenModel->token,
+                'used_count' => $defaultTokenModel->used_count,
+            ];
+        }
 
         return Inertia::render('property', [
-            'property' => $property,
+            'property' => $propertyData,
             'propertyId' => (string) $property->id,
         ]);
     }
@@ -304,14 +328,15 @@ class PropertyController extends Controller
         // Handle new image uploads
         if (!empty($images)) {
             // Delete old images
+            $disk = \App\Helpers\StorageHelper::getDisk('private');
             foreach ($property->images as $oldImage) {
-                Storage::disk('properties')->delete($oldImage->image_path);
+                Storage::disk($disk)->delete($oldImage->image_path);
                 $oldImage->delete();
             }
 
             // Upload new images
             foreach ($images as $index => $image) {
-                $path = $image->store('properties/' . $property->id, 'properties');
+                $path = StorageHelper::store($image, 'properties/' . $property->id, 'private');
 
                 $property->images()->create([
                     'image_path' => $path,
@@ -421,6 +446,7 @@ class PropertyController extends Controller
 
     /**
      * Toggle invite requirement for applications.
+     * When enabling for the first time, creates default token.
      */
     public function togglePublicAccess(Property $property)
     {
@@ -433,88 +459,183 @@ class PropertyController extends Controller
         $property->requires_invite = !$property->requires_invite;
         $property->save();
 
+        // If enabling requires_invite for first time, create default token
+        $defaultToken = null;
+        if ($property->requires_invite) {
+            $defaultToken = $property->getOrCreateDefaultToken();
+        }
+
         return response()->json([
             'requires_invite' => $property->requires_invite,
+            'default_token' => $defaultToken ? [
+                'token' => $defaultToken->token,
+                'used_count' => $defaultToken->used_count,
+            ] : null,
         ]);
     }
 
     /**
-     * Serve property image securely to authenticated property owner.
+     * Regenerate the default invite token.
      */
-    public function showImage(Property $property)
+    public function regenerateDefaultToken(Property $property)
     {
-        // Ensure user owns this property through their property manager
+        // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
         if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
-        if (!$property->image_path) {
-            abort(404, 'No image found for this property');
-        }
+        $defaultToken = $property->regenerateDefaultToken();
 
-        if (!Storage::disk('properties')->exists($property->image_path)) {
-            abort(404, 'Image file not found');
-        }
-
-        $file = Storage::disk('properties')->get($property->image_path);
-        $mimeType = Storage::disk('properties')->mimeType($property->image_path);
-
-        return response($file, 200)
-            ->header('Content-Type', $mimeType)
-            ->header('Cache-Control', 'public, max-age=3600');
+        return response()->json([
+            'token' => $defaultToken->token,
+            'used_count' => $defaultToken->used_count,
+        ]);
     }
 
     /**
-     * Serve property image via temporary signed URL for sharing.
+     * Get all invite tokens for a property.
      */
-    public function showImageSigned(Request $request, Property $property)
+    public function getInviteTokens(Property $property)
     {
-        if (!$request->hasValidSignature()) {
-            abort(403, 'Invalid or expired signature');
-        }
-
-        if (!$property->image_path) {
-            abort(404, 'No image found for this property');
-        }
-
-        if (!Storage::disk('properties')->exists($property->image_path)) {
-            abort(404, 'Image file not found');
-        }
-
-        $file = Storage::disk('properties')->get($property->image_path);
-        $mimeType = Storage::disk('properties')->mimeType($property->image_path);
-
-        return response($file, 200)
-            ->header('Content-Type', $mimeType)
-            ->header('Cache-Control', 'public, max-age=3600');
-    }
-
-    /**
-     * Serve individual property image from property_images table.
-     */
-    public function showPropertyImage(Property $property, PropertyImage $propertyImage)
-    {
-        // Ensure the image belongs to the property
-        if ($propertyImage->property_id !== $property->id) {
-            abort(404);
-        }
-
-        // Ensure user owns this property through their property manager
+        // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
         if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
-        if (!Storage::disk('properties')->exists($propertyImage->image_path)) {
-            abort(404, 'Image file not found');
+        $tokens = $property->inviteTokens()->get()->map(function ($token) {
+            return [
+                'id' => $token->id,
+                'name' => $token->name,
+                'token' => $token->token,
+                'type' => $token->type,
+                'email' => $token->email,
+                'max_uses' => $token->max_uses,
+                'used_count' => $token->used_count,
+                'expires_at' => $token->expires_at?->toISOString(),
+                'is_valid' => $token->isValid(),
+                'is_default' => $token->isDefault(),
+            ];
+        });
+
+        return response()->json([
+            'tokens' => $tokens,
+        ]);
+    }
+
+    /**
+     * Create a custom invite token.
+     */
+    public function createCustomToken(Request $request, Property $property)
+    {
+        // Ensure user owns this property
+        $propertyManager = Auth::user()->propertyManager;
+        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+            abort(403);
         }
 
-        $file = Storage::disk('properties')->get($propertyImage->image_path);
-        $mimeType = Storage::disk('properties')->mimeType($propertyImage->image_path);
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'type' => 'required|in:private,invite',
+            'email' => 'nullable|required_if:type,invite|email',
+            'max_uses' => 'nullable|integer|min:1',
+            'expires_at' => 'nullable|date|after:today',
+        ]);
 
-        return response($file, 200)
-            ->header('Content-Type', $mimeType)
-            ->header('Cache-Control', 'public, max-age=3600');
+        $tokenData = [
+            'name' => $validated['name'] ?? null,
+            'type' => $validated['type'],
+            'email' => $validated['email'] ?? null,
+            'max_uses' => $validated['max_uses'] ?? null,
+            'expires_at' => $validated['expires_at'] ?? null,
+        ];
+
+        $token = $property->createCustomToken($tokenData);
+
+        return response()->json([
+            'id' => $token->id,
+            'name' => $token->name,
+            'token' => $token->token,
+            'type' => $token->type,
+            'email' => $token->email,
+            'max_uses' => $token->max_uses,
+            'used_count' => $token->used_count,
+            'expires_at' => $token->expires_at?->toISOString(),
+            'is_valid' => $token->isValid(),
+        ]);
+    }
+
+    /**
+     * Update a custom invite token.
+     */
+    public function updateCustomToken(Request $request, Property $property, $tokenId)
+    {
+        // Ensure user owns this property
+        $propertyManager = Auth::user()->propertyManager;
+        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+            abort(403);
+        }
+
+        $token = $property->inviteTokens()->findOrFail($tokenId);
+
+        // Cannot edit default token via this endpoint
+        if ($token->isDefault()) {
+            abort(403, 'Cannot edit default token');
+        }
+
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'max_uses' => 'nullable|integer|min:1',
+            'expires_in_days' => 'nullable|integer|min:1|max:365',
+        ]);
+
+        $updates = [
+            'name' => $validated['name'] ?? $token->name,
+            'max_uses' => $validated['max_uses'] ?? $token->max_uses,
+        ];
+
+        if (isset($validated['expires_in_days'])) {
+            $updates['expires_at'] = now()->addDays($validated['expires_in_days']);
+        }
+
+        $token->update($updates);
+
+        return response()->json([
+            'id' => $token->id,
+            'name' => $token->name,
+            'token' => $token->token,
+            'type' => $token->type,
+            'email' => $token->email,
+            'max_uses' => $token->max_uses,
+            'used_count' => $token->used_count,
+            'expires_at' => $token->expires_at?->toISOString(),
+            'is_valid' => $token->isValid(),
+        ]);
+    }
+
+    /**
+     * Delete a custom invite token.
+     */
+    public function deleteCustomToken(Property $property, $tokenId)
+    {
+        // Ensure user owns this property
+        $propertyManager = Auth::user()->propertyManager;
+        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+            abort(403);
+        }
+
+        $token = $property->inviteTokens()->findOrFail($tokenId);
+
+        // Cannot delete default token
+        if ($token->isDefault()) {
+            abort(403, 'Cannot delete default token');
+        }
+
+        $token->delete();
+
+        return response()->json([
+            'message' => 'Token deleted successfully',
+        ]);
     }
 }

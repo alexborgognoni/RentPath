@@ -1,5 +1,6 @@
 import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { copyToClipboard } from '@/utils/clipboard';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Copy, ExternalLink, Users } from 'lucide-react';
@@ -25,11 +26,14 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
         return fullAddress;
     };
 
-    const applicationUrl = `${window.location.origin}/invite/${property.invite_token}`;
+    const rootDomain = window.location.origin.replace('manager.', '');
+    const applicationUrl = property.default_token
+        ? `${rootDomain}/properties/${property.id}?token=${property.default_token.token}`
+        : `${rootDomain}/properties/${property.id}`;
 
-    const copyApplicationLink = (e: React.MouseEvent) => {
+    const copyApplicationLink = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        navigator.clipboard.writeText(applicationUrl);
+        await copyToClipboard(applicationUrl);
         // TODO: Add toast notification here when toast system is available
     };
 

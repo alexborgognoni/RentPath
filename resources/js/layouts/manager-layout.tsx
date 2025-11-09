@@ -63,7 +63,7 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                         {breadcrumbs && breadcrumbs.length > 0 && (
                             <nav className="mb-6 flex items-center space-x-2 text-sm">
                                 {breadcrumbs.map((crumb, index) => (
-                                    <div key={crumb.href || index} className="flex items-center space-x-2">
+                                    <div key={`breadcrumb-${index}`} className="flex items-center space-x-2">
                                         {index > 0 && <span className="text-muted-foreground">/</span>}
                                         {index === breadcrumbs.length - 1 || !crumb.href ? (
                                             <span className="font-semibold text-foreground">{crumb.title}</span>
