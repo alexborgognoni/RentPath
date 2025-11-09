@@ -106,8 +106,8 @@ export interface Property {
         | 'maintenance'
         | 'archived';
     tenant_count?: number; // This will be computed/added by backend
-    // Public access and invite tokens
-    public_apply_url_enabled: boolean;
+    // Application access control and invite tokens
+    requires_invite: boolean;
     invite_token?: string | null;
     invite_token_expires_at?: string | null;
     created_at: string;

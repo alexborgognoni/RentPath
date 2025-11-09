@@ -80,9 +80,10 @@ tenant_profiles (optional profile, 1:1 with users)
 - Status (inactive → available → application_received → ... → leased → archived)
 
 **Access Control**:
-- `public_apply_url_enabled`: Toggle for open applications
-- `invite_token`: 64-char token for private access
+- `requires_invite`: Boolean - when true, only invite tokens grant access; when false, direct URLs work
+- `invite_token`: 64-char token for private/controlled access
 - `invite_token_expires_at`: Token expiration
+- Note: Future enhancement will add `is_listed` for public listing visibility (separate from application access)
 
 **Images**: Multiple images via `property_images` table (has `is_main` flag, sort order)
 

@@ -68,8 +68,8 @@ class Property extends Model
         'postal_code',
         'country',
 
-        // Public access and invite tokens
-        'public_apply_url_enabled',
+        // Application access control and invite tokens
+        'requires_invite',
         'invite_token',
         'invite_token_expires_at',
     ];
@@ -101,7 +101,7 @@ class Property extends Model
         'has_garden' => 'boolean',
         'has_rooftop' => 'boolean',
         'extras' => 'array',
-        'public_apply_url_enabled' => 'boolean',
+        'requires_invite' => 'boolean',
         'invite_token_expires_at' => 'datetime',
     ];
 
@@ -308,10 +308,11 @@ class Property extends Model
 
     /**
      * Check if the property can be accessed publicly for applications.
+     * Returns true if invite is NOT required (inverted from requires_invite).
      */
     public function isPubliclyAccessible(): bool
     {
-        return $this->public_apply_url_enabled === true;
+        return $this->requires_invite === false;
     }
 
     /**

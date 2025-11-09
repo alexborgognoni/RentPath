@@ -420,7 +420,7 @@ class PropertyController extends Controller
     }
 
     /**
-     * Toggle public apply URL access.
+     * Toggle invite requirement for applications.
      */
     public function togglePublicAccess(Property $property)
     {
@@ -430,11 +430,11 @@ class PropertyController extends Controller
             abort(403);
         }
 
-        $property->public_apply_url_enabled = !$property->public_apply_url_enabled;
+        $property->requires_invite = !$property->requires_invite;
         $property->save();
 
         return response()->json([
-            'public_apply_url_enabled' => $property->public_apply_url_enabled,
+            'requires_invite' => $property->requires_invite,
         ]);
     }
 

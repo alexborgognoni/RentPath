@@ -9,7 +9,7 @@ interface PropertySidebarProps {
 }
 
 export function PropertySidebar({ property, tenantCount }: PropertySidebarProps) {
-    const [publicAccessEnabled, setPublicAccessEnabled] = useState(property.public_apply_url_enabled || false);
+    const [requiresInvite, setRequiresInvite] = useState(property.requires_invite ?? true);
     const [inviteToken, setInviteToken] = useState(property.invite_token || null);
     const [tokenExpiresAt, setTokenExpiresAt] = useState(property.invite_token_expires_at || null);
     const [copiedToken, setCopiedToken] = useState(false);
@@ -55,10 +55,10 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
             if (response.ok) {
                 const data = await response.json();
-                setPublicAccessEnabled(data.public_apply_url_enabled);
+                setRequiresInvite(data.requires_invite);
             }
         } catch (error) {
-            console.error('Failed to toggle public access:', error);
+            console.error('Failed to toggle invite requirement:', error);
         }
     };
 
@@ -216,28 +216,28 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     Application Access
                 </h3>
 
-                {/* Public Access Toggle */}
+                {/* Invite Requirement Toggle */}
                 <div className="mb-4 flex items-center justify-between rounded-lg border border-border bg-background/50 p-3">
                     <div className="flex items-center">
                         <Link2 className="mr-2 text-muted-foreground" size={16} />
-                        <span className="text-sm font-medium">Public Applications</span>
+                        <span className="text-sm font-medium">Require Invite</span>
                     </div>
                     <button
                         onClick={handleTogglePublicAccess}
-                        className={`relative h-6 w-11 rounded-full transition-colors ${publicAccessEnabled ? 'bg-primary' : 'bg-muted'}`}
+                        className={`relative h-6 w-11 rounded-full transition-colors ${requiresInvite ? 'bg-primary' : 'bg-muted'}`}
                     >
                         <span
                             className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
-                                publicAccessEnabled ? 'right-0.5' : 'left-0.5'
+                                requiresInvite ? 'right-0.5' : 'left-0.5'
                             }`}
                         />
                     </button>
                 </div>
 
-                {!publicAccessEnabled && (
+                {requiresInvite && (
                     <>
                         <p className="mb-4 text-xs text-muted-foreground">
-                            Public access is disabled. Generate an invite link to share with specific applicants.
+                            Invite required. Generate an invite link to share with specific applicants.
                         </p>
 
                         {/* Generate/Regenerate Token Button */}
@@ -290,7 +290,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     </>
                 )}
 
-                {publicAccessEnabled && (
+                {!requiresInvite && (
                     <p className="text-xs text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>
                 )}
             </div>

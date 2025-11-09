@@ -84,8 +84,9 @@ return new class extends Migration
                 'archived'
             ])->default('inactive');
 
-            // Public access control
-            $table->boolean('public_apply_url_enabled')->default(false);
+            // Application access control
+            // Note: Future enhancement will add 'is_listed' for public listing visibility
+            $table->boolean('requires_invite')->default(true)->comment('true = invite token required, false = direct URL works');
 
             // Invite token fields
             $table->string('invite_token', 64)->unique()->nullable();
