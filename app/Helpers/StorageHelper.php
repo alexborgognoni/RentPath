@@ -88,11 +88,18 @@ class StorageHelper
                 ? 'private.storage'
                 : 'tenant.private.storage';
 
-            return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            // Force URL generation to use current request scheme/host/port
+            $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
                 $routeName,
                 now()->addMinutes($expiresInMinutes),
                 ['path' => $path]
             );
+
+            // Replace the base URL with the current request URL to ensure subdomain is correct
+            $currentUrl = request()->getSchemeAndHttpHost();
+            $appUrl = config('app.url');
+
+            return str_replace($appUrl, $currentUrl, $url);
         }
 
         // For public files, just return the URL
