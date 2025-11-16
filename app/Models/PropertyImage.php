@@ -39,4 +39,12 @@ class PropertyImage extends Model
     {
         return $this->belongsTo(Property::class);
     }
+
+    /**
+     * Get the URL for the image.
+     */
+    public function getUrlAttribute(): string
+    {
+        return \App\Helpers\StorageHelper::url($this->image_path, 'private');
+    }
 }

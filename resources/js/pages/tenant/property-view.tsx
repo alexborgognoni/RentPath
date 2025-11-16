@@ -8,6 +8,17 @@ interface PropertyViewPageProps {
     property: Property;
     token?: string | null;
     canApply: boolean;
+    tenantProfileStatus: {
+        exists: boolean;
+        verified: boolean;
+        rejected: boolean;
+    };
+    applicationStatus: {
+        hasApplication: boolean;
+        hasDraft: boolean;
+        status: string | null;
+        applicationId?: number;
+    };
     auth?: {
         user: {
             id: number;
@@ -20,11 +31,13 @@ interface PropertyViewPageProps {
 }
 
 export default function PropertyViewPage() {
-    const { property, canApply, auth } = usePage<PropertyViewPageProps>().props;
+    const { property, canApply, auth, tenantProfileStatus, applicationStatus, token } = usePage<PropertyViewPageProps>().props;
 
     const handleApply = () => {
-        // TODO: Implement application logic
-        console.log('Apply button clicked');
+        // Build apply URL with token if present
+        const applyUrl = token ? `/properties/${property.id}/apply?token=${token}` : `/properties/${property.id}/apply`;
+
+        window.location.href = applyUrl;
     };
 
     return (
@@ -76,19 +89,65 @@ export default function PropertyViewPage() {
                                     )}
                                 </div>
 
-                                {canApply ? (
+                                {canApply || applicationStatus.hasDraft ? (
                                     <button
                                         onClick={handleApply}
                                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-4 font-semibold text-white shadow-lg transition-all hover:scale-105"
                                     >
                                         <Send size={20} />
-                                        Apply for this Property
+                                        {applicationStatus.hasDraft ? 'Continue Application' : 'Apply for this Property'}
                                     </button>
                                 ) : (
-                                    <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-center">
-                                        <p className="text-sm text-amber-600 dark:text-amber-400">
-                                            {!auth?.user ? 'Please sign in to apply for this property' : 'You have already applied for this property'}
-                                        </p>
+                                    <div className="space-y-3">
+                                        {!auth?.user ? (
+                                            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-center">
+                                                <p className="text-sm text-amber-600 dark:text-amber-400">
+                                                    Please sign in to apply for this property
+                                                </p>
+                                            </div>
+                                        ) : !tenantProfileStatus.exists ? (
+                                            <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4 text-center">
+                                                <p className="mb-3 text-sm text-blue-600 dark:text-blue-400">
+                                                    Create your tenant profile to apply for properties
+                                                </p>
+                                                <a
+                                                    href="/profile/tenant/setup"
+                                                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                                                >
+                                                    Create Profile
+                                                </a>
+                                            </div>
+                                        ) : !tenantProfileStatus.verified ? (
+                                            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-center">
+                                                <p className="text-sm text-amber-600 dark:text-amber-400">
+                                                    {tenantProfileStatus.rejected
+                                                        ? 'Your profile was rejected. Please update and resubmit.'
+                                                        : 'Your profile is pending verification'}
+                                                </p>
+                                                <a
+                                                    href="/profile/tenant/unverified"
+                                                    className="mt-2 inline-block text-sm font-medium text-amber-700 hover:underline dark:text-amber-300"
+                                                >
+                                                    View Status
+                                                </a>
+                                            </div>
+                                        ) : applicationStatus.hasApplication ? (
+                                            <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-center">
+                                                <p className="mb-2 text-sm text-green-600 dark:text-green-400">
+                                                    You have already applied for this property
+                                                </p>
+                                                <a
+                                                    href={`/applications/${applicationStatus.applicationId}`}
+                                                    className="text-sm font-medium text-green-700 hover:underline dark:text-green-300"
+                                                >
+                                                    View Application
+                                                </a>
+                                            </div>
+                                        ) : (
+                                            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-center">
+                                                <p className="text-sm text-amber-600 dark:text-amber-400">Unable to apply at this time</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 

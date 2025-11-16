@@ -332,10 +332,74 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('tenant/dashboard');
     })->name('dashboard');
 
+    // Tenant Profile routes
+    Route::get('profile/tenant/setup', [\App\Http\Controllers\TenantProfileController::class, 'create'])
+        ->name('tenant.profile.setup');
+
+    Route::post('profile/tenant/setup', [\App\Http\Controllers\TenantProfileController::class, 'store'])
+        ->name('tenant.profile.store');
+
+    Route::get('profile/tenant/unverified', function (Illuminate\Http\Request $request) {
+        $user = $request->user();
+        $tenantProfile = $user->tenantProfile;
+
+        if (!$tenantProfile) {
+            return redirect('/profile/tenant/setup');
+        }
+
+        if ($tenantProfile->isVerified()) {
+            return redirect('/dashboard');
+        }
+
+        if ($request->get('edit')) {
+            return Inertia::render('tenant/tenant-profile-setup', [
+                'tenantProfile' => $tenantProfile,
+                'user' => $user,
+                'isEditing' => true,
+                'rejectionReason' => $tenantProfile->verification_rejection_reason,
+                'rejectedFields' => $tenantProfile->verification_rejected_fields ?? [],
+            ]);
+        }
+
+        return Inertia::render('tenant/tenant-profile-unverified', [
+            'isRejected' => $tenantProfile->isRejected(),
+            'rejectionReason' => $tenantProfile->verification_rejection_reason,
+        ]);
+    })->name('tenant.profile.unverified');
+
+    Route::get('profile/tenant/edit', [\App\Http\Controllers\TenantProfileController::class, 'edit'])
+        ->name('tenant.profile.edit');
+
+    Route::post('profile/tenant/edit', [\App\Http\Controllers\TenantProfileController::class, 'update'])
+        ->name('tenant.profile.update');
+
+    Route::get('tenant-profile/document/{type}', [\App\Http\Controllers\TenantProfileController::class, 'serveDocument'])
+        ->name('tenant.profile.document');
+
+    // Application routes
+    Route::get('properties/{property}/apply', [\App\Http\Controllers\ApplicationController::class, 'create'])
+        ->name('applications.create');
+
+    Route::post('properties/{property}/apply', [\App\Http\Controllers\ApplicationController::class, 'store'])
+        ->name('applications.store');
+
+    Route::post('properties/{property}/apply/draft', [\App\Http\Controllers\ApplicationController::class, 'saveDraft'])
+        ->name('applications.save-draft');
+
+    Route::get('applications/{application}', [\App\Http\Controllers\ApplicationController::class, 'show'])
+        ->name('applications.show');
+
+    Route::put('applications/{application}', [\App\Http\Controllers\ApplicationController::class, 'update'])
+        ->name('applications.update');
+
+    Route::delete('applications/{application}', [\App\Http\Controllers\ApplicationController::class, 'destroy'])
+        ->name('applications.destroy');
+
+    Route::post('applications/{application}/withdraw', [\App\Http\Controllers\ApplicationController::class, 'withdraw'])
+        ->name('applications.withdraw');
+
     // Settings routes (same paths as manager, different views)
     if (file_exists(__DIR__ . '/settings.php')) {
         require __DIR__ . '/settings.php';
     }
-
-    // Future tenant routes: applications, etc.
 });

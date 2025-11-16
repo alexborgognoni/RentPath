@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\PropertyManager;
+use App\Models\TenantProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -29,15 +30,19 @@ class TestUserSeeder extends Seeder
         // Create individual property manager user
         $this->createIndividualPropertyManager();
 
-        // Create tenant user (no properties)
+        // Create basic tenant user (no tenant profile)
         $this->createTenantUser();
+
+        // Create verified tenant user (with complete tenant profile)
+        $this->createVerifiedTenantUser();
 
         $this->command->info('✅ Test users created successfully!');
         $this->command->line('');
         $this->command->line('Test Accounts:');
         $this->command->line('  Professional PM: professional@test.com / password');
         $this->command->line('  Individual PM: individual@test.com / password');
-        $this->command->line('  Tenant: tenant@test.com / password');
+        $this->command->line('  Tenant (basic): tenant@test.com / password');
+        $this->command->line('  Tenant (verified): verified-tenant@test.com / password');
     }
 
     /**
@@ -110,7 +115,7 @@ class TestUserSeeder extends Seeder
     }
 
     /**
-     * Create a tenant user (no property manager profile).
+     * Create a tenant user (no tenant profile).
      */
     private function createTenantUser(): void
     {
@@ -130,6 +135,77 @@ class TestUserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        $this->command->info("Created tenant: {$user->email}");
+        $this->command->info("Created tenant (no profile): {$user->email}");
+    }
+
+    /**
+     * Create a verified tenant user (with complete tenant profile).
+     */
+    private function createVerifiedTenantUser(): void
+    {
+        // Check if user already exists
+        if (User::where('email', 'verified-tenant@test.com')->exists()) {
+            $this->command->warn('User verified-tenant@test.com already exists, skipping...');
+
+            return;
+        }
+
+        // Create user
+        $user = User::create([
+            'first_name' => 'Michael',
+            'last_name' => 'Johnson',
+            'email' => 'verified-tenant@test.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+        ]);
+
+        // Create verified tenant profile
+        TenantProfile::create([
+            'user_id' => $user->id,
+
+            // Personal information
+            'date_of_birth' => '1995-06-15',
+            'nationality' => 'US',
+            'phone_country_code' => '+1',
+            'phone_number' => '5551234567',
+
+            // Current address
+            'current_house_number' => '123',
+            'current_street_name' => 'Main Street',
+            'current_city' => 'New York',
+            'current_postal_code' => '10001',
+            'current_country' => 'US',
+
+            // Employment
+            'employment_status' => 'employed',
+            'employer_name' => 'Tech Solutions Inc.',
+            'job_title' => 'Software Engineer',
+            'employment_start_date' => '2021-03-01',
+            'employment_type' => 'full_time',
+            'monthly_income' => 6500.00,
+            'income_currency' => 'eur',
+            'employer_contact_name' => 'Sarah Williams',
+            'employer_contact_phone' => '+1-555-9876543',
+            'employer_contact_email' => 'hr@techsolutions.com',
+
+            // Emergency contact
+            'emergency_contact_name' => 'Robert Johnson',
+            'emergency_contact_phone' => '+1-555-7654321',
+            'emergency_contact_relationship' => 'Father',
+
+            // Preferences
+            'preferred_move_in_date' => now()->addMonth()->format('Y-m-d'),
+            'occupants_count' => 1,
+            'has_pets' => false,
+            'is_smoker' => false,
+
+            // Guarantor
+            'has_guarantor' => false,
+
+            // Verification - VERIFIED
+            'profile_verified_at' => now(),
+        ]);
+
+        $this->command->info("Created verified tenant: {$user->email}");
     }
 }

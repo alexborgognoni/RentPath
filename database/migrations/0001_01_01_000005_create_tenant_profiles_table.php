@@ -40,14 +40,57 @@ return new class extends Migration
             ])->nullable();
             $table->string('employer_name')->nullable();
             $table->string('job_title')->nullable();
+            $table->date('employment_start_date')->nullable();
+            $table->enum('employment_type', ['full_time', 'part_time', 'contract', 'temporary'])->nullable();
             $table->decimal('monthly_income', 10, 2)->nullable();
             $table->enum('income_currency', ['eur', 'usd', 'gbp', 'chf'])->default('eur');
+
+            // Employer contact (for verification)
+            $table->string('employer_contact_name')->nullable();
+            $table->string('employer_contact_phone')->nullable();
+            $table->string('employer_contact_email')->nullable();
+
+            // Student-specific information
+            $table->string('university_name')->nullable();
+            $table->string('program_of_study')->nullable();
+            $table->date('expected_graduation_date')->nullable();
+            $table->string('student_income_source')->nullable()->comment('e.g., parents, scholarship, part-time job');
+
+            // Guarantor information (commonly needed for students)
+            $table->boolean('has_guarantor')->default(false);
+            $table->string('guarantor_name')->nullable();
+            $table->string('guarantor_relationship')->nullable();
+            $table->string('guarantor_phone')->nullable();
+            $table->string('guarantor_email')->nullable();
+            $table->string('guarantor_address')->nullable();
+            $table->string('guarantor_employer')->nullable();
+            $table->decimal('guarantor_monthly_income', 10, 2)->nullable();
 
             // Documents (private S3 storage)
             $table->string('id_document_path')->nullable();
             $table->string('id_document_original_name')->nullable();
-            $table->string('proof_of_income_path')->nullable();
-            $table->string('proof_of_income_original_name')->nullable();
+
+            // Employment documents
+            $table->string('employment_contract_path')->nullable();
+            $table->string('employment_contract_original_name')->nullable();
+            $table->string('payslip_1_path')->nullable();
+            $table->string('payslip_1_original_name')->nullable();
+            $table->string('payslip_2_path')->nullable();
+            $table->string('payslip_2_original_name')->nullable();
+            $table->string('payslip_3_path')->nullable();
+            $table->string('payslip_3_original_name')->nullable();
+
+            // Student documents
+            $table->string('student_proof_path')->nullable();
+            $table->string('student_proof_original_name')->nullable();
+
+            // Guarantor documents
+            $table->string('guarantor_id_path')->nullable();
+            $table->string('guarantor_id_original_name')->nullable();
+            $table->string('guarantor_proof_income_path')->nullable();
+            $table->string('guarantor_proof_income_original_name')->nullable();
+
+            // Additional documents
             $table->string('reference_letter_path')->nullable();
             $table->string('reference_letter_original_name')->nullable();
 

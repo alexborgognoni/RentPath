@@ -3,7 +3,10 @@ import { LanguageSelector } from '@/components/language-selector';
 import { LogoHomeButton } from '@/components/logo-home-button';
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
 import { MobileMenu } from '@/components/mobile-menu';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { translate as t } from '@/utils/translate-utils';
+import { Link, usePage } from '@inertiajs/react';
+import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface AppHeaderProps {
@@ -12,6 +15,8 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
+    const page = usePage<SharedData>();
+    const { auth, translations } = page.props;
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -38,6 +43,11 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
 
     const handleLogoutCancel = () => {
         setShowLogoutConfirmation(false);
+    };
+
+    const handleLogout = () => {
+        setShowUserMenu(false);
+        setShowLogoutConfirmation(true);
     };
 
     useEffect(() => {
@@ -134,6 +144,58 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                     <div className="hidden md:flex md:items-center md:space-x-4">
                         <CurrencySelector />
                         <LanguageSelector />
+
+                        {/* User Menu Bubble */}
+                        {auth?.user && (
+                            <div ref={userMenuRef} className="relative">
+                                <button
+                                    onClick={() => setShowUserMenu(!showUserMenu)}
+                                    className="flex items-center gap-2 rounded-lg px-2 py-1 text-sm transition-colors hover:bg-muted"
+                                >
+                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary">
+                                        {auth.user?.property_manager?.profile_picture_url ? (
+                                            <img
+                                                src={auth.user.property_manager.profile_picture_url}
+                                                alt={auth.user?.name || auth.user?.email}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-xs font-semibold text-white">{getUserInitials(auth.user)}</span>
+                                        )}
+                                    </div>
+                                    <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+                                </button>
+
+                                {showUserMenu && (
+                                    <div className="absolute top-full right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
+                                        <div className="border-b border-border px-4 py-3">
+                                            <div className="min-w-0">
+                                                {auth.user?.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
+                                                <p className="truncate text-xs text-muted-foreground">{auth.user?.email}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="py-1">
+                                            <Link
+                                                href="/settings"
+                                                className="text-text-secondary flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background"
+                                            >
+                                                <Settings size={16} />
+                                                <span>{t(translations?.header, 'settings')}</span>
+                                            </Link>
+                                            <div className="mb-1 border-t border-border"></div>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10"
+                                            >
+                                                <LogOut size={16} />
+                                                <span>{t(translations?.header, 'sign_out')}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

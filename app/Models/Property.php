@@ -75,6 +75,16 @@ class Property extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'formatted_rent',
+        'main_image_url',
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
@@ -230,6 +240,20 @@ class Property extends Model
         $symbol = $symbols[$this->rent_currency] ?? $this->rent_currency;
 
         return $symbol . number_format($this->rent_amount, 2);
+    }
+
+    /**
+     * Get the main image URL.
+     */
+    public function getMainImageUrlAttribute(): ?string
+    {
+        $mainImage = $this->mainImage;
+
+        if (!$mainImage) {
+            return null;
+        }
+
+        return $mainImage->url;
     }
 
     /**

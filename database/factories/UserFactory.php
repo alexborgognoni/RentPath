@@ -42,4 +42,33 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Indicate that the user has a tenant profile.
+     */
+    public function withTenantProfile(bool $verified = false): static
+    {
+        return $this->afterCreating(function ($user) use ($verified) {
+            \App\Models\TenantProfile::factory()
+                ->for($user)
+                ->when($verified, fn($factory) => $factory->verified())
+                ->create();
+        });
+    }
+
+    /**
+     * Indicate that the user has a property manager profile.
+     */
+    public function withPropertyManager(string $type = 'individual', bool $verified = false): static
+    {
+        return $this->afterCreating(function ($user) use ($type, $verified) {
+            \App\Models\PropertyManager::factory()
+                ->for($user)
+                ->state([
+                    'type' => $type,
+                    'profile_verified_at' => $verified ? now() : null,
+                ])
+                ->create();
+        });
+    }
 }

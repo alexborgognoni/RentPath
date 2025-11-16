@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
+use App\Models\Application;
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class PropertyViewController extends Controller
@@ -63,6 +65,11 @@ class PropertyViewController extends Controller
                 'sort_order' => $image->sort_order,
             ];
         })->sortBy('sort_order')->values();
+
+        // Determine if user can apply
+        $canApply = $this->canUserApply($property);
+        $tenantProfileStatus = $this->getTenantProfileStatus();
+        $applicationStatus = $this->getApplicationStatus($property);
 
         return Inertia::render('tenant/property-view', [
             'property' => [
@@ -128,8 +135,136 @@ class PropertyViewController extends Controller
                 ],
             ],
             'token' => $token,
-            'canApply' => true, // Will be enhanced later with application logic
+            'canApply' => $canApply,
+            'tenantProfileStatus' => $tenantProfileStatus,
+            'applicationStatus' => $applicationStatus,
         ]);
+    }
+
+    /**
+     * Check if the current user can apply for the property.
+     */
+    private function canUserApply(Property $property): bool
+    {
+        // Must be authenticated
+        if (!Auth::check()) {
+            return false;
+        }
+
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        // Must have a verified tenant profile
+        if (!$tenantProfile || !$tenantProfile->isVerified()) {
+            return false;
+        }
+
+        // Check if user already has an active application for this property (excluding drafts)
+        $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted'])
+            ->exists();
+
+        if ($existingApplication) {
+            return false;
+        }
+
+        // Property must be accepting applications
+        if (!in_array($property->status, ['available', 'application_received'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the tenant profile status for the current user.
+     */
+    private function getTenantProfileStatus(): array
+    {
+        if (!Auth::check()) {
+            return [
+                'exists' => false,
+                'verified' => false,
+                'rejected' => false,
+            ];
+        }
+
+        $tenantProfile = Auth::user()->tenantProfile;
+
+        if (!$tenantProfile) {
+            return [
+                'exists' => false,
+                'verified' => false,
+                'rejected' => false,
+            ];
+        }
+
+        return [
+            'exists' => true,
+            'verified' => $tenantProfile->isVerified(),
+            'rejected' => $tenantProfile->isRejected(),
+        ];
+    }
+
+    /**
+     * Get the application status for the current user and property.
+     */
+    private function getApplicationStatus(Property $property): array
+    {
+        if (!Auth::check()) {
+            return [
+                'hasApplication' => false,
+                'hasDraft' => false,
+                'status' => null,
+            ];
+        }
+
+        $tenantProfile = Auth::user()->tenantProfile;
+
+        if (!$tenantProfile) {
+            return [
+                'hasApplication' => false,
+                'hasDraft' => false,
+                'status' => null,
+            ];
+        }
+
+        // Check for draft
+        $draftApplication = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->where('status', 'draft')
+            ->first();
+
+        if ($draftApplication) {
+            return [
+                'hasApplication' => true,
+                'hasDraft' => true,
+                'status' => 'draft',
+                'applicationId' => $draftApplication->id,
+            ];
+        }
+
+        // Check for submitted application
+        $application = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted'])
+            ->first();
+
+        if ($application) {
+            return [
+                'hasApplication' => true,
+                'hasDraft' => false,
+                'status' => $application->status,
+                'applicationId' => $application->id,
+            ];
+        }
+
+        return [
+            'hasApplication' => false,
+            'hasDraft' => false,
+            'status' => null,
+        ];
     }
 
     /**

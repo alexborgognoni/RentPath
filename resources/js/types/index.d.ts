@@ -43,5 +43,221 @@ export interface User {
         profile_picture_url?: string;
         [key: string]: unknown;
     };
+    tenant_profile?: TenantProfile;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface TenantProfile {
+    id: number;
+    user_id: number;
+
+    // Personal information
+    date_of_birth: string;
+    nationality: string;
+    phone_country_code: string;
+    phone_number: string;
+
+    // Current address
+    current_house_number: string;
+    current_street_name: string;
+    current_city: string;
+    current_postal_code: string;
+    current_country: string;
+
+    // Employment
+    employment_status: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired';
+    employer_name?: string;
+    job_title?: string;
+    employment_start_date?: string;
+    employment_type?: 'full_time' | 'part_time' | 'contract' | 'temporary';
+    monthly_income?: number;
+    income_currency: 'eur' | 'usd' | 'gbp' | 'chf';
+    employer_contact_name?: string;
+    employer_contact_phone?: string;
+    employer_contact_email?: string;
+
+    // Student info
+    university_name?: string;
+    program_of_study?: string;
+    expected_graduation_date?: string;
+    student_income_source?: string;
+
+    // Guarantor
+    has_guarantor: boolean;
+    guarantor_name?: string;
+    guarantor_relationship?: string;
+    guarantor_phone?: string;
+    guarantor_email?: string;
+    guarantor_address?: string;
+    guarantor_employer?: string;
+    guarantor_monthly_income?: number;
+
+    // Documents
+    id_document_path?: string;
+    id_document_original_name?: string;
+    employment_contract_path?: string;
+    employment_contract_original_name?: string;
+    payslip_1_path?: string;
+    payslip_1_original_name?: string;
+    payslip_2_path?: string;
+    payslip_2_original_name?: string;
+    payslip_3_path?: string;
+    payslip_3_original_name?: string;
+    student_proof_path?: string;
+    student_proof_original_name?: string;
+    guarantor_id_path?: string;
+    guarantor_id_original_name?: string;
+    guarantor_proof_income_path?: string;
+    guarantor_proof_income_original_name?: string;
+    reference_letter_path?: string;
+    reference_letter_original_name?: string;
+    profile_picture_path?: string;
+
+    // Emergency contact
+    emergency_contact_name?: string;
+    emergency_contact_phone?: string;
+    emergency_contact_relationship?: string;
+
+    // Preferences
+    preferred_move_in_date?: string;
+    occupants_count: number;
+    has_pets: boolean;
+    pets_description?: string;
+    is_smoker: boolean;
+
+    // Verification
+    profile_verified_at?: string;
+    verification_rejection_reason?: string;
+    verification_rejected_fields?: string[];
+
+    // Timestamps
+    created_at: string;
+    updated_at: string;
+
+    // Computed
+    age?: number;
+    profile_picture_url?: string;
+}
+
+export interface Application {
+    id: number;
+    property_id: number;
+    tenant_profile_id: number;
+
+    // Status
+    status:
+        | 'draft'
+        | 'submitted'
+        | 'under_review'
+        | 'visit_scheduled'
+        | 'visit_completed'
+        | 'approved'
+        | 'rejected'
+        | 'withdrawn'
+        | 'leased'
+        | 'archived'
+        | 'deleted';
+
+    // Application details
+    desired_move_in_date: string;
+    lease_duration_months: number;
+    message_to_landlord?: string;
+
+    // Occupants
+    additional_occupants: number;
+    occupants_details?: Array<{
+        name: string;
+        age: number;
+        relationship: string;
+    }>;
+
+    // Pets
+    has_pets: boolean;
+    pets_details?: Array<{
+        type: string;
+        breed?: string;
+        age?: number;
+        weight?: number;
+    }>;
+
+    // References
+    references?: Array<{
+        name: string;
+        phone: string;
+        email: string;
+        relationship: string;
+        years_known: number;
+    }>;
+
+    // Previous landlord
+    previous_landlord_name: string;
+    previous_landlord_phone: string;
+    previous_landlord_email: string;
+
+    // Emergency contact
+    emergency_contact_name?: string;
+    emergency_contact_phone?: string;
+    emergency_contact_relationship?: string;
+
+    // Documents
+    application_id_document_path?: string;
+    application_id_document_original_name?: string;
+    application_proof_of_income_path?: string;
+    application_proof_of_income_original_name?: string;
+    application_reference_letter_path?: string;
+    application_reference_letter_original_name?: string;
+    additional_documents?: Array<{
+        path: string;
+        original_name: string;
+        type: string;
+        description?: string;
+    }>;
+
+    // Review & decision
+    rejection_reason?: string;
+    rejection_details?: Record<string, unknown>;
+    reviewed_by_user_id?: number;
+    reviewed_at?: string;
+
+    // Visit
+    visit_scheduled_at?: string;
+    visit_notes?: string;
+    visit_completed_at?: string;
+
+    // Approval
+    approved_by_user_id?: number;
+    approved_at?: string;
+    approval_notes?: string;
+
+    // Lease
+    lease_start_date?: string;
+    lease_end_date?: string;
+    agreed_rent_amount?: number;
+    deposit_amount?: number;
+    lease_document_path?: string;
+    lease_document_original_name?: string;
+    lease_signed_at?: string;
+
+    // Status timestamps
+    submitted_at?: string;
+    withdrawn_at?: string;
+    archived_at?: string;
+
+    // Token
+    invited_via_token?: string;
+
+    // Internal
+    internal_notes?: string;
+
+    // Timestamps
+    created_at: string;
+    updated_at: string;
+
+    // Computed
+    status_text?: string;
+    total_occupants?: number;
+
+    // Relationships
+    property?: import('@/types/dashboard').Property;
+    tenant_profile?: TenantProfile;
 }

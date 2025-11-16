@@ -1,0 +1,508 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Helpers\StorageHelper;
+use App\Models\Application;
+use App\Models\Property;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+
+class ApplicationController extends Controller
+{
+    /**
+     * Show the application creation form for a specific property.
+     */
+    public function create(Property $property)
+    {
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        // Check if tenant profile exists
+        if (!$tenantProfile) {
+            return redirect('/profile/tenant/setup')
+                ->with('message', 'Please complete your tenant profile first');
+        }
+
+        // Check if profile is verified
+        if (!$tenantProfile->isVerified()) {
+            return redirect('/profile/tenant/unverified')
+                ->with('message', 'Your profile is pending verification');
+        }
+
+        // Check if already applied (excluding drafts - those can continue)
+        $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted'])
+            ->first();
+
+        if ($existingApplication) {
+            return redirect("/applications/{$existingApplication->id}")
+                ->with('message', 'You already have an application for this property');
+        }
+
+        // Load existing draft if it exists
+        $draftApplication = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->where('status', 'draft')
+            ->first();
+
+        // Check if property is available for applications
+        if (!in_array($property->status, ['available', 'application_received'])) {
+            return redirect("/properties/{$property->id}")
+                ->with('error', 'This property is not accepting applications at this time');
+        }
+
+        return Inertia::render('tenant/application-create', [
+            'property' => $property->load('images', 'mainImage', 'propertyManager'),
+            'tenantProfile' => $tenantProfile,
+            'draftApplication' => $draftApplication,
+            'token' => request()->query('token'), // Pass token if accessing via invite
+        ]);
+    }
+
+    /**
+     * Store a new application.
+     */
+    public function store(Request $request, Property $property)
+    {
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        // Verification checks
+        if (!$tenantProfile || !$tenantProfile->isVerified()) {
+            return redirect('/profile/tenant/setup')
+                ->with('error', 'Tenant profile required and must be verified');
+        }
+
+        // Check for existing application
+        $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted'])
+            ->first();
+
+        if ($existingApplication) {
+            return redirect("/applications/{$existingApplication->id}")
+                ->with('error', 'You already have an application for this property');
+        }
+
+        // Check for draft application (we'll update it instead of creating new)
+        $draftApplication = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->where('status', 'draft')
+            ->first();
+
+        // Validation rules
+        $rules = [
+            'desired_move_in_date' => 'required|date|after:today',
+            'lease_duration_months' => 'required|integer|min:1|max:60',
+            'message_to_landlord' => 'nullable|string|max:2000',
+
+            // Occupants
+            'additional_occupants' => 'required|integer|min:0|max:20',
+            'occupants_details' => 'nullable|array',
+            'occupants_details.*.name' => 'required|string|max:255',
+            'occupants_details.*.age' => 'required|integer|min:0|max:120',
+            'occupants_details.*.relationship' => 'required|string|max:100',
+
+            // Pets
+            'has_pets' => 'required|boolean',
+            'pets_details' => 'nullable|array',
+            'pets_details.*.type' => 'required|string|max:100',
+            'pets_details.*.breed' => 'nullable|string|max:100',
+            'pets_details.*.age' => 'nullable|integer|min:0|max:50',
+            'pets_details.*.weight' => 'nullable|numeric|min:0',
+
+            // Previous landlord reference (optional)
+            'previous_landlord_name' => 'nullable|string|max:255',
+            'previous_landlord_phone' => 'nullable|string|max:20',
+            'previous_landlord_email' => 'nullable|email|max:255',
+
+            // Emergency contact (can override profile)
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_phone' => 'nullable|string|max:20',
+            'emergency_contact_relationship' => 'nullable|string|max:100',
+
+            // References
+            'references' => 'nullable|array',
+            'references.*.name' => 'required|string|max:255',
+            'references.*.phone' => 'required|string|max:20',
+            'references.*.email' => 'required|email|max:255',
+            'references.*.relationship' => 'required|string|max:100',
+            'references.*.years_known' => 'required|integer|min:0|max:100',
+
+            // Optional fresh documents
+            'application_id_document' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
+            'application_proof_of_income' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
+            'application_reference_letter' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
+
+            // Additional documents
+            'additional_documents' => 'nullable|array',
+            'additional_documents.*' => 'file|mimes:pdf,jpeg,png,jpg|max:20480',
+
+            // Token tracking
+            'invited_via_token' => 'nullable|string|max:64',
+        ];
+
+        $validated = $request->validate($rules);
+
+        // Handle file uploads for application-specific documents
+        if ($request->hasFile('application_id_document')) {
+            $validated['application_id_document_path'] = StorageHelper::store(
+                $request->file('application_id_document'),
+                'applications/id-documents',
+                'private'
+            );
+            $validated['application_id_document_original_name'] = $request->file('application_id_document')->getClientOriginalName();
+        }
+
+        if ($request->hasFile('application_proof_of_income')) {
+            $validated['application_proof_of_income_path'] = StorageHelper::store(
+                $request->file('application_proof_of_income'),
+                'applications/proof-of-income',
+                'private'
+            );
+            $validated['application_proof_of_income_original_name'] = $request->file('application_proof_of_income')->getClientOriginalName();
+        }
+
+        if ($request->hasFile('application_reference_letter')) {
+            $validated['application_reference_letter_path'] = StorageHelper::store(
+                $request->file('application_reference_letter'),
+                'applications/reference-letters',
+                'private'
+            );
+            $validated['application_reference_letter_original_name'] = $request->file('application_reference_letter')->getClientOriginalName();
+        }
+
+        // Handle additional documents
+        if ($request->hasFile('additional_documents')) {
+            $additionalDocs = [];
+            foreach ($request->file('additional_documents') as $index => $file) {
+                $path = StorageHelper::store($file, 'applications/additional-documents', 'private');
+                $additionalDocs[] = [
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'type' => $file->getClientMimeType(),
+                    'description' => $request->input("additional_documents_description.{$index}", ''),
+                ];
+            }
+            $validated['additional_documents'] = $additionalDocs;
+        }
+
+        // Remove file fields from validated data
+        unset(
+            $validated['application_id_document'],
+            $validated['application_proof_of_income'],
+            $validated['application_reference_letter']
+        );
+
+        // Update draft or create new application
+        $validated['property_id'] = $property->id;
+        $validated['tenant_profile_id'] = $tenantProfile->id;
+        $validated['status'] = 'submitted';
+        $validated['submitted_at'] = now();
+
+        if ($draftApplication) {
+            $draftApplication->update($validated);
+            $application = $draftApplication;
+        } else {
+            $application = Application::create($validated);
+        }
+
+        // TODO: Send email notifications to property manager and tenant
+
+        // Update property status
+        if ($property->status === 'available') {
+            $property->update(['status' => 'application_received']);
+        }
+
+        return redirect("/applications/{$application->id}")
+            ->with('success', 'Application submitted successfully!');
+    }
+
+    /**
+     * Save application as draft (for step-by-step form).
+     */
+    public function saveDraft(Request $request, Property $property)
+    {
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        if (!$tenantProfile || !$tenantProfile->isVerified()) {
+            return back()->with('error', 'Tenant profile not verified');
+        }
+
+        // Check if draft already exists for this user and property
+        $application = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->where('status', 'draft')
+            ->first();
+
+        $requestedStep = $request->input('current_step', 1);
+        $previousMaxStep = $application ? $application->current_step : 0;
+
+        // ALWAYS save the data first (preserve user work)
+        $data = $request->all();
+        $data['tenant_profile_id'] = $tenantProfile->id;
+        $data['property_id'] = $property->id;
+        $data['status'] = 'draft';
+        // Don't set current_step yet - will determine after validation
+
+        // Validate to determine actual allowed max step
+        $validatedMaxStep = 0;
+
+        // Check all steps up to the requested step
+        for ($step = 1; $step <= $requestedStep; $step++) {
+            $stepValidation = $this->getStepValidationRules($step, $data);
+
+            if (!empty($stepValidation)) {
+                // Create a validator instance to check without throwing
+                $validator = \Validator::make($data, $stepValidation);
+
+                if ($validator->fails()) {
+                    // This step is invalid - can't progress beyond here
+                    // But we still save the data
+                    break;
+                }
+            }
+
+            // This step is valid
+            $validatedMaxStep = $step;
+        }
+
+        // The actual current_step is the max validated step
+        // If no steps are valid, current_step stays at 0
+        $data['current_step'] = $validatedMaxStep;
+
+        if ($application) {
+            $application->update($data);
+        } else {
+            $application = Application::create($data);
+        }
+
+        // Return back with the actual max step reached
+        // The frontend will read this from the updated draft application
+        return back(303);
+    }
+
+    /**
+     * Get validation rules for a specific step.
+     */
+    private function getStepValidationRules(int $step, array $data): array
+    {
+        switch ($step) {
+            case 1:
+                $rules = [
+                    'desired_move_in_date' => 'required|date|after:today',
+                    'lease_duration_months' => 'required|integer|min:1|max:60',
+                    'additional_occupants' => 'required|integer|min:0|max:20',
+                    'occupants_details' => 'nullable|array',
+                    'occupants_details.*.name' => 'required|string|max:255',
+                    'occupants_details.*.age' => 'required|integer|min:0|max:120',
+                    'occupants_details.*.relationship' => 'required|string|max:100',
+                    'has_pets' => 'required|boolean',
+                ];
+
+                // Add pets validation only if has_pets is true
+                if (isset($data['has_pets']) && $data['has_pets'] === true) {
+                    $rules['pets_details'] = 'required|array|min:1';
+                    $rules['pets_details.*.type'] = 'required|string|max:100';
+                    $rules['pets_details.*.breed'] = 'nullable|string|max:100';
+                    $rules['pets_details.*.age'] = 'nullable|integer|min:0|max:50';
+                    $rules['pets_details.*.weight'] = 'nullable|numeric|min:0';
+                }
+
+                return $rules;
+
+            case 2:
+                // Step 2: References (all optional, but if provided must be complete)
+                return [];
+
+            case 3:
+            case 4:
+                // Steps 3 and 4 have no required fields
+                return [];
+
+            default:
+                return [];
+        }
+    }
+
+    /**
+     * Show a specific application.
+     */
+    public function show(Application $application)
+    {
+        $user = Auth::user();
+
+        // Check authorization: must be the applicant or the property owner
+        $isApplicant = $application->tenantProfile->user_id === $user->id;
+        $isPropertyOwner = $application->property->property_manager_id === $user->propertyManager?->id;
+
+        if (!$isApplicant && !$isPropertyOwner) {
+            abort(403, 'Unauthorized to view this application');
+        }
+
+        // If applicant views a draft application, redirect to continue editing
+        if ($isApplicant && $application->status === 'draft') {
+            return redirect("/properties/{$application->property_id}/apply")
+                ->with('message', 'Continue filling out your application');
+        }
+
+        // Load relationships
+        $application->load([
+            'property.images',
+            'property.propertyManager',
+            'tenantProfile.user',
+        ]);
+
+        // Determine which view to render based on user role
+        if ($isPropertyOwner) {
+            return Inertia::render('property-manager/application-view', [
+                'application' => $application,
+            ]);
+        }
+
+        return Inertia::render('tenant/application-view', [
+            'application' => $application,
+        ]);
+    }
+
+    /**
+     * Withdraw an application.
+     */
+    public function withdraw(Application $application)
+    {
+        $user = Auth::user();
+
+        // Check authorization: must be the applicant
+        if ($application->tenantProfile->user_id !== $user->id) {
+            abort(403, 'Unauthorized to withdraw this application');
+        }
+
+        // Check if can be withdrawn
+        if (!$application->canBeWithdrawn()) {
+            return back()->with('error', 'This application cannot be withdrawn at this stage');
+        }
+
+        $application->withdraw();
+
+        return redirect('/dashboard')
+            ->with('success', 'Application withdrawn successfully');
+    }
+
+    /**
+     * Update a draft application.
+     */
+    public function update(Request $request, Application $application)
+    {
+        $user = Auth::user();
+
+        // Check authorization
+        if ($application->tenantProfile->user_id !== $user->id) {
+            abort(403, 'Unauthorized to update this application');
+        }
+
+        // Check if can be edited
+        if (!$application->canBeEdited()) {
+            return back()->with('error', 'Only draft applications can be edited');
+        }
+
+        // Same validation rules as store (could be extracted to a shared method)
+        $rules = [
+            'desired_move_in_date' => 'required|date|after:today',
+            'lease_duration_months' => 'required|integer|min:1|max:60',
+            'message_to_landlord' => 'nullable|string|max:2000',
+            'additional_occupants' => 'required|integer|min:0|max:20',
+            'occupants_details' => 'nullable|array',
+            'has_pets' => 'required|boolean',
+            'pets_details' => 'nullable|array',
+            'previous_landlord_name' => 'required|string|max:255',
+            'previous_landlord_phone' => 'required|string|max:20',
+            'previous_landlord_email' => 'required|email|max:255',
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_phone' => 'nullable|string|max:20',
+            'emergency_contact_relationship' => 'nullable|string|max:100',
+            'references' => 'nullable|array',
+        ];
+
+        $validated = $request->validate($rules);
+
+        // Handle file uploads (same as store)
+        if ($request->hasFile('application_id_document')) {
+            if ($application->application_id_document_path) {
+                StorageHelper::delete($application->application_id_document_path, 'private');
+            }
+            $validated['application_id_document_path'] = StorageHelper::store(
+                $request->file('application_id_document'),
+                'applications/id-documents',
+                'private'
+            );
+            $validated['application_id_document_original_name'] = $request->file('application_id_document')->getClientOriginalName();
+        }
+
+        if ($request->hasFile('application_proof_of_income')) {
+            if ($application->application_proof_of_income_path) {
+                StorageHelper::delete($application->application_proof_of_income_path, 'private');
+            }
+            $validated['application_proof_of_income_path'] = StorageHelper::store(
+                $request->file('application_proof_of_income'),
+                'applications/proof-of-income',
+                'private'
+            );
+            $validated['application_proof_of_income_original_name'] = $request->file('application_proof_of_income')->getClientOriginalName();
+        }
+
+        if ($request->hasFile('application_reference_letter')) {
+            if ($application->application_reference_letter_path) {
+                StorageHelper::delete($application->application_reference_letter_path, 'private');
+            }
+            $validated['application_reference_letter_path'] = StorageHelper::store(
+                $request->file('application_reference_letter'),
+                'applications/reference-letters',
+                'private'
+            );
+            $validated['application_reference_letter_original_name'] = $request->file('application_reference_letter')->getClientOriginalName();
+        }
+
+        $application->update($validated);
+
+        return back()->with('success', 'Application updated successfully');
+    }
+
+    /**
+     * Delete a draft application.
+     */
+    public function destroy(Application $application)
+    {
+        $user = Auth::user();
+
+        // Check authorization
+        if ($application->tenantProfile->user_id !== $user->id) {
+            abort(403, 'Unauthorized to delete this application');
+        }
+
+        // Check if can be deleted
+        if (!$application->isDraft()) {
+            return back()->with('error', 'Only draft applications can be deleted');
+        }
+
+        // Delete uploaded files
+        if ($application->application_id_document_path) {
+            StorageHelper::delete($application->application_id_document_path, 'private');
+        }
+        if ($application->application_proof_of_income_path) {
+            StorageHelper::delete($application->application_proof_of_income_path, 'private');
+        }
+        if ($application->application_reference_letter_path) {
+            StorageHelper::delete($application->application_reference_letter_path, 'private');
+        }
+
+        $application->delete();
+
+        return redirect('/dashboard')
+            ->with('success', 'Draft application deleted');
+    }
+}

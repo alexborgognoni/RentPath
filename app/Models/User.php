@@ -61,10 +61,26 @@ class User extends Authenticatable
     }
 
     /**
+     * Relation to tenant profile.
+     */
+    public function tenantProfile(): HasOne
+    {
+        return $this->hasOne(TenantProfile::class);
+    }
+
+    /**
      * Relation to properties owned by the user through property manager.
      */
     public function properties(): HasManyThrough
     {
         return $this->hasManyThrough(Property::class, PropertyManager::class);
+    }
+
+    /**
+     * Relation to applications submitted by the user through tenant profile.
+     */
+    public function applications(): HasManyThrough
+    {
+        return $this->hasManyThrough(Application::class, TenantProfile::class);
     }
 }
