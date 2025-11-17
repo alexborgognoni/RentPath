@@ -161,7 +161,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
     };
 
     const handleRowClick = (property: Property) => {
-        window.location.href = `/property/${property.id}`;
+        window.location.href = `/properties/${property.id}`;
     };
 
     const handleResizeStart = (e: React.MouseEvent, column: string) => {
