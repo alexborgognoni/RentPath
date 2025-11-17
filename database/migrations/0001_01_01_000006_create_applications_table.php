@@ -38,6 +38,8 @@ return new class extends Migration
                 'deleted'             // Draft cleanup
             ])->default('draft');
 
+            $table->integer('current_step')->default(1);
+
             // Application-specific details
             $table->date('desired_move_in_date')->nullable();
             $table->integer('lease_duration_months')->nullable()->comment('Preferred lease length');
