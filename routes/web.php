@@ -82,12 +82,14 @@ Route::get('/contact-us', function () {
     return Inertia::render('contact-us');
 })->name('contact.us');
 
-// Property viewing (public or token-protected)
-Route::get('/properties/{property}', [PropertyViewController::class, 'show'])
-    ->name('tenant.properties.show');
+// Property viewing (public or token-protected) - ONLY on main domain
+Route::domain(config('app.domain'))->group(function () {
+    Route::get('/properties/{property}', [PropertyViewController::class, 'show'])
+        ->name('tenant.properties.show');
 
-Route::get('/properties/{property}/images/{imageId}', [PropertyViewController::class, 'showImage'])
-    ->name('tenant.properties.images.show');
+    Route::get('/properties/{property}/images/{imageId}', [PropertyViewController::class, 'showImage'])
+        ->name('tenant.properties.images.show');
+});
 
 // Private storage route for serving signed URLs (tenant side)
 Route::get('/private-storage/{path}', function ($path) {
@@ -229,9 +231,6 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
         Route::get('property-manager/document/{type}', [PropertyManagerController::class, 'serveDocument'])
             ->name('property-manager.document');
 
-        Route::get('property/{property}', [PropertyController::class, 'show'])
-            ->name('property.show');
-
         // Property CRUD
         Route::get('properties', [PropertyController::class, 'index'])
             ->name('properties.index');
@@ -316,7 +315,7 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             return redirect()->away(config('app.url') . '/login?intended=' . urlencode(request()->fullUrl()));
         }
         abort(404);
-    })->where('any', '.*');
+    })->where('any', '[^/]+');
 });
 
 /*

@@ -422,7 +422,7 @@ class PropertyController extends Controller
         return response()->json([
             'token' => $token,
             'expires_at' => $property->invite_token_expires_at,
-            'invite_url' => route('property.show', ['property' => $property->id]) . '?token=' . $token,
+            'invite_url' => route('properties.show', ['property' => $property->id]) . '?token=' . $token,
         ]);
     }
 
