@@ -117,19 +117,6 @@ resource "aws_route53_record" "manager_domain" {
     evaluate_target_health = true
   }
 }
-
-# A record for tenant subdomain pointing to Elastic Beanstalk
-resource "aws_route53_record" "tenant_domain" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "tenant.${var.domain_name}"
-  type    = "A"
-
-  alias {
-    name                   = aws_elastic_beanstalk_environment.main.cname
-    zone_id                = data.aws_elastic_beanstalk_hosted_zone.current.id
-    evaluate_target_health = true
-  }
-}
 #
 # MX record for email
 resource "aws_route53_record" "mx_record" {
