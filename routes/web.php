@@ -273,7 +273,7 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
 
         // Property CRUD
         Route::get('properties', [PropertyController::class, 'index'])
-            ->name('properties.index');
+            ->name('manager.properties.index');
 
         Route::get('properties/create', [PropertyController::class, 'create'])
             ->name('properties.create');
