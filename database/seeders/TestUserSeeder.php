@@ -194,7 +194,6 @@ class TestUserSeeder extends Seeder
             'emergency_contact_relationship' => 'Father',
 
             // Preferences
-            'preferred_move_in_date' => now()->addMonth()->format('Y-m-d'),
             'occupants_count' => 1,
             'has_pets' => false,
             'is_smoker' => false,

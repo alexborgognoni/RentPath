@@ -145,26 +145,33 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                         <CurrencySelector />
                         <LanguageSelector />
 
-                        {/* User Menu Bubble */}
-                        {auth?.user && (
-                            <div ref={userMenuRef} className="relative">
-                                <button
-                                    onClick={() => setShowUserMenu(!showUserMenu)}
-                                    className="flex items-center gap-2 rounded-lg px-2 py-1 text-sm transition-colors hover:bg-muted"
+                        {/* Auth Buttons or User Menu */}
+                        {auth?.user ? (
+                            <>
+                                <Link
+                                    href="/dashboard"
+                                    className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
                                 >
-                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary">
-                                        {auth.user?.property_manager?.profile_picture_url ? (
-                                            <img
-                                                src={auth.user.property_manager.profile_picture_url}
-                                                alt={auth.user?.name || auth.user?.email}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-xs font-semibold text-white">{getUserInitials(auth.user)}</span>
-                                        )}
-                                    </div>
-                                    <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
-                                </button>
+                                    {t(translations?.header, 'dashboard') || 'Dashboard'}
+                                </Link>
+                                <div ref={userMenuRef} className="relative">
+                                    <button
+                                        onClick={() => setShowUserMenu(!showUserMenu)}
+                                        className="flex items-center gap-2 rounded-lg px-2 py-1 text-sm transition-colors hover:bg-muted"
+                                    >
+                                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary">
+                                            {auth.user?.property_manager?.profile_picture_url ? (
+                                                <img
+                                                    src={auth.user.property_manager.profile_picture_url}
+                                                    alt={auth.user?.name || auth.user?.email}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <span className="text-xs font-semibold text-white">{getUserInitials(auth.user)}</span>
+                                            )}
+                                        </div>
+                                        <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+                                    </button>
 
                                 {showUserMenu && (
                                     <div className="absolute top-full right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
@@ -194,7 +201,15 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                                         </div>
                                     </div>
                                 )}
-                            </div>
+                                </div>
+                            </>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
+                            >
+                                {t(translations?.header, 'login') || 'Log In'}
+                            </Link>
                         )}
                     </div>
                 </div>

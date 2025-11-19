@@ -14,7 +14,7 @@ class Authenticate extends Middleware
     {
         if (!$request->expectsJson()) {
             // Always redirect to root domain login page, regardless of subdomain
-            return config('app.url') . '/login?intended=' . urlencode($request->fullUrl());
+            return config('app.url') . '/login?redirect=' . urlencode($request->fullUrl());
         }
 
         return null;

@@ -85,7 +85,6 @@ class TenantProfile extends Model
         'emergency_contact_relationship',
 
         // Preferences
-        'preferred_move_in_date',
         'occupants_count',
         'has_pets',
         'pets_description',
@@ -106,7 +105,6 @@ class TenantProfile extends Model
         'date_of_birth' => 'date',
         'employment_start_date' => 'date',
         'expected_graduation_date' => 'date',
-        'preferred_move_in_date' => 'date',
         'monthly_income' => 'decimal:2',
         'guarantor_monthly_income' => 'decimal:2',
         'has_guarantor' => 'boolean',

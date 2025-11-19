@@ -89,6 +89,35 @@ class Application extends Model
 
         // Internal notes
         'internal_notes',
+
+        // Snapshot fields (frozen profile data at submission time)
+        'snapshot_employment_status',
+        'snapshot_employer_name',
+        'snapshot_job_title',
+        'snapshot_employment_start_date',
+        'snapshot_employment_type',
+        'snapshot_monthly_income',
+        'snapshot_income_currency',
+        'snapshot_current_house_number',
+        'snapshot_current_street_name',
+        'snapshot_current_city',
+        'snapshot_current_postal_code',
+        'snapshot_current_country',
+        'snapshot_university_name',
+        'snapshot_program_of_study',
+        'snapshot_expected_graduation_date',
+        'snapshot_has_guarantor',
+        'snapshot_guarantor_name',
+        'snapshot_guarantor_relationship',
+        'snapshot_guarantor_monthly_income',
+        'snapshot_id_document_path',
+        'snapshot_employment_contract_path',
+        'snapshot_payslip_1_path',
+        'snapshot_payslip_2_path',
+        'snapshot_payslip_3_path',
+        'snapshot_student_proof_path',
+        'snapshot_guarantor_id_path',
+        'snapshot_guarantor_proof_income_path',
     ];
 
     /**
@@ -118,6 +147,11 @@ class Application extends Model
         'submitted_at' => 'datetime',
         'withdrawn_at' => 'datetime',
         'archived_at' => 'datetime',
+        'snapshot_employment_start_date' => 'date',
+        'snapshot_expected_graduation_date' => 'date',
+        'snapshot_monthly_income' => 'decimal:2',
+        'snapshot_guarantor_monthly_income' => 'decimal:2',
+        'snapshot_has_guarantor' => 'boolean',
     ];
 
     /**

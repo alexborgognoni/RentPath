@@ -67,7 +67,6 @@ class TenantProfileFactory extends Factory
             'emergency_contact_relationship' => fake()->randomElement(['Parent', 'Sibling', 'Friend', 'Spouse']),
 
             // Preferences
-            'preferred_move_in_date' => fake()->dateTimeBetween('now', '+2 months')->format('Y-m-d'),
             'occupants_count' => fake()->numberBetween(1, 3),
             'has_pets' => fake()->boolean(30),
             'pets_description' => fake()->boolean(30) ? fake()->randomElement(['1 cat', '1 dog (small breed)', '2 cats']) : null,

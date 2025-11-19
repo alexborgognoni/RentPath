@@ -21,20 +21,26 @@ class SubdomainRoutingTest extends TestCase
 
     public function test_root_domain_public_routes_accessible_when_not_authenticated(): void
     {
-        $response = $this->get('/');
+        $domain = config('app.domain'); // 'localhost' from phpunit.xml
+
+        $response = $this->get('http://' . $domain . '/');
         $response->assertStatus(200);
     }
 
     public function test_root_domain_auth_routes_redirect_to_login_when_not_authenticated(): void
     {
-        $response = $this->get('/dashboard');
+        $domain = config('app.domain');
+
+        $response = $this->get('http://' . $domain . '/dashboard');
         $response->assertRedirect();
         $this->assertTrue(str_contains($response->headers->get('Location'), '/login'));
     }
 
     public function test_root_domain_non_existing_routes_return_404_when_not_authenticated(): void
     {
-        $response = $this->get('/this-does-not-exist');
+        $domain = config('app.domain');
+
+        $response = $this->get('http://' . $domain . '/this-does-not-exist');
         $response->assertStatus(404);
     }
 
@@ -55,7 +61,7 @@ class SubdomainRoutingTest extends TestCase
         $location = $response->headers->get('Location');
         $this->assertStringContainsString($appUrl, $location);
         $this->assertStringContainsString('/login', $location);
-        $this->assertStringContainsString('intended=', $location);
+        $this->assertStringContainsString('redirect=', $location);
     }
 
     public function test_manager_subdomain_non_existing_routes_redirect_to_login_when_not_authenticated(): void
@@ -73,7 +79,7 @@ class SubdomainRoutingTest extends TestCase
         $location = $response->headers->get('Location');
         $this->assertStringContainsString($appUrl, $location);
         $this->assertStringContainsString('/login', $location);
-        $this->assertStringContainsString('intended=', $location);
+        $this->assertStringContainsString('redirect=', $location);
     }
 
     // ============ AUTHENTICATED - ROOT DOMAIN ============
@@ -81,16 +87,18 @@ class SubdomainRoutingTest extends TestCase
     public function test_root_domain_auth_routes_accessible_when_authenticated(): void
     {
         $user = User::factory()->create();
+        $domain = config('app.domain');
 
-        $response = $this->actingAs($user)->get('/dashboard');
+        $response = $this->actingAs($user)->get('http://' . $domain . '/dashboard');
         $response->assertStatus(200);
     }
 
     public function test_root_domain_non_existing_routes_return_404_when_authenticated(): void
     {
         $user = User::factory()->create();
+        $domain = config('app.domain');
 
-        $response = $this->actingAs($user)->get('/this-does-not-exist');
+        $response = $this->actingAs($user)->get('http://' . $domain . '/this-does-not-exist');
         $response->assertStatus(404);
     }
 

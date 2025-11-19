@@ -24,31 +24,41 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const page = usePage<SharedData>();
     const { translations } = page.props;
 
-    // Determine initial user type based on:
-    // 1. If redirected from manager subdomain -> property-manager
-    // 2. Otherwise use localStorage or default to tenant
-    const [userType, setUserType] = useState<'tenant' | 'property-manager'>(() => {
-        // Check if there's an intended URL in query params
-        const urlParams = new URLSearchParams(window.location.search);
-        const intended = urlParams.get('intended');
+    // Determine initial user type based on priority:
+    // 1. Deduce from 'redirect' URL subdomain (if present, hide toggle)
+    // 2. Fall back to localStorage or default to tenant
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirect = urlParams.get('redirect');
 
-        // If intended URL contains manager subdomain, default to property-manager
-        if (intended) {
-            try {
-                const intendedUrl = new URL(intended);
-                const managerSubdomain = import.meta.env.VITE_MANAGER_SUBDOMAIN || 'manager';
-                const baseDomain = import.meta.env.VITE_APP_DOMAIN || window.location.hostname;
-                const managerDomain = `${managerSubdomain}.${baseDomain}`;
+    // Detect user type from redirect URL
+    const deducedType = (() => {
+        if (!redirect) return null;
 
-                if (intendedUrl.hostname === managerDomain) {
-                    return 'property-manager';
-                }
-            } catch {
-                // Invalid URL, continue to localStorage check
+        try {
+            const redirectUrl = new URL(redirect, window.location.origin);
+            const managerSubdomain = import.meta.env.VITE_MANAGER_SUBDOMAIN || 'manager';
+            const baseDomain = import.meta.env.VITE_APP_DOMAIN || window.location.hostname;
+            const managerDomain = `${managerSubdomain}.${baseDomain}`;
+
+            if (redirectUrl.hostname === managerDomain) {
+                return 'property-manager' as const;
             }
+            // If it's root domain or any other domain, it's tenant
+            return 'tenant' as const;
+        } catch {
+            return null;
+        }
+    })();
+
+    const hideToggle = !!deducedType; // Hide toggle if we deduced type from redirect
+
+    const [userType, setUserType] = useState<'tenant' | 'property-manager'>(() => {
+        // Priority 1: Deduce from redirect URL
+        if (deducedType) {
+            return deducedType;
         }
 
-        // Fall back to localStorage or default to tenant
+        // Priority 2: Fall back to localStorage or default to tenant
         const saved = localStorage.getItem('userType');
         return (saved === 'property-manager' ? 'property-manager' : 'tenant') as 'tenant' | 'property-manager';
     });
@@ -67,7 +77,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 {({ processing, errors }) => (
                     <>
                         <input type="hidden" name="userType" value={userType} />
-                        <UserTypeToggle userType={userType} onUserTypeChange={handleUserTypeChange} />
+                        {redirect && <input type="hidden" name="redirect" value={redirect} />}
+                        {!hideToggle && <UserTypeToggle userType={userType} onUserTypeChange={handleUserTypeChange} />}
 
                         <div className="grid gap-6">
                             <div className="grid gap-2">

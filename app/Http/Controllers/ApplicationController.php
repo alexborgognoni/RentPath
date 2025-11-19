@@ -18,19 +18,13 @@ class ApplicationController extends Controller
     public function create(Property $property)
     {
         $user = Auth::user();
+
+        // Auto-create tenant profile if it doesn't exist
+        if (!$user->tenantProfile) {
+            $user->tenantProfile()->create([]);
+        }
+
         $tenantProfile = $user->tenantProfile;
-
-        // Check if tenant profile exists
-        if (!$tenantProfile) {
-            return redirect('/profile/tenant/setup')
-                ->with('message', 'Please complete your tenant profile first');
-        }
-
-        // Check if profile is verified
-        if (!$tenantProfile->isVerified()) {
-            return redirect('/profile/tenant/unverified')
-                ->with('message', 'Your profile is pending verification');
-        }
 
         // Check if already applied (excluding drafts - those can continue)
         $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
@@ -69,13 +63,13 @@ class ApplicationController extends Controller
     public function store(Request $request, Property $property)
     {
         $user = Auth::user();
-        $tenantProfile = $user->tenantProfile;
 
-        // Verification checks
-        if (!$tenantProfile || !$tenantProfile->isVerified()) {
-            return redirect('/profile/tenant/setup')
-                ->with('error', 'Tenant profile required and must be verified');
+        // Auto-create tenant profile if it doesn't exist
+        if (!$user->tenantProfile) {
+            $user->tenantProfile()->create([]);
         }
+
+        $tenantProfile = $user->tenantProfile;
 
         // Check for existing application
         $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
@@ -198,6 +192,9 @@ class ApplicationController extends Controller
             $validated['application_reference_letter']
         );
 
+        // Snapshot profile data at submission time (for audit trail)
+        $validated = array_merge($validated, $this->snapshotProfileData($tenantProfile));
+
         // Update draft or create new application
         $validated['property_id'] = $property->id;
         $validated['tenant_profile_id'] = $tenantProfile->id;
@@ -210,6 +207,9 @@ class ApplicationController extends Controller
         } else {
             $application = Application::create($validated);
         }
+
+        // Auto-verify profile if minimum required data is present
+        $this->autoVerifyProfileIfReady($tenantProfile);
 
         // TODO: Send email notifications to property manager and tenant
 
@@ -228,11 +228,13 @@ class ApplicationController extends Controller
     public function saveDraft(Request $request, Property $property)
     {
         $user = Auth::user();
-        $tenantProfile = $user->tenantProfile;
 
-        if (!$tenantProfile || !$tenantProfile->isVerified()) {
-            return back()->with('error', 'Tenant profile not verified');
+        // Auto-create tenant profile if it doesn't exist
+        if (!$user->tenantProfile) {
+            $user->tenantProfile()->create([]);
         }
+
+        $tenantProfile = $user->tenantProfile;
 
         // Check if draft already exists for this user and property
         $application = Application::where('tenant_profile_id', $tenantProfile->id)
@@ -504,5 +506,81 @@ class ApplicationController extends Controller
 
         return redirect('/dashboard')
             ->with('success', 'Draft application deleted');
+    }
+
+    /**
+     * Snapshot profile data into application for audit trail.
+     * This preserves the profile state at submission time.
+     */
+    private function snapshotProfileData($tenantProfile): array
+    {
+        return [
+            // Employment snapshot
+            'snapshot_employment_status' => $tenantProfile->employment_status,
+            'snapshot_employer_name' => $tenantProfile->employer_name,
+            'snapshot_job_title' => $tenantProfile->job_title,
+            'snapshot_employment_start_date' => $tenantProfile->employment_start_date,
+            'snapshot_employment_type' => $tenantProfile->employment_type,
+            'snapshot_monthly_income' => $tenantProfile->monthly_income,
+            'snapshot_income_currency' => $tenantProfile->income_currency,
+
+            // Current address snapshot
+            'snapshot_current_house_number' => $tenantProfile->current_house_number,
+            'snapshot_current_street_name' => $tenantProfile->current_street_name,
+            'snapshot_current_city' => $tenantProfile->current_city,
+            'snapshot_current_postal_code' => $tenantProfile->current_postal_code,
+            'snapshot_current_country' => $tenantProfile->current_country,
+
+            // Student snapshot
+            'snapshot_university_name' => $tenantProfile->university_name,
+            'snapshot_program_of_study' => $tenantProfile->program_of_study,
+            'snapshot_expected_graduation_date' => $tenantProfile->expected_graduation_date,
+
+            // Guarantor snapshot
+            'snapshot_has_guarantor' => $tenantProfile->has_guarantor,
+            'snapshot_guarantor_name' => $tenantProfile->guarantor_name,
+            'snapshot_guarantor_relationship' => $tenantProfile->guarantor_relationship,
+            'snapshot_guarantor_monthly_income' => $tenantProfile->guarantor_monthly_income,
+
+            // Document paths snapshot
+            'snapshot_id_document_path' => $tenantProfile->id_document_path,
+            'snapshot_employment_contract_path' => $tenantProfile->employment_contract_path,
+            'snapshot_payslip_1_path' => $tenantProfile->payslip_1_path,
+            'snapshot_payslip_2_path' => $tenantProfile->payslip_2_path,
+            'snapshot_payslip_3_path' => $tenantProfile->payslip_3_path,
+            'snapshot_student_proof_path' => $tenantProfile->student_proof_path,
+            'snapshot_guarantor_id_path' => $tenantProfile->guarantor_id_path,
+            'snapshot_guarantor_proof_income_path' => $tenantProfile->guarantor_proof_income_path,
+        ];
+    }
+
+    /**
+     * Auto-verify profile if minimum required data is present.
+     * Called when an application is submitted.
+     */
+    private function autoVerifyProfileIfReady($tenantProfile): void
+    {
+        // Skip if already verified
+        if ($tenantProfile->isVerified()) {
+            return;
+        }
+
+        // Check minimum required data
+        $hasRequiredData = $tenantProfile->date_of_birth
+            && $tenantProfile->phone_number
+            && $tenantProfile->employment_status
+            && $tenantProfile->id_document_path
+            && (
+                // Employed: need employment docs
+                ($tenantProfile->isEmployed() && $tenantProfile->employment_contract_path)
+                // Student: need student proof
+                || ($tenantProfile->isStudent() && $tenantProfile->student_proof_path)
+                // Other statuses: ID is enough
+                || in_array($tenantProfile->employment_status, ['unemployed', 'retired'])
+            );
+
+        if ($hasRequiredData) {
+            $tenantProfile->update(['profile_verified_at' => now()]);
+        }
     }
 }

@@ -56,67 +56,95 @@ if (!function_exists('userDefaultDashboard')) {
 
 /*
 |--------------------------------------------------------------------------
-| Root Route - Landing page
+| Root Domain Routes - Public pages ONLY on root domain
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return Inertia::render('landing');
-})->name('landing');
-
-/*
-|--------------------------------------------------------------------------
-| Main Domain Routes (NO subdomain) - Public and Auth pages
-|--------------------------------------------------------------------------
-*/
-
-// Public pages
-Route::get('/privacy-policy', function () {
-    return Inertia::render('privacy-policy');
-})->name('privacy.policy');
-
-Route::get('/terms-of-use', function () {
-    return Inertia::render('terms-of-use');
-})->name('terms.of.use');
-
-Route::get('/contact-us', function () {
-    return Inertia::render('contact-us');
-})->name('contact.us');
-
-// Property viewing (public or token-protected) - ONLY on main domain
 Route::domain(config('app.domain'))->group(function () {
+    // Landing page
+    Route::get('/', function () {
+        return Inertia::render('landing');
+    })->name('landing');
+
+    // Public pages
+    Route::get('/privacy-policy', function () {
+        return Inertia::render('privacy-policy');
+    })->name('privacy.policy');
+
+    Route::get('/terms-of-use', function () {
+        return Inertia::render('terms-of-use');
+    })->name('terms.of.use');
+
+    Route::get('/contact-us', function () {
+        return Inertia::render('contact-us');
+    })->name('contact.us');
+
+    // Browse all public properties
+    Route::get('/properties', function () {
+        // Fetch all properties that don't require invite
+        $properties = \App\Models\Property::where('requires_invite', false)
+            ->where('status', 'available')
+            ->with(['images', 'propertyManager.user'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($property) {
+                $propertyArray = $property->toArray();
+
+                // Add property image URLs
+                if ($property->images) {
+                    $propertyArray['images'] = $property->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image_url' => \App\Helpers\StorageHelper::url($image->image_path, 'private', 1440),
+                            'image_path' => $image->image_path,
+                            'is_main' => $image->is_main,
+                            'sort_order' => $image->sort_order,
+                        ];
+                    })->sortBy('sort_order')->values()->toArray();
+                }
+
+                return $propertyArray;
+            });
+
+        return Inertia::render('tenant/properties', [
+            'properties' => $properties,
+        ]);
+    })->name('properties.index');
+
+    // Property viewing (public or token-protected)
     Route::get('/properties/{property}', [PropertyViewController::class, 'show'])
         ->name('tenant.properties.show');
 
     Route::get('/properties/{property}/images/{imageId}', [PropertyViewController::class, 'showImage'])
         ->name('tenant.properties.images.show');
-});
 
-// Private storage route for serving signed URLs (tenant side)
-Route::get('/private-storage/{path}', function ($path) {
-    $disk = \App\Helpers\StorageHelper::getDisk('private');
-    if (!Storage::disk($disk)->exists($path)) {
-        abort(404);
+    // Private storage route for serving signed URLs (tenant side)
+    Route::get('/private-storage/{path}', function ($path) {
+        $disk = \App\Helpers\StorageHelper::getDisk('private');
+        if (!Storage::disk($disk)->exists($path)) {
+            abort(404);
+        }
+        return Storage::disk($disk)->response($path);
+    })->where('path', '.*')->middleware('signed')->name('tenant.private.storage');
+
+    // Locale switching
+    Route::post('/locale', function (Request $request) {
+        $locale = $request->input('locale');
+        if (in_array($locale, ['en', 'fr', 'de', 'nl'])) {
+            session(['locale' => $locale]);
+        }
+        return response()->json(['locale' => session('locale')]);
+    });
+
+    // Development tools (local only)
+    if (config('app.env') === 'local') {
+        Route::get('dev/schema', [SchemaViewerController::class, 'index'])
+            ->name('dev.schema');
     }
-    return Storage::disk($disk)->response($path);
-})->where('path', '.*')->middleware('signed')->name('tenant.private.storage');
 
-Route::post('/locale', function (Request $request) {
-    $locale = $request->input('locale');
-    if (in_array($locale, ['en', 'fr', 'de', 'nl'])) {
-        session(['locale' => $locale]);
-    }
-    return response()->json(['locale' => session('locale')]);
+    // Auth routes (login, register, password reset, email verification)
+    require __DIR__ . '/auth.php';
 });
-
-// Development tools (local only)
-if (config('app.env') === 'local') {
-    Route::get('dev/schema', [SchemaViewerController::class, 'index'])
-        ->name('dev.schema');
-}
-
-// Auth routes
-require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -125,6 +153,11 @@ require __DIR__ . '/auth.php';
 */
 
 Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager')->group(function () {
+
+    // Redirect root to dashboard
+    Route::get('/', function () {
+        return redirect('/dashboard');
+    });
 
     // Dashboard
     Route::middleware(['auth'])->get('dashboard', function (Request $request) {
@@ -319,7 +352,7 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
     // Catch-all route for manager subdomain - redirects to login if not authenticated
     Route::any('{any}', function () {
         if (!auth()->check()) {
-            return redirect()->away(config('app.url') . '/login?intended=' . urlencode(request()->fullUrl()));
+            return redirect()->away(config('app.url') . '/login?redirect=' . urlencode(request()->fullUrl()));
         }
         abort(404);
     })->where('any', '[^/]+');
@@ -332,47 +365,59 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
 */
 
 // Tenant authenticated routes
-Route::middleware(['auth', 'verified'])->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Root Domain - Tenant Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(function () {
     // Dashboard
-    Route::get('dashboard', function () {
-        return Inertia::render('tenant/dashboard');
-    })->name('dashboard');
-
-    // Tenant Profile routes
-    Route::get('profile/tenant/setup', [\App\Http\Controllers\TenantProfileController::class, 'create'])
-        ->name('tenant.profile.setup');
-
-    Route::post('profile/tenant/setup', [\App\Http\Controllers\TenantProfileController::class, 'store'])
-        ->name('tenant.profile.store');
-
-    Route::get('profile/tenant/unverified', function (Illuminate\Http\Request $request) {
+    Route::get('dashboard', function (Request $request) {
         $user = $request->user();
         $tenantProfile = $user->tenantProfile;
 
+        // If no tenant profile, show empty state
         if (!$tenantProfile) {
-            return redirect('/profile/tenant/setup');
-        }
-
-        if ($tenantProfile->isVerified()) {
-            return redirect('/dashboard');
-        }
-
-        if ($request->get('edit')) {
-            return Inertia::render('tenant/tenant-profile-setup', [
-                'tenantProfile' => $tenantProfile,
-                'user' => $user,
-                'isEditing' => true,
-                'rejectionReason' => $tenantProfile->verification_rejection_reason,
-                'rejectedFields' => $tenantProfile->verification_rejected_fields ?? [],
+            return Inertia::render('tenant/dashboard', [
+                'applications' => [],
             ]);
         }
 
-        return Inertia::render('tenant/tenant-profile-unverified', [
-            'isRejected' => $tenantProfile->isRejected(),
-            'rejectionReason' => $tenantProfile->verification_rejection_reason,
-        ]);
-    })->name('tenant.profile.unverified');
+        // Fetch all applications for this tenant with property details
+        $applications = \App\Models\Application::where('tenant_profile_id', $tenantProfile->id)
+            ->with(['property' => function ($query) {
+                $query->with('images');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($application) {
+                $applicationArray = $application->toArray();
 
+                // Add property image URLs
+                if ($application->property && $application->property->images) {
+                    $applicationArray['property']['images'] = $application->property->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image_url' => \App\Helpers\StorageHelper::url($image->image_path, 'private', 1440),
+                            'image_path' => $image->image_path,
+                            'is_main' => $image->is_main,
+                            'sort_order' => $image->sort_order,
+                        ];
+                    })->sortBy('sort_order')->values()->toArray();
+                }
+
+                return $applicationArray;
+            });
+
+        return Inertia::render('tenant/dashboard', [
+            'applications' => $applications,
+        ]);
+    })->name('dashboard');
+
+    // Tenant Profile routes
+    // Note: Setup/unverified routes removed - profiles are now auto-created on first application
+    // Users can edit their profile after submitting their first application
     Route::get('profile/tenant/edit', [\App\Http\Controllers\TenantProfileController::class, 'edit'])
         ->name('tenant.profile.edit');
 

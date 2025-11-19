@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\RedirectHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -43,28 +44,12 @@ class AuthenticatedSessionController extends Controller
         // Explicitly save session to database before redirect
         $request->session()->save();
 
-        // Check if there's an intended URL from query parameter
-        $intended = $request->query('intended');
+        // Check if there's a redirect URL from form data or query parameter
+        $redirect = $request->input('redirect') ?? $request->query('redirect');
+        $userTypePreference = $request->input('userType', 'tenant');
 
-        // If no intended URL, determine redirect based on user type preference
-        if (!$intended) {
-            $userTypePreference = $request->input('userType', 'tenant');
-            $user = $request->user();
-
-            // If they selected property-manager but don't have a property manager profile,
-            // still redirect to manager subdomain (they'll be prompted to create profile)
-            if ($userTypePreference === 'property-manager') {
-                $managerUrl = config('app.env') === 'local'
-                    ? 'http://manager.' . parse_url(config('app.url'), PHP_URL_HOST) . ':' . parse_url(config('app.url'), PHP_URL_PORT)
-                    : 'https://manager.' . config('app.domain');
-                $redirectUrl = $managerUrl . '/dashboard';
-            } else {
-                // Tenant selected - redirect to root domain dashboard
-                $redirectUrl = config('app.url') . '/dashboard';
-            }
-        } else {
-            $redirectUrl = $intended;
-        }
+        // Resolve the redirect URL using helper
+        $redirectUrl = RedirectHelper::resolveRedirectUrl($redirect, $userTypePreference);
 
         \Log::info('Login redirect URL: ' . $redirectUrl);
         \Log::info('Session ID: ' . $request->session()->getId());
@@ -103,14 +88,23 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request): RedirectResponse|HttpResponse
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Redirect to main domain landing page
-        return redirect(config('app.url'));
+        $redirectUrl = config('app.url');
+
+        // For Inertia requests (from manager subdomain), return 409 with X-Inertia-Location
+        if ($request->header('X-Inertia')) {
+            return ResponseFacade::make('', 409, [
+                'X-Inertia-Location' => $redirectUrl
+            ]);
+        }
+
+        // For regular requests, use standard redirect
+        return redirect()->away($redirectUrl);
     }
 }

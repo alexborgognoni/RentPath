@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\RedirectHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -55,25 +56,12 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        // Check if there's an intended URL from query parameter
-        $intended = $request->query('intended');
+        // Check if there's a redirect URL from form data or query parameter
+        $redirect = $request->input('redirect') ?? $request->query('redirect');
+        $userTypePreference = $request->input('userType', 'tenant');
 
-        // If no intended URL, determine redirect based on user type preference
-        if (!$intended) {
-            $userTypePreference = $request->input('userType', 'tenant');
-
-            if ($userTypePreference === 'property-manager') {
-                $managerUrl = config('app.env') === 'local'
-                    ? 'http://manager.' . parse_url(config('app.url'), PHP_URL_HOST) . ':' . parse_url(config('app.url'), PHP_URL_PORT)
-                    : 'https://manager.' . config('app.domain');
-                $redirectUrl = $managerUrl . '/dashboard';
-            } else {
-                // Tenant selected - redirect to root domain dashboard
-                $redirectUrl = config('app.url') . '/dashboard';
-            }
-        } else {
-            $redirectUrl = $intended;
-        }
+        // Resolve the redirect URL using helper
+        $redirectUrl = RedirectHelper::resolveRedirectUrl($redirect, $userTypePreference);
 
         // For Inertia external redirects, return 409 with X-Inertia-Location header
         if ($request->header('X-Inertia')) {

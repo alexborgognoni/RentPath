@@ -103,7 +103,6 @@ return new class extends Migration
             $table->string('emergency_contact_relationship')->nullable();
 
             // Preferences (for matching)
-            $table->date('preferred_move_in_date')->nullable();
             $table->integer('occupants_count')->default(1);
             $table->boolean('has_pets')->default(false);
             $table->string('pets_description')->nullable();

@@ -152,12 +152,13 @@ class PropertyViewController extends Controller
         }
 
         $user = Auth::user();
-        $tenantProfile = $user->tenantProfile;
 
-        // Must have a verified tenant profile
-        if (!$tenantProfile || !$tenantProfile->isVerified()) {
-            return false;
+        // Auto-create tenant profile if doesn't exist (will be filled during application)
+        if (!$user->tenantProfile) {
+            $user->tenantProfile()->create([]);
         }
+
+        $tenantProfile = $user->tenantProfile;
 
         // Check if user already has an active application for this property (excluding drafts)
         $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
@@ -179,6 +180,9 @@ class PropertyViewController extends Controller
 
     /**
      * Get the tenant profile status for the current user.
+     *
+     * Note: Profiles are now auto-created and auto-verified on first application submission.
+     * We always return true for authenticated users to allow them to start applying.
      */
     private function getTenantProfileStatus(): array
     {
@@ -190,20 +194,11 @@ class PropertyViewController extends Controller
             ];
         }
 
-        $tenantProfile = Auth::user()->tenantProfile;
-
-        if (!$tenantProfile) {
-            return [
-                'exists' => false,
-                'verified' => false,
-                'rejected' => false,
-            ];
-        }
-
+        // Authenticated users can always apply - profile will be created/verified during application
         return [
             'exists' => true,
-            'verified' => $tenantProfile->isVerified(),
-            'rejected' => $tenantProfile->isRejected(),
+            'verified' => true, // Always true now - verification happens on submission
+            'rejected' => false,
         ];
     }
 
