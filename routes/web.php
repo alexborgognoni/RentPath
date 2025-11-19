@@ -8,6 +8,7 @@ use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyManagerController;
 use App\Http\Controllers\PropertyViewController;
+use App\Http\Controllers\SchemaViewerController;
 
 // Helper to check current subdomain
 if (!function_exists('currentSubdomain')) {
@@ -107,6 +108,12 @@ Route::post('/locale', function (Request $request) {
     }
     return response()->json(['locale' => session('locale')]);
 });
+
+// Development tools (local only)
+if (config('app.env') === 'local') {
+    Route::get('dev/schema', [SchemaViewerController::class, 'index'])
+        ->name('dev.schema');
+}
 
 // Auth routes
 require __DIR__ . '/auth.php';
