@@ -1,23 +1,49 @@
-import { LanguageSelector } from '@/components/language-selector';
-import { SharedData } from '@/types';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarRail,
+    useSidebar,
+} from '@/components/ui/sidebar';
+import type { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
-import { Link, usePage } from '@inertiajs/react';
-import { Building2, ChevronLeft, ChevronRight, ChevronsUpDown, Home, LogOut, Settings, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { Link, router, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { Building2, ChevronsUpDown, Globe, Home, LogOut, Settings } from 'lucide-react';
 
-interface AppSidebarProps {
-    sidebarOpen: boolean;
-    setSidebarOpen: (open: boolean) => void;
-    sidebarCollapsed: boolean;
-    setSidebarCollapsed: (collapsed: boolean) => void;
-    onLogout: () => void;
-}
+const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+];
 
-export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed, onLogout }: AppSidebarProps) {
+export function AppSidebar() {
     const page = usePage<SharedData>();
-    const { auth, translations } = page.props;
-    const [showUserMenu, setShowUserMenu] = useState(false);
-    const userMenuRef = useRef<HTMLDivElement>(null);
+    const { auth, translations, locale } = page.props;
+    const { state } = useSidebar();
+    const isCollapsed = state === 'collapsed';
+
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    const currentLang = languages.find((lang) => lang.code === locale) || languages[0];
+
+    const isPropertiesActive = currentPath === '/dashboard' || currentPath.startsWith('/properties') || currentPath.startsWith('/property');
 
     const getUserInitials = () => {
         if (auth.user?.name) {
@@ -33,145 +59,159 @@ export function AppSidebar({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setS
     };
 
     const handleLogout = () => {
-        setShowUserMenu(false);
-        onLogout();
+        router.post('/logout');
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-                setShowUserMenu(false);
-            }
-        };
-
-        const handleScroll = () => {
-            setShowUserMenu(false);
-        };
-
-        if (showUserMenu) {
-            document.addEventListener('mousedown', handleClickOutside);
-            document.addEventListener('scroll', handleScroll, true);
+    const handleLanguageChange = async (langCode: string) => {
+        try {
+            await axios.post('/locale', { locale: langCode });
+            window.location.reload();
+        } catch (err) {
+            console.error('Failed to change language', err);
         }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('scroll', handleScroll, true);
-        };
-    }, [showUserMenu]);
+    };
 
     return (
-        <aside
-            className={`fixed inset-y-0 left-0 z-50 transform border-r border-border bg-card transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 ${
-                sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            } ${sidebarCollapsed ? 'w-16' : 'w-64'}`}
-        >
-            <div className="flex h-full flex-col">
-                {/* Sidebar Header */}
-                <div className="flex h-16 items-center justify-between border-b border-border px-4">
-                    <div className="flex items-center space-x-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary">
-                            <Home size={20} className="text-white" />
-                        </div>
-                        {!sidebarCollapsed && <span className="text-lg font-bold text-foreground">RentPath</span>}
-                    </div>
-                    <button onClick={() => setSidebarOpen(false)} className="text-muted-foreground hover:text-foreground lg:hidden">
-                        <X size={20} />
-                    </button>
-                    <button
-                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        className="hidden text-muted-foreground hover:text-foreground lg:block"
-                    >
-                        {sidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-                    </button>
-                </div>
+        <Sidebar collapsible="icon">
+            {/* Header */}
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton size="lg" asChild>
+                            <Link href="/dashboard">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary">
+                                    <Home size={18} className="text-white" />
+                                </div>
+                                <div className="flex flex-col gap-0.5 leading-none">
+                                    <span className="font-semibold">RentPath</span>
+                                    <span className="text-xs text-muted-foreground">{t(translations.sidebar, 'managerPortal')}</span>
+                                </div>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
 
-                {/* Navigation */}
-                <nav className="flex-1 space-y-1 px-3 py-4">
-                    <a
-                        href="/dashboard"
-                        className={`flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                            window.location.pathname === '/dashboard' ||
-                            window.location.pathname.startsWith('/properties') ||
-                            window.location.pathname.startsWith('/property')
-                                ? 'bg-primary/10 text-primary'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                        } ${sidebarCollapsed ? 'justify-center' : ''}`}
-                        title={sidebarCollapsed ? 'Properties' : ''}
-                    >
-                        <Building2 size={18} />
-                        {!sidebarCollapsed && <span>Properties</span>}
-                    </a>
-                </nav>
+            {/* Main Navigation */}
+            <SidebarContent>
+                <SidebarGroup>
+                    <SidebarGroupLabel>{t(translations.sidebar, 'navigation')}</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild isActive={isPropertiesActive} tooltip={t(translations.sidebar, 'properties')}>
+                                    <Link href="/dashboard">
+                                        <Building2 />
+                                        <span>{t(translations.sidebar, 'properties')}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
 
-                {/* User Section */}
-                <div className="border-t border-border p-4">
-                    {/* Language Selector */}
-                    {!sidebarCollapsed && (
-                        <div className="mb-3 border-b border-border pb-3">
-                            <LanguageSelector />
-                        </div>
-                    )}
+                {/* Settings Group */}
+                <SidebarGroup>
+                    <SidebarGroupLabel>{t(translations.sidebar, 'preferences')}</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild isActive={currentPath.startsWith('/settings')} tooltip={t(translations.sidebar, 'settings')}>
+                                    <Link href="/settings">
+                                        <Settings />
+                                        <span>{t(translations.sidebar, 'settings')}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
 
-                    <div ref={userMenuRef} className="relative">
-                        <button
-                            onClick={() => setShowUserMenu(!showUserMenu)}
-                            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted ${sidebarCollapsed ? 'justify-center' : ''}`}
-                        >
-                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary">
-                                {auth.user?.property_manager?.profile_picture_url ? (
-                                    <img
-                                        src={auth.user.property_manager.profile_picture_url}
-                                        alt={auth.user?.name || auth.user?.email}
-                                        className="h-full w-full object-cover"
-                                    />
-                                ) : (
-                                    <span className="text-sm font-semibold text-white">{getUserInitials()}</span>
-                                )}
-                            </div>
-                            {!sidebarCollapsed && (
-                                <>
-                                    <div className="flex-1 text-left">
-                                        {auth.user?.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
-                                        <p className="truncate text-xs text-muted-foreground">{auth.user?.email}</p>
+                            {/* Language Selector */}
+                            <SidebarMenuItem>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <SidebarMenuButton tooltip={t(translations.sidebar, 'language')}>
+                                            <Globe />
+                                            <span>
+                                                {currentLang.flag} {currentLang.name}
+                                            </span>
+                                        </SidebarMenuButton>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent side={isCollapsed ? 'right' : 'top'} align="start" className="w-48">
+                                        <DropdownMenuLabel>{t(translations.sidebar, 'selectLanguage')}</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        {languages.map((lang) => (
+                                            <DropdownMenuItem
+                                                key={lang.code}
+                                                onClick={() => handleLanguageChange(lang.code)}
+                                                className={locale === lang.code ? 'bg-accent' : ''}
+                                            >
+                                                <span className="mr-2">{lang.flag}</span>
+                                                <span>{lang.name}</span>
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarContent>
+
+            {/* User Footer */}
+            <SidebarFooter>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <SidebarMenuButton
+                                    size="lg"
+                                    tooltip={auth.user?.name || auth.user?.email || t(translations.sidebar, 'account')}
+                                >
+                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary">
+                                        {auth.user?.property_manager?.profile_picture_url ? (
+                                            <img
+                                                src={auth.user.property_manager.profile_picture_url}
+                                                alt={auth.user?.name || auth.user?.email}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-sm font-semibold text-white">{getUserInitials()}</span>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-1 flex-col gap-0.5 leading-none text-left">
+                                        {auth.user?.name && <span className="font-medium truncate">{auth.user.name}</span>}
+                                        <span className="text-xs text-muted-foreground truncate">{auth.user?.email}</span>
                                     </div>
                                     <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground" />
-                                </>
-                            )}
-                        </button>
-
-                        {showUserMenu && (
-                            <div
-                                className={`absolute z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface shadow-xl ${sidebarCollapsed ? 'bottom-0 left-full ml-2' : 'bottom-full left-0 mb-2'}`}
-                            >
-                                <div className="border-b border-border px-4 py-3">
-                                    <div className="min-w-0">
-                                        {auth.user?.name && <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>}
-                                        <p className="truncate text-xs text-muted-foreground">{auth.user?.email}</p>
+                                </SidebarMenuButton>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent side={isCollapsed ? 'right' : 'top'} align="start" className="w-56">
+                                <DropdownMenuLabel>
+                                    <div className="flex flex-col">
+                                        {auth.user?.name && <span className="font-medium">{auth.user.name}</span>}
+                                        <span className="text-xs text-muted-foreground font-normal">{auth.user?.email}</span>
                                     </div>
-                                </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/settings">
+                                            <Settings />
+                                            <span>{t(translations.sidebar, 'settings')}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+                                    <LogOut />
+                                    <span>{t(translations.sidebar, 'signOut')}</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarFooter>
 
-                                <div className="py-1">
-                                    <Link
-                                        href="/settings"
-                                        className="text-text-secondary flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background"
-                                    >
-                                        <Settings size={16} />
-                                        <span>{t(translations.header, 'settings')}</span>
-                                    </Link>
-                                    <div className="mb-1 border-t border-border"></div>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10"
-                                    >
-                                        <LogOut size={16} />
-                                        <span>{t(translations.header, 'sign_out')}</span>
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </aside>
+            <SidebarRail />
+        </Sidebar>
     );
 }

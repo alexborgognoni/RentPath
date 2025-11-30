@@ -9,6 +9,7 @@ export interface Translations {
     profile: ProfileTranslations;
     'cookie-banner': CookieBannerTranslations;
     dashboard: DashboardTranslations;
+    sidebar: SidebarTranslations;
 }
 
 export type TranslationKey = string;
