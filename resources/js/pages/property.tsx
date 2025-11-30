@@ -30,7 +30,7 @@ export default function PropertyPage() {
         return (
             <ManagerLayout breadcrumbs={breadcrumbs}>
                 <Head title={translate(translations, 'properties.propertyNotFound')} />
-                <div className="mt-6 rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm">
+                <div className="rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm">
                     <h2 className="mb-4 text-2xl font-bold text-destructive">{error || translate(translations, 'properties.propertyNotFound')}</h2>
                     <p className="mb-6 text-muted-foreground">The property you're looking for doesn't exist or you don't have access to it.</p>
                     <Link
@@ -47,7 +47,7 @@ export default function PropertyPage() {
     return (
         <ManagerLayout breadcrumbs={breadcrumbs}>
             <Head title={property.title} />
-            <div className="mt-6 grid grid-cols-1 gap-8 pb-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* Left Column - Main Content */}
                 <div className="space-y-6 lg:col-span-2">
                     <PropertyInfo property={property} />

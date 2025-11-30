@@ -333,7 +333,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="mt-6 mb-6 sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:p-8 sm:shadow-lg"
+                className="sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:p-8 sm:shadow-lg"
             >
                 <div className="mb-8">
                     <h1 className="mb-2 flex items-center gap-3 text-3xl font-bold text-foreground">

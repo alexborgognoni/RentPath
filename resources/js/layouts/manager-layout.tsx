@@ -45,9 +45,9 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                 </div>
 
                 <main className="h-full flex-1 overflow-y-auto">
-                    <div className="h-full px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="px-4 py-6 sm:px-6 lg:px-8">
                         {breadcrumbs && breadcrumbs.length > 0 && (
-                            <nav className="mb-6 flex items-center gap-2 text-sm">
+                            <nav className="mb-4 flex items-center gap-2 text-sm">
                                 {breadcrumbs.map((crumb, i) => (
                                     <div key={i} className="flex items-center gap-2">
                                         {i > 0 && <span className="text-muted-foreground">/</span>}
@@ -90,9 +90,9 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                 </Sheet>
 
                 <main className="flex-1 overflow-y-auto">
-                    <div className="h-full px-4 py-6">
+                    <div className="px-4 py-6">
                         {breadcrumbs && breadcrumbs.length > 0 && (
-                            <nav className="mb-6 flex items-center gap-2 text-sm">
+                            <nav className="mb-4 flex items-center gap-2 text-sm">
                                 {breadcrumbs.map((crumb, i) => (
                                     <div key={i} className="flex items-center gap-2">
                                         {i > 0 && <span className="text-muted-foreground">/</span>}
