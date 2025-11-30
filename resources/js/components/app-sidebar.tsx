@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { SharedData } from '@/types';
+import { route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
@@ -49,12 +50,12 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
     };
 
     const handleLogout = () => {
-        router.post('/logout');
+        router.post(route('manager.logout'));
     };
 
     const handleLanguageChange = async (langCode: string) => {
         try {
-            await axios.post('/locale', { locale: langCode });
+            await axios.post(route('locale.update'), { locale: langCode });
             window.location.reload();
         } catch (err) {
             console.error('Failed to change language', err);
@@ -80,7 +81,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                         </Tooltip>
                     ) : (
                         <div className="flex w-full items-center justify-between">
-                            <Link href="/properties" className="flex items-center space-x-3">
+                            <Link href={route('manager.properties.index')} className="flex items-center space-x-3">
                                 <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary">
                                     <Home size={18} className="text-white" />
                                 </div>
@@ -104,7 +105,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                 {/* Navigation */}
                 <nav className="flex-1 space-y-1 px-3 py-4">
                     <NavItem
-                        href="/properties"
+                        href={route('manager.properties.index')}
                         icon={<Building2 size={18} />}
                         label={t(translations.sidebar, 'properties')}
                         isActive={isPropertiesActive}
@@ -115,7 +116,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                 {/* Settings Section */}
                 <div className="border-t border-border px-3 py-4 space-y-1">
                     <NavItem
-                        href="/settings"
+                        href={settingsRoute('profile')}
                         icon={<Settings size={18} />}
                         label={t(translations.sidebar, 'settings')}
                         isActive={currentPath.startsWith('/settings')}
@@ -210,7 +211,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/settings">
+                                    <Link href={settingsRoute('profile')}>
                                         <Settings size={16} />
                                         <span>{t(translations.sidebar, 'settings')}</span>
                                     </Link>

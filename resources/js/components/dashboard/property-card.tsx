@@ -1,6 +1,7 @@
 import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { copyToClipboard } from '@/utils/clipboard';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Copy, ExternalLink, Users } from 'lucide-react';
@@ -39,7 +40,7 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
 
     const handleCardClick = () => {
         // Navigate to property detail page
-        window.location.href = `/property/${property.id}`;
+        window.location.href = route('properties.show', { property: property.id });
     };
 
     const handleEditClick = (e: React.MouseEvent) => {

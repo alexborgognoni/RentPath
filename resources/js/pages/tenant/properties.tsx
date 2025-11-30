@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import type { Property } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { BedDouble, Bath, Maximize, MapPin, Home } from 'lucide-react';
 import { AppLayout } from '@/layouts/app-layout';
 
@@ -34,7 +35,7 @@ export default function PropertiesPage({ properties }: PropertiesPageProps) {
                             return (
                                 <Link
                                     key={property.id}
-                                    href={`/properties/${property.id}`}
+                                    href={route('tenant.properties.show', { property: property.id })}
                                     className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-lg"
                                 >
                                     {/* Property Image */}

@@ -1,5 +1,6 @@
 import { BaseLayout } from '@/layouts/base-layout';
 import { type Application, type SharedData } from '@/types';
+import { route } from '@/utils/route';
 import { Head, router, usePage } from '@inertiajs/react';
 import { AlertCircle, Calendar, CheckCircle, Clock, FileText, Home, User, XCircle } from 'lucide-react';
 import { useState } from 'react';
@@ -14,7 +15,7 @@ export default function ApplicationView() {
 
     const handleWithdraw = () => {
         router.post(
-            `/applications/${application.id}/withdraw`,
+            route('applications.withdraw', { application: application.id }),
             {},
             {
                 onBefore: () => confirm('Are you sure you want to withdraw this application? This action cannot be undone.'),
@@ -269,7 +270,7 @@ export default function ApplicationView() {
 
                     {/* Actions */}
                     <div className="flex gap-4">
-                        <a href="/dashboard" className="rounded-lg border border-border px-6 py-3 font-medium hover:bg-muted">
+                        <a href={route('dashboard')} className="rounded-lg border border-border px-6 py-3 font-medium hover:bg-muted">
                             Back to Dashboard
                         </a>
 

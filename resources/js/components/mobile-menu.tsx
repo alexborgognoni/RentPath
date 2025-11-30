@@ -2,6 +2,7 @@ import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popo
 import { Button } from '@/components/ui/button';
 import { SharedData } from '@/types';
 import { currencies, getCurrency, getCurrencyFromStorage, setCurrencyInStorage, type Currency, type CurrencyCode } from '@/utils/currency-utils';
+import { route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
@@ -63,7 +64,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
 
     const handleLanguageChange = async (langCode: string) => {
         try {
-            await axios.post('/locale', { locale: langCode });
+            await axios.post(route('locale.update'), { locale: langCode });
             window.location.reload();
         } catch (err) {
             console.error('Failed to change language', err);
@@ -260,7 +261,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                             {!auth.user && (
                                 <>
                                     <a
-                                        href="/login"
+                                        href={route('login')}
                                         className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-base font-semibold text-white shadow-xs transition-all hover:scale-105"
                                         onClick={() => setIsOpen(false)}
                                     >
@@ -363,7 +364,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                         {auth.user && (
                             <div className="space-y-2 pt-4">
                                 <Button variant="outline" className="h-11 w-full justify-start text-base" asChild>
-                                    <a href="/settings" onClick={() => setIsOpen(false)}>
+                                    <a href={settingsRoute('profile')} onClick={() => setIsOpen(false)}>
                                         <Settings size={20} />
                                         <span>{t(translations.header, 'settings')}</span>
                                     </a>

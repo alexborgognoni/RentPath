@@ -134,7 +134,7 @@ Route::domain(config('app.domain'))->group(function () {
             session(['locale' => $locale]);
         }
         return response()->json(['locale' => session('locale')]);
-    });
+    })->name('locale.update');
 
     // Development tools (local only)
     if (config('app.env') === 'local') {
@@ -339,9 +339,10 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
     Route::middleware('auth')->post('logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
         ->name('manager.logout');
 
-    // Settings routes
+    // Settings routes (manager subdomain)
     Route::middleware('auth')->group(function () {
         if (file_exists(__DIR__ . '/settings.php')) {
+            $routePrefix = 'manager.settings';
             require __DIR__ . '/settings.php';
         }
     });
@@ -446,8 +447,9 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
     Route::post('applications/{application}/withdraw', [\App\Http\Controllers\ApplicationController::class, 'withdraw'])
         ->name('applications.withdraw');
 
-    // Settings routes (same paths as manager, different views)
+    // Settings routes (tenant/root domain)
     if (file_exists(__DIR__ . '/settings.php')) {
+        $routePrefix = 'tenant.settings';
         require __DIR__ . '/settings.php';
     }
 });

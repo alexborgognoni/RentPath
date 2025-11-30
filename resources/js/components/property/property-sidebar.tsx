@@ -1,5 +1,6 @@
 import type { Property } from '@/types/dashboard';
 import { copyToClipboard } from '@/utils/clipboard';
+import { route } from '@/utils/route';
 import { router } from '@inertiajs/react';
 import { Check, Copy, Edit, FileText, Link2, RefreshCw, Settings, Share, Trash2, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -51,14 +52,14 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     };
 
     const handleEdit = () => {
-        router.visit(`/properties/${property.id}/edit`);
+        router.visit(route('properties.edit', { property: property.id }));
     };
 
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
-            router.delete(`/properties/${property.id}`, {
+            router.delete(route('properties.destroy', { property: property.id }), {
                 onSuccess: () => {
-                    router.visit('/properties');
+                    router.visit(route('manager.properties.index'));
                 },
             });
         }
@@ -66,7 +67,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
     const handleTogglePublicAccess = async () => {
         try {
-            const response = await fetch(`/properties/${property.id}/toggle-public-access`, {
+            const response = await fetch(route('properties.togglePublicAccess', { property: property.id }), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     const handleRegenerateDefaultToken = async () => {
         setRegeneratingToken(true);
         try {
-            const response = await fetch(`/properties/${property.id}/regenerate-default-token`, {
+            const response = await fetch(route('properties.regenerateDefaultToken', { property: property.id }), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

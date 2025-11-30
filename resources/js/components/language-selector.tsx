@@ -1,4 +1,5 @@
 import { SharedData } from '@/types';
+import { route } from '@/utils/route';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { ChevronDown } from 'lucide-react';
@@ -24,7 +25,7 @@ export function LanguageSelector({ currentLanguage }: LanguageSelectorProps) {
 
     const handleLanguageChange = async (langCode: string) => {
         try {
-            await axios.post('/locale', { locale: langCode });
+            await axios.post(route('locale.update'), { locale: langCode });
             // Reload the page to reflect new translations
             window.location.reload();
         } catch (err) {

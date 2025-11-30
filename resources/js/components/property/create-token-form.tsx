@@ -1,3 +1,4 @@
+import { route } from '@/utils/route';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -66,7 +67,7 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                 payload.expires_at = formData.expires_at;
             }
 
-            const response = await fetch(`/properties/${propertyId}/invite-tokens`, {
+            const response = await fetch(route('properties.createCustomToken', { property: propertyId }), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

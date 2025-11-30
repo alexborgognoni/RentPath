@@ -2,6 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BaseLayout } from '@/layouts/base-layout';
 import { type SharedData } from '@/types';
 import type { PropertyManager, User } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -220,7 +221,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
         setGeneralError(null);
 
         // Submit form
-        const endpoint = isEditing ? '/edit-profile' : '/profile/setup';
+        const endpoint = isEditing ? route('property-manager.update') : route('property-manager.store');
 
         router.post(endpoint, formData, {
             onError: (errors) => {
@@ -979,7 +980,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                                     if (data.id_document && data.id_document instanceof File) {
                                                                         window.open(URL.createObjectURL(data.id_document), '_blank');
                                                                     } else if (propertyManager?.id_document_path) {
-                                                                        window.open('/property-manager/document/id_document', '_blank');
+                                                                        window.open(route('property-manager.document', { type: 'id_document' }), '_blank');
                                                                     }
                                                                 }}
                                                                 title={
@@ -1083,7 +1084,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                                     if (data.license_document && data.license_document instanceof File) {
                                                                         window.open(URL.createObjectURL(data.license_document), '_blank');
                                                                     } else if (propertyManager?.license_document_path) {
-                                                                        window.open('/property-manager/document/license_document', '_blank');
+                                                                        window.open(route('property-manager.document', { type: 'license_document' }), '_blank');
                                                                     }
                                                                 }}
                                                                 title={

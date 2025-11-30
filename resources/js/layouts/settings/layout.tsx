@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { type NavItem, type SharedData } from '@/types';
+import { settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
@@ -12,17 +13,17 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const sidebarNavItems: NavItem[] = [
         {
             title: t(translations.settings, 'menu.account'),
-            href: '/settings/profile',
+            href: settingsRoute('profile'),
             icon: null,
         },
         {
             title: t(translations.settings, 'menu.password'),
-            href: '/settings/password',
+            href: settingsRoute('password'),
             icon: null,
         },
         {
             title: t(translations.settings, 'menu.appearance'),
-            href: '/settings/appearance',
+            href: settingsRoute('appearance'),
             icon: null,
         },
     ];

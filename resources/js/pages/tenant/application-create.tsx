@@ -1,6 +1,7 @@
 import { BaseLayout } from '@/layouts/base-layout';
 import { type SharedData, type TenantProfile } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, MapPin, Plus, Trash2, Upload } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -96,7 +97,7 @@ export default function ApplicationCreate() {
         saveTimeoutRef.current = setTimeout(() => {
             setPendingSave(true);
             router.post(
-                `/properties/${property.id}/apply/draft${token ? `?token=${token}` : ''}`,
+                route('applications.save-draft', { property: property.id }) + (token ? `?token=${token}` : ''),
                 { ...data, current_step: maxStepReached },
                 {
                     preserveState: true,
@@ -133,7 +134,7 @@ export default function ApplicationCreate() {
     const saveDraft = (newMaxStep?: number) => {
         return new Promise<number>((resolve, reject) => {
             router.post(
-                `/properties/${property.id}/apply/draft${token ? `?token=${token}` : ''}`,
+                route('applications.save-draft', { property: property.id }) + (token ? `?token=${token}` : ''),
                 { ...data, current_step: newMaxStep ?? maxStepReached },
                 {
                     preserveState: true,
@@ -185,7 +186,7 @@ export default function ApplicationCreate() {
         }
 
         // All valid, submit
-        post(`/properties/${property.id}/apply${token ? `?token=${token}` : ''}`);
+        post(route('applications.store', { property: property.id }) + (token ? `?token=${token}` : ''));
     };
 
     // Mark field as touched and validate it (save happens on blur)

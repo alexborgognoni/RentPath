@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { type SharedData } from '@/types';
+import { route } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';
 import { AlertTriangle } from 'lucide-react';
@@ -44,7 +45,7 @@ export function LogoutConfirmationPopover({ isOpen, onClose, onConfirm }: Logout
 
     const handleLogout = () => {
         onConfirm?.();
-        router.post('/logout');
+        router.post(route('logout'));
     };
 
     if (!isOpen) return null;

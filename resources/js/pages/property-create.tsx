@@ -2,6 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ManagerLayout } from '@/layouts/manager-layout';
 import { type BreadcrumbItem } from '@/types';
 import type { Property, PropertyFormData } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { Head, router, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Camera, Home, Trash2, Upload, X } from 'lucide-react';
@@ -84,8 +85,8 @@ export default function PropertyCreate({ property, isEditing = false }: Property
     const [subtypeOptions, setSubtypeOptions] = useState<{ value: string; label: string }[]>([]);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Dashboard', href: '/properties' },
-        { title: 'Properties', href: '/properties' },
+        { title: 'Dashboard', href: route('manager.properties.index') },
+        { title: 'Properties', href: route('manager.properties.index') },
         { title: isEditing ? 'Edit Property' : 'Add Property' },
     ];
 
@@ -1038,7 +1039,7 @@ export default function PropertyCreate({ property, isEditing = false }: Property
                     <div className="flex gap-4 pt-6">
                         <button
                             type="button"
-                            onClick={() => router.visit('/properties')}
+                            onClick={() => router.visit(route('manager.properties.index'))}
                             className="flex-1 cursor-pointer rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground shadow-lg transition-all hover:bg-muted"
                         >
                             Cancel

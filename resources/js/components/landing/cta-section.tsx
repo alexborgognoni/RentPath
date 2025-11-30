@@ -1,4 +1,5 @@
 import type { SharedData } from '@/types';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
@@ -9,7 +10,7 @@ export function CtaSection() {
     const HEADING = translate(translations, 'landing.cta.heading');
     const SUBTITLE = translate(translations, 'landing.cta.subtitle');
     const CTA_BUTTON_TEXT = translate(translations, 'landing.cta.button_text');
-    const CTA_BUTTON_HREF = '/register';
+    const CTA_BUTTON_HREF = route('register');
 
     return (
         <section className="bg-background py-12 md:py-16 lg:py-20">

@@ -1,8 +1,9 @@
 import { ManagerLayout } from '@/layouts/manager-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 import { PropertyInfo } from '@/components/property/property-info';
@@ -21,8 +22,8 @@ export default function PropertyPage() {
     const [error] = useState<string | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: translate(translations, 'properties.title'), href: '/properties' },
-        { title: 'Properties', href: '/properties' },
+        { title: translate(translations, 'properties.title'), href: route('manager.properties.index') },
+        { title: 'Properties', href: route('manager.properties.index') },
         { title: property?.title || translate(translations, 'properties.property') },
     ];
 
@@ -33,12 +34,12 @@ export default function PropertyPage() {
                 <div className="mt-6 rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm">
                     <h2 className="mb-4 text-2xl font-bold text-destructive">{error || translate(translations, 'properties.propertyNotFound')}</h2>
                     <p className="mb-6 text-muted-foreground">The property you're looking for doesn't exist or you don't have access to it.</p>
-                    <a
-                        href="/properties"
+                    <Link
+                        href={route('manager.properties.index')}
                         className="rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105"
                     >
-                        Back to Dashboard
-                    </a>
+                        Back to Properties
+                    </Link>
                 </div>
             </ManagerLayout>
         );

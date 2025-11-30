@@ -1,5 +1,6 @@
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { SharedData } from '@/types';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -82,7 +83,7 @@ export function HeroSection() {
                         className="flex flex-col justify-center gap-4 xs:gap-6 sm:flex-row"
                     >
                         <a
-                            href="/register"
+                            href={route('register')}
                             className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center text-base font-semibold whitespace-nowrap shadow-lg xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:scale-105"
                         >
                             {translate(translations, 'landing.hero.cta_primary_guest')}
@@ -133,7 +134,7 @@ export function HeroSection() {
                         {/* Row 2, Col 1: Get Started button and Subtitle */}
                         <div className="flex flex-col gap-4 xl:gap-6">
                             <a
-                                href="/register"
+                                href={route('register')}
                                 className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary text-center font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
                             >
                                 {translate(translations, 'landing.hero.cta_primary_guest')}

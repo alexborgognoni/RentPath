@@ -1,4 +1,5 @@
 import { copyToClipboard } from '@/utils/clipboard';
+import { route } from '@/utils/route';
 import { Check, Copy, Plus, RefreshCw, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CreateTokenForm } from './create-token-form';
@@ -48,7 +49,7 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
     const fetchTokens = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/properties/${propertyId}/invite-tokens`);
+            const response = await fetch(route('properties.getInviteTokens', { property: propertyId }));
             if (response.ok) {
                 const data = await response.json();
                 // Exclude default token from the list
@@ -78,7 +79,7 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
         }
 
         try {
-            const response = await fetch(`/properties/${propertyId}/invite-tokens/${tokenId}`, {
+            const response = await fetch(route('properties.deleteCustomToken', { property: propertyId, tokenId }), {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

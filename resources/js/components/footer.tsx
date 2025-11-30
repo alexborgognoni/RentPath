@@ -1,4 +1,5 @@
 import type { SharedData } from '@/types';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Home } from 'lucide-react';
@@ -13,14 +14,14 @@ export function Footer() {
 
     const PRODUCT_LINKS = [
         { href: '#features', label: translate(translations, 'landing.footer.links.features') },
-        { href: '/register', label: translate(translations, 'landing.footer.links.pricing') },
-        { href: '/register', label: translate(translations, 'landing.footer.links.free_trial') },
+        { href: route('register'), label: translate(translations, 'landing.footer.links.pricing') },
+        { href: route('register'), label: translate(translations, 'landing.footer.links.free_trial') },
     ];
 
     const SUPPORT_LINKS = [
-        { href: '/contact-us', label: translate(translations, 'landing.footer.links.contact_us') },
-        { href: '/privacy-policy', label: translate(translations, 'landing.footer.links.privacy_policy') },
-        { href: '/terms-of-use', label: translate(translations, 'landing.footer.links.terms_of_use') },
+        { href: route('contact.us'), label: translate(translations, 'landing.footer.links.contact_us') },
+        { href: route('privacy.policy'), label: translate(translations, 'landing.footer.links.privacy_policy') },
+        { href: route('terms.of.use'), label: translate(translations, 'landing.footer.links.terms_of_use') },
     ];
 
     const COPYRIGHT_TEXT = `© 2025 ${BRAND_NAME}. ${translate(translations, 'landing.footer.all_rights_reserved')}`;

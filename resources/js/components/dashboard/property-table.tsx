@@ -5,6 +5,7 @@ import type { Property } from '@/types/dashboard';
 import { copyToClipboard } from '@/utils/clipboard';
 import { formatAddress } from '@/utils/country-utils';
 import { getCurrency } from '@/utils/currency-utils';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { type ColumnDef, createColumnHelper } from '@tanstack/react-table';
@@ -100,7 +101,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
     };
 
     const handleRowClick = (property: Property) => {
-        window.location.href = `/properties/${property.id}`;
+        window.location.href = route('properties.show', { property: property.id });
     };
 
     const columns = useMemo(

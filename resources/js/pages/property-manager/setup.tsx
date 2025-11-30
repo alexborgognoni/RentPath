@@ -1,6 +1,7 @@
 import { AppLayout } from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import type { PropertyManagerFormData, User } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { Head, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -24,8 +25,8 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: translate(translations, 'properties.title'), href: '/properties' },
-        { title: 'Setup Property Manager Profile', href: '/setup-profile' },
+        { title: translate(translations, 'properties.title'), href: route('manager.properties.index') },
+        { title: 'Setup Property Manager Profile', href: route('profile.setup') },
     ];
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -58,7 +59,7 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
             }
         });
 
-        router.post('/setup-profile', submitFormData, {
+        router.post(route('property-manager.store'), submitFormData, {
             onError: (errors) => {
                 setErrors(errors);
                 setIsSubmitting(false);

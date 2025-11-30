@@ -6,6 +6,7 @@ import { LoaderCircle } from 'lucide-react';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
+import { route } from '@/utils/route';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
@@ -26,7 +27,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                             Resend verification email
                         </Button>
 
-                        <TextLink href="/logout" className="mx-auto block text-sm">
+                        <TextLink href={route('logout')} className="mx-auto block text-sm">
                             Log out
                         </TextLink>
                     </>

@@ -1,4 +1,5 @@
 import type { Property } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Bold, Camera, HousePlus, Italic, Link, List, ListOrdered, Upload, X } from 'lucide-react';
@@ -211,7 +212,7 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                 data.append('images[]', selectedImage);
             }
 
-            router.post('/properties', data, {
+            router.post(route('properties.store'), data, {
                 onSuccess: () => {
                     onClose();
                     // The server redirects to dashboard automatically

@@ -1,5 +1,6 @@
 import type { SharedData } from '@/types';
 import { convertAndRoundUpPrice, getCurrencyFromStorage } from '@/utils/currency-utils';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -228,7 +229,7 @@ export function BenefitsSection() {
                                 </div>
 
                                 <a
-                                    href="/register"
+                                    href={route('register')}
                                     className="block w-full rounded-lg bg-gradient-to-r from-primary to-secondary py-4 text-center text-lg font-bold text-white shadow-lg md:transition-all md:hover:scale-105 md:hover:from-primary md:hover:to-secondary"
                                 >
                                     {GET_STARTED_BUTTON}

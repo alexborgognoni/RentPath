@@ -1,5 +1,6 @@
 import { BaseLayout } from '@/layouts/base-layout';
 import { type SharedData } from '@/types';
+import { route } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { AlertCircle, Clock, RefreshCw, Shield, XCircle } from 'lucide-react';
@@ -79,7 +80,7 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
                         <div className="space-y-3">
                             {isRejected ? (
                                 <Link
-                                    href="/profile/unverified?edit=true"
+                                    href={route('profile.unverified', { edit: 'true' })}
                                     className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary px-4 py-2 font-semibold text-white transition-all hover:scale-105"
                                 >
                                     <RefreshCw className="mr-2 h-4 w-4" />
@@ -87,7 +88,7 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
                                 </Link>
                             ) : (
                                 <Link
-                                    href="/profile/unverified?edit=true"
+                                    href={route('profile.unverified', { edit: 'true' })}
                                     className="block w-full rounded-lg border border-border bg-background px-4 py-2 font-semibold text-foreground transition-colors hover:bg-muted"
                                 >
                                     {t(translations.profile, 'unverified.edit_profile_info')}

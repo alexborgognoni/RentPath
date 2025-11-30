@@ -4,6 +4,7 @@ import { PropertyForm } from '@/components/property/property-form';
 import { AppLayout } from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import type { Property, PropertyManager } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { Head, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -22,8 +23,8 @@ export default function AgentProfilePage({ initialManager }: Props) {
     const [showPropertyForm, setShowPropertyForm] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: translate(translations, 'properties.title'), href: '/properties' },
-        { title: translate(translations, 'profile.title'), href: '/setup-profile' },
+        { title: translate(translations, 'properties.title'), href: route('manager.properties.index') },
+        { title: translate(translations, 'profile.title'), href: route('profile.setup') },
     ];
 
     const fetchProfileData = async () => {
@@ -31,7 +32,7 @@ export default function AgentProfilePage({ initialManager }: Props) {
             setLoading(true);
             setError(null);
 
-            const profileResponse = await fetch('/setup-profile', {
+            const profileResponse = await fetch(route('profile.setup'), {
                 headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
             });
 
@@ -48,7 +49,7 @@ export default function AgentProfilePage({ initialManager }: Props) {
             setPropertyManager(profileData.propertyManager);
 
             if (profileData.propertyManager) {
-                const propertiesResponse = await fetch('/properties', {
+                const propertiesResponse = await fetch(route('manager.properties.index'), {
                     headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 });
 
@@ -72,13 +73,13 @@ export default function AgentProfilePage({ initialManager }: Props) {
     }, []);
 
     const handleEditProfile = () => {
-        router.get('/edit-profile');
+        router.get(route('property-manager.edit'));
     };
     const handleSetupProfile = () => {
-        router.get('/setup-profile');
+        router.get(route('profile.setup'));
     };
     const handleAddProperty = () => {
-        if (!propertyManager) return router.get('/setup-profile');
+        if (!propertyManager) return router.get(route('profile.setup'));
         setShowPropertyForm(true);
     };
 

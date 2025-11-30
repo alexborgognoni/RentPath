@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import type { Application } from '@/types/dashboard';
 import { Calendar, Home, MapPin } from 'lucide-react';
 import { AppLayout } from '@/layouts/app-layout';
+import { route } from '@/utils/route';
 
 interface TenantDashboardProps {
     applications: Application[];
@@ -42,7 +43,7 @@ export default function TenantDashboard({ applications }: TenantDashboardProps) 
                         <p className="text-muted-foreground">Track and manage your rental applications</p>
                     </div>
                     <Link
-                        href="/properties"
+                        href={route('properties.index')}
                         className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
                     >
                         Browse Properties
@@ -58,7 +59,7 @@ export default function TenantDashboard({ applications }: TenantDashboardProps) 
                             application.
                         </p>
                         <Link
-                            href="/properties"
+                            href={route('properties.index')}
                             className="rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary/90"
                         >
                             Browse Properties

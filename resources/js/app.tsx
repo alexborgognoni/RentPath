@@ -11,8 +11,13 @@ createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
     setup({ el, App, props }) {
-        const root = createRoot(el);
+        // Make Ziggy config available globally for route() helper
+        const pageProps = props.initialPage.props as { ziggy?: object };
+        if (pageProps.ziggy) {
+            (window as unknown as { Ziggy: object }).Ziggy = pageProps.ziggy;
+        }
 
+        const root = createRoot(el);
         root.render(<App {...props} />);
     },
     progress: {

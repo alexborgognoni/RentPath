@@ -1,6 +1,7 @@
 import { PropertyInfo } from '@/components/property/property-info';
 import { PublicLayout } from '@/layouts/public-layout';
 import type { Property } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { Head, usePage } from '@inertiajs/react';
 import { ArrowLeft, Send } from 'lucide-react';
 
@@ -35,7 +36,9 @@ export default function PropertyViewPage() {
 
     const handleApply = () => {
         // Build apply URL with token if present
-        const applyUrl = token ? `/properties/${property.id}/apply?token=${token}` : `/properties/${property.id}/apply`;
+        const applyUrl = token
+            ? route('applications.create', { property: property.id }) + `?token=${token}`
+            : route('applications.create', { property: property.id });
 
         window.location.href = applyUrl;
     };
@@ -92,7 +95,7 @@ export default function PropertyViewPage() {
                                 {!auth?.user ? (
                                     // Not logged in - show "Sign In to apply" button
                                     <a
-                                        href={`/login?redirect=${encodeURIComponent(`/properties/${property.id}/apply`)}`}
+                                        href={route('login') + `?redirect=${encodeURIComponent(route('applications.create', { property: property.id }))}`}
                                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-4 font-semibold text-white shadow-lg transition-all hover:scale-105"
                                     >
                                         <Send size={20} />
@@ -114,7 +117,7 @@ export default function PropertyViewPage() {
                                             You have already applied for this property
                                         </p>
                                         <a
-                                            href={`/applications/${applicationStatus.applicationId}`}
+                                            href={route('applications.show', { application: applicationStatus.applicationId! })}
                                             className="text-sm font-medium text-green-700 hover:underline dark:text-green-300"
                                         >
                                             View Application
@@ -130,7 +133,7 @@ export default function PropertyViewPage() {
                                 {!auth?.user && (
                                     <p className="text-center text-xs text-muted-foreground">
                                         Don't have an account?{' '}
-                                        <a href={`/register?redirect=${encodeURIComponent(`/properties/${property.id}/apply`)}`} className="text-primary hover:underline">
+                                        <a href={route('register') + `?redirect=${encodeURIComponent(route('applications.create', { property: property.id }))}`} className="text-primary hover:underline">
                                             Register here
                                         </a>
                                     </p>

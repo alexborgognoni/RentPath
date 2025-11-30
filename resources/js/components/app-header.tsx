@@ -4,6 +4,7 @@ import { LogoHomeButton } from '@/components/logo-home-button';
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
 import { MobileMenu } from '@/components/mobile-menu';
 import { type BreadcrumbItem, type SharedData } from '@/types';
+import { route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
@@ -149,7 +150,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                         {auth?.user ? (
                             <>
                                 <Link
-                                    href="/dashboard"
+                                    href={route('dashboard')}
                                     className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
                                 >
                                     {t(translations?.header, 'dashboard') || 'Dashboard'}
@@ -184,7 +185,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
 
                                         <div className="py-1">
                                             <Link
-                                                href="/settings"
+                                                href={settingsRoute('profile')}
                                                 className="text-text-secondary flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background"
                                             >
                                                 <Settings size={16} />
@@ -205,7 +206,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                             </>
                         ) : (
                             <Link
-                                href="/login"
+                                href={route('login')}
                                 className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
                             >
                                 {t(translations?.header, 'login') || 'Log In'}
