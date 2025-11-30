@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'title' => 'Eigenschappen',
+    'property' => 'Eigendom',
+    'propertyNotFound' => 'Eigendom niet gevonden',
     'properties' => 'Eigenschappen',
     'addProperty' => 'Eigenschap toevoegen',
     'noPropertiesYet' => 'Nog geen eigendommen',

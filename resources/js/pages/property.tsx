@@ -21,20 +21,20 @@ export default function PropertyPage() {
     const [error] = useState<string | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: translate(translations, 'dashboard.title'), href: '/dashboard' },
-        { title: 'Properties', href: '/dashboard' },
-        { title: property?.title || translate(translations, 'dashboard.property') },
+        { title: translate(translations, 'properties.title'), href: '/properties' },
+        { title: 'Properties', href: '/properties' },
+        { title: property?.title || translate(translations, 'properties.property') },
     ];
 
     if (error || !property) {
         return (
             <ManagerLayout breadcrumbs={breadcrumbs}>
-                <Head title={translate(translations, 'dashboard.propertyNotFound')} />
+                <Head title={translate(translations, 'properties.propertyNotFound')} />
                 <div className="mt-6 rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm">
-                    <h2 className="mb-4 text-2xl font-bold text-destructive">{error || translate(translations, 'dashboard.propertyNotFound')}</h2>
+                    <h2 className="mb-4 text-2xl font-bold text-destructive">{error || translate(translations, 'properties.propertyNotFound')}</h2>
                     <p className="mb-6 text-muted-foreground">The property you're looking for doesn't exist or you don't have access to it.</p>
                     <a
-                        href="/dashboard"
+                        href="/properties"
                         className="rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105"
                     >
                         Back to Dashboard

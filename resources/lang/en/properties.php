@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'title' => 'Properties',
+    'property' => 'Property',
+    'propertyNotFound' => 'Property not found',
     'properties' => 'Properties',
     'addProperty' => 'Add Property',
     'noPropertiesYet' => 'No properties yet',

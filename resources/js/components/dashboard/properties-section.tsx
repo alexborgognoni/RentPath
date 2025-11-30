@@ -182,7 +182,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                 <h1 className="flex items-center gap-3 text-2xl font-bold text-foreground">
                     <Home className="text-primary" size={32} />
                     <span>
-                        {translate(translations, 'dashboard.properties')} <span className="text-2xl">({filteredProperties.length})</span>
+                        {translate(translations, 'properties.properties')} <span className="text-2xl">({filteredProperties.length})</span>
                     </span>
                 </h1>
                 <button
@@ -190,7 +190,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                     className="flex cursor-pointer items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
                 >
                     <Plus size={18} />
-                    <span>{translate(translations, 'dashboard.addProperty')}</span>
+                    <span>{translate(translations, 'properties.addProperty')}</span>
                 </button>
             </div>
 
@@ -206,7 +206,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                             className="transition-transform duration-300"
                             style={{ transform: filtersOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
                         />
-                        <span>{translate(translations, 'dashboard.filters')}</span>
+                        <span>{translate(translations, 'properties.filters')}</span>
                     </div>
                 </div>
                 {filtersOpen && (
@@ -222,8 +222,8 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                     <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
                         <Building size={40} className="text-muted-foreground" />
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-foreground">{translate(translations, 'dashboard.noPropertiesYet')}</h3>
-                    <p className="mx-auto max-w-md text-muted-foreground">{translate(translations, 'dashboard.noPropertiesDesc')}</p>
+                    <h3 className="mb-2 text-xl font-semibold text-foreground">{translate(translations, 'properties.noPropertiesYet')}</h3>
+                    <p className="mx-auto max-w-md text-muted-foreground">{translate(translations, 'properties.noPropertiesDesc')}</p>
                 </div>
             ) : filteredProperties.length === 0 ? (
                 <div className="rounded-2xl border border-border bg-card py-16 text-center">

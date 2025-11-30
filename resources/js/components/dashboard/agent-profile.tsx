@@ -17,14 +17,14 @@ export function AgentProfile({ agent, onEdit }: AgentProfileProps) {
             <div className="mb-8 flex items-start justify-between">
                 <h2 className="flex items-center text-2xl font-bold text-foreground">
                     <User className="mr-3 text-primary" size={28} />
-                    {translate(translations, 'dashboard.profile')}
+                    {translate(translations, 'properties.profile')}
                 </h2>
                 <button
                     onClick={onEdit}
                     className="flex cursor-pointer items-center space-x-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105"
                 >
                     <Edit size={16} />
-                    <span>{translate(translations, 'dashboard.editProfile')}</span>
+                    <span>{translate(translations, 'properties.editProfile')}</span>
                 </button>
             </div>
 

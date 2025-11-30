@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'title' => 'Immobilien',
+    'property' => 'Immobilie',
+    'propertyNotFound' => 'Immobilie nicht gefunden',
     'properties' => 'Immobilien',
     'addProperty' => 'Immobilie hinzufügen',
     'noPropertiesYet' => 'Noch keine Immobilien',

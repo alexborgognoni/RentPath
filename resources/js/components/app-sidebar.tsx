@@ -33,7 +33,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
     const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
     const currentLang = languages.find((lang) => lang.code === locale) || languages[0];
 
-    const isPropertiesActive = currentPath === '/dashboard' || currentPath.startsWith('/properties') || currentPath.startsWith('/property');
+    const isPropertiesActive = currentPath.startsWith('/properties') || currentPath.startsWith('/property');
 
     const getUserInitials = () => {
         if (auth.user?.name) {
@@ -80,7 +80,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                         </Tooltip>
                     ) : (
                         <div className="flex w-full items-center justify-between">
-                            <Link href="/dashboard" className="flex items-center space-x-3">
+                            <Link href="/properties" className="flex items-center space-x-3">
                                 <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary">
                                     <Home size={18} className="text-white" />
                                 </div>
@@ -104,7 +104,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                 {/* Navigation */}
                 <nav className="flex-1 space-y-1 px-3 py-4">
                     <NavItem
-                        href="/dashboard"
+                        href="/properties"
                         icon={<Building2 size={18} />}
                         label={t(translations.sidebar, 'properties')}
                         isActive={isPropertiesActive}

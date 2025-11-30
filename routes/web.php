@@ -46,7 +46,7 @@ if (!function_exists('userDefaultDashboard')) {
             $managerUrl = config('app.env') === 'local'
                 ? 'http://manager.' . parse_url(config('app.url'), PHP_URL_HOST) . ':' . parse_url(config('app.url'), PHP_URL_PORT)
                 : 'https://manager.' . config('app.domain');
-            return $managerUrl . '/dashboard';
+            return $managerUrl . '/properties';
         }
 
         // Otherwise, user is a tenant - redirect to root domain dashboard
@@ -154,13 +154,13 @@ Route::domain(config('app.domain'))->group(function () {
 
 Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager')->group(function () {
 
-    // Redirect root to dashboard
+    // Redirect root to properties
     Route::get('/', function () {
-        return redirect('/dashboard');
+        return redirect('/properties');
     });
 
-    // Dashboard
-    Route::middleware(['auth'])->get('dashboard', function (Request $request) {
+    // Properties list (manager dashboard)
+    Route::middleware(['auth'])->get('properties', function (Request $request) {
         \Log::info('Manager dashboard accessed', [
             'host' => $request->getHost(),
             'url' => $request->url(),
@@ -204,11 +204,11 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
                 return $propertyArray;
             });
 
-        \Log::info('Rendering manager dashboard');
+        \Log::info('Rendering manager properties');
         return Inertia::render('dashboard', [
             'properties' => $properties
         ]);
-    })->name('manager.dashboard');
+    })->name('manager.properties.index');
 
     // All manager routes require authentication
     Route::middleware(['auth'])->group(function () {
@@ -222,7 +222,7 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             }
 
             if ($propertyManager->isVerified()) {
-                return redirect('/dashboard');
+                return redirect('/properties');
             }
 
             return redirect('/profile/unverified');
@@ -243,7 +243,7 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             }
 
             if ($propertyManager->isVerified()) {
-                return redirect('/dashboard');
+                return redirect('/properties');
             }
 
             if ($request->get('edit')) {
@@ -272,9 +272,6 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             ->name('property-manager.document');
 
         // Property CRUD
-        Route::get('properties', [PropertyController::class, 'index'])
-            ->name('manager.properties.index');
-
         Route::get('properties/create', [PropertyController::class, 'create'])
             ->name('properties.create');
 

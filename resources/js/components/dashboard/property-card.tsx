@@ -72,14 +72,14 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             <h3 className="mb-2 text-xl font-bold text-foreground">{property.title}</h3>
             <p className="mb-3 text-muted-foreground">{formatAddress(property)}</p>
             <p className="mb-4 text-lg font-bold text-primary">
-                {formatCurrency(property.rent_amount)}/{translate(translations, 'dashboard.month')}
+                {formatCurrency(property.rent_amount)}/{translate(translations, 'properties.month')}
             </p>
 
             <div className="mb-6 flex items-center justify-between text-sm text-muted-foreground">
                 <div className="flex flex-col space-y-1">
                     <span className="font-medium">
-                        {property.bedrooms || 'N/A'} {translate(translations, 'dashboard.bedrooms')} • {property.bathrooms || 'N/A'}{' '}
-                        {translate(translations, 'dashboard.bathrooms')}
+                        {property.bedrooms || 'N/A'} {translate(translations, 'properties.bedrooms')} • {property.bathrooms || 'N/A'}{' '}
+                        {translate(translations, 'properties.bathrooms')}
                     </span>
                     {property.size && <span className="font-medium text-muted-foreground/70">{property.size} m²</span>}
                 </div>
@@ -96,7 +96,7 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
                         className="flex flex-1 items-center justify-center space-x-2 rounded-xl border border-border bg-muted py-3 font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/80"
                     >
                         <Copy size={16} />
-                        <span>{translate(translations, 'dashboard.copyApplicationLink')}</span>
+                        <span>{translate(translations, 'properties.copyApplicationLink')}</span>
                     </button>
                     {onEdit && (
                         <button

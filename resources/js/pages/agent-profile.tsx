@@ -22,7 +22,7 @@ export default function AgentProfilePage({ initialManager }: Props) {
     const [showPropertyForm, setShowPropertyForm] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: translate(translations, 'dashboard.title'), href: '/dashboard' },
+        { title: translate(translations, 'properties.title'), href: '/properties' },
         { title: translate(translations, 'profile.title'), href: '/setup-profile' },
     ];
 

@@ -24,7 +24,7 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: translate(translations, 'dashboard.title'), href: '/dashboard' },
+        { title: translate(translations, 'properties.title'), href: '/properties' },
         { title: 'Setup Property Manager Profile', href: '/setup-profile' },
     ];
 

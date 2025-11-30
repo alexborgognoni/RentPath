@@ -21,39 +21,39 @@ const columnHelper = createColumnHelper<Property>();
 // Status badge configuration for all 9 statuses
 const statusConfig: Record<string, { labelKey: string; className: string }> = {
     inactive: {
-        labelKey: 'dashboard.statusInactive',
+        labelKey: 'properties.statusInactive',
         className: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
     },
     available: {
-        labelKey: 'dashboard.statusAvailable',
+        labelKey: 'properties.statusAvailable',
         className: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
     },
     application_received: {
-        labelKey: 'dashboard.statusApplicationReceived',
+        labelKey: 'properties.statusApplicationReceived',
         className: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
     },
     under_review: {
-        labelKey: 'dashboard.statusUnderReview',
+        labelKey: 'properties.statusUnderReview',
         className: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     },
     visit_scheduled: {
-        labelKey: 'dashboard.statusVisitScheduled',
+        labelKey: 'properties.statusVisitScheduled',
         className: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
     },
     approved: {
-        labelKey: 'dashboard.statusApproved',
+        labelKey: 'properties.statusApproved',
         className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     },
     leased: {
-        labelKey: 'dashboard.statusLeased',
+        labelKey: 'properties.statusLeased',
         className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     },
     maintenance: {
-        labelKey: 'dashboard.statusMaintenance',
+        labelKey: 'properties.statusMaintenance',
         className: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     },
     archived: {
-        labelKey: 'dashboard.statusArchived',
+        labelKey: 'properties.statusArchived',
         className: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
     },
 };
@@ -88,9 +88,9 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
         const success = await copyToClipboard(applicationUrl);
         if (success) {
-            toast.success(translate(translations, 'dashboard.linkCopied'));
+            toast.success(translate(translations, 'properties.linkCopied'));
         } else {
-            toast.error(translate(translations, 'dashboard.linkCopyFailed'));
+            toast.error(translate(translations, 'properties.linkCopyFailed'));
         }
     };
 
@@ -134,7 +134,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
             // Property column (title + address)
             columnHelper.accessor('title', {
-                header: () => translate(translations, 'dashboard.columnProperty'),
+                header: () => translate(translations, 'properties.columnProperty'),
                 size: 250,
                 cell: ({ row }) => {
                     const property = row.original;
@@ -149,14 +149,14 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
             // Price column
             columnHelper.accessor('rent_amount', {
-                header: () => translate(translations, 'dashboard.columnPrice'),
+                header: () => translate(translations, 'properties.columnPrice'),
                 size: 120,
                 cell: ({ row }) => {
                     const property = row.original;
                     return (
                         <div className="flex flex-col items-center">
                             <div className="font-bold text-foreground">{formatPrice(property.rent_amount, property.rent_currency)}</div>
-                            <div className="text-sm text-muted-foreground">{translate(translations, 'dashboard.perMonth')}</div>
+                            <div className="text-sm text-muted-foreground">{translate(translations, 'properties.perMonth')}</div>
                         </div>
                     );
                 },
@@ -179,7 +179,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
             // Status column
             columnHelper.accessor('status', {
-                header: () => translate(translations, 'dashboard.columnStatus'),
+                header: () => translate(translations, 'properties.columnStatus'),
                 size: 140,
                 cell: ({ getValue }) => {
                     const status = getValue() || 'available';
@@ -242,7 +242,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
             // Applicants column
             columnHelper.accessor('tenant_count', {
-                header: () => translate(translations, 'dashboard.columnApplicants'),
+                header: () => translate(translations, 'properties.columnApplicants'),
                 size: 100,
                 cell: ({ getValue }) => (
                     <div className="flex items-center justify-center gap-2">
@@ -257,7 +257,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Actions column
             columnHelper.display({
                 id: 'actions',
-                header: () => translate(translations, 'dashboard.columnActions'),
+                header: () => translate(translations, 'properties.columnActions'),
                 size: 150,
                 cell: ({ row }) => {
                     const property = row.original;
@@ -268,13 +268,13 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                                 className="flex items-center gap-1 rounded-lg bg-muted px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80"
                             >
                                 <LinkIcon size={14} />
-                                <span>{translate(translations, 'dashboard.invite')}</span>
+                                <span>{translate(translations, 'properties.invite')}</span>
                             </button>
                             <button
                                 onClick={(e) => handleEdit(e, property)}
                                 className="flex items-center gap-1 rounded-lg bg-primary px-2 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
                             >
-                                <span>{translate(translations, 'dashboard.edit')}</span>
+                                <span>{translate(translations, 'properties.edit')}</span>
                             </button>
                             <button
                                 onClick={(e) => {

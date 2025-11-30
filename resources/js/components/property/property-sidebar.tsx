@@ -58,7 +58,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
         if (confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
             router.delete(`/properties/${property.id}`, {
                 onSuccess: () => {
-                    router.visit('/dashboard');
+                    router.visit('/properties');
                 },
             });
         }
