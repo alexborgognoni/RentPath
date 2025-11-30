@@ -4,66 +4,57 @@ import { Toaster } from '@/components/ui/toast';
 import type { BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Menu } from 'lucide-react';
-import { useCallback, useEffect, useState, type PropsWithChildren } from 'react';
+import { useCallback, useState, type PropsWithChildren } from 'react';
 
 interface ManagerLayoutProps extends PropsWithChildren {
     breadcrumbs?: BreadcrumbItem[];
 }
 
-const SIDEBAR_WIDTH = 256; // px
-const SIDEBAR_COLLAPSED_WIDTH = 64; // px
+const SIDEBAR_EXPANDED = 256;
+const SIDEBAR_COLLAPSED = 64;
+
+function getInitialCollapsedState(): boolean {
+    if (typeof document === 'undefined') return false;
+    return document.cookie.includes('sidebar_collapsed=true');
+}
 
 export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(getInitialCollapsedState);
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    // Load saved state from cookie
-    useEffect(() => {
-        const savedState = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('sidebar_collapsed='))
-            ?.split('=')[1];
-        if (savedState === 'true') {
-            setIsCollapsed(true);
-        }
+    const handleToggle = useCallback(() => {
+        setIsCollapsed((prev) => {
+            const next = !prev;
+            document.cookie = `sidebar_collapsed=${next}; path=/; max-age=31536000`;
+            return next;
+        });
     }, []);
-
-    // Save state to cookie
-    const saveState = useCallback((collapsed: boolean) => {
-        document.cookie = `sidebar_collapsed=${collapsed}; path=/; max-age=${60 * 60 * 24 * 365}`;
-    }, []);
-
-    const handleToggleCollapse = useCallback(() => {
-        const newCollapsed = !isCollapsed;
-        setIsCollapsed(newCollapsed);
-        saveState(newCollapsed);
-    }, [isCollapsed, saveState]);
 
     return (
         <div className="flex h-screen w-full bg-background">
-            {/* Desktop Layout */}
+            {/* Desktop */}
             <div className="hidden h-full w-full lg:flex">
-                {/* Sidebar */}
                 <div
-                    className="h-full border-r border-border transition-[width] duration-200"
-                    style={{ width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH }}
+                    className="h-full shrink-0 border-r border-border bg-card"
+                    style={{
+                        width: isCollapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED,
+                        transition: 'width 150ms ease-out',
+                    }}
                 >
-                    <AppSidebar isCollapsed={isCollapsed} onToggleCollapse={handleToggleCollapse} />
+                    <AppSidebar isCollapsed={isCollapsed} onToggle={handleToggle} />
                 </div>
 
-                {/* Main Content */}
-                <main className="h-full flex-1 overflow-y-auto bg-background">
+                <main className="h-full flex-1 overflow-y-auto">
                     <div className="h-full px-4 py-6 sm:px-6 lg:px-8">
-                        {/* Breadcrumbs */}
                         {breadcrumbs && breadcrumbs.length > 0 && (
-                            <nav className="mb-6 flex items-center space-x-2 text-sm">
-                                {breadcrumbs.map((crumb, index) => (
-                                    <div key={`breadcrumb-${index}`} className="flex items-center space-x-2">
-                                        {index > 0 && <span className="text-muted-foreground">/</span>}
-                                        {index === breadcrumbs.length - 1 || !crumb.href ? (
+                            <nav className="mb-6 flex items-center gap-2 text-sm">
+                                {breadcrumbs.map((crumb, i) => (
+                                    <div key={i} className="flex items-center gap-2">
+                                        {i > 0 && <span className="text-muted-foreground">/</span>}
+                                        {i === breadcrumbs.length - 1 || !crumb.href ? (
                                             <span className="font-semibold text-foreground">{crumb.title}</span>
                                         ) : (
-                                            <Link href={crumb.href} className="text-muted-foreground transition-colors hover:text-foreground">
+                                            <Link href={crumb.href} className="text-muted-foreground hover:text-foreground">
                                                 {crumb.title}
                                             </Link>
                                         )}
@@ -76,43 +67,39 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                 </main>
             </div>
 
-            {/* Mobile Layout */}
+            {/* Mobile */}
             <div className="flex h-full w-full flex-col lg:hidden">
-                {/* Mobile Header */}
-                <header className="flex h-14 items-center gap-4 border-b border-border bg-card px-4">
+                <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-card px-4">
                     <button
                         onClick={() => setMobileOpen(true)}
                         className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
                     >
-                        <Menu size={20} />
+                        <Menu className="h-5 w-5" />
                     </button>
                     <span className="text-sm font-semibold text-foreground">RentPath</span>
                 </header>
 
-                {/* Mobile Sheet */}
                 <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                     <SheetContent side="left" className="w-72 p-0">
                         <SheetHeader className="sr-only">
                             <SheetTitle>Navigation</SheetTitle>
                             <SheetDescription>Main navigation menu</SheetDescription>
                         </SheetHeader>
-                        <AppSidebar isCollapsed={false} onToggleCollapse={() => {}} />
+                        <AppSidebar isCollapsed={false} onToggle={() => setMobileOpen(false)} />
                     </SheetContent>
                 </Sheet>
 
-                {/* Mobile Content */}
-                <main className="flex-1 overflow-y-auto bg-background">
+                <main className="flex-1 overflow-y-auto">
                     <div className="h-full px-4 py-6">
-                        {/* Breadcrumbs */}
                         {breadcrumbs && breadcrumbs.length > 0 && (
-                            <nav className="mb-6 flex items-center space-x-2 text-sm">
-                                {breadcrumbs.map((crumb, index) => (
-                                    <div key={`breadcrumb-${index}`} className="flex items-center space-x-2">
-                                        {index > 0 && <span className="text-muted-foreground">/</span>}
-                                        {index === breadcrumbs.length - 1 || !crumb.href ? (
+                            <nav className="mb-6 flex items-center gap-2 text-sm">
+                                {breadcrumbs.map((crumb, i) => (
+                                    <div key={i} className="flex items-center gap-2">
+                                        {i > 0 && <span className="text-muted-foreground">/</span>}
+                                        {i === breadcrumbs.length - 1 || !crumb.href ? (
                                             <span className="font-semibold text-foreground">{crumb.title}</span>
                                         ) : (
-                                            <Link href={crumb.href} className="text-muted-foreground transition-colors hover:text-foreground">
+                                            <Link href={crumb.href} className="text-muted-foreground hover:text-foreground">
                                                 {crumb.title}
                                             </Link>
                                         )}
@@ -125,7 +112,6 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                 </main>
             </div>
 
-            {/* Toast Notifications */}
             <Toaster />
         </div>
     );
