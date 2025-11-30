@@ -7,25 +7,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarRail,
-    useSidebar,
-} from '@/components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Building2, ChevronsUpDown, Globe, Home, LogOut, Settings } from 'lucide-react';
+import { Building2, ChevronsUpDown, Globe, Home, LogOut, PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react';
 
 const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -34,11 +21,14 @@ const languages = [
     { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+    isCollapsed: boolean;
+    onToggleCollapse: () => void;
+}
+
+export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
     const page = usePage<SharedData>();
     const { auth, translations, locale } = page.props;
-    const { state } = useSidebar();
-    const isCollapsed = state === 'collapsed';
 
     const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
     const currentLang = languages.find((lang) => lang.code === locale) || languages[0];
@@ -72,146 +62,198 @@ export function AppSidebar() {
     };
 
     return (
-        <Sidebar collapsible="icon">
-            {/* Header */}
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary">
+        <TooltipProvider delayDuration={0}>
+            <aside className="flex h-full flex-col bg-card">
+                {/* Header */}
+                <div className="flex h-16 items-center justify-center border-b border-border px-4">
+                    {isCollapsed ? (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={onToggleCollapse}
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                >
+                                    <PanelLeftOpen size={20} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right">Expand sidebar</TooltipContent>
+                        </Tooltip>
+                    ) : (
+                        <div className="flex w-full items-center justify-between">
+                            <Link href="/dashboard" className="flex items-center space-x-3">
+                                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary">
                                     <Home size={18} className="text-white" />
                                 </div>
-                                <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">RentPath</span>
-                                    <span className="text-xs text-muted-foreground">{t(translations.sidebar, 'managerPortal')}</span>
-                                </div>
+                                <span className="text-lg font-bold text-foreground">RentPath</span>
                             </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={onToggleCollapse}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                    >
+                                        <PanelLeftClose size={18} />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">Collapse sidebar</TooltipContent>
+                            </Tooltip>
+                        </div>
+                    )}
+                </div>
 
-            {/* Main Navigation */}
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>{t(translations.sidebar, 'navigation')}</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive={isPropertiesActive} tooltip={t(translations.sidebar, 'properties')}>
-                                    <Link href="/dashboard">
-                                        <Building2 />
-                                        <span>{t(translations.sidebar, 'properties')}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
+                {/* Navigation */}
+                <nav className="flex-1 space-y-1 px-3 py-4">
+                    <NavItem
+                        href="/dashboard"
+                        icon={<Building2 size={18} />}
+                        label={t(translations.sidebar, 'properties')}
+                        isActive={isPropertiesActive}
+                        isCollapsed={isCollapsed}
+                    />
+                </nav>
 
-                {/* Settings Group */}
-                <SidebarGroup>
-                    <SidebarGroupLabel>{t(translations.sidebar, 'preferences')}</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive={currentPath.startsWith('/settings')} tooltip={t(translations.sidebar, 'settings')}>
-                                    <Link href="/settings">
-                                        <Settings />
-                                        <span>{t(translations.sidebar, 'settings')}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                {/* Settings Section */}
+                <div className="border-t border-border px-3 py-4 space-y-1">
+                    <NavItem
+                        href="/settings"
+                        icon={<Settings size={18} />}
+                        label={t(translations.sidebar, 'settings')}
+                        isActive={currentPath.startsWith('/settings')}
+                        isCollapsed={isCollapsed}
+                    />
 
-                            {/* Language Selector */}
-                            <SidebarMenuItem>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <SidebarMenuButton tooltip={t(translations.sidebar, 'language')}>
-                                            <Globe />
+                    {/* Language Selector */}
+                    <DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        className={`flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
+                                    >
+                                        <Globe size={18} />
+                                        {!isCollapsed && (
                                             <span>
                                                 {currentLang.flag} {currentLang.name}
                                             </span>
-                                        </SidebarMenuButton>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent side={isCollapsed ? 'right' : 'top'} align="start" className="w-48">
-                                        <DropdownMenuLabel>{t(translations.sidebar, 'selectLanguage')}</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        {languages.map((lang) => (
-                                            <DropdownMenuItem
-                                                key={lang.code}
-                                                onClick={() => handleLanguageChange(lang.code)}
-                                                className={locale === lang.code ? 'bg-accent' : ''}
-                                            >
-                                                <span className="mr-2">{lang.flag}</span>
-                                                <span>{lang.name}</span>
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </SidebarContent>
-
-            {/* User Footer */}
-            <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton
-                                    size="lg"
-                                    tooltip={auth.user?.name || auth.user?.email || t(translations.sidebar, 'account')}
-                                >
-                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary">
-                                        {auth.user?.property_manager?.profile_picture_url ? (
-                                            <img
-                                                src={auth.user.property_manager.profile_picture_url}
-                                                alt={auth.user?.name || auth.user?.email}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-sm font-semibold text-white">{getUserInitials()}</span>
                                         )}
-                                    </div>
-                                    <div className="flex flex-1 flex-col gap-0.5 leading-none text-left">
-                                        {auth.user?.name && <span className="font-medium truncate">{auth.user.name}</span>}
-                                        <span className="text-xs text-muted-foreground truncate">{auth.user?.email}</span>
-                                    </div>
-                                    <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground" />
-                                </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent side={isCollapsed ? 'right' : 'top'} align="start" className="w-56">
-                                <DropdownMenuLabel>
-                                    <div className="flex flex-col">
-                                        {auth.user?.name && <span className="font-medium">{auth.user.name}</span>}
-                                        <span className="text-xs text-muted-foreground font-normal">{auth.user?.email}</span>
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/settings">
-                                            <Settings />
-                                            <span>{t(translations.sidebar, 'settings')}</span>
-                                        </Link>
-                                    </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem variant="destructive" onClick={handleLogout}>
-                                    <LogOut />
-                                    <span>{t(translations.sidebar, 'signOut')}</span>
+                                    </button>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            {isCollapsed && (
+                                <TooltipContent side="right">{t(translations.sidebar, 'language')}</TooltipContent>
+                            )}
+                        </Tooltip>
+                        <DropdownMenuContent side="right" align="start" className="w-48">
+                            <DropdownMenuLabel>{t(translations.sidebar, 'selectLanguage')}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {languages.map((lang) => (
+                                <DropdownMenuItem
+                                    key={lang.code}
+                                    onClick={() => handleLanguageChange(lang.code)}
+                                    className={locale === lang.code ? 'bg-accent' : ''}
+                                >
+                                    <span className="mr-2">{lang.flag}</span>
+                                    <span>{lang.name}</span>
                                 </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
-            <SidebarRail />
-        </Sidebar>
+                {/* User Section */}
+                <div className="border-t border-border p-4">
+                    <DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted ${isCollapsed ? 'justify-center' : ''}`}
+                                    >
+                                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary">
+                                            {auth.user?.property_manager?.profile_picture_url ? (
+                                                <img
+                                                    src={auth.user.property_manager.profile_picture_url}
+                                                    alt={auth.user?.name || auth.user?.email}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <span className="text-sm font-semibold text-white">{getUserInitials()}</span>
+                                            )}
+                                        </div>
+                                        {!isCollapsed && (
+                                            <>
+                                                <div className="flex-1 text-left">
+                                                    {auth.user?.name && (
+                                                        <p className="truncate text-sm font-medium text-foreground">{auth.user.name}</p>
+                                                    )}
+                                                    <p className="truncate text-xs text-muted-foreground">{auth.user?.email}</p>
+                                                </div>
+                                                <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground" />
+                                            </>
+                                        )}
+                                    </button>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            {isCollapsed && (
+                                <TooltipContent side="right">
+                                    {auth.user?.name || auth.user?.email}
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+                        <DropdownMenuContent side="right" align="end" className="w-56">
+                            <DropdownMenuLabel>
+                                <div className="flex flex-col">
+                                    {auth.user?.name && <span className="font-medium">{auth.user.name}</span>}
+                                    <span className="text-xs text-muted-foreground font-normal">{auth.user?.email}</span>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/settings">
+                                        <Settings size={16} />
+                                        <span>{t(translations.sidebar, 'settings')}</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+                                <LogOut size={16} />
+                                <span>{t(translations.sidebar, 'signOut')}</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </aside>
+        </TooltipProvider>
+    );
+}
+
+interface NavItemProps {
+    href: string;
+    icon: React.ReactNode;
+    label: string;
+    isActive: boolean;
+    isCollapsed: boolean;
+}
+
+function NavItem({ href, icon, label, isActive, isCollapsed }: NavItemProps) {
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Link
+                    href={href}
+                    className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                        isActive
+                            ? 'bg-primary/10 text-primary'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    } ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
+                >
+                    {icon}
+                    {!isCollapsed && <span>{label}</span>}
+                </Link>
+            </TooltipTrigger>
+            {isCollapsed && <TooltipContent side="right">{label}</TooltipContent>}
+        </Tooltip>
     );
 }
