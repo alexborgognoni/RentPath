@@ -23,7 +23,6 @@ export default function PropertyPage() {
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: translate(translations, 'properties.title'), href: route('manager.properties.index') },
-        { title: 'Properties', href: route('manager.properties.index') },
         { title: property?.title || translate(translations, 'properties.property') },
     ];
 

@@ -84,11 +84,14 @@ export default function PropertyCreate({ property, isEditing = false }: Property
     const [mainImageIndex, setMainImageIndex] = useState<number>(0);
     const [subtypeOptions, setSubtypeOptions] = useState<{ value: string; label: string }[]>([]);
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Dashboard', href: route('manager.properties.index') },
-        { title: 'Properties', href: route('manager.properties.index') },
-        { title: isEditing ? 'Edit Property' : 'Add Property' },
-    ];
+    const breadcrumbs: BreadcrumbItem[] =
+        isEditing && property
+            ? [
+                  { title: 'Properties', href: route('manager.properties.index') },
+                  { title: property.title, href: route('properties.show', { property: property.id }) },
+                  { title: 'Edit' },
+              ]
+            : [{ title: 'Properties', href: route('manager.properties.index') }, { title: 'Add Property' }];
 
     // @ts-expect-error - Complex PropertyFormData type causes issues with Inertia's FormDataType constraint
     const { data, setData, processing, errors, progress } = useForm({
