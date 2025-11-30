@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
+import { Toaster } from '@/components/ui/toast';
 import type { BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Home, Menu } from 'lucide-react';
@@ -87,6 +88,9 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                 onClose={() => setShowLogoutConfirmation(false)}
                 onConfirm={() => setShowLogoutConfirmation(false)}
             />
+
+            {/* Toast Notifications */}
+            <Toaster />
         </div>
     );
 }

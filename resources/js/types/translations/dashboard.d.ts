@@ -38,14 +38,23 @@ interface DashboardTranslations {
     maxSize: string;
 
     // Status badges
+    statusInactive: string;
     statusAvailable: string;
+    statusApplicationReceived: string;
+    statusUnderReview: string;
+    statusVisitScheduled: string;
+    statusApproved: string;
     statusLeased: string;
     statusMaintenance: string;
-    statusUnderReview: string;
+    statusArchived: string;
     statusReserved: string;
 
     // Actions
     invite: string;
     edit: string;
     perMonth: string;
+
+    // Toast messages
+    linkCopied: string;
+    linkCopyFailed: string;
 }

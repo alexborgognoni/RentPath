@@ -40,14 +40,23 @@ return [
     'maxSize' => 'Max m²',
 
     // Status badges
+    'statusInactive' => 'Inactive',
     'statusAvailable' => 'Available',
+    'statusApplicationReceived' => 'Application Received',
+    'statusUnderReview' => 'Under Review',
+    'statusVisitScheduled' => 'Visit Scheduled',
+    'statusApproved' => 'Approved',
     'statusLeased' => 'Leased',
     'statusMaintenance' => 'Maintenance',
-    'statusUnderReview' => 'Under Review',
+    'statusArchived' => 'Archived',
     'statusReserved' => 'Reserved',
 
     // Actions
     'invite' => 'Invite',
     'edit' => 'Edit',
     'perMonth' => 'per month',
+
+    // Toast messages
+    'linkCopied' => 'Application link copied to clipboard',
+    'linkCopyFailed' => 'Failed to copy link to clipboard',
 ];
