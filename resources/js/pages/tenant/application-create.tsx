@@ -103,8 +103,8 @@ export default function ApplicationCreate() {
                     preserveState: true,
                     preserveScroll: true,
                     only: ['draftApplication'],
-                    onSuccess: (page: { props: { draftApplication?: Application } }) => {
-                        const updatedDraft = page.props.draftApplication;
+                    onSuccess: (page) => {
+                        const updatedDraft = (page.props as { draftApplication?: Application }).draftApplication;
                         if (updatedDraft && updatedDraft.current_step !== undefined) {
                             // Backend may have reduced current_step due to validation
                             const actualMaxStep = updatedDraft.current_step;
@@ -140,9 +140,9 @@ export default function ApplicationCreate() {
                     preserveState: true,
                     preserveScroll: true,
                     only: ['draftApplication'], // Reload only the draft application data
-                    onSuccess: (page: { props: { draftApplication?: Application } }) => {
+                    onSuccess: (page) => {
                         // Backend validated and updated current_step
-                        const updatedDraft = page.props.draftApplication;
+                        const updatedDraft = (page.props as { draftApplication?: Application }).draftApplication;
                         if (updatedDraft && updatedDraft.current_step !== undefined) {
                             const actualMaxStep = updatedDraft.current_step;
                             setMaxStepReached(actualMaxStep);

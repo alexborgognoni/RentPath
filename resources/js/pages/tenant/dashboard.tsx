@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import type { Application } from '@/types/dashboard';
+import type { Application, PropertyImage } from '@/types/dashboard';
 import { Calendar, Home, MapPin } from 'lucide-react';
 import { AppLayout } from '@/layouts/app-layout';
 import { route } from '@/utils/route';
@@ -69,7 +69,7 @@ export default function TenantDashboard({ applications }: TenantDashboardProps) 
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {applications.map((application) => {
                             const property = application.property;
-                            const mainImage = property?.images?.find((img) => img.is_main) || property?.images?.[0];
+                            const mainImage = property?.images?.find((img: PropertyImage) => img.is_main) || property?.images?.[0];
 
                             return (
                                 <Link

@@ -5,8 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { isManagerSubdomain } from '@/utils/route';
 import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
+
+const getProfileRoute = () => {
+    const domain = isManagerSubdomain() ? 'manager.rentpath.test' : 'rentpath.test';
+    return `//${domain}/settings/profile` as keyof typeof ProfileController.destroy;
+};
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -32,7 +38,7 @@ export default function DeleteUser() {
                         </DialogDescription>
 
                         <Form
-                            {...ProfileController.destroy['/settings/profile'].form()}
+                            {...ProfileController.destroy[getProfileRoute()].form()}
                             options={{
                                 preserveScroll: true,
                             }}

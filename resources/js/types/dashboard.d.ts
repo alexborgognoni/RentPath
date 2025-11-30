@@ -70,6 +70,7 @@ export interface Property {
     parking_spots_interior: number;
     parking_spots_exterior: number;
     size?: number; // in square meters
+    size_sqm?: number; // alias for size
     balcony_size?: number;
     land_size?: number; // only for houses
     floor_level?: number;
@@ -92,8 +93,12 @@ export interface Property {
     extras?: Record<string, unknown>; // JSON field for uncommon features
     // Rental information
     available_date?: string;
+    available_from?: string; // alias for available_date
     rent_amount: number;
     rent_currency: 'eur' | 'usd' | 'gbp' | 'chf';
+    utilities_included?: boolean;
+    pets_allowed?: boolean;
+    smoking_allowed?: boolean;
     // Property status
     status:
         | 'inactive'
@@ -114,6 +119,7 @@ export interface Property {
     // Computed attributes
     formatted_rent?: string;
     formatted_size?: string;
+    main_image_url?: string;
     // Relationships
     property_manager?: PropertyManager;
     images?: PropertyImage[];
@@ -210,4 +216,44 @@ export interface TenantApplication {
     notes?: string;
     created_at: string;
     updated_at: string;
+}
+
+export interface Application {
+    id: number;
+    property_id: number;
+    tenant_profile_id: number;
+    status: 'draft' | 'submitted' | 'under_review' | 'visit_scheduled' | 'visit_completed' | 'approved' | 'rejected' | 'withdrawn' | 'leased' | 'archived';
+    current_step: number;
+    desired_move_in_date?: string;
+    lease_duration_months?: number;
+    message_to_landlord?: string;
+    additional_occupants?: number;
+    occupants_details?: { name: string; age: string; relationship: string; relationship_other: string }[];
+    has_pets?: boolean;
+    pets_details?: string;
+    is_smoker?: boolean;
+    has_vehicle?: boolean;
+    vehicle_details?: string;
+    special_requests?: string;
+    employer_name?: string;
+    employer_phone?: string;
+    job_title?: string;
+    monthly_income?: number;
+    employment_start_date?: string;
+    employment_type?: string;
+    proof_of_income_path?: string;
+    proof_of_employment_path?: string;
+    invited_via_token?: string;
+    submitted_at?: string;
+    reviewed_at?: string;
+    visit_scheduled_at?: string;
+    visit_completed_at?: string;
+    decision_at?: string;
+    withdrawn_at?: string;
+    leased_at?: string;
+    archived_at?: string;
+    created_at: string;
+    updated_at: string;
+    // Relationships
+    property?: Property;
 }

@@ -3,11 +3,17 @@ import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { type SharedData } from '@/types';
+import { isManagerSubdomain } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Transition } from '@headlessui/react';
 import { Form, usePage } from '@inertiajs/react';
 import { Lock } from 'lucide-react';
 import { useRef } from 'react';
+
+const getPasswordRoute = () => {
+    const domain = isManagerSubdomain() ? 'manager.rentpath.test' : 'rentpath.test';
+    return `//${domain}/settings/password` as keyof typeof PasswordController.update;
+};
 
 export default function PasswordContent() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -28,7 +34,7 @@ export default function PasswordContent() {
             {/* Password Settings */}
             <div className="xs:rounded-2xl xs:border xs:border-border xs:bg-card xs:p-6 xs:shadow-sm">
                 <Form
-                    {...PasswordController.update['/settings/password'].form()}
+                    {...PasswordController.update[getPasswordRoute()].form()}
                     options={{
                         preserveScroll: true,
                     }}

@@ -1,6 +1,7 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import { send } from '@/routes/verification';
 import { type SharedData } from '@/types';
+import { isManagerSubdomain } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Transition } from '@headlessui/react';
 import { Form, Link, usePage } from '@inertiajs/react';
@@ -8,6 +9,11 @@ import { Trash2, User } from 'lucide-react';
 
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
+
+const getProfileRoute = () => {
+    const domain = isManagerSubdomain() ? 'manager.rentpath.test' : 'rentpath.test';
+    return `//${domain}/settings/profile` as keyof typeof ProfileController.update;
+};
 
 interface ProfileContentProps {
     mustVerifyEmail: boolean;
@@ -33,7 +39,7 @@ export default function ProfileContent({ mustVerifyEmail, status }: ProfileConte
                 <h2 className="mb-4 text-xl font-semibold text-foreground">{t(translations.settings, 'account.email_address')}</h2>
 
                 <Form
-                    {...ProfileController.update['/settings/profile'].form()}
+                    {...ProfileController.update[getProfileRoute()].form()}
                     options={{
                         preserveScroll: true,
                     }}
