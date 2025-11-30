@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
-use App\Models\PropertyManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -26,6 +24,7 @@ class PropertyManagerController extends Controller
             if ($user->propertyManager->isRejected()) {
                 return redirect('/edit-profile');
             }
+
             return redirect('/dashboard');
         }
 
@@ -86,7 +85,7 @@ class PropertyManagerController extends Controller
         $validated = $request->validate($rules, $messages);
 
         // Normalize and validate company website
-        if (!empty($validated['company_website'])) {
+        if (! empty($validated['company_website'])) {
             $website = trim($validated['company_website']);
 
             // Remove protocol if present
@@ -96,9 +95,9 @@ class PropertyManagerController extends Controller
             $website = preg_replace('/^www\./i', '', $website);
 
             // Validate domain format
-            if (!preg_match('/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/', $website)) {
+            if (! preg_match('/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/', $website)) {
                 return back()->withErrors([
-                    'company_website' => 'Please enter a valid domain (e.g., example.com).'
+                    'company_website' => 'Please enter a valid domain (e.g., example.com).',
                 ])->withInput();
             }
 
@@ -149,7 +148,7 @@ class PropertyManagerController extends Controller
     {
         $propertyManager = Auth::user()->propertyManager;
 
-        if (!$propertyManager) {
+        if (! $propertyManager) {
             return redirect('/profile/setup');
         }
 
@@ -169,7 +168,7 @@ class PropertyManagerController extends Controller
     {
         $propertyManager = Auth::user()->propertyManager;
 
-        if (!$propertyManager) {
+        if (! $propertyManager) {
             return redirect('/profile/setup');
         }
 
@@ -182,7 +181,7 @@ class PropertyManagerController extends Controller
 
         if ($request->input('type') === 'individual') {
             // Only require ID document if it doesn't already exist
-            if (!$propertyManager->id_document_path) {
+            if (! $propertyManager->id_document_path) {
                 $rules['id_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
             } else {
                 $rules['id_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
@@ -193,7 +192,7 @@ class PropertyManagerController extends Controller
             $rules['license_number'] = 'required|string|max:255';
 
             // Only require license document if it doesn't already exist
-            if (!$propertyManager->license_document_path) {
+            if (! $propertyManager->license_document_path) {
                 $rules['license_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
             } else {
                 $rules['license_document'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
@@ -220,7 +219,7 @@ class PropertyManagerController extends Controller
         $validated = $request->validate($rules, $messages);
 
         // Normalize and validate company website
-        if (!empty($validated['company_website'])) {
+        if (! empty($validated['company_website'])) {
             $website = trim($validated['company_website']);
 
             // Remove protocol if present
@@ -230,9 +229,9 @@ class PropertyManagerController extends Controller
             $website = preg_replace('/^www\./i', '', $website);
 
             // Validate domain format
-            if (!preg_match('/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/', $website)) {
+            if (! preg_match('/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/', $website)) {
                 return back()->withErrors([
-                    'company_website' => 'Please enter a valid domain (e.g., example.com).'
+                    'company_website' => 'Please enter a valid domain (e.g., example.com).',
                 ])->withInput();
             }
 
@@ -325,18 +324,18 @@ class PropertyManagerController extends Controller
         $user = Auth::user();
         $propertyManager = $user->propertyManager;
 
-        if (!$propertyManager) {
+        if (! $propertyManager) {
             abort(404);
         }
 
-        [$documentPath, $visibility] = match($type) {
+        [$documentPath, $visibility] = match ($type) {
             'id_document' => [$propertyManager->id_document_path, 'private'],
             'license_document' => [$propertyManager->license_document_path, 'private'],
             'profile_picture' => [$propertyManager->profile_picture_path, 'public'],
             default => [null, null]
         };
 
-        if (!$documentPath) {
+        if (! $documentPath) {
             abort(404);
         }
 

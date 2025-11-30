@@ -35,7 +35,7 @@ return [
         'subtitle' => 'Plus d\'examens manuels, de demandes manquées et de communication désordonnée. Notre plateforme simplifie le parcours locataire.',
         'interactive_demo' => 'Démo Interactive',
         'slides' => [
-            "real_time_dashboard" => [
+            'real_time_dashboard' => [
                 'title' => 'Tableau de Bord Temps Réel',
                 'description' => 'Visibilité sur tous vos biens, suivi des candidatures, inspections, baux et efforts marketing — instantanément.',
                 'features' => [
@@ -45,7 +45,7 @@ return [
                     'Rapports propriétaires simplifiés',
                 ],
             ],
-            "guided_applications" => [
+            'guided_applications' => [
                 'title' => 'Candidatures Locataires Guidées',
                 'description' => 'Invitez les prospects à un processus de candidature étape par étape qui assure la collecte de tous les documents nécessaires. Des candidatures complètes, à chaque fois.',
                 'features' => [
@@ -55,7 +55,7 @@ return [
                     'Expérience de candidature professionnelle',
                 ],
             ],
-            "automated_review" => [
+            'automated_review' => [
                 'title' => 'Examen Automatisé des Candidatures',
                 'description' => 'Validez les informations et documents locataires instantanément. Fini de fouiller dans les emails ou le papier.',
                 'features' => [
@@ -65,7 +65,7 @@ return [
                     'Gestion complète des contrats',
                 ],
             ],
-            "progress_visibility" => [
+            'progress_visibility' => [
                 'title' => 'Visibilité Complète du Progrès',
                 'description' => 'Suivez chaque candidat et chaque étape du bail en un seul coup d’œil pour détecter les blocages et accélérer la location.',
                 'features' => [

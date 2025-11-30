@@ -32,7 +32,7 @@ interface PropertyViewPageProps {
 }
 
 export default function PropertyViewPage() {
-    const { property, canApply, auth, tenantProfileStatus, applicationStatus, token } = usePage<PropertyViewPageProps>().props;
+    const { property, canApply, auth, applicationStatus, token } = usePage<PropertyViewPageProps>().props;
 
     const handleApply = () => {
         // Build apply URL with token if present
@@ -95,7 +95,10 @@ export default function PropertyViewPage() {
                                 {!auth?.user ? (
                                     // Not logged in - show "Sign In to apply" button
                                     <a
-                                        href={route('login') + `?redirect=${encodeURIComponent(route('applications.create', { property: property.id }))}`}
+                                        href={
+                                            route('login') +
+                                            `?redirect=${encodeURIComponent(route('applications.create', { property: property.id }))}`
+                                        }
                                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-4 font-semibold text-white shadow-lg transition-all hover:scale-105"
                                     >
                                         <Send size={20} />
@@ -113,9 +116,7 @@ export default function PropertyViewPage() {
                                 ) : applicationStatus.hasApplication ? (
                                     // Already applied
                                     <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-center">
-                                        <p className="mb-2 text-sm text-green-600 dark:text-green-400">
-                                            You have already applied for this property
-                                        </p>
+                                        <p className="mb-2 text-sm text-green-600 dark:text-green-400">You have already applied for this property</p>
                                         <a
                                             href={route('applications.show', { application: applicationStatus.applicationId! })}
                                             className="text-sm font-medium text-green-700 hover:underline dark:text-green-300"
@@ -133,7 +134,13 @@ export default function PropertyViewPage() {
                                 {!auth?.user && (
                                     <p className="text-center text-xs text-muted-foreground">
                                         Don't have an account?{' '}
-                                        <a href={route('register') + `?redirect=${encodeURIComponent(route('applications.create', { property: property.id }))}`} className="text-primary hover:underline">
+                                        <a
+                                            href={
+                                                route('register') +
+                                                `?redirect=${encodeURIComponent(route('applications.create', { property: property.id }))}`
+                                            }
+                                            className="text-primary hover:underline"
+                                        >
                                             Register here
                                         </a>
                                     </p>

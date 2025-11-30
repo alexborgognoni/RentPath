@@ -66,13 +66,13 @@ class RegisteredUserController extends Controller
         // For Inertia external redirects, return 409 with X-Inertia-Location header
         if ($request->header('X-Inertia')) {
             return ResponseFacade::make('', 409, [
-                'X-Inertia-Location' => $redirectUrl
+                'X-Inertia-Location' => $redirectUrl,
             ]);
         }
 
         // Fallback for non-Inertia requests
         return ResponseFacade::make('', 302, [
-            'Location' => $redirectUrl
+            'Location' => $redirectUrl,
         ]);
     }
 }

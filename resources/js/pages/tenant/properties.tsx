@@ -1,8 +1,8 @@
-import { Head, Link } from '@inertiajs/react';
+import { AppLayout } from '@/layouts/app-layout';
 import type { Property } from '@/types/dashboard';
 import { route } from '@/utils/route';
-import { BedDouble, Bath, Maximize, MapPin, Home } from 'lucide-react';
-import { AppLayout } from '@/layouts/app-layout';
+import { Head, Link } from '@inertiajs/react';
+import { Bath, BedDouble, Home, MapPin, Maximize } from 'lucide-react';
 
 interface PropertiesPageProps {
     properties: Property[];
@@ -54,7 +54,7 @@ export default function PropertiesPage({ properties }: PropertiesPageProps) {
 
                                         {/* Property Type Badge */}
                                         {property.type && (
-                                            <div className="absolute left-3 top-3">
+                                            <div className="absolute top-3 left-3">
                                                 <span className="rounded-full bg-background/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
                                                     {property.type.charAt(0).toUpperCase() + property.type.slice(1)}
                                                 </span>
@@ -65,9 +65,7 @@ export default function PropertiesPage({ properties }: PropertiesPageProps) {
                                     {/* Property Details */}
                                     <div className="p-5">
                                         <div className="mb-3">
-                                            <h3 className="mb-1 text-lg font-semibold text-foreground line-clamp-1">
-                                                {property.title}
-                                            </h3>
+                                            <h3 className="mb-1 line-clamp-1 text-lg font-semibold text-foreground">{property.title}</h3>
                                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                                 <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
                                                 <span className="line-clamp-1">

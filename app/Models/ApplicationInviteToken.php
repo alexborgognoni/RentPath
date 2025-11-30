@@ -63,7 +63,7 @@ class ApplicationInviteToken extends Model
      */
     public function canBeUsed(?string $email = null): bool
     {
-        if (!$this->isValid()) {
+        if (! $this->isValid()) {
             return false;
         }
 

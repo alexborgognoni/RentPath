@@ -35,17 +35,17 @@ return [
         'subtitle' => 'Keine manuellen Überprüfungen, verpasste Bewerbungen, oder chaotische Kommunikation. Unsere Plattform optimiert die Mieter-Journey.',
         'interactive_demo' => 'Interaktive Demo',
         'slides' => [
-            "real_time_dashboard" => [
+            'real_time_dashboard' => [
                 'title' => 'Echtzeit-Dashboard',
                 'description' => 'Sofortige Sichtbarkeit über alle Immobilien, Bewerbungen, Besichtigungen, Verträge und Marketing.',
                 'features' => [
                     'Live-Bewerbungs-Pipeline',
                     'Planung von Nachverfolgungen',
                     'Automatische Erinnerungen',
-                    'Einfache Vermieterberichte'
+                    'Einfache Vermieterberichte',
                 ],
             ],
-            "guided_applications" => [
+            'guided_applications' => [
                 'title' => 'Geleitete Mieter-Bewerbungen',
                 'description' => 'Laden Sie Interessenten zu einem Schritt-für-Schritt-Bewerbungsprozess ein, der alle erforderlichen Dokumente abfragt. Vollständige Bewerbungen – jedes Mal.',
                 'features' => [
@@ -55,7 +55,7 @@ return [
                     'Professionelle Bewerbungserfahrung',
                 ],
             ],
-            "automated_review" => [
+            'automated_review' => [
                 'title' => 'Automatisierte Bewerbungsprüfung',
                 'description' => 'Validieren Sie Mieterinformationen und Dokumente sofort. Schluss mit dem Durchsuchen von E-Mails oder Papierkram.',
                 'features' => [
@@ -65,7 +65,7 @@ return [
                     'Vollständiges Vertragsmanagement',
                 ],
             ],
-            "progress_visibility" => [
+            'progress_visibility' => [
                 'title' => 'Vollständige Fortschrittssichtbarkeit',
                 'description' => 'Alle Bewerber und Vertragsfortschritte auf einen Blick – Engpässe erkennen, Vermietung beschleunigen.',
                 'features' => [

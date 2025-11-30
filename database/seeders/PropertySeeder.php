@@ -33,7 +33,7 @@ class PropertySeeder extends Seeder
             $this->command->info("Created: {$property->title}");
         }
 
-        $this->command->info("\nCreated " . count($properties) . " properties \n");
+        $this->command->info("\nCreated ".count($properties)." properties \n");
     }
 
     /**
@@ -911,10 +911,10 @@ class PropertySeeder extends Seeder
         }
 
         $imageFiles = array_merge(
-            File::glob($imagesPath . '/*.jpg'),
-            File::glob($imagesPath . '/*.jpeg'),
-            File::glob($imagesPath . '/*.png'),
-            File::glob($imagesPath . '/*.webp')
+            File::glob($imagesPath.'/*.jpg'),
+            File::glob($imagesPath.'/*.jpeg'),
+            File::glob($imagesPath.'/*.png'),
+            File::glob($imagesPath.'/*.webp')
         );
 
         if (empty($imageFiles)) {

@@ -90,7 +90,7 @@ class PropertyManager extends Model
      */
     public function isVerified(): bool
     {
-        return !is_null($this->profile_verified_at);
+        return ! is_null($this->profile_verified_at);
     }
 
     /**
@@ -98,7 +98,7 @@ class PropertyManager extends Model
      */
     public function isRejected(): bool
     {
-        return !is_null($this->rejection_reason);
+        return ! is_null($this->rejection_reason);
     }
 
     /**

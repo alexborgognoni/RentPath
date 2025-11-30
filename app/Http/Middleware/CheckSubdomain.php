@@ -25,7 +25,7 @@ class CheckSubdomain
             $expectedHost = $baseDomain;
         } else {
             // Expecting a subdomain (e.g., manager.example.com or manager.app.example.com)
-            $expectedHost = $expectedSubdomain . '.' . $baseDomain;
+            $expectedHost = $expectedSubdomain.'.'.$baseDomain;
         }
 
         // Compare actual host against expected host (getHost() already strips port)

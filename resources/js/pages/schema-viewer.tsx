@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Column {
     name: string;
@@ -66,9 +66,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
         });
 
         // Sort by connectivity
-        const sorted = [...schema].sort(
-            (a, b) => (connections[b.name] || 0) - (connections[a.name] || 0)
-        );
+        const sorted = [...schema].sort((a, b) => (connections[b.name] || 0) - (connections[a.name] || 0));
 
         const positions: Record<string, { x: number; y: number }> = {};
 
@@ -125,7 +123,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                 const calculatedRadius = (itemsOnCircle * arcLengthNeeded) / (2 * Math.PI);
 
                 // Also ensure radius accounts for table diagonal + gap from center
-                const radiusFromDiagonal = (tableDiagonal / 2) + minGap + (tierIdx * 600);
+                const radiusFromDiagonal = tableDiagonal / 2 + minGap + tierIdx * 600;
 
                 const radius = Math.max(calculatedRadius, radiusFromDiagonal);
 
@@ -149,9 +147,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
         return positions;
     };
 
-    const [tablePositions, setTablePositions] = useState<Record<string, { x: number; y: number }>>(
-        getInitialPositions()
-    );
+    const [tablePositions, setTablePositions] = useState<Record<string, { x: number; y: number }>>(getInitialPositions());
 
     // Update positions when schema changes
     useEffect(() => {
@@ -254,7 +250,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
         toTable: string,
         fromPos: { x: number; y: number },
         toPos: { x: number; y: number },
-        fromWidth: number
+        fromWidth: number,
     ) => {
         // Offset for infinite canvas
         const offset = 10000;
@@ -282,12 +278,12 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
             <Head title="Database Schema Viewer" />
             <div className="min-h-screen bg-slate-950 text-white">
                 {/* Controls */}
-                <div className="fixed top-4 left-4 z-50 bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-700">
-                    <h1 className="text-lg font-bold mb-2">Schema Viewer</h1>
-                    <div className="text-sm space-y-1 text-slate-300">
+                <div className="fixed top-4 left-4 z-50 rounded-lg border border-slate-700 bg-slate-800 p-4 shadow-xl">
+                    <h1 className="mb-2 text-lg font-bold">Schema Viewer</h1>
+                    <div className="space-y-1 text-sm text-slate-300">
                         <div>Tables: {schema.length}</div>
                         <div>Zoom: {(scale * 100).toFixed(0)}%</div>
-                        <div className="pt-2 border-t border-slate-600 space-y-1">
+                        <div className="space-y-1 border-t border-slate-600 pt-2">
                             <div>🖱️ Drag canvas to pan</div>
                             <div>🔍 Scroll to zoom</div>
                             <div>✋ Drag tables to move</div>
@@ -297,7 +293,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                     </div>
                     <button
                         onClick={resetLayout}
-                        className="mt-3 w-full px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition-colors"
+                        className="mt-3 w-full rounded bg-slate-700 px-3 py-1.5 text-sm transition-colors hover:bg-slate-600"
                     >
                         Reset Layout
                     </button>
@@ -305,13 +301,10 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
 
                 {/* Selected Table Details */}
                 {selectedTable && (
-                    <div className="fixed top-4 right-4 z-50 bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-700 max-w-md max-h-[80vh] overflow-auto">
-                        <div className="flex justify-between items-start mb-3">
+                    <div className="fixed top-4 right-4 z-50 max-h-[80vh] max-w-md overflow-auto rounded-lg border border-slate-700 bg-slate-800 p-4 shadow-xl">
+                        <div className="mb-3 flex items-start justify-between">
                             <h2 className="text-lg font-bold">{selectedTable}</h2>
-                            <button
-                                onClick={() => setSelectedTable(null)}
-                                className="text-slate-400 hover:text-white"
-                            >
+                            <button onClick={() => setSelectedTable(null)} className="text-slate-400 hover:text-white">
                                 ✕
                             </button>
                         </div>
@@ -324,16 +317,11 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                                 return (
                                     <div key={table.name} className="space-y-3 text-sm">
                                         <div>
-                                            <h3 className="font-semibold mb-2 text-slate-300">Columns</h3>
+                                            <h3 className="mb-2 font-semibold text-slate-300">Columns</h3>
                                             <div className="space-y-1">
                                                 {columns.map((col) => (
-                                                    <div
-                                                        key={col.name}
-                                                        className="p-2 bg-slate-900 rounded text-xs"
-                                                    >
-                                                        <div className="font-mono text-emerald-400">
-                                                            {col.name}
-                                                        </div>
+                                                    <div key={col.name} className="rounded bg-slate-900 p-2 text-xs">
+                                                        <div className="font-mono text-emerald-400">{col.name}</div>
                                                         <div className="text-slate-400">
                                                             {col.type}
                                                             {!col.nullable && ' NOT NULL'}
@@ -345,23 +333,15 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                                         </div>
                                         {foreignKeys.length > 0 && (
                                             <div>
-                                                <h3 className="font-semibold mb-2 text-slate-300">
-                                                    Foreign Keys
-                                                </h3>
+                                                <h3 className="mb-2 font-semibold text-slate-300">Foreign Keys</h3>
                                                 <div className="space-y-1">
                                                     {foreignKeys.map((fk, idx) => (
-                                                        <div
-                                                            key={idx}
-                                                            className="p-2 bg-slate-900 rounded text-xs"
-                                                        >
+                                                        <div key={idx} className="rounded bg-slate-900 p-2 text-xs">
                                                             <div className="font-mono">
-                                                                {Array.isArray(fk.columns) ? fk.columns.join(', ') : ''} →{' '}
-                                                                {fk.foreign_table}.
+                                                                {Array.isArray(fk.columns) ? fk.columns.join(', ') : ''} → {fk.foreign_table}.
                                                                 {Array.isArray(fk.foreign_columns) ? fk.foreign_columns.join(', ') : ''}
                                                             </div>
-                                                            <div className="text-slate-400 mt-1">
-                                                                {fk.on_delete && `ON DELETE ${fk.on_delete}`}
-                                                            </div>
+                                                            <div className="mt-1 text-slate-400">{fk.on_delete && `ON DELETE ${fk.on_delete}`}</div>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -376,7 +356,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                 {/* Canvas */}
                 <div
                     ref={canvasRef}
-                    className="w-full h-screen overflow-hidden cursor-grab active:cursor-grabbing"
+                    className="h-screen w-full cursor-grab overflow-hidden active:cursor-grabbing"
                     style={{ touchAction: 'none' }}
                     onWheel={handleWheel}
                     onMouseDown={handleMouseDown}
@@ -393,7 +373,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                     >
                         {/* SVG for relationships - infinite canvas */}
                         <svg
-                            className="absolute pointer-events-none"
+                            className="pointer-events-none absolute"
                             style={{
                                 left: '-10000px',
                                 top: '-10000px',
@@ -402,14 +382,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                             }}
                         >
                             <defs>
-                                <marker
-                                    id="arrowhead"
-                                    markerWidth="10"
-                                    markerHeight="10"
-                                    refX="9"
-                                    refY="3"
-                                    orient="auto"
-                                >
+                                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
                                     <polygon points="0 0, 10 3, 0 6" fill="#64748b" />
                                 </marker>
                             </defs>
@@ -424,17 +397,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                                     // Create unique key using both table index and foreign key index
                                     const uniqueKey = `${table.name}-${fk.foreign_table}-${tableIdx}-${fkIdx}`;
 
-                                    return (
-                                        <g key={uniqueKey}>
-                                            {drawRelationship(
-                                                table.name,
-                                                fk.foreign_table,
-                                                fromPos,
-                                                toPos,
-                                                fromSize.width
-                                            )}
-                                        </g>
-                                    );
+                                    return <g key={uniqueKey}>{drawRelationship(table.name, fk.foreign_table, fromPos, toPos, fromSize.width)}</g>;
                                 });
                             })}
                         </svg>
@@ -457,7 +420,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                             return (
                                 <div
                                     key={table.name}
-                                    className="absolute bg-slate-800 rounded-lg shadow-xl border-2 border-slate-700 hover:border-slate-500 select-none flex flex-col"
+                                    className="absolute flex flex-col rounded-lg border-2 border-slate-700 bg-slate-800 shadow-xl select-none hover:border-slate-500"
                                     style={{
                                         left: pos.x,
                                         top: pos.y,
@@ -468,33 +431,23 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
                                     onMouseDown={(e) => handleTableMouseDown(e, table.name)}
                                 >
                                     {/* Table Header */}
-                                    <div className="bg-slate-700 px-3 py-2 rounded-t-lg border-b border-slate-600 flex-shrink-0">
-                                        <div className="font-bold text-sm">{table.name}</div>
-                                        <div className="text-xs text-slate-400">
-                                            {columns.length} columns
-                                        </div>
+                                    <div className="flex-shrink-0 rounded-t-lg border-b border-slate-600 bg-slate-700 px-3 py-2">
+                                        <div className="text-sm font-bold">{table.name}</div>
+                                        <div className="text-xs text-slate-400">{columns.length} columns</div>
                                     </div>
 
                                     {/* Columns */}
-                                    <div className="p-2 flex-1 overflow-auto">
+                                    <div className="flex-1 overflow-auto p-2">
                                         {columns.slice(0, maxVisibleColumns).map((col) => (
                                             <div
                                                 key={col.name}
-                                                className="px-2 py-1 text-xs font-mono flex justify-between items-center hover:bg-slate-700 rounded"
+                                                className="flex items-center justify-between rounded px-2 py-1 font-mono text-xs hover:bg-slate-700"
                                             >
-                                                <span
-                                                    className={
-                                                        col.name === pk
-                                                            ? 'text-yellow-400 font-bold'
-                                                            : 'text-slate-300'
-                                                    }
-                                                >
+                                                <span className={col.name === pk ? 'font-bold text-yellow-400' : 'text-slate-300'}>
                                                     {col.name === pk && '🔑 '}
                                                     {col.name}
                                                 </span>
-                                                <span className="text-slate-500 text-[10px]">
-                                                    {col.type}
-                                                </span>
+                                                <span className="text-[10px] text-slate-500">{col.type}</span>
                                             </div>
                                         ))}
                                         {columns.length > maxVisibleColumns && (
@@ -506,15 +459,10 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
 
                                     {/* Foreign Keys Section */}
                                     {foreignKeys.length > 0 && (
-                                        <div className="px-3 py-2 border-t border-slate-700 flex-shrink-0">
-                                            <div className="text-xs font-semibold text-slate-400 mb-1">
-                                                Foreign Keys
-                                            </div>
+                                        <div className="flex-shrink-0 border-t border-slate-700 px-3 py-2">
+                                            <div className="mb-1 text-xs font-semibold text-slate-400">Foreign Keys</div>
                                             {foreignKeys.map((fk, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className="text-xs font-mono text-slate-300 py-0.5"
-                                                >
+                                                <div key={idx} className="py-0.5 font-mono text-xs text-slate-300">
                                                     {Array.isArray(fk.columns) ? fk.columns.join(', ') : ''} → {fk.foreign_table}
                                                 </div>
                                             ))}
@@ -523,7 +471,7 @@ export default function SchemaViewer({ schema }: SchemaViewerProps) {
 
                                     {/* Resize Handle */}
                                     <div
-                                        className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize"
+                                        className="absolute right-0 bottom-0 h-4 w-4 cursor-nwse-resize"
                                         style={{
                                             background: 'linear-gradient(135deg, transparent 50%, #64748b 50%)',
                                         }}

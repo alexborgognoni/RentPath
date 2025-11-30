@@ -1,8 +1,8 @@
-import { Head, Link } from '@inertiajs/react';
-import type { Application, PropertyImage } from '@/types/dashboard';
-import { Calendar, Home, MapPin } from 'lucide-react';
 import { AppLayout } from '@/layouts/app-layout';
+import type { Application, PropertyImage } from '@/types/dashboard';
 import { route } from '@/utils/route';
+import { Head, Link } from '@inertiajs/react';
+import { Calendar, Home, MapPin } from 'lucide-react';
 
 interface TenantDashboardProps {
     applications: Application[];
@@ -55,8 +55,7 @@ export default function TenantDashboard({ applications }: TenantDashboardProps) 
                         <Home className="mb-4 h-16 w-16 text-muted-foreground opacity-50" />
                         <h2 className="mb-2 text-xl font-semibold text-foreground">No Applications Yet</h2>
                         <p className="mb-6 max-w-md text-muted-foreground">
-                            You haven't applied to any properties yet. Start browsing available properties to submit your first
-                            application.
+                            You haven't applied to any properties yet. Start browsing available properties to submit your first application.
                         </p>
                         <Link
                             href={route('properties.index')}
@@ -92,10 +91,8 @@ export default function TenantDashboard({ applications }: TenantDashboardProps) 
                                         )}
 
                                         {/* Status Badge */}
-                                        <div className="absolute right-3 top-3">
-                                            <span
-                                                className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(application.status)}`}
-                                            >
+                                        <div className="absolute top-3 right-3">
+                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(application.status)}`}>
                                                 {formatStatus(application.status)}
                                             </span>
                                         </div>
@@ -103,7 +100,7 @@ export default function TenantDashboard({ applications }: TenantDashboardProps) 
 
                                     {/* Property Details */}
                                     <div className="p-5">
-                                        <h3 className="mb-2 text-lg font-semibold text-foreground line-clamp-1">
+                                        <h3 className="mb-2 line-clamp-1 text-lg font-semibold text-foreground">
                                             {property?.title || 'Property Title'}
                                         </h3>
 

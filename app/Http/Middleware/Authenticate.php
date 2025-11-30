@@ -12,9 +12,9 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        if (!$request->expectsJson()) {
+        if (! $request->expectsJson()) {
             // Always redirect to root domain login page, regardless of subdomain
-            return config('app.url') . '/login?redirect=' . urlencode($request->fullUrl());
+            return config('app.url').'/login?redirect='.urlencode($request->fullUrl());
         }
 
         return null;

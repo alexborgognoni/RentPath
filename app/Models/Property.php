@@ -209,6 +209,7 @@ class Property extends Model
     public static function getSubtypesForType(string $type): array
     {
         $subtypes = self::getSubtypeOptions();
+
         return $subtypes[$type] ?? [];
     }
 
@@ -239,7 +240,7 @@ class Property extends Model
 
         $symbol = $symbols[$this->rent_currency] ?? $this->rent_currency;
 
-        return $symbol . number_format($this->rent_amount, 2);
+        return $symbol.number_format($this->rent_amount, 2);
     }
 
     /**
@@ -249,7 +250,7 @@ class Property extends Model
     {
         $mainImage = $this->mainImage;
 
-        if (!$mainImage) {
+        if (! $mainImage) {
             return null;
         }
 
@@ -261,11 +262,11 @@ class Property extends Model
      */
     public function getFormattedSizeAttribute(): ?string
     {
-        if (!$this->size) {
+        if (! $this->size) {
             return null;
         }
 
-        return number_format($this->size, 0) . ' m²';
+        return number_format($this->size, 0).' m²';
     }
 
     /**
@@ -317,11 +318,11 @@ class Property extends Model
      */
     public function hasValidInviteToken(): bool
     {
-        if (!$this->invite_token) {
+        if (! $this->invite_token) {
             return false;
         }
 
-        if (!$this->invite_token_expires_at) {
+        if (! $this->invite_token_expires_at) {
             return false;
         }
 
@@ -355,7 +356,7 @@ class Property extends Model
     {
         $inviteToken = $this->inviteTokens()->where('token', $token)->first();
 
-        if (!$inviteToken) {
+        if (! $inviteToken) {
             return false;
         }
 
@@ -369,7 +370,7 @@ class Property extends Model
     {
         $defaultToken = $this->inviteTokens()->default()->first();
 
-        if (!$defaultToken) {
+        if (! $defaultToken) {
             $defaultToken = $this->inviteTokens()->create([
                 'name' => 'Default',
                 'token' => ApplicationInviteToken::generateToken(),

@@ -35,7 +35,7 @@ return new class extends Migration
                 'withdrawn',          // Tenant withdrew
                 'leased',             // Lease signed
                 'archived',           // Closed for records
-                'deleted'             // Draft cleanup
+                'deleted',             // Draft cleanup
             ])->default('draft');
 
             $table->integer('current_step')->default(1);

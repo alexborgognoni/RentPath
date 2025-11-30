@@ -17,12 +17,7 @@ export function getCountryName(countryCode: string | undefined, locale: string =
 /**
  * Format a full address from property parts
  */
-export function formatAddress(parts: {
-    house_number?: string;
-    street_name?: string;
-    city?: string;
-    country?: string;
-}): string {
+export function formatAddress(parts: { house_number?: string; street_name?: string; city?: string; country?: string }): string {
     const { house_number, street_name, city, country } = parts;
     const addressParts = [house_number, street_name, city, getCountryName(country)].filter(Boolean);
     return addressParts.join(', ');

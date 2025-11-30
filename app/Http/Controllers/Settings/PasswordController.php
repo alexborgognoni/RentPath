@@ -31,7 +31,7 @@ class PasswordController extends Controller
     {
         $host = $request->getHost();
         $baseDomain = config('app.domain');
-        $managerDomain = env('MANAGER_SUBDOMAIN', 'manager') . '.' . $baseDomain;
+        $managerDomain = env('MANAGER_SUBDOMAIN', 'manager').'.'.$baseDomain;
 
         if ($host === $managerDomain) {
             return 'manager';

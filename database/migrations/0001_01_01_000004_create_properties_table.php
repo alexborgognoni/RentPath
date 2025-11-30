@@ -33,7 +33,7 @@ return new class extends Migration
                 // Industrial subtypes
                 'warehouse', 'factory',
                 // Parking subtypes
-                'garage', 'indoor_spot', 'outdoor_spot'
+                'garage', 'indoor_spot', 'outdoor_spot',
             ]);
 
             // Property specifications
@@ -81,7 +81,7 @@ return new class extends Migration
                 'approved',
                 'leased',
                 'maintenance',
-                'archived'
+                'archived',
             ])->default('inactive');
 
             // Application access control

@@ -35,7 +35,7 @@ return [
         'subtitle' => 'No manual reviews, missed applications, and messy communication. Our platform streamlines the tenant journey.',
         'interactive_demo' => 'Interactive Demo',
         'slides' => [
-            "real_time_dashboard" => [
+            'real_time_dashboard' => [
                 'title' => 'Real-time Dashboard',
                 'description' => 'Visibility across all your properties, tracking applications, inspections, leases, and marketing efforts — instantly.',
                 'features' => [
@@ -45,7 +45,7 @@ return [
                     'Effortless landlord reporting',
                 ],
             ],
-            "guided_applications" => [
+            'guided_applications' => [
                 'title' => 'Guided Tenant Applications',
                 'description' => 'Invite leads to a step-by-step application flow that ensures complete information, every time.',
                 'features' => [
@@ -55,7 +55,7 @@ return [
                     'Professional application experience',
                 ],
             ],
-            "automated_review" => [
+            'automated_review' => [
                 'title' => 'Automated Application Review',
                 'description' => 'Validate tenant information and documents instantly. No more digging through emails or paper.',
                 'features' => [
@@ -65,7 +65,7 @@ return [
                     'Complete contract management',
                 ],
             ],
-            "progress_visibility" => [
+            'progress_visibility' => [
                 'title' => 'Full Progress Visibility',
                 'description' => 'Monitor each applicant and lease stage in one view to spot bottlenecks and accelerate leasing.',
                 'features' => [

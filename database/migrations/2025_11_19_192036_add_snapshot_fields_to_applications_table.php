@@ -18,7 +18,7 @@ return new class extends Migration
                 'self_employed',
                 'student',
                 'unemployed',
-                'retired'
+                'retired',
             ])->nullable()->after('internal_notes');
             $table->string('snapshot_employer_name')->nullable()->after('snapshot_employment_status');
             $table->string('snapshot_job_title')->nullable()->after('snapshot_employer_name');

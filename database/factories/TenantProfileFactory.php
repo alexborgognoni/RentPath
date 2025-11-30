@@ -53,7 +53,7 @@ class TenantProfileFactory extends Factory
             'employer_contact_email' => $isEmployed ? fake()->safeEmail() : null,
 
             // Student info
-            'university_name' => $isStudent ? fake()->company() . ' University' : null,
+            'university_name' => $isStudent ? fake()->company().' University' : null,
             'program_of_study' => $isStudent ? fake()->randomElement(['Computer Science', 'Business Administration', 'Engineering', 'Medicine']) : null,
             'expected_graduation_date' => $isStudent ? fake()->date('Y-m-d', '+2 years') : null,
             'student_income_source' => $isStudent ? fake()->randomElement(['Parents', 'Scholarship', 'Part-time job', 'Student loan']) : null,
@@ -84,7 +84,7 @@ class TenantProfileFactory extends Factory
      */
     public function verified(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'profile_verified_at' => now(),
         ]);
     }
@@ -94,7 +94,7 @@ class TenantProfileFactory extends Factory
      */
     public function rejected(string $reason = 'Documents are not clear enough'): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'profile_verified_at' => null,
             'verification_rejection_reason' => $reason,
             'verification_rejected_fields' => ['id_document_path'],
@@ -106,7 +106,7 @@ class TenantProfileFactory extends Factory
      */
     public function employed(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'employment_status' => 'employed',
             'employer_name' => fake()->company(),
             'job_title' => fake()->jobTitle(),
@@ -128,7 +128,7 @@ class TenantProfileFactory extends Factory
      */
     public function student(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'employment_status' => 'student',
             'employer_name' => null,
             'job_title' => null,
@@ -138,7 +138,7 @@ class TenantProfileFactory extends Factory
             'employer_contact_name' => null,
             'employer_contact_phone' => null,
             'employer_contact_email' => null,
-            'university_name' => fake()->company() . ' University',
+            'university_name' => fake()->company().' University',
             'program_of_study' => fake()->randomElement(['Computer Science', 'Business Administration', 'Engineering', 'Medicine']),
             'expected_graduation_date' => fake()->date('Y-m-d', '+2 years'),
             'student_income_source' => fake()->randomElement(['Parents', 'Scholarship', 'Part-time job']),
@@ -150,7 +150,7 @@ class TenantProfileFactory extends Factory
      */
     public function withGuarantor(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'has_guarantor' => true,
             'guarantor_name' => fake()->name(),
             'guarantor_relationship' => fake()->randomElement(['Parent', 'Sibling', 'Friend', 'Relative']),

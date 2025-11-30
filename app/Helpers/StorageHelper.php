@@ -14,12 +14,12 @@ class StorageHelper
      * Uses environment variables FILESYSTEM_DISK_PUBLIC and FILESYSTEM_DISK_PRIVATE
      * to determine which disk to use.
      *
-     * @param string $visibility 'public' or 'private'
+     * @param  string  $visibility  'public' or 'private'
      * @return string The disk name
      */
     public static function getDisk(string $visibility): string
     {
-        if (!in_array($visibility, ['public', 'private'])) {
+        if (! in_array($visibility, ['public', 'private'])) {
             throw new \InvalidArgumentException("Invalid visibility: {$visibility}. Must be 'public' or 'private'.");
         }
 
@@ -27,7 +27,7 @@ class StorageHelper
         $defaultPublic = app()->environment('local') ? 'public' : 's3_public';
         $defaultPrivate = app()->environment('local') ? 'private' : 's3_private';
 
-        return match($visibility) {
+        return match ($visibility) {
             'public' => env('FILESYSTEM_DISK_PUBLIC', $defaultPublic),
             'private' => env('FILESYSTEM_DISK_PRIVATE', $defaultPrivate),
         };
@@ -36,9 +36,8 @@ class StorageHelper
     /**
      * Store a file with the specified visibility.
      *
-     * @param \Illuminate\Http\UploadedFile $file
-     * @param string $path
-     * @param string $visibility 'public' or 'private'
+     * @param  \Illuminate\Http\UploadedFile  $file
+     * @param  string  $visibility  'public' or 'private'
      * @return string The stored file path
      */
     public static function store($file, string $path, string $visibility): string
@@ -59,14 +58,12 @@ class StorageHelper
     /**
      * Get a URL for a stored file based on its visibility.
      *
-     * @param string $path
-     * @param string $visibility 'public' or 'private'
-     * @param int $expiresInMinutes Only used for private files
-     * @return string|null
+     * @param  string  $visibility  'public' or 'private'
+     * @param  int  $expiresInMinutes  Only used for private files
      */
     public static function url(?string $path, string $visibility, int $expiresInMinutes = 5): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return null;
         }
 
@@ -82,7 +79,7 @@ class StorageHelper
             // Local: Laravel signed URLs (mimics CloudFront behavior)
             // Use appropriate route based on current subdomain
             $currentHost = request()->getHost();
-            $managerHost = env('MANAGER_SUBDOMAIN', 'manager') . '.' . config('app.domain');
+            $managerHost = env('MANAGER_SUBDOMAIN', 'manager').'.'.config('app.domain');
 
             $routeName = ($currentHost === $managerHost)
                 ? 'private.storage'
@@ -108,17 +105,13 @@ class StorageHelper
 
     /**
      * Generate a CloudFront signed URL for private content.
-     *
-     * @param string $path
-     * @param int $expiresInMinutes
-     * @return string
      */
     protected static function getCloudFrontSignedUrl(string $path, int $expiresInMinutes): string
     {
         $cloudFrontUrl = config('filesystems.disks.s3_private.url');
         $keyPairId = env('AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID');
 
-        if (!$cloudFrontUrl || !$keyPairId) {
+        if (! $cloudFrontUrl || ! $keyPairId) {
             throw new \RuntimeException('CloudFront URL or Key Pair ID not configured');
         }
 
@@ -135,9 +128,10 @@ class StorageHelper
                 ]);
 
                 $secret = json_decode($result['SecretString'], true);
+
                 return $secret['private_key'];
             } catch (\Exception $e) {
-                throw new \RuntimeException('Failed to retrieve CloudFront private key: ' . $e->getMessage());
+                throw new \RuntimeException('Failed to retrieve CloudFront private key: '.$e->getMessage());
             }
         });
 
@@ -148,7 +142,7 @@ class StorageHelper
         ]);
 
         // Generate signed URL
-        $resourceKey = rtrim($cloudFrontUrl, '/') . '/' . ltrim($path, '/');
+        $resourceKey = rtrim($cloudFrontUrl, '/').'/'.ltrim($path, '/');
         $expires = time() + ($expiresInMinutes * 60);
 
         return $cloudFront->getSignedUrl([

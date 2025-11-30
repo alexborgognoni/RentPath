@@ -1,5 +1,5 @@
-import { route } from 'ziggy-js';
 import { usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 interface ZiggyConfig {
     url: string;
@@ -10,11 +10,7 @@ interface ZiggyConfig {
 }
 
 // Re-export route function that uses Ziggy config from page props
-function routeHelper(
-    name: string,
-    params?: Record<string, string | number | boolean> | string | number,
-    absolute?: boolean
-): string {
+function routeHelper(name: string, params?: Record<string, string | number | boolean> | string | number, absolute?: boolean): string {
     // Get ziggy config from window (set by Inertia)
     const ziggy = (window as unknown as { Ziggy?: ZiggyConfig }).Ziggy;
 
@@ -31,11 +27,7 @@ function routeHelper(
 export function useRoute() {
     const { ziggy } = usePage().props as { ziggy?: ZiggyConfig };
 
-    return (
-        name: string,
-        params?: Record<string, string | number | boolean> | string | number,
-        absolute?: boolean
-    ): string => {
+    return (name: string, params?: Record<string, string | number | boolean> | string | number, absolute?: boolean): string => {
         if (!ziggy) {
             console.warn('Ziggy config not found in page props');
             return `/${name}`;
@@ -57,7 +49,7 @@ export function isManagerSubdomain(): boolean {
 export function settingsRoute(
     name: 'profile' | 'password' | 'appearance' | 'profile.update' | 'profile.destroy' | 'password.update',
     params?: Record<string, string | number | boolean> | string | number,
-    absolute?: boolean
+    absolute?: boolean,
 ): string {
     const prefix = isManagerSubdomain() ? 'manager.settings' : 'tenant.settings';
     return routeHelper(`${prefix}.${name}`, params, absolute);

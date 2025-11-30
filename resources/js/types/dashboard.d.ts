@@ -222,7 +222,17 @@ export interface Application {
     id: number;
     property_id: number;
     tenant_profile_id: number;
-    status: 'draft' | 'submitted' | 'under_review' | 'visit_scheduled' | 'visit_completed' | 'approved' | 'rejected' | 'withdrawn' | 'leased' | 'archived';
+    status:
+        | 'draft'
+        | 'submitted'
+        | 'under_review'
+        | 'visit_scheduled'
+        | 'visit_completed'
+        | 'approved'
+        | 'rejected'
+        | 'withdrawn'
+        | 'leased'
+        | 'archived';
     current_step: number;
     desired_move_in_date?: string;
     lease_duration_months?: number;

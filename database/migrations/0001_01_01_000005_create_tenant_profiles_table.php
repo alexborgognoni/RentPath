@@ -36,7 +36,7 @@ return new class extends Migration
                 'self_employed',
                 'student',
                 'unemployed',
-                'retired'
+                'retired',
             ])->nullable();
             $table->string('employer_name')->nullable();
             $table->string('job_title')->nullable();

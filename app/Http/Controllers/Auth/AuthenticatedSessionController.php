@@ -51,8 +51,8 @@ class AuthenticatedSessionController extends Controller
         // Resolve the redirect URL using helper
         $redirectUrl = RedirectHelper::resolveRedirectUrl($redirect, $userTypePreference);
 
-        \Log::info('Login redirect URL: ' . $redirectUrl);
-        \Log::info('Session ID: ' . $request->session()->getId());
+        \Log::info('Login redirect URL: '.$redirectUrl);
+        \Log::info('Session ID: '.$request->session()->getId());
 
         $sessionName = config('session.cookie');
         $sessionId = $request->session()->getId();
@@ -60,7 +60,7 @@ class AuthenticatedSessionController extends Controller
         // For Inertia external redirects, return 409 with X-Inertia-Location header
         if ($request->header('X-Inertia')) {
             $response = ResponseFacade::make('', 409, [
-                'X-Inertia-Location' => $redirectUrl
+                'X-Inertia-Location' => $redirectUrl,
             ]);
 
             // Manually set session cookie with explicit domain from config
@@ -81,7 +81,7 @@ class AuthenticatedSessionController extends Controller
 
         // Fallback for non-Inertia requests
         return ResponseFacade::make('', 302, [
-            'Location' => $redirectUrl
+            'Location' => $redirectUrl,
         ]);
     }
 
@@ -100,7 +100,7 @@ class AuthenticatedSessionController extends Controller
         // For Inertia requests (from manager subdomain), return 409 with X-Inertia-Location
         if ($request->header('X-Inertia')) {
             return ResponseFacade::make('', 409, [
-                'X-Inertia-Location' => $redirectUrl
+                'X-Inertia-Location' => $redirectUrl,
             ]);
         }
 

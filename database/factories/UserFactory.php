@@ -38,7 +38,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -51,7 +51,7 @@ class UserFactory extends Factory
         return $this->afterCreating(function ($user) use ($verified) {
             \App\Models\TenantProfile::factory()
                 ->for($user)
-                ->when($verified, fn($factory) => $factory->verified())
+                ->when($verified, fn ($factory) => $factory->verified())
                 ->create();
         });
     }

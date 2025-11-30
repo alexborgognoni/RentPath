@@ -199,7 +199,7 @@ class Application extends Model
      */
     public function isSubmitted(): bool
     {
-        return !is_null($this->submitted_at);
+        return ! is_null($this->submitted_at);
     }
 
     /**
@@ -335,7 +335,7 @@ class Application extends Model
      */
     public function getStatusTextAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'Draft',
             'submitted' => 'Submitted',
             'under_review' => 'Under Review',
@@ -364,12 +364,13 @@ class Application extends Model
      */
     public function submit(): bool
     {
-        if (!$this->isDraft()) {
+        if (! $this->isDraft()) {
             return false;
         }
 
         $this->status = 'submitted';
         $this->submitted_at = now();
+
         return $this->save();
     }
 
@@ -378,12 +379,13 @@ class Application extends Model
      */
     public function withdraw(): bool
     {
-        if (!$this->canBeWithdrawn()) {
+        if (! $this->canBeWithdrawn()) {
             return false;
         }
 
         $this->status = 'withdrawn';
         $this->withdrawn_at = now();
+
         return $this->save();
     }
 
@@ -399,6 +401,7 @@ class Application extends Model
         $this->status = 'under_review';
         $this->reviewed_by_user_id = $reviewer->id;
         $this->reviewed_at = now();
+
         return $this->save();
     }
 
@@ -407,7 +410,7 @@ class Application extends Model
      */
     public function approve(User $approver, ?string $notes = null): bool
     {
-        if (!in_array($this->status, ['under_review', 'visit_completed'])) {
+        if (! in_array($this->status, ['under_review', 'visit_completed'])) {
             return false;
         }
 
@@ -415,6 +418,7 @@ class Application extends Model
         $this->approved_by_user_id = $approver->id;
         $this->approved_at = now();
         $this->approval_notes = $notes;
+
         return $this->save();
     }
 
@@ -423,13 +427,14 @@ class Application extends Model
      */
     public function reject(string $reason, ?array $details = null): bool
     {
-        if (!in_array($this->status, ['submitted', 'under_review', 'visit_completed'])) {
+        if (! in_array($this->status, ['submitted', 'under_review', 'visit_completed'])) {
             return false;
         }
 
         $this->status = 'rejected';
         $this->rejection_reason = $reason;
         $this->rejection_details = $details;
+
         return $this->save();
     }
 
@@ -438,13 +443,14 @@ class Application extends Model
      */
     public function scheduleVisit(\DateTime $dateTime, ?string $notes = null): bool
     {
-        if (!in_array($this->status, ['submitted', 'under_review'])) {
+        if (! in_array($this->status, ['submitted', 'under_review'])) {
             return false;
         }
 
         $this->status = 'visit_scheduled';
         $this->visit_scheduled_at = $dateTime;
         $this->visit_notes = $notes;
+
         return $this->save();
     }
 
@@ -460,8 +466,9 @@ class Application extends Model
         $this->status = 'visit_completed';
         $this->visit_completed_at = now();
         if ($notes) {
-            $this->visit_notes = ($this->visit_notes ? $this->visit_notes . "\n\n" : '') . $notes;
+            $this->visit_notes = ($this->visit_notes ? $this->visit_notes."\n\n" : '').$notes;
         }
+
         return $this->save();
     }
 
@@ -484,6 +491,7 @@ class Application extends Model
         $this->agreed_rent_amount = $rentAmount;
         $this->deposit_amount = $depositAmount;
         $this->lease_signed_at = now();
+
         return $this->save();
     }
 
@@ -494,6 +502,7 @@ class Application extends Model
     {
         $this->status = 'archived';
         $this->archived_at = now();
+
         return $this->save();
     }
 }

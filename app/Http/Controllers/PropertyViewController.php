@@ -25,19 +25,19 @@ class PropertyViewController extends Controller
         $token = $request->query('token');
 
         // If property doesn't require invite, allow access
-        if (!$property->requires_invite) {
+        if (! $property->requires_invite) {
             return $this->renderPropertyView($property);
         }
 
         // Property requires invite - check for token
-        if (!$token) {
+        if (! $token) {
             abort(403, 'This property requires an invite token to view.');
         }
 
         // Find and validate the token
         $inviteToken = $property->inviteTokens()->where('token', $token)->first();
 
-        if (!$inviteToken || !$inviteToken->canBeUsed()) {
+        if (! $inviteToken || ! $inviteToken->canBeUsed()) {
             abort(403, 'Invalid or expired invite token.');
         }
 
@@ -147,14 +147,14 @@ class PropertyViewController extends Controller
     private function canUserApply(Property $property): bool
     {
         // Must be authenticated
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return false;
         }
 
         $user = Auth::user();
 
         // Auto-create tenant profile if doesn't exist (will be filled during application)
-        if (!$user->tenantProfile) {
+        if (! $user->tenantProfile) {
             $user->tenantProfile()->create([]);
         }
 
@@ -171,7 +171,7 @@ class PropertyViewController extends Controller
         }
 
         // Property must be accepting applications
-        if (!in_array($property->status, ['available', 'application_received'])) {
+        if (! in_array($property->status, ['available', 'application_received'])) {
             return false;
         }
 
@@ -186,7 +186,7 @@ class PropertyViewController extends Controller
      */
     private function getTenantProfileStatus(): array
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return [
                 'exists' => false,
                 'verified' => false,
@@ -207,7 +207,7 @@ class PropertyViewController extends Controller
      */
     private function getApplicationStatus(Property $property): array
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return [
                 'hasApplication' => false,
                 'hasDraft' => false,
@@ -217,7 +217,7 @@ class PropertyViewController extends Controller
 
         $tenantProfile = Auth::user()->tenantProfile;
 
-        if (!$tenantProfile) {
+        if (! $tenantProfile) {
             return [
                 'hasApplication' => false,
                 'hasDraft' => false,
@@ -270,7 +270,7 @@ class PropertyViewController extends Controller
         // Check access control (same logic as show method)
         $token = $request->query('token');
 
-        if ($property->requires_invite && !$property->canAccessWithToken($token)) {
+        if ($property->requires_invite && ! $property->canAccessWithToken($token)) {
             abort(403, 'Invalid or expired invite token.');
         }
 
@@ -280,7 +280,7 @@ class PropertyViewController extends Controller
         // Use StorageHelper to get the image
         $disk = StorageHelper::getDisk('private');
 
-        if (!\Storage::disk($disk)->exists($image->image_path)) {
+        if (! \Storage::disk($disk)->exists($image->image_path)) {
             abort(404, 'Image file not found');
         }
 

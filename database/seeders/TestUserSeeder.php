@@ -16,7 +16,7 @@ class TestUserSeeder extends Seeder
     public function run(): void
     {
         // Only run in local environment
-        if (!app()->environment('local')) {
+        if (! app()->environment('local')) {
             $this->command->warn('Skipping TestUserSeeder - only runs in local environment');
 
             return;

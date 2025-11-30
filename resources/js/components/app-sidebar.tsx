@@ -72,7 +72,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                             <TooltipTrigger asChild>
                                 <button
                                     onClick={onToggleCollapse}
-                                    className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                 >
                                     <PanelLeftOpen size={20} />
                                 </button>
@@ -91,7 +91,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                                 <TooltipTrigger asChild>
                                     <button
                                         onClick={onToggleCollapse}
-                                        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                     >
                                         <PanelLeftClose size={18} />
                                     </button>
@@ -114,7 +114,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                 </nav>
 
                 {/* Settings Section */}
-                <div className="border-t border-border px-3 py-4 space-y-1">
+                <div className="space-y-1 border-t border-border px-3 py-4">
                     <NavItem
                         href={settingsRoute('profile')}
                         icon={<Settings size={18} />}
@@ -129,7 +129,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                             <TooltipTrigger asChild>
                                 <DropdownMenuTrigger asChild>
                                     <button
-                                        className={`flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors text-muted-foreground hover:bg-muted hover:text-foreground ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
+                                        className={`flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
                                     >
                                         <Globe size={18} />
                                         {!isCollapsed && (
@@ -140,9 +140,7 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                                     </button>
                                 </DropdownMenuTrigger>
                             </TooltipTrigger>
-                            {isCollapsed && (
-                                <TooltipContent side="right">{t(translations.sidebar, 'language')}</TooltipContent>
-                            )}
+                            {isCollapsed && <TooltipContent side="right">{t(translations.sidebar, 'language')}</TooltipContent>}
                         </Tooltip>
                         <DropdownMenuContent side="right" align="start" className="w-48">
                             <DropdownMenuLabel>{t(translations.sidebar, 'selectLanguage')}</DropdownMenuLabel>
@@ -195,17 +193,13 @@ export function AppSidebar({ isCollapsed, onToggleCollapse }: AppSidebarProps) {
                                     </button>
                                 </DropdownMenuTrigger>
                             </TooltipTrigger>
-                            {isCollapsed && (
-                                <TooltipContent side="right">
-                                    {auth.user?.name || auth.user?.email}
-                                </TooltipContent>
-                            )}
+                            {isCollapsed && <TooltipContent side="right">{auth.user?.name || auth.user?.email}</TooltipContent>}
                         </Tooltip>
                         <DropdownMenuContent side="right" align="end" className="w-56">
                             <DropdownMenuLabel>
                                 <div className="flex flex-col">
                                     {auth.user?.name && <span className="font-medium">{auth.user.name}</span>}
-                                    <span className="text-xs text-muted-foreground font-normal">{auth.user?.email}</span>
+                                    <span className="text-xs font-normal text-muted-foreground">{auth.user?.email}</span>
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
@@ -245,9 +239,7 @@ function NavItem({ href, icon, label, isActive, isCollapsed }: NavItemProps) {
                 <Link
                     href={href}
                     className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                        isActive
-                            ? 'bg-primary/10 text-primary'
-                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     } ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
                 >
                     {icon}

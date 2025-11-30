@@ -66,8 +66,8 @@ return [
     */
 
     'manager_domain' => env('APP_ENV') === 'local'
-        ? env('MANAGER_SUBDOMAIN', 'manager') . '.' . parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) . (parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) ? ':' . parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) : '')
-        : env('MANAGER_SUBDOMAIN', 'manager') . '.' . env('APP_DOMAIN'),
+        ? env('MANAGER_SUBDOMAIN', 'manager').'.'.parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST).(parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) ? ':'.parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) : '')
+        : env('MANAGER_SUBDOMAIN', 'manager').'.'.env('APP_DOMAIN'),
 
     /*
     |--------------------------------------------------------------------------

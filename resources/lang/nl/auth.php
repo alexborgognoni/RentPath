@@ -55,4 +55,3 @@ return [
         'return_to_login_link' => 'inloggen',
     ],
 ];
-

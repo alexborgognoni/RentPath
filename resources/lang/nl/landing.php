@@ -35,7 +35,7 @@ return [
         'subtitle' => 'Handmatige beoordelingen, gemiste aanvragen, rommelige communicatie - verhuur is inefficiënt. Ons platform stroomlijnt de huurdertraject.',
         'interactive_demo' => 'Interactieve Demo',
         'slides' => [
-            "real_time_dashboard" => [
+            'real_time_dashboard' => [
                 'title' => 'Real-time Dashboard',
                 'description' => 'Zichtbaarheid over al uw eigendommen, volgen van aanvragen, inspecties, huurcontracten en marketing inspanningen — direct.',
                 'features' => [
@@ -45,7 +45,7 @@ return [
                     'Eenvoudige verhuurdersrapportage',
                 ],
             ],
-            "guided_applications" => [
+            'guided_applications' => [
                 'title' => 'Begeleide Huurder Aanvragen',
                 'description' => 'Nodig prospects uit voor een stap-voor-stap aanvraag proces dat ervoor zorgt dat alle benodigde documenten worden verzameld. Volledige aanvragen, elke keer.',
                 'features' => [
@@ -55,7 +55,7 @@ return [
                     'Professionele aanvraag ervaring',
                 ],
             ],
-            "automated_review" => [
+            'automated_review' => [
                 'title' => 'Geautomatiseerde Aanvraag Beoordeling',
                 'description' => 'Valideer huurder informatie en documenten direct. Geen spitten door emails of papier meer.',
                 'features' => [
@@ -65,7 +65,7 @@ return [
                     'Volledig contract beheer',
                 ],
             ],
-            "progress_visibility" => [
+            'progress_visibility' => [
                 'title' => 'Volledige Voortgang Zichtbaarheid',
                 'description' => 'Monitor elke aanvrager en huurcontract fase in één overzicht om knelpunten te spotten en verhuur te versnellen.',
                 'features' => [

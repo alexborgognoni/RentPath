@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
 use App\Models\Property;
-use App\Models\PropertyImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -20,8 +19,8 @@ class PropertyController extends Controller
     {
         // Get the user's property manager profile
         $propertyManager = Auth::user()->propertyManager;
-        
-        if (!$propertyManager) {
+
+        if (! $propertyManager) {
             return response()->json([]);
         }
 
@@ -35,6 +34,7 @@ class PropertyController extends Controller
                 // $property->tenant_count = $property->tenantApplications->first()?->tenant_count ?? 0;
                 // unset($property->tenantApplications);
                 $property->tenant_count = 0;
+
                 return $property;
             });
 
@@ -78,7 +78,7 @@ class PropertyController extends Controller
                 'private_room', 'student_room', 'co-living',
                 'office', 'retail',
                 'warehouse', 'factory',
-                'garage', 'indoor_spot', 'outdoor_spot'
+                'garage', 'indoor_spot', 'outdoor_spot',
             ])],
 
             // Specifications
@@ -91,7 +91,7 @@ class PropertyController extends Controller
             'land_size' => 'nullable|numeric|min:0|max:1000000',
             'floor_level' => 'nullable|integer',
             'has_elevator' => 'nullable|boolean',
-            'year_built' => 'nullable|integer|min:1800|max:' . date('Y'),
+            'year_built' => 'nullable|integer|min:1800|max:'.date('Y'),
 
             // Energy/Building
             'energy_class' => ['nullable', Rule::in(['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'])],
@@ -124,7 +124,7 @@ class PropertyController extends Controller
         // Get the user's property manager profile
         $propertyManager = Auth::user()->propertyManager;
 
-        if (!$propertyManager) {
+        if (! $propertyManager) {
             return redirect('/dashboard')
                 ->with('error', 'You need to set up your property manager profile first.');
         }
@@ -134,7 +134,7 @@ class PropertyController extends Controller
 
         // Convert boolean fields from strings to actual booleans
         $booleanFields = ['has_elevator', 'kitchen_equipped', 'kitchen_separated', 'has_cellar',
-                         'has_laundry', 'has_fireplace', 'has_air_conditioning', 'has_garden', 'has_rooftop'];
+            'has_laundry', 'has_fireplace', 'has_air_conditioning', 'has_garden', 'has_rooftop'];
         foreach ($booleanFields as $field) {
             if (isset($validated[$field])) {
                 $validated[$field] = filter_var($validated[$field], FILTER_VALIDATE_BOOLEAN);
@@ -150,9 +150,9 @@ class PropertyController extends Controller
         $property = $propertyManager->properties()->create($validated);
 
         // Handle image uploads
-        if (!empty($images)) {
+        if (! empty($images)) {
             foreach ($images as $index => $image) {
-                $path = StorageHelper::store($image, 'properties/' . $property->id, 'private');
+                $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
 
                 $property->images()->create([
                     'image_path' => $path,
@@ -173,7 +173,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property through their property manager
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -219,7 +219,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property through their property manager
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -239,7 +239,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property through their property manager
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -265,7 +265,7 @@ class PropertyController extends Controller
                 'private_room', 'student_room', 'co-living',
                 'office', 'retail',
                 'warehouse', 'factory',
-                'garage', 'indoor_spot', 'outdoor_spot'
+                'garage', 'indoor_spot', 'outdoor_spot',
             ])],
 
             // Specifications
@@ -278,7 +278,7 @@ class PropertyController extends Controller
             'land_size' => 'nullable|numeric|min:0|max:1000000',
             'floor_level' => 'nullable|integer',
             'has_elevator' => 'nullable|boolean',
-            'year_built' => 'nullable|integer|min:1800|max:' . date('Y'),
+            'year_built' => 'nullable|integer|min:1800|max:'.date('Y'),
 
             // Energy/Building
             'energy_class' => ['nullable', Rule::in(['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'])],
@@ -310,7 +310,7 @@ class PropertyController extends Controller
 
         // Convert boolean fields from strings to actual booleans
         $booleanFields = ['has_elevator', 'kitchen_equipped', 'kitchen_separated', 'has_cellar',
-                         'has_laundry', 'has_fireplace', 'has_air_conditioning', 'has_garden', 'has_rooftop'];
+            'has_laundry', 'has_fireplace', 'has_air_conditioning', 'has_garden', 'has_rooftop'];
         foreach ($booleanFields as $field) {
             if (isset($validated[$field])) {
                 $validated[$field] = filter_var($validated[$field], FILTER_VALIDATE_BOOLEAN);
@@ -326,7 +326,7 @@ class PropertyController extends Controller
         $property->update($validated);
 
         // Handle new image uploads
-        if (!empty($images)) {
+        if (! empty($images)) {
             // Delete old images
             $disk = \App\Helpers\StorageHelper::getDisk('private');
             foreach ($property->images as $oldImage) {
@@ -336,7 +336,7 @@ class PropertyController extends Controller
 
             // Upload new images
             foreach ($images as $index => $image) {
-                $path = StorageHelper::store($image, 'properties/' . $property->id, 'private');
+                $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
 
                 $property->images()->create([
                     'image_path' => $path,
@@ -357,7 +357,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property through their property manager
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -375,7 +375,7 @@ class PropertyController extends Controller
         $property = Property::where('invite_token', $token)->firstOrFail();
 
         // Check if token is valid
-        if (!$property->hasValidInviteToken()) {
+        if (! $property->hasValidInviteToken()) {
             abort(403, 'Invite link has expired or is invalid');
         }
 
@@ -408,7 +408,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -422,7 +422,7 @@ class PropertyController extends Controller
         return response()->json([
             'token' => $token,
             'expires_at' => $property->invite_token_expires_at,
-            'invite_url' => route('properties.show', ['property' => $property->id]) . '?token=' . $token,
+            'invite_url' => route('properties.show', ['property' => $property->id]).'?token='.$token,
         ]);
     }
 
@@ -433,7 +433,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -452,11 +452,11 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
-        $property->requires_invite = !$property->requires_invite;
+        $property->requires_invite = ! $property->requires_invite;
         $property->save();
 
         // If enabling requires_invite for first time, create default token
@@ -481,7 +481,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -500,7 +500,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -531,7 +531,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -573,7 +573,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 
@@ -621,7 +621,7 @@ class PropertyController extends Controller
     {
         // Ensure user owns this property
         $propertyManager = Auth::user()->propertyManager;
-        if (!$propertyManager || $property->property_manager_id !== $propertyManager->id) {
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
             abort(403);
         }
 

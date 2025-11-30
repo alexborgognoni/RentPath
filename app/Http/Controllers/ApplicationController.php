@@ -7,7 +7,6 @@ use App\Models\Application;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ApplicationController extends Controller
@@ -20,7 +19,7 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         // Auto-create tenant profile if it doesn't exist
-        if (!$user->tenantProfile) {
+        if (! $user->tenantProfile) {
             $user->tenantProfile()->create([]);
         }
 
@@ -44,7 +43,7 @@ class ApplicationController extends Controller
             ->first();
 
         // Check if property is available for applications
-        if (!in_array($property->status, ['available', 'application_received'])) {
+        if (! in_array($property->status, ['available', 'application_received'])) {
             return redirect("/properties/{$property->id}")
                 ->with('error', 'This property is not accepting applications at this time');
         }
@@ -65,7 +64,7 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         // Auto-create tenant profile if it doesn't exist
-        if (!$user->tenantProfile) {
+        if (! $user->tenantProfile) {
             $user->tenantProfile()->create([]);
         }
 
@@ -230,7 +229,7 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         // Auto-create tenant profile if it doesn't exist
-        if (!$user->tenantProfile) {
+        if (! $user->tenantProfile) {
             $user->tenantProfile()->create([]);
         }
 
@@ -259,7 +258,7 @@ class ApplicationController extends Controller
         for ($step = 1; $step <= $requestedStep; $step++) {
             $stepValidation = $this->getStepValidationRules($step, $data);
 
-            if (!empty($stepValidation)) {
+            if (! empty($stepValidation)) {
                 // Create a validator instance to check without throwing
                 $validator = \Validator::make($data, $stepValidation);
 
@@ -343,7 +342,7 @@ class ApplicationController extends Controller
         $isApplicant = $application->tenantProfile->user_id === $user->id;
         $isPropertyOwner = $application->property->property_manager_id === $user->propertyManager?->id;
 
-        if (!$isApplicant && !$isPropertyOwner) {
+        if (! $isApplicant && ! $isPropertyOwner) {
             abort(403, 'Unauthorized to view this application');
         }
 
@@ -385,7 +384,7 @@ class ApplicationController extends Controller
         }
 
         // Check if can be withdrawn
-        if (!$application->canBeWithdrawn()) {
+        if (! $application->canBeWithdrawn()) {
             return back()->with('error', 'This application cannot be withdrawn at this stage');
         }
 
@@ -408,7 +407,7 @@ class ApplicationController extends Controller
         }
 
         // Check if can be edited
-        if (!$application->canBeEdited()) {
+        if (! $application->canBeEdited()) {
             return back()->with('error', 'Only draft applications can be edited');
         }
 
@@ -487,7 +486,7 @@ class ApplicationController extends Controller
         }
 
         // Check if can be deleted
-        if (!$application->isDraft()) {
+        if (! $application->isDraft()) {
             return back()->with('error', 'Only draft applications can be deleted');
         }
 

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class ImageUploadController extends Controller
 {
@@ -20,22 +19,22 @@ class ImageUploadController extends Controller
 
         try {
             $image = $request->file('image');
-            
+
             // Generate unique filename
-            $filename = Str::random(40) . '.' . $image->getClientOriginalExtension();
-            
+            $filename = Str::random(40).'.'.$image->getClientOriginalExtension();
+
             // Store in private properties directory
             $path = $image->storeAs('', $filename, 'properties');
-            
+
             return response()->json([
                 'success' => true,
                 'image_path' => $path,
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Failed to upload image: ' . $e->getMessage(),
+                'error' => 'Failed to upload image: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -51,10 +50,10 @@ class ImageUploadController extends Controller
 
         try {
             $path = $request->input('image_path');
-            
+
             if (Storage::disk('properties')->exists($path)) {
                 Storage::disk('properties')->delete($path);
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Image deleted successfully',
@@ -65,11 +64,11 @@ class ImageUploadController extends Controller
                     'error' => 'Image not found',
                 ], 404);
             }
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Failed to delete image: ' . $e->getMessage(),
+                'error' => 'Failed to delete image: '.$e->getMessage(),
             ], 500);
         }
     }

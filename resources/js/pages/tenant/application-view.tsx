@@ -3,7 +3,6 @@ import { type Application, type SharedData } from '@/types';
 import { route } from '@/utils/route';
 import { Head, router, usePage } from '@inertiajs/react';
 import { AlertCircle, Calendar, CheckCircle, Clock, FileText, Home, User, XCircle } from 'lucide-react';
-import { useState } from 'react';
 
 interface ApplicationViewProps extends SharedData {
     application: Application;
@@ -11,7 +10,6 @@ interface ApplicationViewProps extends SharedData {
 
 export default function ApplicationView() {
     const { application } = usePage<ApplicationViewProps>().props;
-    const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
 
     const handleWithdraw = () => {
         router.post(
@@ -24,7 +22,7 @@ export default function ApplicationView() {
     };
 
     const getStatusBadge = () => {
-        const statusConfig: Record<string, { color: string; icon: any; text: string }> = {
+        const statusConfig: Record<string, { color: string; icon: React.ElementType; text: string }> = {
             draft: { color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300', icon: FileText, text: 'Draft' },
             submitted: { color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', icon: Clock, text: 'Submitted' },
             under_review: {

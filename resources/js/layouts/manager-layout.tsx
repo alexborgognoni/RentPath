@@ -42,7 +42,7 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
     return (
         <div className="flex h-screen w-full bg-background">
             {/* Desktop Layout */}
-            <div className="hidden lg:flex h-full w-full">
+            <div className="hidden h-full w-full lg:flex">
                 {/* Sidebar */}
                 <div
                     className="h-full border-r border-border transition-[width] duration-200"
@@ -52,7 +52,7 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                 </div>
 
                 {/* Main Content */}
-                <main className="flex-1 h-full overflow-y-auto bg-background">
+                <main className="h-full flex-1 overflow-y-auto bg-background">
                     <div className="h-full px-4 py-6 sm:px-6 lg:px-8">
                         {/* Breadcrumbs */}
                         {breadcrumbs && breadcrumbs.length > 0 && (
@@ -63,10 +63,7 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                                         {index === breadcrumbs.length - 1 || !crumb.href ? (
                                             <span className="font-semibold text-foreground">{crumb.title}</span>
                                         ) : (
-                                            <Link
-                                                href={crumb.href}
-                                                className="text-muted-foreground transition-colors hover:text-foreground"
-                                            >
+                                            <Link href={crumb.href} className="text-muted-foreground transition-colors hover:text-foreground">
                                                 {crumb.title}
                                             </Link>
                                         )}
@@ -80,7 +77,7 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
             </div>
 
             {/* Mobile Layout */}
-            <div className="flex flex-col h-full w-full lg:hidden">
+            <div className="flex h-full w-full flex-col lg:hidden">
                 {/* Mobile Header */}
                 <header className="flex h-14 items-center gap-4 border-b border-border bg-card px-4">
                     <button
@@ -115,10 +112,7 @@ export function ManagerLayout({ children, breadcrumbs }: ManagerLayoutProps) {
                                         {index === breadcrumbs.length - 1 || !crumb.href ? (
                                             <span className="font-semibold text-foreground">{crumb.title}</span>
                                         ) : (
-                                            <Link
-                                                href={crumb.href}
-                                                className="text-muted-foreground transition-colors hover:text-foreground"
-                                            >
+                                            <Link href={crumb.href} className="text-muted-foreground transition-colors hover:text-foreground">
                                                 {crumb.title}
                                             </Link>
                                         )}

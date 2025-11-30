@@ -980,7 +980,10 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                                     if (data.id_document && data.id_document instanceof File) {
                                                                         window.open(URL.createObjectURL(data.id_document), '_blank');
                                                                     } else if (propertyManager?.id_document_path) {
-                                                                        window.open(route('property-manager.document', { type: 'id_document' }), '_blank');
+                                                                        window.open(
+                                                                            route('property-manager.document', { type: 'id_document' }),
+                                                                            '_blank',
+                                                                        );
                                                                     }
                                                                 }}
                                                                 title={
@@ -1084,7 +1087,10 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                                     if (data.license_document && data.license_document instanceof File) {
                                                                         window.open(URL.createObjectURL(data.license_document), '_blank');
                                                                     } else if (propertyManager?.license_document_path) {
-                                                                        window.open(route('property-manager.document', { type: 'license_document' }), '_blank');
+                                                                        window.open(
+                                                                            route('property-manager.document', { type: 'license_document' }),
+                                                                            '_blank',
+                                                                        );
                                                                     }
                                                                 }}
                                                                 title={

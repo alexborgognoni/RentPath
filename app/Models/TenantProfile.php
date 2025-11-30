@@ -146,7 +146,7 @@ class TenantProfile extends Model
      */
     public function isVerified(): bool
     {
-        return !is_null($this->profile_verified_at);
+        return ! is_null($this->profile_verified_at);
     }
 
     /**
@@ -154,7 +154,7 @@ class TenantProfile extends Model
      */
     public function isRejected(): bool
     {
-        return !is_null($this->verification_rejection_reason);
+        return ! is_null($this->verification_rejection_reason);
     }
 
     /**
@@ -178,7 +178,7 @@ class TenantProfile extends Model
      */
     public function getAgeAttribute(): ?int
     {
-        if (!$this->date_of_birth) {
+        if (! $this->date_of_birth) {
             return null;
         }
 

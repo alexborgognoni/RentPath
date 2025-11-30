@@ -1,23 +1,24 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyManagerController;
 use App\Http\Controllers\PropertyViewController;
 use App\Http\Controllers\SchemaViewerController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 // Helper to check current subdomain
-if (!function_exists('currentSubdomain')) {
-    function currentSubdomain(): ?string {
+if (! function_exists('currentSubdomain')) {
+    function currentSubdomain(): ?string
+    {
         $host = request()->getHost();
         $baseDomain = config('app.domain');
 
         // Build expected domain for manager subdomain
-        $managerDomain = env('MANAGER_SUBDOMAIN', 'manager') . '.' . $baseDomain;
+        $managerDomain = env('MANAGER_SUBDOMAIN', 'manager').'.'.$baseDomain;
 
         // Check against known subdomains
         if ($host === $managerDomain) {
@@ -35,22 +36,24 @@ if (!function_exists('currentSubdomain')) {
 }
 
 // Helper to determine user's default redirect based on type
-if (!function_exists('userDefaultDashboard')) {
-    function userDefaultDashboard($user): string {
-        if (!$user) {
-            return config('app.url') . '/login';
+if (! function_exists('userDefaultDashboard')) {
+    function userDefaultDashboard($user): string
+    {
+        if (! $user) {
+            return config('app.url').'/login';
         }
 
         // Check if user is a property manager
         if ($user->propertyManager) {
             $managerUrl = config('app.env') === 'local'
-                ? 'http://manager.' . parse_url(config('app.url'), PHP_URL_HOST) . ':' . parse_url(config('app.url'), PHP_URL_PORT)
-                : 'https://manager.' . config('app.domain');
-            return $managerUrl . '/properties';
+                ? 'http://manager.'.parse_url(config('app.url'), PHP_URL_HOST).':'.parse_url(config('app.url'), PHP_URL_PORT)
+                : 'https://manager.'.config('app.domain');
+
+            return $managerUrl.'/properties';
         }
 
         // Otherwise, user is a tenant - redirect to root domain dashboard
-        return config('app.url') . '/dashboard';
+        return config('app.url').'/dashboard';
     }
 }
 
@@ -121,9 +124,10 @@ Route::domain(config('app.domain'))->group(function () {
     // Private storage route for serving signed URLs (tenant side)
     Route::get('/private-storage/{path}', function ($path) {
         $disk = \App\Helpers\StorageHelper::getDisk('private');
-        if (!Storage::disk($disk)->exists($path)) {
+        if (! Storage::disk($disk)->exists($path)) {
             abort(404);
         }
+
         return Storage::disk($disk)->response($path);
     })->where('path', '.*')->middleware('signed')->name('tenant.private.storage');
 
@@ -133,6 +137,7 @@ Route::domain(config('app.domain'))->group(function () {
         if (in_array($locale, config('app.available_locales', ['en']))) {
             session(['locale' => $locale]);
         }
+
         return response()->json(['locale' => session('locale')]);
     })->name('locale.update');
 
@@ -143,7 +148,7 @@ Route::domain(config('app.domain'))->group(function () {
     }
 
     // Auth routes (login, register, password reset, email verification)
-    require __DIR__ . '/auth.php';
+    require __DIR__.'/auth.php';
 });
 
 /*
@@ -152,7 +157,7 @@ Route::domain(config('app.domain'))->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager')->group(function () {
+Route::domain('manager.'.config('app.domain'))->middleware('subdomain:manager')->group(function () {
 
     // Redirect root to properties
     Route::get('/', function () {
@@ -171,13 +176,15 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
         $user = $request->user();
         $propertyManager = $user->propertyManager;
 
-        if (!$propertyManager) {
+        if (! $propertyManager) {
             \Log::info('Redirecting to profile setup - no property manager');
+
             return redirect('/profile/setup');
         }
 
-        if (!$propertyManager->isVerified()) {
+        if (! $propertyManager->isVerified()) {
             \Log::info('Redirecting to unverified - property manager not verified');
+
             return redirect('/profile/unverified');
         }
 
@@ -205,8 +212,9 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             });
 
         \Log::info('Rendering manager properties');
+
         return Inertia::render('dashboard', [
-            'properties' => $properties
+            'properties' => $properties,
         ]);
     })->name('manager.properties.index');
 
@@ -217,7 +225,7 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             $user = $request->user();
             $propertyManager = $user->propertyManager;
 
-            if (!$propertyManager) {
+            if (! $propertyManager) {
                 return redirect('/profile/setup');
             }
 
@@ -238,7 +246,7 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
             $user = $request->user();
             $propertyManager = $user->propertyManager;
 
-            if (!$propertyManager) {
+            if (! $propertyManager) {
                 return redirect('/profile/setup');
             }
 
@@ -328,9 +336,10 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
 
         Route::get('/private-storage/{path}', function ($path) {
             $disk = \App\Helpers\StorageHelper::getDisk('private');
-            if (!Storage::disk($disk)->exists($path)) {
+            if (! Storage::disk($disk)->exists($path)) {
                 abort(404);
             }
+
             return Storage::disk($disk)->response($path);
         })->where('path', '.*')->middleware('signed')->name('private.storage');
     });
@@ -341,16 +350,16 @@ Route::domain('manager.' . config('app.domain'))->middleware('subdomain:manager'
 
     // Settings routes (manager subdomain)
     Route::middleware('auth')->group(function () {
-        if (file_exists(__DIR__ . '/settings.php')) {
+        if (file_exists(__DIR__.'/settings.php')) {
             $routePrefix = 'manager.settings';
-            require __DIR__ . '/settings.php';
+            require __DIR__.'/settings.php';
         }
     });
 
     // Catch-all route for manager subdomain - redirects to login if not authenticated
     Route::any('{any}', function () {
-        if (!auth()->check()) {
-            return redirect()->away(config('app.url') . '/login?redirect=' . urlencode(request()->fullUrl()));
+        if (! auth()->check()) {
+            return redirect()->away(config('app.url').'/login?redirect='.urlencode(request()->fullUrl()));
         }
         abort(404);
     })->where('any', '[^/]+');
@@ -376,7 +385,7 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
         $tenantProfile = $user->tenantProfile;
 
         // If no tenant profile, show empty state
-        if (!$tenantProfile) {
+        if (! $tenantProfile) {
             return Inertia::render('tenant/dashboard', [
                 'applications' => [],
             ]);
@@ -448,8 +457,8 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
         ->name('applications.withdraw');
 
     // Settings routes (tenant/root domain)
-    if (file_exists(__DIR__ . '/settings.php')) {
+    if (file_exists(__DIR__.'/settings.php')) {
         $routePrefix = 'tenant.settings';
-        require __DIR__ . '/settings.php';
+        require __DIR__.'/settings.php';
     }
 });

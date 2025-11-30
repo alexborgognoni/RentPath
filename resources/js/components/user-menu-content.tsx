@@ -3,7 +3,7 @@ import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSep
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type SharedData, type User } from '@/types';
-import { route, settingsRoute } from '@/utils/route';
+import { settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
 import { LogOut, Settings } from 'lucide-react';

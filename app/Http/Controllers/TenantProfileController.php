@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
-use App\Models\TenantProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -42,7 +41,7 @@ class TenantProfileController extends Controller
         $tenantProfile = Auth::user()->tenantProfile;
 
         // This should never happen now (profiles auto-created), but handle gracefully
-        if (!$tenantProfile) {
+        if (! $tenantProfile) {
             abort(500, 'Profile not found. Please contact support.');
         }
 
@@ -68,7 +67,7 @@ class TenantProfileController extends Controller
     {
         $tenantProfile = Auth::user()->tenantProfile;
 
-        if (!$tenantProfile) {
+        if (! $tenantProfile) {
             return redirect('/profile/tenant/setup');
         }
 
@@ -79,7 +78,7 @@ class TenantProfileController extends Controller
 
         // Same validation rules as store, but make existing file uploads optional
         $rules = [
-            'date_of_birth' => 'required|date|before:today|after:' . now()->subYears(120)->toDateString(),
+            'date_of_birth' => 'required|date|before:today|after:'.now()->subYears(120)->toDateString(),
             'nationality' => 'required|string|size:2',
             'phone_country_code' => 'required|string|max:10',
             'phone_number' => 'required|string|max:20',
@@ -291,20 +290,20 @@ class TenantProfileController extends Controller
     {
         $tenantProfile = Auth::user()->tenantProfile;
 
-        if (!$tenantProfile) {
+        if (! $tenantProfile) {
             abort(404);
         }
 
-        $pathField = $type . '_path';
+        $pathField = $type.'_path';
 
-        if (!property_exists($tenantProfile, $pathField) || !$tenantProfile->$pathField) {
+        if (! property_exists($tenantProfile, $pathField) || ! $tenantProfile->$pathField) {
             abort(404);
         }
 
         $path = $tenantProfile->$pathField;
         $disk = StorageHelper::getDisk('private');
 
-        if (!Storage::disk($disk)->exists($path)) {
+        if (! Storage::disk($disk)->exists($path)) {
             abort(404);
         }
 

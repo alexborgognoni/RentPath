@@ -82,19 +82,23 @@ class SchemaViewerController extends Controller
             switch ($connection) {
                 case 'sqlite':
                     $tables = DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+
                     return array_column($tables, 'name');
 
                 case 'mysql':
                     $dbName = DB::getDatabaseName();
-                    $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = ?", [$dbName]);
+                    $tables = DB::select('SELECT table_name FROM information_schema.tables WHERE table_schema = ?', [$dbName]);
+
                     return array_column($tables, 'table_name');
 
                 case 'pgsql':
                     $tables = DB::select("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public'");
+
                     return array_column($tables, 'tablename');
 
                 case 'sqlsrv':
                     $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'");
+
                     return array_column($tables, 'table_name');
 
                 default:

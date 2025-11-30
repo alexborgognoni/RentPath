@@ -23,7 +23,7 @@ class SubdomainRoutingTest extends TestCase
     {
         $domain = config('app.domain'); // 'localhost' from phpunit.xml
 
-        $response = $this->get('http://' . $domain . '/');
+        $response = $this->get('http://'.$domain.'/');
         $response->assertStatus(200);
     }
 
@@ -31,7 +31,7 @@ class SubdomainRoutingTest extends TestCase
     {
         $domain = config('app.domain');
 
-        $response = $this->get('http://' . $domain . '/dashboard');
+        $response = $this->get('http://'.$domain.'/dashboard');
         $response->assertRedirect();
         $this->assertTrue(str_contains($response->headers->get('Location'), '/login'));
     }
@@ -40,7 +40,7 @@ class SubdomainRoutingTest extends TestCase
     {
         $domain = config('app.domain');
 
-        $response = $this->get('http://' . $domain . '/this-does-not-exist');
+        $response = $this->get('http://'.$domain.'/this-does-not-exist');
         $response->assertStatus(404);
     }
 
@@ -50,12 +50,12 @@ class SubdomainRoutingTest extends TestCase
     {
         $domain = config('app.domain');
         $appUrl = config('app.url');
-        $managerUrl = 'http://manager.' . $domain;
+        $managerUrl = 'http://manager.'.$domain;
         if (parse_url($appUrl, PHP_URL_PORT)) {
-            $managerUrl .= ':' . parse_url($appUrl, PHP_URL_PORT);
+            $managerUrl .= ':'.parse_url($appUrl, PHP_URL_PORT);
         }
 
-        $response = $this->get($managerUrl . '/dashboard');
+        $response = $this->get($managerUrl.'/dashboard');
 
         $response->assertRedirect();
         $location = $response->headers->get('Location');
@@ -68,12 +68,12 @@ class SubdomainRoutingTest extends TestCase
     {
         $domain = config('app.domain');
         $appUrl = config('app.url');
-        $managerUrl = 'http://manager.' . $domain;
+        $managerUrl = 'http://manager.'.$domain;
         if (parse_url($appUrl, PHP_URL_PORT)) {
-            $managerUrl .= ':' . parse_url($appUrl, PHP_URL_PORT);
+            $managerUrl .= ':'.parse_url($appUrl, PHP_URL_PORT);
         }
 
-        $response = $this->get($managerUrl . '/this-does-not-exist');
+        $response = $this->get($managerUrl.'/this-does-not-exist');
 
         $response->assertRedirect();
         $location = $response->headers->get('Location');
@@ -89,7 +89,7 @@ class SubdomainRoutingTest extends TestCase
         $user = User::factory()->create();
         $domain = config('app.domain');
 
-        $response = $this->actingAs($user)->get('http://' . $domain . '/dashboard');
+        $response = $this->actingAs($user)->get('http://'.$domain.'/dashboard');
         $response->assertStatus(200);
     }
 
@@ -98,7 +98,7 @@ class SubdomainRoutingTest extends TestCase
         $user = User::factory()->create();
         $domain = config('app.domain');
 
-        $response = $this->actingAs($user)->get('http://' . $domain . '/this-does-not-exist');
+        $response = $this->actingAs($user)->get('http://'.$domain.'/this-does-not-exist');
         $response->assertStatus(404);
     }
 
@@ -108,9 +108,9 @@ class SubdomainRoutingTest extends TestCase
     {
         $domain = config('app.domain');
         $appUrl = config('app.url');
-        $managerUrl = 'http://manager.' . $domain;
+        $managerUrl = 'http://manager.'.$domain;
         if (parse_url($appUrl, PHP_URL_PORT)) {
-            $managerUrl .= ':' . parse_url($appUrl, PHP_URL_PORT);
+            $managerUrl .= ':'.parse_url($appUrl, PHP_URL_PORT);
         }
 
         $user = User::factory()->create();
@@ -122,7 +122,7 @@ class SubdomainRoutingTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->get($managerUrl . '/dashboard');
+            ->get($managerUrl.'/dashboard');
 
         $response->assertStatus(200);
     }
@@ -131,15 +131,15 @@ class SubdomainRoutingTest extends TestCase
     {
         $domain = config('app.domain');
         $appUrl = config('app.url');
-        $managerUrl = 'http://manager.' . $domain;
+        $managerUrl = 'http://manager.'.$domain;
         if (parse_url($appUrl, PHP_URL_PORT)) {
-            $managerUrl .= ':' . parse_url($appUrl, PHP_URL_PORT);
+            $managerUrl .= ':'.parse_url($appUrl, PHP_URL_PORT);
         }
 
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->get($managerUrl . '/this-does-not-exist');
+            ->get($managerUrl.'/this-does-not-exist');
 
         $response->assertStatus(404);
     }
