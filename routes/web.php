@@ -130,7 +130,7 @@ Route::domain(config('app.domain'))->group(function () {
     // Locale switching
     Route::post('/locale', function (Request $request) {
         $locale = $request->input('locale');
-        if (in_array($locale, ['en', 'fr', 'de', 'nl'])) {
+        if (in_array($locale, config('app.available_locales', ['en']))) {
             session(['locale' => $locale]);
         }
         return response()->json(['locale' => session('locale')]);

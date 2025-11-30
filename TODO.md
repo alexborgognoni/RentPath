@@ -116,6 +116,7 @@
 - [ ] [ux] "Report Bug" button - ~2h
 - [ ] [frontend] Tenant-side authenticated user menu polish - ~3h
 - [ ] [config] Fix tsconfig build file exclusion - ~2h
+- [ ] [i18n] Migrate localization logic to use [laravel-react-i18n](https://github.com/EugeneMeles/laravel-react-i18n) - ~10h
 
 ---
 
