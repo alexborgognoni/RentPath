@@ -47,17 +47,15 @@ export default function PropertyPage() {
     return (
         <ManagerLayout breadcrumbs={breadcrumbs}>
             <Head title={property.title} />
-            <div className="mt-6 mb-6 grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="mt-6 grid grid-cols-1 gap-8 pb-6 lg:grid-cols-3">
                 {/* Left Column - Main Content */}
-                <div className="space-y-8 lg:col-span-2">
+                <div className="space-y-6 lg:col-span-2">
                     <PropertyInfo property={property} />
                 </div>
 
                 {/* Right Column - Sidebar */}
                 <div className="lg:col-span-1">
-                    <div className="sticky top-8">
-                        <PropertySidebar property={property} tenantCount={property.tenant_count || 0} />
-                    </div>
+                    <PropertySidebar property={property} tenantCount={property.tenant_count || 0} />
                 </div>
             </div>
         </ManagerLayout>

@@ -180,62 +180,60 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Quick Stats */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h3 className="mb-4 flex items-center text-lg font-semibold text-foreground">
-                    <FileText className="mr-2 text-primary" size={20} />
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
+                    <FileText className="mr-2 text-primary" size={18} />
                     Quick Stats
                 </h3>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Monthly Rent</span>
-                        <span className="font-semibold text-foreground">{formatCurrency(property.rent_amount, property.rent_currency)}</span>
+                        <span className="text-sm text-muted-foreground">Monthly Rent</span>
+                        <span className="text-sm font-semibold text-foreground">{formatCurrency(property.rent_amount, property.rent_currency)}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Applications</span>
-                        <span className="flex items-center font-semibold text-foreground">
-                            <Users className="mr-1" size={16} />
+                        <span className="text-sm text-muted-foreground">Applications</span>
+                        <span className="flex items-center text-sm font-semibold text-foreground">
+                            <Users className="mr-1" size={14} />
                             {tenantCount}
                         </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Status</span>
+                        <span className="text-sm text-muted-foreground">Status</span>
                         {getStatusBadge()}
                     </div>
                 </div>
             </div>
 
             {/* Actions */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h3 className="mb-4 flex items-center text-lg font-semibold text-foreground">
-                    <Settings className="mr-2 text-primary" size={20} />
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
+                    <Settings className="mr-2 text-primary" size={18} />
                     Actions
                 </h3>
 
-                <div className="space-y-3">
-                    <button
-                        onClick={handleEdit}
-                        className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-3 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
-                    >
-                        <Edit className="mr-3" size={16} />
-                        Edit Property
-                    </button>
-                </div>
+                <button
+                    onClick={handleEdit}
+                    className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
+                >
+                    <Edit className="mr-3" size={16} />
+                    Edit Property
+                </button>
             </div>
 
             {/* Application Access */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h3 className="mb-4 flex items-center text-lg font-semibold text-foreground">
-                    <Share className="mr-2 text-primary" size={20} />
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
+                    <Share className="mr-2 text-primary" size={18} />
                     Application Access
                 </h3>
 
                 {/* Invite Requirement Toggle */}
-                <div className="mb-4 flex items-center justify-between rounded-lg border border-border bg-background/50 p-3">
+                <div className="mb-3 flex items-center justify-between rounded-lg border border-border bg-background/50 p-3">
                     <div className="flex items-center">
                         <Link2 className="mr-2 text-muted-foreground" size={16} />
                         <span className="text-sm font-medium">Require Invite</span>
@@ -254,7 +252,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
                 {requiresInvite && (
                     <>
-                        <p className="mb-4 text-xs text-muted-foreground">
+                        <p className="mb-3 text-sm text-muted-foreground">
                             Invite required. Share the default invite link or create custom links with specific restrictions.
                         </p>
 
@@ -262,9 +260,9 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                             <div className="space-y-3">
                                 {/* Default Token Info */}
                                 <div className="rounded-lg border border-border bg-background/30 p-3">
-                                    <div className="mb-2 flex items-center justify-between">
-                                        <span className="text-xs font-medium text-muted-foreground">Default Invite Link</span>
-                                        <span className="text-xs text-muted-foreground">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-medium text-muted-foreground">Default Invite Link</span>
+                                        <span className="text-sm text-muted-foreground">
                                             Used {defaultToken.used_count} {defaultToken.used_count === 1 ? 'time' : 'times'}
                                         </span>
                                     </div>
@@ -292,18 +290,18 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                 <button
                                     onClick={handleRegenerateDefaultToken}
                                     disabled={regeneratingToken}
-                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-border bg-background/50 px-4 py-2 text-xs font-medium text-foreground transition-all hover:bg-background disabled:opacity-50"
+                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-background disabled:opacity-50"
                                 >
-                                    <RefreshCw className={`mr-2 ${regeneratingToken ? 'animate-spin' : ''}`} size={14} />
+                                    <RefreshCw className={`mr-2 ${regeneratingToken ? 'animate-spin' : ''}`} size={16} />
                                     Regenerate Default Link
                                 </button>
 
                                 {/* Manage Custom Tokens Button */}
                                 <button
                                     onClick={() => setShowTokensModal(true)}
-                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition-all hover:bg-primary/20"
+                                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition-all hover:bg-primary/20"
                                 >
-                                    <Settings className="mr-2" size={14} />
+                                    <Settings className="mr-2" size={16} />
                                     Manage Custom Invite Links
                                 </button>
                             </div>
@@ -311,21 +309,21 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     </>
                 )}
 
-                {!requiresInvite && <p className="text-xs text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>}
+                {!requiresInvite && <p className="text-sm text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>}
             </div>
 
             {/* Danger Zone */}
-            <div className="rounded-2xl border border-destructive/20 bg-card p-6 shadow-sm">
-                <h3 className="mb-4 flex items-center text-lg font-semibold text-destructive">
-                    <Trash2 className="mr-2" size={20} />
+            <div className="rounded-2xl border border-destructive/20 bg-card p-4 shadow-sm">
+                <h3 className="mb-3 flex items-center text-base font-semibold text-destructive">
+                    <Trash2 className="mr-2" size={18} />
                     Danger Zone
                 </h3>
 
-                <p className="mb-4 text-sm text-muted-foreground">Deleting this property will permanently remove all associated data.</p>
+                <p className="mb-3 text-sm text-muted-foreground">Deleting this property will permanently remove all associated data.</p>
 
                 <button
                     onClick={handleDelete}
-                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-destructive bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive transition-all hover:bg-destructive/20"
+                    className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-destructive bg-destructive/10 px-4 py-2.5 text-sm font-medium text-destructive transition-all hover:bg-destructive/20"
                 >
                     <Trash2 className="mr-2" size={16} />
                     Delete Property
