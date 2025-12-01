@@ -119,15 +119,14 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
         }
     };
 
-    const handleCopyInviteLink = async () => {
-        if (!defaultToken?.token) {
-            return;
-        }
-
+    const handleCopyLink = async () => {
         const rootDomain = window.location.origin.replace('manager.', '');
-        const inviteUrl = `${rootDomain}/properties/${property.id}?token=${defaultToken.token}`;
+        const propertyUrl =
+            requiresInvite && defaultToken?.token
+                ? `${rootDomain}/properties/${property.id}?token=${defaultToken.token}`
+                : `${rootDomain}/properties/${property.id}`;
 
-        const success = await copyToClipboard(inviteUrl);
+        const success = await copyToClipboard(propertyUrl);
         if (success) {
             setCopiedToken(true);
             setTimeout(() => setCopiedToken(false), 2000);
@@ -268,9 +267,9 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     </div>
                                 </div>
 
-                                {/* Copy Default Invite Link Button */}
+                                {/* Copy Invite Link Button */}
                                 <button
-                                    onClick={handleCopyInviteLink}
+                                    onClick={handleCopyLink}
                                     className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition-all hover:bg-primary/90"
                                 >
                                     {copiedToken ? (
@@ -281,7 +280,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     ) : (
                                         <>
                                             <Copy className="mr-2" size={16} />
-                                            Copy Default Link
+                                            Copy Invite Link
                                         </>
                                     )}
                                 </button>
@@ -309,7 +308,29 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     </>
                 )}
 
-                {!requiresInvite && <p className="text-sm text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>}
+                {!requiresInvite && (
+                    <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>
+
+                        {/* Copy Public Link Button */}
+                        <button
+                            onClick={handleCopyLink}
+                            className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition-all hover:bg-primary/90"
+                        >
+                            {copiedToken ? (
+                                <>
+                                    <Check className="mr-2" size={16} />
+                                    Copied!
+                                </>
+                            ) : (
+                                <>
+                                    <Copy className="mr-2" size={16} />
+                                    Copy Link
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Danger Zone */}
