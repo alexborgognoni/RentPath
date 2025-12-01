@@ -1,300 +1,67 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { WizardNavigation } from '@/components/property-wizard/components/WizardNavigation';
+import { WizardProgress } from '@/components/property-wizard/components/WizardProgress';
+import { AmenitiesStep } from '@/components/property-wizard/steps/AmenitiesStep';
+import { EnergyStep } from '@/components/property-wizard/steps/EnergyStep';
+import { LocationStep } from '@/components/property-wizard/steps/LocationStep';
+import { MediaStep } from '@/components/property-wizard/steps/MediaStep';
+import { PricingStep } from '@/components/property-wizard/steps/PricingStep';
+import { PropertyTypeStep } from '@/components/property-wizard/steps/PropertyTypeStep';
+import { ReviewStep } from '@/components/property-wizard/steps/ReviewStep';
+import { SpecificationsStep } from '@/components/property-wizard/steps/SpecificationsStep';
+import { usePropertyWizard, WIZARD_STEPS } from '@/hooks/usePropertyWizard';
 import { ManagerLayout } from '@/layouts/manager-layout';
-import { type BreadcrumbItem } from '@/types';
-import type { Property, PropertyFormData } from '@/types/dashboard';
+import type { BreadcrumbItem } from '@/types';
+import type { Property } from '@/types/dashboard';
 import { route } from '@/utils/route';
-import { Head, router, useForm } from '@inertiajs/react';
-import { motion } from 'framer-motion';
-import { AlertCircle, Camera, Home, Trash2, Upload, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Head, router } from '@inertiajs/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Home, Save } from 'lucide-react';
 
-interface PropertyCreateProps {
+interface PropertyCreateWizardProps {
     property?: Property;
     isEditing?: boolean;
 }
 
-// Property type and subtype options
-const propertyTypeOptions = [
-    { value: 'apartment', label: 'Apartment' },
-    { value: 'house', label: 'House' },
-    { value: 'room', label: 'Room' },
-    { value: 'commercial', label: 'Commercial' },
-    { value: 'industrial', label: 'Industrial' },
-    { value: 'parking', label: 'Parking' },
-];
+export default function PropertyCreateWizard({ property, isEditing = false }: PropertyCreateWizardProps) {
+    const wizard = usePropertyWizard(property);
 
-const propertySubtypes: { [key: string]: { value: string; label: string }[] } = {
-    apartment: [
-        { value: 'studio', label: 'Studio' },
-        { value: 'loft', label: 'Loft' },
-        { value: 'duplex', label: 'Duplex' },
-        { value: 'triplex', label: 'Triplex' },
-        { value: 'penthouse', label: 'Penthouse' },
-        { value: 'serviced', label: 'Serviced' },
-    ],
-    house: [
-        { value: 'detached', label: 'Detached' },
-        { value: 'semi-detached', label: 'Semi-detached' },
-        { value: 'villa', label: 'Villa' },
-        { value: 'bungalow', label: 'Bungalow' },
-    ],
-    room: [
-        { value: 'private_room', label: 'Private Room' },
-        { value: 'student_room', label: 'Student Room' },
-        { value: 'co-living', label: 'Co-living' },
-    ],
-    commercial: [
-        { value: 'office', label: 'Office' },
-        { value: 'retail', label: 'Retail' },
-    ],
-    industrial: [
-        { value: 'warehouse', label: 'Warehouse' },
-        { value: 'factory', label: 'Factory' },
-    ],
-    parking: [
-        { value: 'garage', label: 'Garage' },
-        { value: 'indoor_spot', label: 'Indoor Spot' },
-        { value: 'outdoor_spot', label: 'Outdoor Spot' },
-    ],
-};
+    const breadcrumbs: BreadcrumbItem[] = isEditing
+        ? [
+              { title: 'Properties', href: route('manager.properties.index') },
+              { title: property?.title || 'Property', href: route('properties.show', { property: property?.id }) },
+              { title: 'Edit' },
+          ]
+        : [{ title: 'Properties', href: route('manager.properties.index') }, { title: 'Add Property' }];
 
-const currencyOptions = [
-    { value: 'eur', label: 'Euro (€)', symbol: '€' },
-    { value: 'usd', label: 'US Dollar ($)', symbol: '$' },
-    { value: 'gbp', label: 'British Pound (£)', symbol: '£' },
-    { value: 'chf', label: 'Swiss Franc (CHF)', symbol: 'CHF' },
-];
-
-const energyClassOptions = ['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
-
-const heatingTypeOptions = [
-    { value: 'gas', label: 'Gas' },
-    { value: 'electric', label: 'Electric' },
-    { value: 'district', label: 'District Heating' },
-    { value: 'wood', label: 'Wood' },
-    { value: 'heat_pump', label: 'Heat Pump' },
-    { value: 'other', label: 'Other' },
-];
-
-export default function PropertyCreate({ property, isEditing = false }: PropertyCreateProps) {
-    const [clientErrors, setClientErrors] = useState<{ [key: string]: string }>({});
-    const [generalError, setGeneralError] = useState<string | null>(null);
-    const [selectedImages, setSelectedImages] = useState<File[]>([]);
-    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-    const [mainImageIndex, setMainImageIndex] = useState<number>(0);
-    const [subtypeOptions, setSubtypeOptions] = useState<{ value: string; label: string }[]>([]);
-
-    const breadcrumbs: BreadcrumbItem[] =
-        isEditing && property
-            ? [
-                  { title: 'Properties', href: route('manager.properties.index') },
-                  { title: property.title, href: route('properties.show', { property: property.id }) },
-                  { title: 'Edit' },
-              ]
-            : [{ title: 'Properties', href: route('manager.properties.index') }, { title: 'Add Property' }];
-
-    // @ts-expect-error - Complex PropertyFormData type causes issues with Inertia's FormDataType constraint
-    const { data, setData, processing, errors, progress } = useForm({
-        // Basic info
-        title: property?.title || '',
-        description: property?.description || '',
-
-        // Address
-        house_number: property?.house_number || '',
-        street_name: property?.street_name || '',
-        street_line2: property?.street_line2 || '',
-        city: property?.city || '',
-        state: property?.state || '',
-        postal_code: property?.postal_code || '',
-        country: property?.country || 'CH',
-
-        // Type
-        type: property?.type || 'apartment',
-        subtype: property?.subtype || 'studio',
-
-        // Specifications
-        bedrooms: property?.bedrooms || 0,
-        bathrooms: property?.bathrooms || 0,
-        parking_spots_interior: property?.parking_spots_interior || 0,
-        parking_spots_exterior: property?.parking_spots_exterior || 0,
-        size: property?.size || undefined,
-        balcony_size: property?.balcony_size || undefined,
-        land_size: property?.land_size || undefined,
-        floor_level: property?.floor_level || undefined,
-        has_elevator: property?.has_elevator || false,
-        year_built: property?.year_built || undefined,
-
-        // Energy/Building
-        energy_class: property?.energy_class || undefined,
-        thermal_insulation_class: property?.thermal_insulation_class || undefined,
-        heating_type: property?.heating_type || undefined,
-
-        // Kitchen
-        kitchen_equipped: property?.kitchen_equipped || false,
-        kitchen_separated: property?.kitchen_separated || false,
-
-        // Amenities
-        has_cellar: property?.has_cellar || false,
-        has_laundry: property?.has_laundry || false,
-        has_fireplace: property?.has_fireplace || false,
-        has_air_conditioning: property?.has_air_conditioning || false,
-        has_garden: property?.has_garden || false,
-        has_rooftop: property?.has_rooftop || false,
-        extras: property?.extras || undefined,
-
-        // Rental
-        rent_amount: property?.rent_amount || 0,
-        rent_currency: property?.rent_currency || 'eur',
-        available_date: property?.available_date || undefined,
-
-        // Images
-        images: undefined as unknown as File[] | undefined,
-        main_image_index: 0,
-    });
-
-    // Update subtypes when type changes
-    useEffect(() => {
-        const options = propertySubtypes[data.type] || [];
-        setSubtypeOptions(options);
-        if (options.length > 0 && !options.find((o) => o.value === data.subtype)) {
-            setData('subtype', options[0].value as Property['subtype']);
-        }
-    }, [data.type, data.subtype, setData]);
-
-    const clearFieldError = (fieldName: string) => {
-        if (clientErrors[fieldName]) {
-            setClientErrors((prev) => {
-                const newErrors = { ...prev };
-                delete newErrors[fieldName];
-                return newErrors;
-            });
-        }
-    };
-
-    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        if (files.length === 0) return;
-
-        const newImages = [...selectedImages];
-        const newPreviews = [...imagePreviews];
-
-        files.forEach((file) => {
-            // Check file type
-            if (!file.type.startsWith('image/')) {
-                setGeneralError('Please select only image files.');
-                return;
-            }
-
-            // Check file size (10MB)
-            if (file.size > 10 * 1024 * 1024) {
-                setGeneralError('Each image must be smaller than 10MB.');
-                return;
-            }
-
-            newImages.push(file);
-
-            // Create preview
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                newPreviews.push(e.target?.result as string);
-                setImagePreviews([...newPreviews]);
-            };
-            reader.readAsDataURL(file);
-        });
-
-        setSelectedImages(newImages);
-        // @ts-expect-error - images field type mismatch
-        setData('images', newImages);
-    };
-
-    const handleRemoveImage = (index: number) => {
-        const newImages = selectedImages.filter((_, i) => i !== index);
-        const newPreviews = imagePreviews.filter((_, i) => i !== index);
-
-        setSelectedImages(newImages);
-        setImagePreviews(newPreviews);
-        // @ts-expect-error - images field type mismatch
-        setData('images', newImages);
-
-        // Adjust main image index if needed
-        if (mainImageIndex >= newImages.length) {
-            setMainImageIndex(Math.max(0, newImages.length - 1));
-            setData('main_image_index', Math.max(0, newImages.length - 1));
-        }
-    };
-
-    const handleSetMainImage = (index: number) => {
-        setMainImageIndex(index);
-        setData('main_image_index', index);
-    };
-
-    const validateForm = (): boolean => {
-        const newErrors: { [key: string]: string } = {};
-
-        // Required fields
-        if (!data.title?.trim()) {
-            newErrors.title = 'Property title is required';
-        }
-        if (!data.house_number?.trim()) {
-            newErrors.house_number = 'House number is required';
-        }
-        if (!data.street_name?.trim()) {
-            newErrors.street_name = 'Street name is required';
-        }
-        if (!data.city?.trim()) {
-            newErrors.city = 'City is required';
-        }
-        if (!data.postal_code?.trim()) {
-            newErrors.postal_code = 'Postal code is required';
-        }
-        if (!data.country?.trim()) {
-            newErrors.country = 'Country is required';
-        }
-        if (!data.type) {
-            newErrors.type = 'Property type is required';
-        }
-        if (!data.subtype) {
-            newErrors.subtype = 'Property subtype is required';
-        }
-        if (!data.rent_amount || data.rent_amount <= 0) {
-            newErrors.rent_amount = 'Rent amount must be greater than 0';
-        }
-
-        setClientErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!validateForm()) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+    const handleSubmit = () => {
+        if (!wizard.validateCurrentStep()) {
             return;
         }
 
-        setGeneralError(null);
+        wizard.setIsSubmitting(true);
 
         const formData = new FormData();
 
         // Add all form fields
+        const { data } = wizard;
         Object.keys(data).forEach((key) => {
-            const value = data[key as keyof PropertyFormData];
-            if (value !== undefined && value !== null && key !== 'images') {
+            const value = data[key as keyof typeof data];
+            if (value !== undefined && value !== null && key !== 'images' && key !== 'imagePreviews') {
                 if (typeof value === 'boolean') {
                     formData.append(key, value ? '1' : '0');
                 } else if (typeof value === 'object' && !Array.isArray(value)) {
                     formData.append(key, JSON.stringify(value));
-                } else {
+                } else if (!Array.isArray(value)) {
                     formData.append(key, String(value));
                 }
             }
         });
 
         // Add images
-        selectedImages.forEach((image, index) => {
+        data.images.forEach((image, index) => {
             formData.append(`images[${index}]`, image);
         });
-        formData.append('main_image_index', String(mainImageIndex));
+        formData.append('main_image_index', String(data.mainImageIndex));
 
         const endpoint = isEditing ? `/properties/${property?.id}` : '/properties';
         const method = isEditing ? 'put' : 'post';
@@ -303,770 +70,113 @@ export default function PropertyCreate({ property, isEditing = false }: Property
             forceFormData: true,
             onError: (errors) => {
                 console.error('Submission errors:', errors);
-                const errorMessages = Object.values(errors).flat();
-                if (errorMessages.length > 0) {
-                    setGeneralError(errorMessages.join(' '));
-                } else {
-                    setGeneralError('An unexpected error occurred. Please try again.');
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                wizard.setIsSubmitting(false);
+                // Map server errors to wizard errors
+                const wizardErrors: Partial<Record<keyof typeof data, string>> = {};
+                Object.entries(errors).forEach(([key, message]) => {
+                    wizardErrors[key as keyof typeof data] = message as string;
+                });
+                wizard.setErrors(wizardErrors);
             },
             onSuccess: () => {
-                setGeneralError(null);
+                wizard.setIsSubmitting(false);
             },
         });
     };
 
-    const getFieldClassName = (fieldName: string) => {
-        const baseClass = 'w-full rounded-lg border px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20';
-        const formErrors = errors as Record<string, string>;
-        if (clientErrors[fieldName] || formErrors[fieldName]) {
-            return baseClass + ' border-destructive bg-destructive/5 focus:border-destructive';
+    const renderCurrentStep = () => {
+        const stepProps = {
+            data: wizard.data,
+            updateData: wizard.updateData,
+            updateMultipleFields: wizard.updateMultipleFields,
+            errors: wizard.errors,
+        };
+
+        switch (wizard.currentStep) {
+            case 'property-type':
+                return <PropertyTypeStep {...stepProps} />;
+            case 'location':
+                return <LocationStep {...stepProps} />;
+            case 'specifications':
+                return <SpecificationsStep {...stepProps} />;
+            case 'amenities':
+                return <AmenitiesStep {...stepProps} />;
+            case 'energy':
+                return <EnergyStep {...stepProps} />;
+            case 'pricing':
+                return <PricingStep {...stepProps} />;
+            case 'media':
+                return <MediaStep {...stepProps} />;
+            case 'review':
+                return <ReviewStep {...stepProps} onEditStep={wizard.goToStep} />;
+            default:
+                return null;
         }
-        return baseClass + ' border-border bg-background focus:border-primary';
     };
+
+    const currentStepConfig = WIZARD_STEPS.find((s) => s.id === wizard.currentStep);
 
     return (
         <ManagerLayout breadcrumbs={breadcrumbs}>
             <Head title={isEditing ? 'Edit Property' : 'Add New Property'} />
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:p-8 sm:shadow-lg"
-            >
-                <div className="mb-8">
-                    <h1 className="mb-2 flex items-center gap-3 text-3xl font-bold text-foreground">
-                        <Home className="text-primary" size={32} />
-                        {isEditing ? 'Edit Property' : 'Add New Property'}
-                    </h1>
-                    <p className="text-muted-foreground">
-                        {isEditing ? 'Update your property details below' : 'Fill in the details to list your property'}
-                    </p>
 
-                    {/* Error Banner */}
-                    {generalError && (
-                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="mt-6">
-                            <Alert variant="destructive" className="relative">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertTitle>Error</AlertTitle>
-                                <AlertDescription>{generalError}</AlertDescription>
-                                <button
-                                    onClick={() => setGeneralError(null)}
-                                    className="absolute top-2 right-2 rounded-sm opacity-70 transition-opacity hover:opacity-100"
-                                >
-                                    <X className="h-4 w-4" />
-                                    <span className="sr-only">Close</span>
-                                </button>
-                            </Alert>
-                        </motion.div>
-                    )}
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-8" noValidate>
-                    {/* Images Section */}
-                    <div className="space-y-4">
-                        <h2 className="border-b border-border pb-2 text-xl font-semibold text-foreground">Property Images</h2>
-
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-foreground">Upload Images</label>
-
-                            <input type="file" accept="image/*" multiple onChange={handleImageSelect} className="hidden" id="property-images" />
-
-                            {imagePreviews.length > 0 ? (
-                                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                                    {imagePreviews.map((preview, index) => (
-                                        <div key={index} className="group relative">
-                                            <img src={preview} alt={`Property image ${index + 1}`} className="h-48 w-full rounded-lg object-cover" />
-                                            <div className="absolute top-2 right-2 flex gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveImage(index)}
-                                                    className="cursor-pointer rounded-full bg-destructive p-2 text-white transition-colors hover:bg-destructive/90"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                            {mainImageIndex === index && (
-                                                <div className="absolute top-2 left-2 rounded bg-primary px-2 py-1 text-xs font-medium text-white">
-                                                    Main
-                                                </div>
-                                            )}
-                                            {mainImageIndex !== index && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleSetMainImage(index)}
-                                                    className="absolute right-2 bottom-2 left-2 cursor-pointer rounded bg-background/90 px-3 py-1.5 text-xs font-medium text-foreground opacity-0 transition-opacity group-hover:opacity-100"
-                                                >
-                                                    Set as Main
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
-                                    <label
-                                        htmlFor="property-images"
-                                        className="flex h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border transition-all hover:bg-muted/50"
-                                    >
-                                        <Camera size={32} className="mb-2 text-muted-foreground" />
-                                        <span className="text-sm text-muted-foreground">Add More</span>
-                                    </label>
-                                </div>
-                            ) : (
-                                <label
-                                    htmlFor="property-images"
-                                    className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border transition-all hover:bg-muted/50"
-                                >
-                                    <Upload size={48} className="mb-4 text-muted-foreground" />
-                                    <p className="mb-1 font-medium text-foreground">Upload property images</p>
-                                    <p className="text-sm text-muted-foreground">Click or drag images here</p>
-                                    <p className="mt-2 text-xs text-muted-foreground">Max 10MB per image</p>
-                                </label>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Basic Information */}
-                    <div className="space-y-4">
-                        <h2 className="border-b border-border pb-2 text-xl font-semibold text-foreground">Basic Information</h2>
-
-                        <div>
-                            <label htmlFor="title" className="mb-2 block text-sm font-medium text-foreground">
-                                Property Title <span className="text-destructive">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                id="title"
-                                value={data.title}
-                                onChange={(e) => {
-                                    setData('title', e.target.value);
-                                    clearFieldError('title');
-                                }}
-                                className={getFieldClassName('title')}
-                                placeholder="e.g., Modern 2BR Apartment in City Center"
-                            />
-                            {(clientErrors.title || errors.title) && (
-                                <p className="mt-1 text-sm text-destructive">{clientErrors.title || errors.title}</p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label htmlFor="description" className="mb-2 block text-sm font-medium text-foreground">
-                                Description
-                            </label>
-                            <textarea
-                                id="description"
-                                value={data.description}
-                                onChange={(e) => {
-                                    setData('description', e.target.value);
-                                    clearFieldError('description');
-                                }}
-                                rows={6}
-                                className={getFieldClassName('description')}
-                                placeholder="Describe your property..."
-                            />
-                        </div>
-                    </div>
-
-                    {/* Property Type */}
-                    <div className="space-y-4">
-                        <h2 className="border-b border-border pb-2 text-xl font-semibold text-foreground">Property Type</h2>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="flex min-h-[calc(100vh-8rem)] flex-col">
+                {/* Header */}
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+                    <div className="mb-6 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                                <Home className="h-6 w-6 text-primary" />
+                            </div>
                             <div>
-                                <label htmlFor="type" className="mb-2 block text-sm font-medium text-foreground">
-                                    Type <span className="text-destructive">*</span>
-                                </label>
-                                <select
-                                    id="type"
-                                    value={data.type}
-                                    onChange={(e) => {
-                                        setData('type', e.target.value as Property['type']);
-                                        clearFieldError('type');
-                                    }}
-                                    className={getFieldClassName('type')}
-                                >
-                                    {propertyTypeOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                {(clientErrors.type || errors.type) && (
-                                    <p className="mt-1 text-sm text-destructive">{clientErrors.type || errors.type}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label htmlFor="subtype" className="mb-2 block text-sm font-medium text-foreground">
-                                    Subtype <span className="text-destructive">*</span>
-                                </label>
-                                <select
-                                    id="subtype"
-                                    value={data.subtype}
-                                    onChange={(e) => {
-                                        setData('subtype', e.target.value as Property['subtype']);
-                                        clearFieldError('subtype');
-                                    }}
-                                    className={getFieldClassName('subtype')}
-                                >
-                                    {subtypeOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                {(clientErrors.subtype || errors.subtype) && (
-                                    <p className="mt-1 text-sm text-destructive">{clientErrors.subtype || errors.subtype}</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Address */}
-                    <div className="space-y-4">
-                        <h2 className="border-b border-border pb-2 text-xl font-semibold text-foreground">Address</h2>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                            <div className="md:col-span-1">
-                                <label htmlFor="house_number" className="mb-2 block text-sm font-medium text-foreground">
-                                    Number <span className="text-destructive">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="house_number"
-                                    value={data.house_number}
-                                    onChange={(e) => {
-                                        setData('house_number', e.target.value);
-                                        clearFieldError('house_number');
-                                    }}
-                                    className={getFieldClassName('house_number')}
-                                    placeholder="123"
-                                />
-                                {(clientErrors.house_number || errors.house_number) && (
-                                    <p className="mt-1 text-sm text-destructive">{clientErrors.house_number || errors.house_number}</p>
-                                )}
-                            </div>
-
-                            <div className="md:col-span-3">
-                                <label htmlFor="street_name" className="mb-2 block text-sm font-medium text-foreground">
-                                    Street Name <span className="text-destructive">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="street_name"
-                                    value={data.street_name}
-                                    onChange={(e) => {
-                                        setData('street_name', e.target.value);
-                                        clearFieldError('street_name');
-                                    }}
-                                    className={getFieldClassName('street_name')}
-                                    placeholder="Main Street"
-                                />
-                                {(clientErrors.street_name || errors.street_name) && (
-                                    <p className="mt-1 text-sm text-destructive">{clientErrors.street_name || errors.street_name}</p>
-                                )}
+                                <h1 className="text-2xl font-bold text-foreground">{isEditing ? 'Edit Property' : 'Add New Property'}</h1>
+                                <p className="text-sm text-muted-foreground">{currentStepConfig?.description}</p>
                             </div>
                         </div>
 
-                        <div>
-                            <label htmlFor="street_line2" className="mb-2 block text-sm font-medium text-foreground">
-                                Address Line 2 <span className="text-xs text-muted-foreground">(Optional)</span>
-                            </label>
-                            <input
-                                type="text"
-                                id="street_line2"
-                                value={data.street_line2}
-                                onChange={(e) => setData('street_line2', e.target.value)}
-                                className={getFieldClassName('street_line2')}
-                                placeholder="Apartment, suite, unit, etc."
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div>
-                                <label htmlFor="city" className="mb-2 block text-sm font-medium text-foreground">
-                                    City <span className="text-destructive">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="city"
-                                    value={data.city}
-                                    onChange={(e) => {
-                                        setData('city', e.target.value);
-                                        clearFieldError('city');
-                                    }}
-                                    className={getFieldClassName('city')}
-                                    placeholder="Zurich"
-                                />
-                                {(clientErrors.city || errors.city) && (
-                                    <p className="mt-1 text-sm text-destructive">{clientErrors.city || errors.city}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label htmlFor="state" className="mb-2 block text-sm font-medium text-foreground">
-                                    State/Region <span className="text-xs text-muted-foreground">(Optional)</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="state"
-                                    value={data.state}
-                                    onChange={(e) => setData('state', e.target.value)}
-                                    className={getFieldClassName('state')}
-                                    placeholder="Canton"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="postal_code" className="mb-2 block text-sm font-medium text-foreground">
-                                    Postal Code <span className="text-destructive">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="postal_code"
-                                    value={data.postal_code}
-                                    onChange={(e) => {
-                                        setData('postal_code', e.target.value);
-                                        clearFieldError('postal_code');
-                                    }}
-                                    className={getFieldClassName('postal_code')}
-                                    placeholder="8001"
-                                />
-                                {(clientErrors.postal_code || errors.postal_code) && (
-                                    <p className="mt-1 text-sm text-destructive">{clientErrors.postal_code || errors.postal_code}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="md:w-1/3">
-                            <label htmlFor="country" className="mb-2 block text-sm font-medium text-foreground">
-                                Country <span className="text-destructive">*</span>
-                            </label>
-                            <select
-                                id="country"
-                                value={data.country}
-                                onChange={(e) => {
-                                    setData('country', e.target.value);
-                                    clearFieldError('country');
-                                }}
-                                className={getFieldClassName('country')}
-                            >
-                                <option value="CH">Switzerland</option>
-                                <option value="DE">Germany</option>
-                                <option value="FR">France</option>
-                                <option value="AT">Austria</option>
-                                <option value="IT">Italy</option>
-                                <option value="US">United States</option>
-                                <option value="GB">United Kingdom</option>
-                                <option value="NL">Netherlands</option>
-                                <option value="BE">Belgium</option>
-                                <option value="ES">Spain</option>
-                            </select>
-                            {(clientErrors.country || errors.country) && (
-                                <p className="mt-1 text-sm text-destructive">{clientErrors.country || errors.country}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Property Specifications */}
-                    <div className="space-y-4">
-                        <h2 className="border-b border-border pb-2 text-xl font-semibold text-foreground">Specifications</h2>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                            <div>
-                                <label htmlFor="bedrooms" className="mb-2 block text-sm font-medium text-foreground">
-                                    Bedrooms
-                                </label>
-                                <input
-                                    type="number"
-                                    id="bedrooms"
-                                    min="0"
-                                    value={data.bedrooms}
-                                    onChange={(e) => setData('bedrooms', parseInt(e.target.value) || 0)}
-                                    className={getFieldClassName('bedrooms')}
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="bathrooms" className="mb-2 block text-sm font-medium text-foreground">
-                                    Bathrooms
-                                </label>
-                                <input
-                                    type="number"
-                                    id="bathrooms"
-                                    min="0"
-                                    step="0.5"
-                                    value={data.bathrooms}
-                                    onChange={(e) => setData('bathrooms', parseFloat(e.target.value) || 0)}
-                                    className={getFieldClassName('bathrooms')}
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="parking_spots_interior" className="mb-2 block text-sm font-medium text-foreground">
-                                    Indoor Parking
-                                </label>
-                                <input
-                                    type="number"
-                                    id="parking_spots_interior"
-                                    min="0"
-                                    value={data.parking_spots_interior}
-                                    onChange={(e) => setData('parking_spots_interior', parseInt(e.target.value) || 0)}
-                                    className={getFieldClassName('parking_spots_interior')}
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="parking_spots_exterior" className="mb-2 block text-sm font-medium text-foreground">
-                                    Outdoor Parking
-                                </label>
-                                <input
-                                    type="number"
-                                    id="parking_spots_exterior"
-                                    min="0"
-                                    value={data.parking_spots_exterior}
-                                    onChange={(e) => setData('parking_spots_exterior', parseInt(e.target.value) || 0)}
-                                    className={getFieldClassName('parking_spots_exterior')}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div>
-                                <label htmlFor="size" className="mb-2 block text-sm font-medium text-foreground">
-                                    Size (m²)
-                                </label>
-                                <input
-                                    type="number"
-                                    id="size"
-                                    min="0"
-                                    step="0.01"
-                                    value={data.size || ''}
-                                    onChange={(e) => setData('size', parseFloat(e.target.value) || undefined)}
-                                    className={getFieldClassName('size')}
-                                    placeholder="0"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="balcony_size" className="mb-2 block text-sm font-medium text-foreground">
-                                    Balcony Size (m²)
-                                </label>
-                                <input
-                                    type="number"
-                                    id="balcony_size"
-                                    min="0"
-                                    step="0.01"
-                                    value={data.balcony_size || ''}
-                                    onChange={(e) => setData('balcony_size', parseFloat(e.target.value) || undefined)}
-                                    className={getFieldClassName('balcony_size')}
-                                    placeholder="0"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="land_size" className="mb-2 block text-sm font-medium text-foreground">
-                                    Land Size (m²) <span className="text-xs text-muted-foreground">(For houses)</span>
-                                </label>
-                                <input
-                                    type="number"
-                                    id="land_size"
-                                    min="0"
-                                    step="0.01"
-                                    value={data.land_size || ''}
-                                    onChange={(e) => setData('land_size', parseFloat(e.target.value) || undefined)}
-                                    className={getFieldClassName('land_size')}
-                                    placeholder="0"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div>
-                                <label htmlFor="floor_level" className="mb-2 block text-sm font-medium text-foreground">
-                                    Floor Level
-                                </label>
-                                <input
-                                    type="number"
-                                    id="floor_level"
-                                    value={data.floor_level || ''}
-                                    onChange={(e) => setData('floor_level', parseInt(e.target.value) || undefined)}
-                                    className={getFieldClassName('floor_level')}
-                                    placeholder="0"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="year_built" className="mb-2 block text-sm font-medium text-foreground">
-                                    Year Built
-                                </label>
-                                <input
-                                    type="number"
-                                    id="year_built"
-                                    min="1800"
-                                    max={new Date().getFullYear()}
-                                    value={data.year_built || ''}
-                                    onChange={(e) => setData('year_built', parseInt(e.target.value) || undefined)}
-                                    className={getFieldClassName('year_built')}
-                                    placeholder="2020"
-                                />
-                            </div>
-
-                            <div className="flex items-center pt-8">
-                                <label className="flex cursor-pointer items-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={data.has_elevator}
-                                        onChange={(e) => setData('has_elevator', e.target.checked)}
-                                        className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                    />
-                                    <span className="text-sm font-medium text-foreground">Has Elevator</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Energy & Building */}
-                    <div className="space-y-4">
-                        <h2 className="border-b border-border pb-2 text-xl font-semibold text-foreground">Energy & Building</h2>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div>
-                                <label htmlFor="energy_class" className="mb-2 block text-sm font-medium text-foreground">
-                                    Energy Class
-                                </label>
-                                <select
-                                    id="energy_class"
-                                    value={data.energy_class || ''}
-                                    onChange={(e) => setData('energy_class', (e.target.value as Property['energy_class']) || undefined)}
-                                    className={getFieldClassName('energy_class')}
-                                >
-                                    <option value="">Not specified</option>
-                                    {energyClassOptions.map((option) => (
-                                        <option key={option} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label htmlFor="thermal_insulation_class" className="mb-2 block text-sm font-medium text-foreground">
-                                    Thermal Insulation
-                                </label>
-                                <select
-                                    id="thermal_insulation_class"
-                                    value={data.thermal_insulation_class || ''}
-                                    onChange={(e) =>
-                                        setData('thermal_insulation_class', (e.target.value as Property['thermal_insulation_class']) || undefined)
-                                    }
-                                    className={getFieldClassName('thermal_insulation_class')}
-                                >
-                                    <option value="">Not specified</option>
-                                    {energyClassOptions
-                                        .filter((o) => o !== 'A+')
-                                        .map((option) => (
-                                            <option key={option} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label htmlFor="heating_type" className="mb-2 block text-sm font-medium text-foreground">
-                                    Heating Type
-                                </label>
-                                <select
-                                    id="heating_type"
-                                    value={data.heating_type || ''}
-                                    onChange={(e) => setData('heating_type', (e.target.value as Property['heating_type']) || undefined)}
-                                    className={getFieldClassName('heating_type')}
-                                >
-                                    <option value="">Not specified</option>
-                                    {heatingTypeOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Kitchen & Amenities */}
-                    <div className="space-y-4">
-                        <h2 className="border-b border-border pb-2 text-xl font-semibold text-foreground">Kitchen & Amenities</h2>
-
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                            <label className="flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.kitchen_equipped}
-                                    onChange={(e) => setData('kitchen_equipped', e.target.checked)}
-                                    className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-foreground">Kitchen Equipped</span>
-                            </label>
-
-                            <label className="flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.kitchen_separated}
-                                    onChange={(e) => setData('kitchen_separated', e.target.checked)}
-                                    className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-foreground">Separate Kitchen</span>
-                            </label>
-
-                            <label className="flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.has_cellar}
-                                    onChange={(e) => setData('has_cellar', e.target.checked)}
-                                    className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-foreground">Cellar</span>
-                            </label>
-
-                            <label className="flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.has_laundry}
-                                    onChange={(e) => setData('has_laundry', e.target.checked)}
-                                    className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-foreground">Laundry</span>
-                            </label>
-
-                            <label className="flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.has_fireplace}
-                                    onChange={(e) => setData('has_fireplace', e.target.checked)}
-                                    className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-foreground">Fireplace</span>
-                            </label>
-
-                            <label className="flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.has_air_conditioning}
-                                    onChange={(e) => setData('has_air_conditioning', e.target.checked)}
-                                    className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-foreground">Air Conditioning</span>
-                            </label>
-
-                            <label className="flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.has_garden}
-                                    onChange={(e) => setData('has_garden', e.target.checked)}
-                                    className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-foreground">Garden</span>
-                            </label>
-
-                            <label className="flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    checked={data.has_rooftop}
-                                    onChange={(e) => setData('has_rooftop', e.target.checked)}
-                                    className="mr-2 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-foreground">Rooftop Access</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    {/* Rental Information */}
-                    <div className="space-y-4">
-                        <h2 className="border-b border-border pb-2 text-xl font-semibold text-foreground">Rental Information</h2>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div>
-                                <label htmlFor="rent_amount" className="mb-2 block text-sm font-medium text-foreground">
-                                    Monthly Rent <span className="text-destructive">*</span>
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type="number"
-                                        id="rent_amount"
-                                        min="0"
-                                        step="0.01"
-                                        value={data.rent_amount}
-                                        onChange={(e) => {
-                                            setData('rent_amount', parseFloat(e.target.value) || 0);
-                                            clearFieldError('rent_amount');
-                                        }}
-                                        className={getFieldClassName('rent_amount') + ' pr-20'}
-                                        placeholder="0.00"
-                                    />
-                                    <div className="absolute top-1 right-1">
-                                        <select
-                                            value={data.rent_currency}
-                                            onChange={(e) => setData('rent_currency', e.target.value as Property['rent_currency'])}
-                                            className="h-10 rounded-md border-0 bg-transparent pr-1 pl-2 text-sm text-foreground focus:ring-0 focus:outline-none"
-                                        >
-                                            {currencyOptions.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.symbol}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                                {(clientErrors.rent_amount || errors.rent_amount) && (
-                                    <p className="mt-1 text-sm text-destructive">{clientErrors.rent_amount || errors.rent_amount}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label htmlFor="available_date" className="mb-2 block text-sm font-medium text-foreground">
-                                    Available From
-                                </label>
-                                <input
-                                    type="date"
-                                    id="available_date"
-                                    value={data.available_date || ''}
-                                    onChange={(e) => setData('available_date', e.target.value || undefined)}
-                                    className={getFieldClassName('available_date')}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Submit Buttons */}
-                    <div className="flex gap-4 pt-6">
+                        {/* Save draft button (hidden for now, future feature) */}
                         <button
                             type="button"
-                            onClick={() => router.visit(route('manager.properties.index'))}
-                            className="flex-1 cursor-pointer rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground shadow-lg transition-all hover:bg-muted"
+                            className="hidden items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted md:flex"
                         >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="flex-1 cursor-pointer rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            {processing ? (isEditing ? 'Updating...' : 'Creating...') : isEditing ? 'Update Property' : 'Create Property'}
+                            <Save className="h-4 w-4" />
+                            Save Draft
                         </button>
                     </div>
 
-                    {/* Progress Bar */}
-                    {progress && (
-                        <div className="mt-4">
-                            <div className="h-2 overflow-hidden rounded-full bg-muted">
-                                <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress.percentage}%` }} />
-                            </div>
-                            <p className="mt-1 text-sm text-muted-foreground">Uploading {progress.percentage}%</p>
-                        </div>
-                    )}
-                </form>
-            </motion.div>
+                    {/* Progress indicator */}
+                    <WizardProgress
+                        steps={WIZARD_STEPS}
+                        currentStep={wizard.currentStep}
+                        completedSteps={wizard.completedSteps}
+                        onStepClick={wizard.goToStep}
+                        canGoToStep={wizard.canGoToStep}
+                    />
+                </motion.div>
+
+                {/* Main content area */}
+                <div className="flex flex-1 flex-col rounded-2xl border border-border bg-card shadow-sm">
+                    {/* Step content */}
+                    <div className="flex-1 overflow-y-auto p-6 md:p-10">
+                        <AnimatePresence mode="wait">
+                            <motion.div key={wizard.currentStep}>{renderCurrentStep()}</motion.div>
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Navigation footer */}
+                    <WizardNavigation
+                        onBack={wizard.goToPreviousStep}
+                        onNext={wizard.goToNextStep}
+                        onSubmit={handleSubmit}
+                        onSkip={currentStepConfig?.optional ? wizard.goToNextStep : undefined}
+                        isFirstStep={wizard.isFirstStep}
+                        isLastStep={wizard.isLastStep}
+                        isSubmitting={wizard.isSubmitting}
+                        showSkip={currentStepConfig?.optional}
+                        nextLabel={wizard.isLastStep ? 'Publish Listing' : undefined}
+                    />
+                </div>
+            </div>
         </ManagerLayout>
     );
 }
