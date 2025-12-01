@@ -96,7 +96,7 @@ export default function ProfileUnverified({ isRejected = false, rejectionReason 
                             )}
 
                             <Link
-                                href="/"
+                                href={route('landing')}
                                 className="block w-full rounded-lg border border-border bg-background px-4 py-2 font-semibold text-foreground transition-colors hover:bg-muted"
                             >
                                 {t(translations.profile, 'unverified.return_home')}

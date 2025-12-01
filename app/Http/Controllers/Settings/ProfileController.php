@@ -57,7 +57,11 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return redirect('/settings/profile');
+        // Determine which settings route to use based on subdomain
+        $subdomain = $this->getCurrentSubdomain($request);
+        $routeName = $subdomain === 'manager' ? 'manager.settings.profile' : 'tenant.settings.profile';
+
+        return redirect()->route($routeName);
     }
 
     /**
@@ -78,6 +82,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('landing');
     }
 }

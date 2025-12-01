@@ -22,10 +22,10 @@ class PropertyManagerController extends Controller
         if ($user->propertyManager) {
             // If profile is rejected, allow editing
             if ($user->propertyManager->isRejected()) {
-                return redirect('/edit-profile');
+                return redirect()->route('property-manager.edit');
             }
 
-            return redirect('/dashboard');
+            return redirect()->route('manager.properties.index');
         }
 
         return Inertia::render('profile-setup', [
@@ -45,7 +45,7 @@ class PropertyManagerController extends Controller
 
         // Check if user already has a property manager profile
         if (Auth::user()->propertyManager) {
-            return redirect('/dashboard')
+            return redirect()->route('manager.properties.index')
                 ->with('error', 'You already have a property manager profile.');
         }
 
@@ -137,7 +137,7 @@ class PropertyManagerController extends Controller
 
         $user->propertyManager()->create($validated);
 
-        return redirect('/profile/unverified')
+        return redirect()->route('profile.unverified')
             ->with('success', 'Profile submitted for review!');
     }
 
@@ -149,7 +149,7 @@ class PropertyManagerController extends Controller
         $propertyManager = Auth::user()->propertyManager;
 
         if (! $propertyManager) {
-            return redirect('/profile/setup');
+            return redirect()->route('profile.setup');
         }
 
         return Inertia::render('profile-setup', [
@@ -169,7 +169,7 @@ class PropertyManagerController extends Controller
         $propertyManager = Auth::user()->propertyManager;
 
         if (! $propertyManager) {
-            return redirect('/profile/setup');
+            return redirect()->route('profile.setup');
         }
 
         $rules = [
@@ -312,7 +312,7 @@ class PropertyManagerController extends Controller
 
         $propertyManager->update($validated);
 
-        return redirect('/profile/unverified')
+        return redirect()->route('profile.unverified')
             ->with('success', 'Profile updated and resubmitted for review!');
     }
 

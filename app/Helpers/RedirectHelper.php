@@ -12,14 +12,17 @@ class RedirectHelper
      *
      * @param  string|null  $redirectPath  The redirect URL (relative path or full URL)
      * @param  string  $userType  The user type ('tenant' or 'property-manager')
-     * @param  string|null  $fallbackPath  The fallback path if no redirect URL (default: '/dashboard')
+     * @param  string|null  $fallbackPath  The fallback path if no redirect URL (default depends on user type)
      * @return string The full redirect URL
      */
-    public static function resolveRedirectUrl(?string $redirectPath, string $userType, ?string $fallbackPath = '/dashboard'): string
+    public static function resolveRedirectUrl(?string $redirectPath, string $userType, ?string $fallbackPath = null): string
     {
-        // If no redirect URL, return default dashboard based on user type
+        // If no redirect URL, return default based on user type
         if (! $redirectPath) {
-            return self::buildUrl($fallbackPath, $userType);
+            // Property managers go to /properties, tenants go to /dashboard
+            $defaultPath = $fallbackPath ?? ($userType === 'property-manager' ? '/properties' : '/dashboard');
+
+            return self::buildUrl($defaultPath, $userType);
         }
 
         // If it's already a full URL, use as is

@@ -11,8 +11,8 @@ use Inertia\Inertia;
 
 $prefix = $routePrefix ?? 'settings';
 
-Route::get('settings', function () {
-    return redirect('/settings/profile');
+Route::get('settings', function () use ($prefix) {
+    return redirect()->route("{$prefix}.profile");
 })->name("{$prefix}");
 
 Route::get('settings/profile', [ProfileController::class, 'edit'])

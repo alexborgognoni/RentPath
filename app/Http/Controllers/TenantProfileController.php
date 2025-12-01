@@ -46,7 +46,7 @@ class TenantProfileController extends Controller
         }
 
         if ($tenantProfile->isVerified()) {
-            return redirect('/dashboard')
+            return redirect()->route('dashboard')
                 ->with('info', 'Your profile is already verified. Contact support to make changes.');
         }
 
@@ -68,11 +68,11 @@ class TenantProfileController extends Controller
         $tenantProfile = Auth::user()->tenantProfile;
 
         if (! $tenantProfile) {
-            return redirect('/profile/tenant/setup');
+            return redirect()->route('tenant.profile.edit');
         }
 
         if ($tenantProfile->isVerified()) {
-            return redirect('/dashboard')
+            return redirect()->route('dashboard')
                 ->with('error', 'Cannot edit a verified profile.');
         }
 
@@ -279,7 +279,7 @@ class TenantProfileController extends Controller
 
         $tenantProfile->update($validated);
 
-        return redirect('/profile/tenant/unverified')
+        return redirect()->route('dashboard')
             ->with('success', 'Profile updated and resubmitted for review!');
     }
 

@@ -32,7 +32,7 @@ class ApplicationController extends Controller
             ->first();
 
         if ($existingApplication) {
-            return redirect("/applications/{$existingApplication->id}")
+            return redirect()->route('applications.show', ['application' => $existingApplication->id])
                 ->with('message', 'You already have an application for this property');
         }
 
@@ -44,7 +44,7 @@ class ApplicationController extends Controller
 
         // Check if property is available for applications
         if (! in_array($property->status, ['available', 'application_received'])) {
-            return redirect("/properties/{$property->id}")
+            return redirect()->route('tenant.properties.show', ['property' => $property->id])
                 ->with('error', 'This property is not accepting applications at this time');
         }
 
@@ -77,7 +77,7 @@ class ApplicationController extends Controller
             ->first();
 
         if ($existingApplication) {
-            return redirect("/applications/{$existingApplication->id}")
+            return redirect()->route('applications.show', ['application' => $existingApplication->id])
                 ->with('error', 'You already have an application for this property');
         }
 
@@ -217,7 +217,7 @@ class ApplicationController extends Controller
             $property->update(['status' => 'application_received']);
         }
 
-        return redirect("/applications/{$application->id}")
+        return redirect()->route('applications.show', ['application' => $application->id])
             ->with('success', 'Application submitted successfully!');
     }
 
@@ -348,7 +348,7 @@ class ApplicationController extends Controller
 
         // If applicant views a draft application, redirect to continue editing
         if ($isApplicant && $application->status === 'draft') {
-            return redirect("/properties/{$application->property_id}/apply")
+            return redirect()->route('applications.create', ['property' => $application->property_id])
                 ->with('message', 'Continue filling out your application');
         }
 
@@ -390,7 +390,7 @@ class ApplicationController extends Controller
 
         $application->withdraw();
 
-        return redirect('/dashboard')
+        return redirect()->route('dashboard')
             ->with('success', 'Application withdrawn successfully');
     }
 
@@ -503,7 +503,7 @@ class ApplicationController extends Controller
 
         $application->delete();
 
-        return redirect('/dashboard')
+        return redirect()->route('dashboard')
             ->with('success', 'Draft application deleted');
     }
 

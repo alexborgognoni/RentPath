@@ -161,7 +161,7 @@ Route::domain('manager.'.config('app.domain'))->middleware('subdomain:manager')-
 
     // Redirect root to properties
     Route::get('/', function () {
-        return redirect('/properties');
+        return redirect()->route('manager.properties.index');
     });
 
     // Properties list (manager dashboard)
@@ -179,13 +179,13 @@ Route::domain('manager.'.config('app.domain'))->middleware('subdomain:manager')-
         if (! $propertyManager) {
             \Log::info('Redirecting to profile setup - no property manager');
 
-            return redirect('/profile/setup');
+            return redirect()->route('profile.setup');
         }
 
         if (! $propertyManager->isVerified()) {
             \Log::info('Redirecting to unverified - property manager not verified');
 
-            return redirect('/profile/unverified');
+            return redirect()->route('profile.unverified');
         }
 
         $properties = $user->properties()
@@ -226,14 +226,14 @@ Route::domain('manager.'.config('app.domain'))->middleware('subdomain:manager')-
             $propertyManager = $user->propertyManager;
 
             if (! $propertyManager) {
-                return redirect('/profile/setup');
+                return redirect()->route('profile.setup');
             }
 
             if ($propertyManager->isVerified()) {
-                return redirect('/properties');
+                return redirect()->route('manager.properties.index');
             }
 
-            return redirect('/profile/unverified');
+            return redirect()->route('profile.unverified');
         })->name('profile');
 
         Route::get('profile/setup', [PropertyManagerController::class, 'create'])
@@ -247,11 +247,11 @@ Route::domain('manager.'.config('app.domain'))->middleware('subdomain:manager')-
             $propertyManager = $user->propertyManager;
 
             if (! $propertyManager) {
-                return redirect('/profile/setup');
+                return redirect()->route('profile.setup');
             }
 
             if ($propertyManager->isVerified()) {
-                return redirect('/properties');
+                return redirect()->route('manager.properties.index');
             }
 
             if ($request->get('edit')) {
