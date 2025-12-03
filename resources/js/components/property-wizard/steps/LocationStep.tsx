@@ -1,6 +1,7 @@
 import { StepContainer } from '@/components/property-wizard/components/StepContainer';
 import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
+import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 
@@ -8,6 +9,7 @@ interface LocationStepProps {
     data: PropertyWizardData;
     updateData: <K extends keyof PropertyWizardData>(key: K, value: PropertyWizardData[K]) => void;
     errors: Partial<Record<keyof PropertyWizardData, string>>;
+    onBlur?: (field: keyof PropertyWizardData, value: unknown) => void;
 }
 
 const countries = [
@@ -23,7 +25,7 @@ const countries = [
     { value: 'ES', label: 'Spain' },
 ];
 
-export function LocationStep({ data, updateData, errors }: LocationStepProps) {
+export function LocationStep({ data, updateData, errors, onBlur }: LocationStepProps) {
     const inputClassName = (fieldName: keyof PropertyWizardData) =>
         cn(
             'w-full rounded-xl border-2 bg-background px-4 py-3 text-foreground shadow-sm transition-all',
@@ -31,6 +33,12 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
             'focus:border-primary focus:ring-4 focus:ring-primary/10 focus:outline-none',
             errors[fieldName] ? 'border-destructive bg-destructive/5' : 'border-border hover:border-primary/30',
         );
+
+    const handleBlur = (field: keyof PropertyWizardData) => {
+        if (onBlur) {
+            onBlur(field, data[field]);
+        }
+    };
 
     return (
         <StepContainer title="Where is your property located?" description="Enter the address where tenants will live">
@@ -62,10 +70,18 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
                                 id="house_number"
                                 value={data.house_number}
                                 onChange={(e) => updateData('house_number', e.target.value)}
+                                onBlur={() => handleBlur('house_number')}
+                                maxLength={PROPERTY_CONSTRAINTS.house_number.maxLength}
                                 className={inputClassName('house_number')}
                                 placeholder="123"
+                                aria-invalid={!!errors.house_number}
+                                aria-describedby={errors.house_number ? 'house_number-error' : undefined}
                             />
-                            {errors.house_number && <p className="mt-1.5 text-sm text-destructive">{errors.house_number}</p>}
+                            {errors.house_number && (
+                                <p id="house_number-error" className="mt-1.5 text-sm text-destructive">
+                                    {errors.house_number}
+                                </p>
+                            )}
                         </div>
 
                         <div className="col-span-2">
@@ -77,10 +93,18 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
                                 id="street_name"
                                 value={data.street_name}
                                 onChange={(e) => updateData('street_name', e.target.value)}
+                                onBlur={() => handleBlur('street_name')}
+                                maxLength={PROPERTY_CONSTRAINTS.street_name.maxLength}
                                 className={inputClassName('street_name')}
                                 placeholder="Main Street"
+                                aria-invalid={!!errors.street_name}
+                                aria-describedby={errors.street_name ? 'street_name-error' : undefined}
                             />
-                            {errors.street_name && <p className="mt-1.5 text-sm text-destructive">{errors.street_name}</p>}
+                            {errors.street_name && (
+                                <p id="street_name-error" className="mt-1.5 text-sm text-destructive">
+                                    {errors.street_name}
+                                </p>
+                            )}
                         </div>
                     </motion.div>
 
@@ -94,6 +118,8 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
                             id="street_line2"
                             value={data.street_line2 || ''}
                             onChange={(e) => updateData('street_line2', e.target.value)}
+                            onBlur={() => handleBlur('street_line2')}
+                            maxLength={PROPERTY_CONSTRAINTS.street_line2.maxLength}
                             className={inputClassName('street_line2')}
                             placeholder="Apt 4B, Floor 2, etc."
                         />
@@ -115,10 +141,18 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
                                 id="city"
                                 value={data.city}
                                 onChange={(e) => updateData('city', e.target.value)}
+                                onBlur={() => handleBlur('city')}
+                                maxLength={PROPERTY_CONSTRAINTS.city.maxLength}
                                 className={inputClassName('city')}
                                 placeholder="Zurich"
+                                aria-invalid={!!errors.city}
+                                aria-describedby={errors.city ? 'city-error' : undefined}
                             />
-                            {errors.city && <p className="mt-1.5 text-sm text-destructive">{errors.city}</p>}
+                            {errors.city && (
+                                <p id="city-error" className="mt-1.5 text-sm text-destructive">
+                                    {errors.city}
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -130,10 +164,18 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
                                 id="postal_code"
                                 value={data.postal_code}
                                 onChange={(e) => updateData('postal_code', e.target.value)}
+                                onBlur={() => handleBlur('postal_code')}
+                                maxLength={PROPERTY_CONSTRAINTS.postal_code.maxLength}
                                 className={inputClassName('postal_code')}
                                 placeholder="8001"
+                                aria-invalid={!!errors.postal_code}
+                                aria-describedby={errors.postal_code ? 'postal_code-error' : undefined}
                             />
-                            {errors.postal_code && <p className="mt-1.5 text-sm text-destructive">{errors.postal_code}</p>}
+                            {errors.postal_code && (
+                                <p id="postal_code-error" className="mt-1.5 text-sm text-destructive">
+                                    {errors.postal_code}
+                                </p>
+                            )}
                         </div>
                     </motion.div>
 
@@ -153,6 +195,8 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
                                 id="state"
                                 value={data.state || ''}
                                 onChange={(e) => updateData('state', e.target.value)}
+                                onBlur={() => handleBlur('state')}
+                                maxLength={PROPERTY_CONSTRAINTS.state.maxLength}
                                 className={inputClassName('state')}
                                 placeholder="Canton, State, etc."
                             />
@@ -166,7 +210,10 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
                                 id="country"
                                 value={data.country}
                                 onChange={(e) => updateData('country', e.target.value)}
+                                onBlur={() => handleBlur('country')}
                                 className={inputClassName('country')}
+                                aria-invalid={!!errors.country}
+                                aria-describedby={errors.country ? 'country-error' : undefined}
                             >
                                 {countries.map((country) => (
                                     <option key={country.value} value={country.value}>
@@ -174,7 +221,11 @@ export function LocationStep({ data, updateData, errors }: LocationStepProps) {
                                     </option>
                                 ))}
                             </select>
-                            {errors.country && <p className="mt-1.5 text-sm text-destructive">{errors.country}</p>}
+                            {errors.country && (
+                                <p id="country-error" className="mt-1.5 text-sm text-destructive">
+                                    {errors.country}
+                                </p>
+                            )}
                         </div>
                     </motion.div>
 

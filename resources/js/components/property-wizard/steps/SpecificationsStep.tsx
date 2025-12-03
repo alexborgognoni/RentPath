@@ -2,6 +2,7 @@ import { NumberStepper } from '@/components/property-wizard/components/NumberSte
 import { StepContainer } from '@/components/property-wizard/components/StepContainer';
 import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
+import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import { motion } from 'framer-motion';
 import { Bath, Bed, Calendar, Car, Expand, Layers, TreePine } from 'lucide-react';
 
@@ -9,9 +10,10 @@ interface SpecificationsStepProps {
     data: PropertyWizardData;
     updateData: <K extends keyof PropertyWizardData>(key: K, value: PropertyWizardData[K]) => void;
     errors: Partial<Record<keyof PropertyWizardData, string>>;
+    onBlur?: (field: keyof PropertyWizardData, value: unknown) => void;
 }
 
-export function SpecificationsStep({ data, updateData }: SpecificationsStepProps) {
+export function SpecificationsStep({ data, updateData, errors, onBlur }: SpecificationsStepProps) {
     const propertyType = data.type;
 
     // Determine which fields to show based on property type
@@ -25,13 +27,20 @@ export function SpecificationsStep({ data, updateData }: SpecificationsStepProps
     const showElevator = ['apartment', 'commercial'].includes(propertyType);
     const showYearBuilt = ['apartment', 'house', 'commercial', 'industrial'].includes(propertyType);
 
-    const inputClassName = cn(
-        'w-full rounded-xl border-2 bg-background px-4 py-3 text-foreground shadow-sm transition-all',
-        'placeholder:text-muted-foreground/60',
-        'focus:border-primary focus:ring-4 focus:ring-primary/10 focus:outline-none',
-        'border-border hover:border-primary/30',
-        '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-    );
+    const handleBlur = (field: keyof PropertyWizardData) => {
+        if (onBlur) {
+            onBlur(field, data[field]);
+        }
+    };
+
+    const inputClassName = (hasError?: boolean) =>
+        cn(
+            'w-full rounded-xl border-2 bg-background px-4 py-3 text-foreground shadow-sm transition-all',
+            'placeholder:text-muted-foreground/60',
+            'focus:border-primary focus:ring-4 focus:ring-primary/10 focus:outline-none',
+            '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+            hasError ? 'border-destructive bg-destructive/5' : 'border-border hover:border-primary/30',
+        );
 
     return (
         <StepContainer title="Tell us about the space" description="These details help tenants find the perfect match">
@@ -82,14 +91,18 @@ export function SpecificationsStep({ data, updateData }: SpecificationsStepProps
                                         id="size"
                                         value={data.size || ''}
                                         onChange={(e) => updateData('size', parseFloat(e.target.value) || undefined)}
-                                        className={inputClassName}
+                                        onBlur={() => handleBlur('size')}
+                                        className={inputClassName(!!errors.size)}
                                         placeholder="0"
-                                        min="0"
+                                        min={PROPERTY_CONSTRAINTS.size.min}
+                                        max={PROPERTY_CONSTRAINTS.size.max}
+                                        aria-invalid={!!errors.size}
                                     />
                                     <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
                                         m²
                                     </span>
                                 </div>
+                                {errors.size && <p className="mt-1.5 text-sm text-destructive">{errors.size}</p>}
                             </div>
 
                             {showBalcony && (
@@ -104,14 +117,18 @@ export function SpecificationsStep({ data, updateData }: SpecificationsStepProps
                                             id="balcony_size"
                                             value={data.balcony_size || ''}
                                             onChange={(e) => updateData('balcony_size', parseFloat(e.target.value) || undefined)}
-                                            className={inputClassName}
+                                            onBlur={() => handleBlur('balcony_size')}
+                                            className={inputClassName(!!errors.balcony_size)}
                                             placeholder="0"
-                                            min="0"
+                                            min={PROPERTY_CONSTRAINTS.balcony_size.min}
+                                            max={PROPERTY_CONSTRAINTS.balcony_size.max}
+                                            aria-invalid={!!errors.balcony_size}
                                         />
                                         <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
                                             m²
                                         </span>
                                     </div>
+                                    {errors.balcony_size && <p className="mt-1.5 text-sm text-destructive">{errors.balcony_size}</p>}
                                 </div>
                             )}
 
@@ -127,14 +144,18 @@ export function SpecificationsStep({ data, updateData }: SpecificationsStepProps
                                             id="land_size"
                                             value={data.land_size || ''}
                                             onChange={(e) => updateData('land_size', parseFloat(e.target.value) || undefined)}
-                                            className={inputClassName}
+                                            onBlur={() => handleBlur('land_size')}
+                                            className={inputClassName(!!errors.land_size)}
                                             placeholder="0"
-                                            min="0"
+                                            min={PROPERTY_CONSTRAINTS.land_size.min}
+                                            max={PROPERTY_CONSTRAINTS.land_size.max}
+                                            aria-invalid={!!errors.land_size}
                                         />
                                         <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
                                             m²
                                         </span>
                                     </div>
+                                    {errors.land_size && <p className="mt-1.5 text-sm text-destructive">{errors.land_size}</p>}
                                 </div>
                             )}
                         </div>
@@ -182,9 +203,14 @@ export function SpecificationsStep({ data, updateData }: SpecificationsStepProps
                                         id="floor_level"
                                         value={data.floor_level ?? ''}
                                         onChange={(e) => updateData('floor_level', parseInt(e.target.value) || undefined)}
-                                        className={inputClassName}
+                                        onBlur={() => handleBlur('floor_level')}
+                                        className={inputClassName(!!errors.floor_level)}
                                         placeholder="0"
+                                        min={PROPERTY_CONSTRAINTS.floor_level.min}
+                                        max={PROPERTY_CONSTRAINTS.floor_level.max}
+                                        aria-invalid={!!errors.floor_level}
                                     />
+                                    {errors.floor_level && <p className="mt-1.5 text-sm text-destructive">{errors.floor_level}</p>}
                                 </div>
                             )}
 
@@ -199,11 +225,14 @@ export function SpecificationsStep({ data, updateData }: SpecificationsStepProps
                                         id="year_built"
                                         value={data.year_built || ''}
                                         onChange={(e) => updateData('year_built', parseInt(e.target.value) || undefined)}
-                                        className={inputClassName}
+                                        onBlur={() => handleBlur('year_built')}
+                                        className={inputClassName(!!errors.year_built)}
                                         placeholder="2020"
-                                        min="1800"
+                                        min={PROPERTY_CONSTRAINTS.year_built.min}
                                         max={new Date().getFullYear()}
+                                        aria-invalid={!!errors.year_built}
                                     />
+                                    {errors.year_built && <p className="mt-1.5 text-sm text-destructive">{errors.year_built}</p>}
                                 </div>
                             )}
 

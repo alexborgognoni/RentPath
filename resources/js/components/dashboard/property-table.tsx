@@ -19,8 +19,12 @@ interface PropertyTableProps {
 
 const columnHelper = createColumnHelper<Property>();
 
-// Status badge configuration for all 9 statuses
+// Status badge configuration for all 10 statuses
 const statusConfig: Record<string, { labelKey: string; className: string }> = {
+    draft: {
+        labelKey: 'properties.statusDraft',
+        className: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    },
     inactive: {
         labelKey: 'properties.statusInactive',
         className: 'bg-gray-500/20 text-gray-400 border-gray-500/30',

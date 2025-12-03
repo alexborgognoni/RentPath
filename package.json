@@ -65,7 +65,8 @@
         "tailwindcss": "^4.0.0",
         "tailwindcss-animate": "^1.0.7",
         "vite": "^7.0.4",
-        "ziggy-js": "^2.6.0"
+        "ziggy-js": "^2.6.0",
+        "zod": "^4.1.13"
     },
     "optionalDependencies": {
         "@rollup/rollup-linux-x64-gnu": "4.9.5",

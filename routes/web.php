@@ -286,6 +286,19 @@ Route::domain('manager.'.config('app.domain'))->middleware('subdomain:manager')-
         Route::post('properties', [PropertyController::class, 'store'])
             ->name('properties.store');
 
+        // Property draft endpoints (autosave)
+        Route::post('properties/draft', [PropertyController::class, 'createDraft'])
+            ->name('properties.createDraft');
+
+        Route::patch('properties/{property}/draft', [PropertyController::class, 'saveDraft'])
+            ->name('properties.saveDraft');
+
+        Route::post('properties/{property}/publish', [PropertyController::class, 'publishDraft'])
+            ->name('properties.publishDraft');
+
+        Route::delete('properties/{property}/draft', [PropertyController::class, 'deleteDraft'])
+            ->name('properties.deleteDraft');
+
         Route::get('properties/{property}', [PropertyController::class, 'show'])
             ->name('properties.show');
 

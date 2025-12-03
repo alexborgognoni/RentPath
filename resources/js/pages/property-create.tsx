@@ -8,6 +8,7 @@ import { PricingStep } from '@/components/property-wizard/steps/PricingStep';
 import { PropertyTypeStep } from '@/components/property-wizard/steps/PropertyTypeStep';
 import { ReviewStep } from '@/components/property-wizard/steps/ReviewStep';
 import { SpecificationsStep } from '@/components/property-wizard/steps/SpecificationsStep';
+import { SaveStatus } from '@/components/ui/save-status';
 import { usePropertyWizard, WIZARD_STEPS } from '@/hooks/usePropertyWizard';
 import { ManagerLayout } from '@/layouts/manager-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -15,15 +16,24 @@ import type { Property } from '@/types/dashboard';
 import { route } from '@/utils/route';
 import { Head, router } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Home, Save } from 'lucide-react';
+import { Home } from 'lucide-react';
+import { useCallback } from 'react';
 
 interface PropertyCreateWizardProps {
     property?: Property;
     isEditing?: boolean;
+    isDraft?: boolean;
 }
 
-export default function PropertyCreateWizard({ property, isEditing = false }: PropertyCreateWizardProps) {
-    const wizard = usePropertyWizard(property);
+export default function PropertyCreateWizard({ property, isEditing = false, isDraft = false }: PropertyCreateWizardProps) {
+    const wizard = usePropertyWizard({
+        property,
+        isDraft,
+        onDraftCreated: (propertyId) => {
+            // Update URL to include draft ID without full navigation
+            window.history.replaceState({}, '', `${window.location.pathname}?draft=${propertyId}`);
+        },
+    });
 
     const breadcrumbs: BreadcrumbItem[] = isEditing
         ? [
@@ -33,8 +43,8 @@ export default function PropertyCreateWizard({ property, isEditing = false }: Pr
           ]
         : [{ title: 'Properties', href: route('manager.properties.index') }, { title: 'Add Property' }];
 
-    const handleSubmit = () => {
-        if (!wizard.validateCurrentStep()) {
+    const handleSubmit = useCallback(() => {
+        if (!wizard.validateForPublish()) {
             return;
         }
 
@@ -46,7 +56,7 @@ export default function PropertyCreateWizard({ property, isEditing = false }: Pr
         const { data } = wizard;
         Object.keys(data).forEach((key) => {
             const value = data[key as keyof typeof data];
-            if (value !== undefined && value !== null && key !== 'images' && key !== 'imagePreviews') {
+            if (value !== undefined && value !== null && key !== 'images' && key !== 'imagePreviews' && key !== 'existingImages') {
                 if (typeof value === 'boolean') {
                     formData.append(key, value ? '1' : '0');
                 } else if (typeof value === 'object' && !Array.isArray(value)) {
@@ -63,26 +73,60 @@ export default function PropertyCreateWizard({ property, isEditing = false }: Pr
         });
         formData.append('main_image_index', String(data.mainImageIndex));
 
-        const endpoint = isEditing ? `/properties/${property?.id}` : '/properties';
-        const method = isEditing ? 'put' : 'post';
-
-        router[method](endpoint, formData, {
-            forceFormData: true,
-            onError: (errors) => {
-                console.error('Submission errors:', errors);
-                wizard.setIsSubmitting(false);
-                // Map server errors to wizard errors
-                const wizardErrors: Partial<Record<keyof typeof data, string>> = {};
-                Object.entries(errors).forEach(([key, message]) => {
-                    wizardErrors[key as keyof typeof data] = message as string;
-                });
-                wizard.setErrors(wizardErrors);
-            },
-            onSuccess: () => {
-                wizard.setIsSubmitting(false);
-            },
-        });
-    };
+        // Use the appropriate endpoint based on whether this is a draft or an existing property
+        if (wizard.propertyId && !isEditing) {
+            // Publishing a draft
+            router.post(`/properties/${wizard.propertyId}/publish`, formData, {
+                forceFormData: true,
+                onError: (errors) => {
+                    console.error('Submission errors:', errors);
+                    wizard.setIsSubmitting(false);
+                    const wizardErrors: Partial<Record<keyof typeof data, string>> = {};
+                    Object.entries(errors).forEach(([key, message]) => {
+                        wizardErrors[key as keyof typeof data] = message as string;
+                    });
+                    wizard.setErrors(wizardErrors);
+                },
+                onSuccess: () => {
+                    wizard.setIsSubmitting(false);
+                },
+            });
+        } else if (isEditing && property?.id) {
+            // Updating existing property
+            router.put(`/properties/${property.id}`, formData, {
+                forceFormData: true,
+                onError: (errors) => {
+                    console.error('Submission errors:', errors);
+                    wizard.setIsSubmitting(false);
+                    const wizardErrors: Partial<Record<keyof typeof data, string>> = {};
+                    Object.entries(errors).forEach(([key, message]) => {
+                        wizardErrors[key as keyof typeof data] = message as string;
+                    });
+                    wizard.setErrors(wizardErrors);
+                },
+                onSuccess: () => {
+                    wizard.setIsSubmitting(false);
+                },
+            });
+        } else {
+            // Fallback: create new property (shouldn't happen with autosave flow)
+            router.post('/properties', formData, {
+                forceFormData: true,
+                onError: (errors) => {
+                    console.error('Submission errors:', errors);
+                    wizard.setIsSubmitting(false);
+                    const wizardErrors: Partial<Record<keyof typeof data, string>> = {};
+                    Object.entries(errors).forEach(([key, message]) => {
+                        wizardErrors[key as keyof typeof data] = message as string;
+                    });
+                    wizard.setErrors(wizardErrors);
+                },
+                onSuccess: () => {
+                    wizard.setIsSubmitting(false);
+                },
+            });
+        }
+    }, [wizard, isEditing, property?.id]);
 
     const renderCurrentStep = () => {
         const stepProps = {
@@ -90,6 +134,7 @@ export default function PropertyCreateWizard({ property, isEditing = false }: Pr
             updateData: wizard.updateData,
             updateMultipleFields: wizard.updateMultipleFields,
             errors: wizard.errors,
+            onBlur: wizard.validateFieldOnBlur,
         };
 
         switch (wizard.currentStep) {
@@ -134,21 +179,16 @@ export default function PropertyCreateWizard({ property, isEditing = false }: Pr
                             </div>
                         </div>
 
-                        {/* Save draft button (hidden for now, future feature) */}
-                        <button
-                            type="button"
-                            className="hidden items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted md:flex"
-                        >
-                            <Save className="h-4 w-4" />
-                            Save Draft
-                        </button>
+                        {/* Save status indicator */}
+                        <SaveStatus status={wizard.autosaveStatus} lastSavedAt={wizard.lastSavedAt} />
                     </div>
 
                     {/* Progress indicator */}
                     <WizardProgress
                         steps={WIZARD_STEPS}
                         currentStep={wizard.currentStep}
-                        completedSteps={wizard.completedSteps}
+                        currentStepIndex={wizard.currentStepIndex}
+                        maxStepReached={wizard.maxStepReached}
                         onStepClick={wizard.goToStep}
                         canGoToStep={wizard.canGoToStep}
                     />

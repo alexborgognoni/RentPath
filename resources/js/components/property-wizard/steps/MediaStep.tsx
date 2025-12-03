@@ -1,6 +1,7 @@
 import { StepContainer } from '@/components/property-wizard/components/StepContainer';
 import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
+import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import { motion, Reorder } from 'framer-motion';
 import { Camera, GripVertical, ImagePlus, Star, Trash2, Upload } from 'lucide-react';
 import { useCallback } from 'react';
@@ -10,9 +11,16 @@ interface MediaStepProps {
     updateData: <K extends keyof PropertyWizardData>(key: K, value: PropertyWizardData[K]) => void;
     updateMultipleFields: (updates: Partial<PropertyWizardData>) => void;
     errors: Partial<Record<keyof PropertyWizardData, string>>;
+    onBlur?: (field: keyof PropertyWizardData, value: unknown) => void;
 }
 
-export function MediaStep({ data, updateData, updateMultipleFields, errors }: MediaStepProps) {
+export function MediaStep({ data, updateData, updateMultipleFields, errors, onBlur }: MediaStepProps) {
+    const handleBlur = (field: keyof PropertyWizardData) => {
+        if (onBlur) {
+            onBlur(field, data[field]);
+        }
+    };
+
     const handleImageSelect = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const files = Array.from(e.target.files || []);
@@ -23,7 +31,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors }: Me
 
             files.forEach((file) => {
                 if (!file.type.startsWith('image/')) return;
-                if (file.size > 10 * 1024 * 1024) return; // 10MB limit
+                if (file.size > PROPERTY_CONSTRAINTS.images.maxSizeBytes) return;
 
                 newImages.push(file);
 
@@ -99,12 +107,13 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors }: Me
         [data.images, data.imagePreviews, data.mainImageIndex, updateMultipleFields],
     );
 
-    const inputClassName = cn(
-        'w-full rounded-xl border-2 bg-background px-4 py-3 text-foreground shadow-sm transition-all',
-        'placeholder:text-muted-foreground/60',
-        'focus:border-primary focus:ring-4 focus:ring-primary/10 focus:outline-none',
-        'border-border hover:border-primary/30',
-    );
+    const inputClassName = (hasError: boolean) =>
+        cn(
+            'w-full rounded-xl border-2 bg-background px-4 py-3 text-foreground shadow-sm transition-all',
+            'placeholder:text-muted-foreground/60',
+            'focus:border-primary focus:ring-4 focus:ring-primary/10 focus:outline-none',
+            hasError ? 'border-destructive bg-destructive/5' : 'border-border hover:border-primary/30',
+        );
 
     return (
         <StepContainer title="Make it shine" description="Great photos and a compelling title attract more applicants">
@@ -119,13 +128,24 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors }: Me
                         id="title"
                         value={data.title}
                         onChange={(e) => updateData('title', e.target.value)}
-                        className={cn(inputClassName, 'text-center text-lg font-medium', errors.title && 'border-destructive bg-destructive/5')}
+                        onBlur={() => handleBlur('title')}
+                        className={cn(inputClassName(!!errors.title), 'text-center text-lg font-medium')}
                         placeholder="e.g., Sunny 2BR Apartment with Balcony in City Center"
-                        maxLength={100}
+                        maxLength={PROPERTY_CONSTRAINTS.title.maxLength}
+                        aria-invalid={!!errors.title}
+                        aria-describedby={errors.title ? 'title-error' : undefined}
                     />
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{errors.title && <span className="text-destructive">{errors.title}</span>}</span>
-                        <span>{data.title.length}/100</span>
+                        <span>
+                            {errors.title && (
+                                <span id="title-error" className="text-destructive">
+                                    {errors.title}
+                                </span>
+                            )}
+                        </span>
+                        <span>
+                            {data.title.length}/{PROPERTY_CONSTRAINTS.title.maxLength}
+                        </span>
                     </div>
                 </motion.div>
 
@@ -138,10 +158,18 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors }: Me
                         id="description"
                         value={data.description || ''}
                         onChange={(e) => updateData('description', e.target.value)}
+                        onBlur={() => handleBlur('description')}
                         rows={4}
-                        className={cn(inputClassName, 'resize-none')}
+                        className={cn(inputClassName(!!errors.description), 'resize-none')}
                         placeholder="Describe what makes your property special. Mention nearby amenities, transport links, and anything else tenants should know..."
+                        maxLength={PROPERTY_CONSTRAINTS.description.maxLength}
                     />
+                    <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{errors.description && <span className="text-destructive">{errors.description}</span>}</span>
+                        <span>
+                            {(data.description || '').length}/{PROPERTY_CONSTRAINTS.description.maxLength.toLocaleString()}
+                        </span>
+                    </div>
                 </motion.div>
 
                 {/* Photo Upload */}
@@ -151,7 +179,14 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors }: Me
                         Property Photos
                     </h3>
 
-                    <input type="file" accept="image/*" multiple onChange={handleImageSelect} className="hidden" id="property-images" />
+                    <input
+                        type="file"
+                        accept={PROPERTY_CONSTRAINTS.images.allowedTypes.join(',')}
+                        multiple
+                        onChange={handleImageSelect}
+                        className="hidden"
+                        id="property-images"
+                    />
 
                     {data.imagePreviews.length > 0 ? (
                         <div className="space-y-4">
@@ -210,16 +245,21 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors }: Me
                                 ))}
 
                                 {/* Add more button */}
-                                <label
-                                    htmlFor="property-images"
-                                    className="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 transition-all hover:border-primary/50 hover:bg-muted/50"
-                                >
-                                    <ImagePlus className="mb-2 h-8 w-8 text-muted-foreground" />
-                                    <span className="text-sm font-medium text-muted-foreground">Add more</span>
-                                </label>
+                                {data.imagePreviews.length < PROPERTY_CONSTRAINTS.images.maxCount && (
+                                    <label
+                                        htmlFor="property-images"
+                                        className="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 transition-all hover:border-primary/50 hover:bg-muted/50"
+                                    >
+                                        <ImagePlus className="mb-2 h-8 w-8 text-muted-foreground" />
+                                        <span className="text-sm font-medium text-muted-foreground">Add more</span>
+                                    </label>
+                                )}
                             </Reorder.Group>
 
-                            <p className="text-center text-xs text-muted-foreground">Drag to reorder. The first image will be your main photo.</p>
+                            <p className="text-center text-xs text-muted-foreground">
+                                Drag to reorder. The first image will be your main photo. ({data.imagePreviews.length}/
+                                {PROPERTY_CONSTRAINTS.images.maxCount})
+                            </p>
                         </div>
                     ) : (
                         <label
@@ -229,7 +269,9 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors }: Me
                             <Upload className="mb-4 h-12 w-12 text-muted-foreground" />
                             <p className="mb-1 font-medium text-foreground">Upload property photos</p>
                             <p className="text-sm text-muted-foreground">Click or drag images here</p>
-                            <p className="mt-2 text-xs text-muted-foreground">Max 10MB per image • JPG, PNG, WebP</p>
+                            <p className="mt-2 text-xs text-muted-foreground">
+                                Max {PROPERTY_CONSTRAINTS.images.maxSizeBytes / (1024 * 1024)}MB per image • JPG, PNG, WebP
+                            </p>
                         </label>
                     )}
                 </motion.div>
