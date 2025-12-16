@@ -114,7 +114,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Image column
             columnHelper.display({
                 id: 'image',
-                size: 80,
                 cell: ({ row }) => {
                     const property = row.original;
                     const mainImage = property.images?.find((img) => img.is_main) || property.images?.[0];
@@ -140,7 +139,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Property column (title + address)
             columnHelper.accessor('title', {
                 header: () => translate(translations, 'properties.columnProperty'),
-                size: 250,
                 cell: ({ row }) => {
                     const property = row.original;
                     return (
@@ -155,7 +153,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Price column
             columnHelper.accessor('rent_amount', {
                 header: () => translate(translations, 'properties.columnPrice'),
-                size: 120,
                 cell: ({ row }) => {
                     const property = row.original;
                     return (
@@ -170,7 +167,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Size column
             columnHelper.accessor('size', {
                 header: 'Size',
-                size: 80,
                 cell: ({ getValue }) => {
                     const size = getValue();
                     return (
@@ -185,7 +181,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Status column
             columnHelper.accessor('status', {
                 header: () => translate(translations, 'properties.columnStatus'),
-                size: 140,
                 cell: ({ getValue }) => {
                     const status = getValue() || 'available';
                     const config = statusConfig[status] || statusConfig.available;
@@ -202,7 +197,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Beds column
             columnHelper.accessor('bedrooms', {
                 header: 'Beds',
-                size: 70,
                 cell: ({ getValue }) => (
                     <div className="flex items-center justify-center gap-2 text-sm">
                         <Bed size={14} className="text-muted-foreground" />
@@ -214,7 +208,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Baths column
             columnHelper.accessor('bathrooms', {
                 header: 'Baths',
-                size: 70,
                 cell: ({ getValue }) => (
                     <div className="flex items-center justify-center gap-2 text-sm">
                         <Bath size={14} className="text-muted-foreground" />
@@ -227,7 +220,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             columnHelper.display({
                 id: 'parking',
                 header: 'Parking',
-                size: 70,
                 cell: ({ row }) => {
                     const property = row.original;
                     const totalParkingSpots = (property.parking_spots_interior || 0) + (property.parking_spots_exterior || 0);
@@ -248,7 +240,6 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Applicants column
             columnHelper.accessor('tenant_count', {
                 header: () => translate(translations, 'properties.columnApplicants'),
-                size: 100,
                 cell: ({ getValue }) => (
                     <div className="flex items-center justify-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
@@ -263,23 +254,22 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             columnHelper.display({
                 id: 'actions',
                 header: () => translate(translations, 'properties.columnActions'),
-                size: 150,
                 cell: ({ row }) => {
                     const property = row.original;
                     return (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 whitespace-nowrap">
                             <button
                                 onClick={(e) => handleInvite(e, property)}
-                                className="flex items-center gap-1 rounded-lg bg-muted px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80"
+                                title={translate(translations, 'properties.invite')}
+                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-muted/80"
                             >
                                 <LinkIcon size={14} />
-                                <span>{translate(translations, 'properties.invite')}</span>
                             </button>
                             <button
                                 onClick={(e) => handleEdit(e, property)}
-                                className="flex items-center gap-1 rounded-lg bg-primary px-2 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+                                className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
                             >
-                                <span>{translate(translations, 'properties.edit')}</span>
+                                {translate(translations, 'properties.edit')}
                             </button>
                             <button
                                 onClick={(e) => {

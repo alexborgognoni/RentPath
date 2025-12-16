@@ -34,7 +34,7 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick, className 
     return (
         <div className={cn('relative overflow-hidden rounded-xl border border-border bg-card', className)}>
             <div className="overflow-x-auto">
-                <table role="grid" className="w-full min-w-[900px]">
+                <table role="grid" className="w-full">
                     <thead>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <tr key={headerGroup.id} className="border-b border-border bg-muted/50">
@@ -51,7 +51,6 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick, className 
                                                 'px-4 py-4 text-left text-sm font-semibold tracking-wide text-muted-foreground',
                                                 isSortable && 'cursor-pointer select-none transition-colors hover:text-foreground',
                                             )}
-                                            style={{ width: header.column.columnDef.size ? `${header.column.columnDef.size}px` : 'auto' }}
                                             onClick={isSortable ? header.column.getToggleSortingHandler() : undefined}
                                         >
                                             {header.isPlaceholder ? null : (

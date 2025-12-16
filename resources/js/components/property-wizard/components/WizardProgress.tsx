@@ -33,26 +33,17 @@ export function WizardProgress({ steps, currentStep, currentStepIndex, maxStepRe
                 </div>
             </div>
 
-            {/* Desktop: Full step indicator with CSS Grid for equal sections */}
-            <div className="hidden overflow-hidden md:block">
-                {/* Grid extends beyond container so first/last bubble centers align with edges */}
+            {/* Desktop: Full step indicator with CSS Grid */}
+            <div className="hidden md:block">
                 <div
                     className="relative grid"
                     style={{
-                        gridTemplateColumns: `repeat(${steps.length}, 1fr)`,
-                        marginLeft: `calc(-100% / ${steps.length} / 2)`,
-                        marginRight: `calc(-100% / ${steps.length} / 2)`,
-                        width: `calc(100% + 100% / ${steps.length})`,
+                        gridTemplateColumns: `repeat(${steps.length}, auto)`,
+                        justifyContent: 'space-between',
                     }}
                 >
                     {/* Connector line spanning from first to last bubble center */}
-                    <div
-                        className="pointer-events-none absolute top-5 h-0.5"
-                        style={{
-                            left: `calc(${100 / steps.length / 2}%)`,
-                            right: `calc(${100 / steps.length / 2}%)`,
-                        }}
-                    >
+                    <div className="pointer-events-none absolute top-5 right-5 left-5 h-0.5">
                         {/* Background track */}
                         <div className="absolute inset-0 rounded-full bg-muted-foreground/20" />
                         {/* Completed portion - colored to max step reached */}
@@ -77,7 +68,7 @@ export function WizardProgress({ steps, currentStep, currentStepIndex, maxStepRe
                                 onClick={() => isClickable && onStepClick?.(step.id)}
                                 disabled={!isClickable}
                                 className={cn(
-                                    'group relative z-10 flex flex-col items-center gap-2 justify-self-center transition-all',
+                                    'group relative z-10 flex flex-col items-center gap-2 transition-all',
                                     isClickable ? 'cursor-pointer' : 'cursor-not-allowed',
                                 )}
                             >
