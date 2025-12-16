@@ -559,6 +559,8 @@ export function usePropertyWizard({
 
         const nextIndex = currentStepIndex + 1;
         if (nextIndex < WIZARD_STEPS.length) {
+            // Mark user interaction to trigger draft creation if not already done
+            setHasUserInteracted(true);
             // Update maxStepReached if advancing beyond current max
             if (nextIndex > maxStepReached) {
                 // Skip the lock check since we're intentionally advancing
