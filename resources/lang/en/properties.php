@@ -43,6 +43,7 @@ return [
     'maxSize' => 'Max m²',
 
     // Status badges
+    'statusDraft' => 'Draft',
     'statusInactive' => 'Inactive',
     'statusAvailable' => 'Available',
     'statusApplicationReceived' => 'Application Received',
@@ -53,6 +54,13 @@ return [
     'statusMaintenance' => 'Maintenance',
     'statusArchived' => 'Archived',
     'statusReserved' => 'Reserved',
+
+    // Draft section
+    'drafts' => 'Drafts',
+    'untitledDraft' => 'Untitled draft',
+    'draftIncomplete' => 'Incomplete listing',
+    'continue' => 'Continue',
+    'delete' => 'Delete',
 
     // Actions
     'invite' => 'Invite',

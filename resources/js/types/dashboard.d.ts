@@ -101,6 +101,7 @@ export interface Property {
     smoking_allowed?: boolean;
     // Property status
     status:
+        | 'draft'
         | 'inactive'
         | 'available'
         | 'application_received'
@@ -110,6 +111,7 @@ export interface Property {
         | 'leased'
         | 'maintenance'
         | 'archived';
+    wizard_step?: number; // 1-indexed step for draft properties
     tenant_count?: number; // This will be computed/added by backend
     // Application access control and invite tokens
     requires_invite: boolean;

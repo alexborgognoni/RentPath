@@ -1,1 +1,2 @@
+npm run types
 npx lint-staged

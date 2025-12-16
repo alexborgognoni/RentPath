@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
+use App\Http\Requests\PublishPropertyRequest;
+use App\Http\Requests\SavePropertyDraftRequest;
+use App\Http\Requests\UpdatePropertyRequest;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,11 +46,265 @@ class PropertyController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     * If a draft ID is provided, load the existing draft.
      */
-    public function create()
+    public function create(Request $request)
     {
+        $draftId = $request->query('draft');
+        $property = null;
+
+        if ($draftId) {
+            $propertyManager = Auth::user()->propertyManager;
+            if ($propertyManager) {
+                $property = $propertyManager->properties()
+                    ->where('id', $draftId)
+                    ->where('status', 'draft')
+                    ->with('images')
+                    ->first();
+
+                if ($property) {
+                    // Transform images to include URLs
+                    $property->images = $property->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image_url' => StorageHelper::url($image->image_path, 'private', 1440),
+                            'image_path' => $image->image_path,
+                            'is_main' => $image->is_main,
+                            'sort_order' => $image->sort_order,
+                        ];
+                    })->sortBy('sort_order')->values();
+                }
+            }
+        }
+
         return Inertia::render('property-create', [
+            'property' => $property,
             'isEditing' => false,
+            'isDraft' => $property !== null,
+        ]);
+    }
+
+    /**
+     * Create a new draft property.
+     * Called when user starts the wizard to get a property ID for autosave.
+     */
+    public function createDraft(Request $request)
+    {
+        $propertyManager = Auth::user()->propertyManager;
+
+        if (! $propertyManager) {
+            return response()->json([
+                'error' => 'Property manager profile required',
+            ], 403);
+        }
+
+        // Create minimal draft property
+        $property = $propertyManager->properties()->create([
+            'status' => 'draft',
+            'title' => '',
+            'type' => $request->input('type', 'apartment'),
+            'subtype' => $request->input('subtype', 'studio'),
+            'house_number' => '',
+            'street_name' => '',
+            'city' => '',
+            'postal_code' => '',
+            'country' => 'CH',
+            'bedrooms' => 0,
+            'bathrooms' => 0,
+            'rent_amount' => 0,
+            'rent_currency' => 'eur',
+        ]);
+
+        return response()->json([
+            'id' => $property->id,
+            'status' => 'draft',
+        ]);
+    }
+
+    /**
+     * Save draft property data (autosave endpoint).
+     * Uses relaxed validation since drafts can be incomplete.
+     */
+    public function saveDraft(SavePropertyDraftRequest $request, Property $property)
+    {
+        // Get validated data with boolean conversions
+        $validated = $request->validatedWithBooleans();
+
+        // Extract wizard_step before filling property
+        $requestedStep = $validated['wizard_step'] ?? $property->wizard_step ?? 1;
+        unset($validated['wizard_step']);
+
+        $property->fill($validated);
+
+        // Calculate max valid step based on current data
+        $maxValidStep = $this->calculateMaxValidStep($property);
+
+        // Update wizard_step (never exceed what was requested, but may reduce)
+        $property->wizard_step = min($requestedStep, $maxValidStep);
+
+        $property->save();
+
+        return response()->json([
+            'id' => $property->id,
+            'status' => 'draft',
+            'saved_at' => now()->toISOString(),
+            'wizard_step' => $property->wizard_step,
+            'max_valid_step' => $maxValidStep,
+        ]);
+    }
+
+    /**
+     * Type-specific required fields for specifications step.
+     * Must match SPECS_REQUIRED_BY_TYPE in property-validation.ts
+     */
+    private static array $specsRequiredByType = [
+        'apartment' => ['bedrooms' => ['min' => 0], 'bathrooms' => ['min' => 1], 'size' => true],
+        'house' => ['bedrooms' => ['min' => 1], 'bathrooms' => ['min' => 1], 'size' => true],
+        'room' => ['bathrooms' => ['min' => 0], 'size' => true],
+        'commercial' => ['size' => true],
+        'industrial' => ['size' => true],
+        'parking' => [], // No required fields
+    ];
+
+    /**
+     * Validate specifications step for a given property type.
+     */
+    private function validateSpecsStep(Property $property): bool
+    {
+        $requirements = self::$specsRequiredByType[$property->type] ?? [];
+
+        // Validate bedrooms requirement
+        if (isset($requirements['bedrooms'])) {
+            $minBedrooms = $requirements['bedrooms']['min'];
+            if ($property->bedrooms < $minBedrooms) {
+                return false;
+            }
+        }
+
+        // Validate bathrooms requirement
+        if (isset($requirements['bathrooms'])) {
+            $minBathrooms = $requirements['bathrooms']['min'];
+            if ($property->bathrooms < $minBathrooms) {
+                return false;
+            }
+        }
+
+        // Validate size requirement
+        if (isset($requirements['size']) && $requirements['size'] === true) {
+            if ($property->size === null || $property->size <= 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Calculate the maximum valid wizard step based on property data.
+     * Returns 1-indexed step number.
+     */
+    private function calculateMaxValidStep(Property $property): int
+    {
+        $steps = [
+            // Step 1: property-type
+            fn () => ! empty($property->type) && ! empty($property->subtype),
+            // Step 2: location
+            fn () => ! empty($property->house_number) && ! empty($property->street_name)
+                 && ! empty($property->city) && ! empty($property->postal_code)
+                 && ! empty($property->country),
+            // Step 3: specifications (type-specific validation)
+            fn () => $this->validateSpecsStep($property),
+            // Step 4: amenities (optional)
+            fn () => true,
+            // Step 5: energy (optional)
+            fn () => true,
+            // Step 6: pricing
+            fn () => $property->rent_amount > 0,
+            // Step 7: media
+            fn () => ! empty($property->title),
+            // Step 8: review (all previous must be valid)
+            fn () => true,
+        ];
+
+        for ($i = 0; $i < count($steps); $i++) {
+            if (! $steps[$i]()) {
+                return $i + 1; // Return 1-indexed step of first invalid
+            }
+        }
+
+        return count($steps); // All steps valid
+    }
+
+    /**
+     * Publish a draft property (changes status from draft to inactive/available).
+     */
+    public function publishDraft(PublishPropertyRequest $request, Property $property)
+    {
+        // Get validated data with boolean conversions
+        $validated = $request->validatedWithBooleans();
+
+        // Handle images
+        $images = $request->file('images', []);
+        $mainImageIndex = $request->input('main_image_index', 0);
+
+        // Update property and change status
+        $validated['status'] = 'inactive';
+        unset($validated['images'], $validated['main_image_index']);
+
+        $property->fill($validated);
+        $property->save();
+
+        // Handle image uploads if new images provided
+        if (! empty($images)) {
+            // Delete old images
+            $disk = StorageHelper::getDisk('private');
+            foreach ($property->images as $oldImage) {
+                Storage::disk($disk)->delete($oldImage->image_path);
+                $oldImage->delete();
+            }
+
+            // Upload new images
+            foreach ($images as $index => $image) {
+                $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
+                $property->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => $index,
+                    'is_main' => $index === (int) $mainImageIndex,
+                ]);
+            }
+        }
+
+        return redirect()->route('manager.properties.index')
+            ->with('success', 'Property published successfully.');
+    }
+
+    /**
+     * Delete a draft property.
+     */
+    public function deleteDraft(Property $property)
+    {
+        $propertyManager = Auth::user()->propertyManager;
+
+        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
+            abort(403);
+        }
+
+        if ($property->status !== 'draft') {
+            return response()->json([
+                'error' => 'Can only delete draft properties via this endpoint',
+            ], 400);
+        }
+
+        // Delete associated images from storage
+        $disk = StorageHelper::getDisk('private');
+        foreach ($property->images as $image) {
+            Storage::disk($disk)->delete($image->image_path);
+        }
+
+        $property->delete();
+
+        return response()->json([
+            'message' => 'Draft deleted successfully',
         ]);
     }
 
@@ -235,87 +492,10 @@ class PropertyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Property $property)
+    public function update(UpdatePropertyRequest $request, Property $property)
     {
-        // Ensure user owns this property through their property manager
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            // Basic info
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-
-            // Address
-            'house_number' => 'required|string|max:20',
-            'street_name' => 'required|string|max:255',
-            'street_line2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'country' => 'required|string|size:2',
-
-            // Type
-            'type' => ['required', Rule::in(['apartment', 'house', 'room', 'commercial', 'industrial', 'parking'])],
-            'subtype' => ['required', Rule::in([
-                'studio', 'loft', 'duplex', 'triplex', 'penthouse', 'serviced',
-                'detached', 'semi-detached', 'villa', 'bungalow',
-                'private_room', 'student_room', 'co-living',
-                'office', 'retail',
-                'warehouse', 'factory',
-                'garage', 'indoor_spot', 'outdoor_spot',
-            ])],
-
-            // Specifications
-            'bedrooms' => 'required|integer|min:0|max:20',
-            'bathrooms' => 'required|numeric|min:0|max:10',
-            'parking_spots_interior' => 'nullable|integer|min:0|max:20',
-            'parking_spots_exterior' => 'nullable|integer|min:0|max:20',
-            'size' => 'nullable|numeric|min:0|max:100000',
-            'balcony_size' => 'nullable|numeric|min:0|max:10000',
-            'land_size' => 'nullable|numeric|min:0|max:1000000',
-            'floor_level' => 'nullable|integer',
-            'has_elevator' => 'nullable|boolean',
-            'year_built' => 'nullable|integer|min:1800|max:'.date('Y'),
-
-            // Energy/Building
-            'energy_class' => ['nullable', Rule::in(['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'])],
-            'thermal_insulation_class' => ['nullable', Rule::in(['A', 'B', 'C', 'D', 'E', 'F', 'G'])],
-            'heating_type' => ['nullable', Rule::in(['gas', 'electric', 'district', 'wood', 'heat_pump', 'other'])],
-
-            // Kitchen
-            'kitchen_equipped' => 'nullable|boolean',
-            'kitchen_separated' => 'nullable|boolean',
-
-            // Amenities
-            'has_cellar' => 'nullable|boolean',
-            'has_laundry' => 'nullable|boolean',
-            'has_fireplace' => 'nullable|boolean',
-            'has_air_conditioning' => 'nullable|boolean',
-            'has_garden' => 'nullable|boolean',
-            'has_rooftop' => 'nullable|boolean',
-            'extras' => 'nullable|json',
-
-            // Rental
-            'rent_amount' => 'required|numeric|min:0|max:999999.99',
-            'rent_currency' => ['required', Rule::in(['eur', 'usd', 'gbp', 'chf'])],
-            'available_date' => 'nullable|date|after_or_equal:today',
-
-            // Images
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240', // 10MB max
-            'main_image_index' => 'nullable|integer|min:0',
-        ]);
-
-        // Convert boolean fields from strings to actual booleans
-        $booleanFields = ['has_elevator', 'kitchen_equipped', 'kitchen_separated', 'has_cellar',
-            'has_laundry', 'has_fireplace', 'has_air_conditioning', 'has_garden', 'has_rooftop'];
-        foreach ($booleanFields as $field) {
-            if (isset($validated[$field])) {
-                $validated[$field] = filter_var($validated[$field], FILTER_VALIDATE_BOOLEAN);
-            }
-        }
+        // Get validated data with boolean conversions
+        $validated = $request->validatedWithBooleans();
 
         // Remove images from validated data
         $images = $request->file('images', []);
@@ -328,7 +508,7 @@ class PropertyController extends Controller
         // Handle new image uploads
         if (! empty($images)) {
             // Delete old images
-            $disk = \App\Helpers\StorageHelper::getDisk('private');
+            $disk = StorageHelper::getDisk('private');
             foreach ($property->images as $oldImage) {
                 Storage::disk($disk)->delete($oldImage->image_path);
                 $oldImage->delete();

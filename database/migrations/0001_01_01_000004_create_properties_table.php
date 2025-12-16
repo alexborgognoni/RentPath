@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('property_manager_id')->constrained()->onDelete('cascade');
 
             // Basic property information
-            $table->string('title');
+            $table->string('title')->nullable(); // Nullable for drafts
             $table->longText('description')->nullable();
 
             // Property type and subtype
@@ -66,13 +66,14 @@ return new class extends Migration
             $table->boolean('has_rooftop')->default(false);
             $table->json('extras')->nullable()->comment('for uncommon features like sauna, home_office, etc.');
 
-            // Rental information
+            // Rental information - nullable/defaults for drafts
             $table->date('available_date')->nullable();
-            $table->decimal('rent_amount', 10, 2);
+            $table->decimal('rent_amount', 10, 2)->default(0);
             $table->enum('rent_currency', ['eur', 'usd', 'gbp', 'chf'])->default('eur');
 
             // Property status
             $table->enum('status', [
+                'draft',
                 'inactive',
                 'available',
                 'application_received',
@@ -82,7 +83,7 @@ return new class extends Migration
                 'leased',
                 'maintenance',
                 'archived',
-            ])->default('inactive');
+            ])->default('draft');
 
             // Application access control
             // Note: Future enhancement will add 'is_listed' for public listing visibility
@@ -92,14 +93,14 @@ return new class extends Migration
             $table->string('invite_token', 64)->unique()->nullable();
             $table->timestamp('invite_token_expires_at')->nullable();
 
-            // Address fields
-            $table->string('house_number', 20);
-            $table->string('street_name', 255);
+            // Address fields - nullable for drafts
+            $table->string('house_number', 20)->nullable();
+            $table->string('street_name', 255)->nullable();
             $table->string('street_line2', 255)->nullable();
-            $table->string('city', 100);
+            $table->string('city', 100)->nullable();
             $table->string('state', 100)->nullable();
-            $table->string('postal_code', 20);
-            $table->char('country', 2); // ISO 3166-1 alpha-2
+            $table->string('postal_code', 20)->nullable();
+            $table->char('country', 2)->default('CH'); // ISO 3166-1 alpha-2
 
             $table->timestamps();
 

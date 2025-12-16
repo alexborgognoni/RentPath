@@ -32,5 +32,7 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="VITE_DEV_SERVER_URL" value=""/>
+        <env name="FILESYSTEM_DISK_PUBLIC" value="public"/>
+        <env name="FILESYSTEM_DISK_PRIVATE" value="private"/>
     </php>
 </phpunit>

@@ -1,10 +1,13 @@
 import { PropertyFilters, type PropertyFilterState } from '@/components/dashboard/property-filters';
 import { PropertyTable } from '@/components/dashboard/property-table';
+import { toast } from '@/components/ui/toast';
 import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
-import { usePage } from '@inertiajs/react';
-import { Building, Filter, Home, Plus } from 'lucide-react';
+import { router, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { ArrowRight, Building, FileEdit, Filter, Home, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 interface PropertiesSectionProps {
@@ -46,20 +49,58 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
         availableFrom: '',
     });
 
-    // Extract unique cities from properties
+    // Separate drafts from published properties
+    const { drafts, publishedProperties } = useMemo(() => {
+        const drafts: Property[] = [];
+        const published: Property[] = [];
+
+        properties.forEach((property) => {
+            if (property.status === 'draft') {
+                drafts.push(property);
+            } else {
+                published.push(property);
+            }
+        });
+
+        return { drafts, publishedProperties: published };
+    }, [properties]);
+
+    // Extract unique cities from published properties only
     const cities = useMemo(() => {
         const uniqueCities = new Set<string>();
-        properties.forEach((property) => {
+        publishedProperties.forEach((property) => {
             if (property.city) {
                 uniqueCities.add(property.city);
             }
         });
         return Array.from(uniqueCities).sort();
-    }, [properties]);
+    }, [publishedProperties]);
 
-    // Filter properties based on current filters
+    // Handle continuing a draft
+    const handleContinueDraft = (draft: Property) => {
+        router.visit(route('properties.create') + `?draft=${draft.id}`);
+    };
+
+    // Handle deleting a draft
+    const handleDeleteDraft = async (draft: Property) => {
+        if (!confirm('Are you sure you want to delete this draft? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            await axios.delete(`/properties/${draft.id}/draft`);
+            toast.success('Draft deleted successfully');
+            // Refresh the page to update the list
+            router.reload();
+        } catch (error) {
+            console.error('Failed to delete draft:', error);
+            toast.error('Failed to delete draft');
+        }
+    };
+
+    // Filter published properties based on current filters (drafts are shown separately)
     const filteredProperties = useMemo(() => {
-        return properties.filter((property) => {
+        return publishedProperties.filter((property) => {
             // Search filter
             if (filters.search) {
                 const searchLower = filters.search.toLowerCase();
@@ -173,7 +214,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
 
             return true;
         });
-    }, [properties, filters]);
+    }, [publishedProperties, filters]);
 
     return (
         <div className="space-y-4">
@@ -193,6 +234,64 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                     <span>{translate(translations, 'properties.addProperty')}</span>
                 </button>
             </div>
+
+            {/* Drafts Section */}
+            {drafts.length > 0 && (
+                <div className="rounded-xl border border-orange-500/30 bg-orange-500/5">
+                    <div className="flex items-center gap-2 border-b border-orange-500/20 px-4 py-3">
+                        <FileEdit size={18} className="text-orange-400" />
+                        <span className="font-medium text-foreground">
+                            {translate(translations, 'properties.drafts')} ({drafts.length})
+                        </span>
+                    </div>
+                    <div className="divide-y divide-orange-500/10">
+                        {drafts.map((draft) => (
+                            <div key={draft.id} className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-orange-500/5">
+                                <div className="flex items-center gap-4">
+                                    {/* Draft image or placeholder */}
+                                    {draft.images?.[0]?.image_url ? (
+                                        <img
+                                            src={draft.images[0].image_url}
+                                            alt="Draft"
+                                            className="h-12 w-16 rounded-lg border border-orange-500/20 object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex h-12 w-16 items-center justify-center rounded-lg border border-orange-500/20 bg-orange-500/10">
+                                            <FileEdit size={20} className="text-orange-400" />
+                                        </div>
+                                    )}
+                                    <div>
+                                        <div className="font-medium text-foreground">
+                                            {draft.title || translate(translations, 'properties.untitledDraft')}
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">
+                                            {draft.type && draft.city
+                                                ? `${draft.type} in ${draft.city}`
+                                                : draft.type || translate(translations, 'properties.draftIncomplete')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleDeleteDraft(draft)}
+                                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                    >
+                                        <Trash2 size={14} />
+                                        <span>{translate(translations, 'properties.delete')}</span>
+                                    </button>
+                                    <button
+                                        onClick={() => handleContinueDraft(draft)}
+                                        className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+                                    >
+                                        <span>{translate(translations, 'properties.continue')}</span>
+                                        <ArrowRight size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Filters Card */}
             <div className="rounded-xl border border-border bg-card shadow-sm">
@@ -217,7 +316,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
             </div>
 
             {/* Content */}
-            {properties.length === 0 ? (
+            {publishedProperties.length === 0 ? (
                 <div className="rounded-2xl border border-border bg-card py-16 text-center">
                     <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
                         <Building size={40} className="text-muted-foreground" />

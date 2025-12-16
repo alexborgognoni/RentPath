@@ -122,7 +122,7 @@ class SubdomainRoutingTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->get($managerUrl.'/dashboard');
+            ->get($managerUrl.'/properties');
 
         $response->assertStatus(200);
     }

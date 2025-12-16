@@ -58,6 +58,7 @@ class Property extends Model
         'rent_amount',
         'rent_currency',
         'status',
+        'wizard_step',
 
         // Address fields
         'house_number',
@@ -113,6 +114,7 @@ class Property extends Model
         'extras' => 'array',
         'requires_invite' => 'boolean',
         'invite_token_expires_at' => 'datetime',
+        'wizard_step' => 'integer',
     ];
 
     /**
