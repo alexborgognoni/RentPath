@@ -24,8 +24,8 @@ import {
 
 export const propertyTypeSchema = z
     .object({
-        type: z.enum(PROPERTY_TYPES, {
-            errorMap: () => ({ message: PROPERTY_MESSAGES.type.required }),
+        type: z.enum([...PROPERTY_TYPES], {
+            error: PROPERTY_MESSAGES.type.required,
         }),
         subtype: z.string().min(1, PROPERTY_MESSAGES.subtype.required),
     })
@@ -63,19 +63,16 @@ export const locationSchema = z.object({
 
 // Helper to handle nullable/optional numeric fields that may come as strings or empty strings
 const coerceOptionalNullableNumber = (message: string) =>
-    z.preprocess(
-        (val) => (val === '' || val === null || val === undefined ? null : Number(val)),
-        z.number({ invalid_type_error: message }).nullable(),
-    );
+    z.preprocess((val) => (val === '' || val === null || val === undefined ? null : Number(val)), z.number({ error: message }).nullable());
 
 export const specificationsSchema = z.object({
     bedrooms: z.coerce
-        .number({ invalid_type_error: PROPERTY_MESSAGES.bedrooms.integer })
+        .number({ error: PROPERTY_MESSAGES.bedrooms.integer })
         .int(PROPERTY_MESSAGES.bedrooms.integer)
         .min(PROPERTY_CONSTRAINTS.bedrooms.min, PROPERTY_MESSAGES.bedrooms.min)
         .max(PROPERTY_CONSTRAINTS.bedrooms.max, PROPERTY_MESSAGES.bedrooms.max),
     bathrooms: z.coerce
-        .number({ invalid_type_error: PROPERTY_MESSAGES.bathrooms.number })
+        .number({ error: PROPERTY_MESSAGES.bathrooms.number })
         .min(PROPERTY_CONSTRAINTS.bathrooms.min, PROPERTY_MESSAGES.bathrooms.min)
         .max(PROPERTY_CONSTRAINTS.bathrooms.max, PROPERTY_MESSAGES.bathrooms.max),
     size: coerceOptionalNullableNumber(PROPERTY_MESSAGES.size.number).pipe(
@@ -103,13 +100,13 @@ export const specificationsSchema = z.object({
             .nullable(),
     ),
     parking_spots_interior: z.coerce
-        .number({ invalid_type_error: PROPERTY_MESSAGES.parking_spots_interior.integer })
+        .number({ error: PROPERTY_MESSAGES.parking_spots_interior.integer })
         .int(PROPERTY_MESSAGES.parking_spots_interior.integer)
         .min(PROPERTY_CONSTRAINTS.parking_spots_interior.min, PROPERTY_MESSAGES.parking_spots_interior.min)
         .max(PROPERTY_CONSTRAINTS.parking_spots_interior.max, PROPERTY_MESSAGES.parking_spots_interior.max)
         .default(0),
     parking_spots_exterior: z.coerce
-        .number({ invalid_type_error: PROPERTY_MESSAGES.parking_spots_exterior.integer })
+        .number({ error: PROPERTY_MESSAGES.parking_spots_exterior.integer })
         .int(PROPERTY_MESSAGES.parking_spots_exterior.integer)
         .min(PROPERTY_CONSTRAINTS.parking_spots_exterior.min, PROPERTY_MESSAGES.parking_spots_exterior.min)
         .max(PROPERTY_CONSTRAINTS.parking_spots_exterior.max, PROPERTY_MESSAGES.parking_spots_exterior.max)
@@ -151,20 +148,20 @@ export const amenitiesSchema = z.object({
 
 export const energySchema = z.object({
     energy_class: z
-        .enum(ENERGY_CLASSES, {
-            errorMap: () => ({ message: PROPERTY_MESSAGES.energy_class.invalid }),
+        .enum([...ENERGY_CLASSES], {
+            error: PROPERTY_MESSAGES.energy_class.invalid,
         })
         .optional()
         .nullable(),
     thermal_insulation_class: z
-        .enum(THERMAL_INSULATION_CLASSES, {
-            errorMap: () => ({ message: PROPERTY_MESSAGES.thermal_insulation_class.invalid }),
+        .enum([...THERMAL_INSULATION_CLASSES], {
+            error: PROPERTY_MESSAGES.thermal_insulation_class.invalid,
         })
         .optional()
         .nullable(),
     heating_type: z
-        .enum(HEATING_TYPES, {
-            errorMap: () => ({ message: PROPERTY_MESSAGES.heating_type.invalid }),
+        .enum([...HEATING_TYPES], {
+            error: PROPERTY_MESSAGES.heating_type.invalid,
         })
         .optional()
         .nullable(),
@@ -176,11 +173,11 @@ export const energySchema = z.object({
 
 export const pricingSchema = z.object({
     rent_amount: z.coerce
-        .number({ invalid_type_error: PROPERTY_MESSAGES.rent_amount.number })
+        .number({ error: PROPERTY_MESSAGES.rent_amount.number })
         .min(PROPERTY_CONSTRAINTS.rent_amount.min, PROPERTY_MESSAGES.rent_amount.min)
         .max(PROPERTY_CONSTRAINTS.rent_amount.max, PROPERTY_MESSAGES.rent_amount.max),
-    rent_currency: z.enum(CURRENCIES, {
-        errorMap: () => ({ message: PROPERTY_MESSAGES.rent_currency.invalid }),
+    rent_currency: z.enum([...CURRENCIES], {
+        error: PROPERTY_MESSAGES.rent_currency.invalid,
     }),
     available_date: z
         .string()
@@ -230,7 +227,7 @@ export const publishPropertySchema = propertyTypeSchema
 // For drafts, we only require type and subtype (which are needed to create the draft)
 // All numeric fields use coercion to handle string inputs from forms/database
 export const draftPropertySchema = z.object({
-    type: z.enum(PROPERTY_TYPES).optional(),
+    type: z.enum([...PROPERTY_TYPES]).optional(),
     subtype: z.string().optional(),
     // All other fields are optional for drafts
     house_number: z.string().max(PROPERTY_CONSTRAINTS.house_number.maxLength).optional().or(z.literal('')),
@@ -258,11 +255,20 @@ export const draftPropertySchema = z.object({
     has_air_conditioning: z.boolean().optional(),
     has_garden: z.boolean().optional(),
     has_rooftop: z.boolean().optional(),
-    energy_class: z.enum(ENERGY_CLASSES).optional().nullable(),
-    thermal_insulation_class: z.enum(THERMAL_INSULATION_CLASSES).optional().nullable(),
-    heating_type: z.enum(HEATING_TYPES).optional().nullable(),
+    energy_class: z
+        .enum([...ENERGY_CLASSES])
+        .optional()
+        .nullable(),
+    thermal_insulation_class: z
+        .enum([...THERMAL_INSULATION_CLASSES])
+        .optional()
+        .nullable(),
+    heating_type: z
+        .enum([...HEATING_TYPES])
+        .optional()
+        .nullable(),
     rent_amount: z.coerce.number().min(0).optional(),
-    rent_currency: z.enum(CURRENCIES).optional(),
+    rent_currency: z.enum([...CURRENCIES]).optional(),
     available_date: z.string().optional().nullable(),
     title: z.string().max(PROPERTY_CONSTRAINTS.title.maxLength).optional().or(z.literal('')),
     description: z.string().max(PROPERTY_CONSTRAINTS.description.maxLength).optional().or(z.literal('')),

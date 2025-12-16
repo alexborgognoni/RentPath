@@ -35,13 +35,14 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
         },
     });
 
-    const breadcrumbs: BreadcrumbItem[] = isEditing
-        ? [
-              { title: 'Properties', href: route('manager.properties.index') },
-              { title: property?.title || 'Property', href: route('properties.show', { property: property?.id }) },
-              { title: 'Edit' },
-          ]
-        : [{ title: 'Properties', href: route('manager.properties.index') }, { title: 'Add Property' }];
+    const breadcrumbs: BreadcrumbItem[] =
+        isEditing && property
+            ? [
+                  { title: 'Properties', href: route('manager.properties.index') },
+                  { title: property.title || 'Property', href: route('properties.show', { property: property.id }) },
+                  { title: 'Edit' },
+              ]
+            : [{ title: 'Properties', href: route('manager.properties.index') }, { title: 'Add Property' }];
 
     const handleSubmit = useCallback(() => {
         if (!wizard.validateForPublish()) {

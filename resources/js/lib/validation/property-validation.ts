@@ -212,8 +212,8 @@ export const PROPERTY_CONSTRAINTS = {
  * Check if a subtype is valid for a given property type
  */
 export function isValidSubtypeForType(type: PropertyType, subtype: string): boolean {
-    const validSubtypes = PROPERTY_SUBTYPES[type];
-    return validSubtypes.includes(subtype as (typeof validSubtypes)[number]);
+    const validSubtypes: readonly string[] = PROPERTY_SUBTYPES[type];
+    return validSubtypes.includes(subtype);
 }
 
 /**

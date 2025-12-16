@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import type { AutosaveStatus } from '@/hooks/useAutosave';
+import type { AutosaveStatus } from '@/hooks/usePropertyWizard';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, Check, Cloud, Loader2, Save } from 'lucide-react';
 

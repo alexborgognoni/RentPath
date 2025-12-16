@@ -459,7 +459,7 @@ export function usePropertyWizard({
             const stepId = currentStep as StepId;
             if (stepId === 'review') return; // Review step uses full validation
 
-            const error = validateField(stepId, field as string, value, data as Record<string, unknown>);
+            const error = validateField(stepId, field as string, value, data as unknown as Record<string, unknown>);
 
             setErrors((prev) => {
                 if (error) {
