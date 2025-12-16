@@ -75,6 +75,7 @@
 - [ ] [feature] Admin dashboard (user management, property approval, system stats)
 - [ ] [feature] Admin profile verification workflow UI
 - [ ] [feature] Property status transitions UI (manager-side)
+- [ ] [feature] Address validation with country-specific rules (postal code format, state/canton/province fields)
 - [ ] [feature] Revise property type-specific logic across wizard steps
     - [ ] Make amenities/features type-specific (e.g., commercial: reception, meeting rooms; industrial: loading dock, 3-phase power)
     - [ ] Add more amenities per type (currently same 12 amenities for all types)
@@ -117,6 +118,7 @@
 
 ### High Value, Low Effort
 
+- [ ] [frontend] Confirmation modal component (replaces browser confirm dialogs) - ~4h
 - [ ] [frontend] Toast notification system (replaces browser alerts) - ~4h
 - [ ] [frontend] Loading skeletons for property listings and dashboard - ~5h
 - [ ] [security] Rate limiting on public endpoints - ~3h
