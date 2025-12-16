@@ -33,30 +33,38 @@ export function WizardProgress({ steps, currentStep, currentStepIndex, maxStepRe
                 </div>
             </div>
 
-            {/* Desktop: Full step indicator */}
-            <div className="hidden md:block">
-                <div className="relative flex w-full items-start justify-between">
-                    {/* Connector lines layer - positioned behind circles */}
+            {/* Desktop: Full step indicator with CSS Grid for equal sections */}
+            <div className="hidden overflow-hidden md:block">
+                {/* Grid extends beyond container so first/last bubble centers align with edges */}
+                <div
+                    className="relative grid"
+                    style={{
+                        gridTemplateColumns: `repeat(${steps.length}, 1fr)`,
+                        marginLeft: `calc(-100% / ${steps.length} / 2)`,
+                        marginRight: `calc(-100% / ${steps.length} / 2)`,
+                        width: `calc(100% + 100% / ${steps.length})`,
+                    }}
+                >
+                    {/* Connector line spanning from first to last bubble center */}
                     <div
-                        className="pointer-events-none absolute top-5 right-0 left-0 flex items-center"
-                        style={{ paddingLeft: '20px', paddingRight: '20px' }}
+                        className="pointer-events-none absolute top-5 h-0.5"
+                        style={{
+                            left: `calc(${100 / steps.length / 2}%)`,
+                            right: `calc(${100 / steps.length / 2}%)`,
+                        }}
                     >
-                        {steps.slice(0, -1).map((step, index) => {
-                            const isCompleted = index < currentStepIndex;
-                            return (
-                                <div key={`connector-${step.id}`} className="h-0.5 flex-1">
-                                    <div
-                                        className={cn(
-                                            'h-full rounded-full transition-colors duration-300',
-                                            isCompleted ? 'bg-primary' : 'bg-muted-foreground/20',
-                                        )}
-                                    />
-                                </div>
-                            );
-                        })}
+                        {/* Background track */}
+                        <div className="absolute inset-0 rounded-full bg-muted-foreground/20" />
+                        {/* Completed portion - colored to max step reached */}
+                        <div
+                            className="absolute top-0 bottom-0 left-0 rounded-full bg-primary transition-all duration-300"
+                            style={{
+                                width: maxStepReached > 0 ? `${(maxStepReached / (steps.length - 1)) * 100}%` : '0%',
+                            }}
+                        />
                     </div>
 
-                    {/* Step circles */}
+                    {/* Step circles - each centered in its grid cell */}
                     {steps.map((step, index) => {
                         const isCurrent = step.id === currentStep;
                         const isCompleted = index < maxStepReached;
@@ -69,7 +77,7 @@ export function WizardProgress({ steps, currentStep, currentStepIndex, maxStepRe
                                 onClick={() => isClickable && onStepClick?.(step.id)}
                                 disabled={!isClickable}
                                 className={cn(
-                                    'group relative z-10 flex flex-col items-center gap-2 transition-all',
+                                    'group relative z-10 flex flex-col items-center gap-2 justify-self-center transition-all',
                                     isClickable ? 'cursor-pointer' : 'cursor-not-allowed',
                                 )}
                             >
