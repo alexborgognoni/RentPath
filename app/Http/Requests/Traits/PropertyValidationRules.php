@@ -47,6 +47,20 @@ trait PropertyValidationRules
     protected static array $currencies = ['eur', 'usd', 'gbp', 'chf'];
 
     /**
+     * Type-specific required fields for specifications step.
+     * Maps property type to which fields are required and their minimum values.
+     * Must match SPECS_REQUIRED_BY_TYPE in property-validation.ts
+     */
+    protected static array $specsRequiredByType = [
+        'apartment' => ['bedrooms' => ['min' => 0], 'bathrooms' => ['min' => 1], 'size' => true],
+        'house' => ['bedrooms' => ['min' => 1], 'bathrooms' => ['min' => 1], 'size' => true],
+        'room' => ['bathrooms' => ['min' => 0], 'size' => true],
+        'commercial' => ['size' => true],
+        'industrial' => ['size' => true],
+        'parking' => [], // No required fields
+    ];
+
+    /**
      * Validation constraints matching property-validation.ts
      */
     protected static array $constraints = [
@@ -228,12 +242,15 @@ trait PropertyValidationRules
             // Step 3: Specifications
             'bedrooms.required' => 'Number of bedrooms is required',
             'bedrooms.min' => 'Bedrooms cannot be less than '.self::$constraints['bedrooms']['min'],
+            'bedrooms.min_house' => 'Houses must have at least 1 bedroom',
             'bedrooms.max' => 'Bedrooms cannot exceed '.self::$constraints['bedrooms']['max'],
             'bedrooms.integer' => 'Bedrooms must be a whole number',
             'bathrooms.required' => 'Number of bathrooms is required',
             'bathrooms.min' => 'Bathrooms cannot be less than '.self::$constraints['bathrooms']['min'],
+            'bathrooms.min_residential' => 'Residential properties must have at least 1 bathroom',
             'bathrooms.max' => 'Bathrooms cannot exceed '.self::$constraints['bathrooms']['max'],
             'bathrooms.numeric' => 'Bathrooms must be a number',
+            'size.required' => 'Living space size is required',
             'size.min' => 'Size must be greater than 0',
             'size.max' => 'Size cannot exceed '.number_format(self::$constraints['size']['max']).' sqm',
             'size.numeric' => 'Size must be a valid number',
@@ -297,6 +314,52 @@ trait PropertyValidationRules
         $validSubtypes = self::$subtypesByType[$data['type']] ?? [];
 
         return in_array($data['subtype'], $validSubtypes, true);
+    }
+
+    /**
+     * Validate type-specific specifications requirements.
+     * Returns array of errors or empty array if valid.
+     */
+    protected function validateSpecsForType(array $data): array
+    {
+        $errors = [];
+        $type = $data['type'] ?? 'apartment';
+        $requirements = self::$specsRequiredByType[$type] ?? [];
+
+        // Validate bedrooms requirement
+        if (isset($requirements['bedrooms'])) {
+            $minBedrooms = $requirements['bedrooms']['min'];
+            $bedrooms = $data['bedrooms'] ?? 0;
+
+            if ($bedrooms < $minBedrooms) {
+                $errors['bedrooms'] = $minBedrooms === 1
+                    ? 'Houses must have at least 1 bedroom'
+                    : 'Number of bedrooms is required';
+            }
+        }
+
+        // Validate bathrooms requirement
+        if (isset($requirements['bathrooms'])) {
+            $minBathrooms = $requirements['bathrooms']['min'];
+            $bathrooms = $data['bathrooms'] ?? 0;
+
+            if ($bathrooms < $minBathrooms) {
+                $errors['bathrooms'] = $minBathrooms >= 1
+                    ? 'Residential properties must have at least 1 bathroom'
+                    : 'Number of bathrooms is required';
+            }
+        }
+
+        // Validate size requirement
+        if (isset($requirements['size']) && $requirements['size'] === true) {
+            $size = $data['size'] ?? null;
+
+            if ($size === null || $size === '' || $size <= 0) {
+                $errors['size'] = 'Living space size is required';
+            }
+        }
+
+        return $errors;
     }
 
     /**

@@ -11,9 +11,10 @@ interface NumberStepperProps {
     label: string;
     icon?: React.ReactNode;
     suffix?: string;
+    integerOnly?: boolean;
 }
 
-export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, label, icon, suffix }: NumberStepperProps) {
+export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, label, icon, suffix, integerOnly = false }: NumberStepperProps) {
     const handleDecrement = () => {
         if (value > min) {
             onChange(value - step);
@@ -27,9 +28,17 @@ export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, la
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = parseFloat(e.target.value);
+        const rawValue = e.target.value;
+        const newValue = integerOnly ? parseInt(rawValue, 10) : parseFloat(rawValue);
         if (!isNaN(newValue) && newValue >= min && newValue <= max) {
             onChange(newValue);
+        }
+    };
+
+    // Prevent invalid characters for integer-only inputs
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (integerOnly && (e.key === '.' || e.key === ',')) {
+            e.preventDefault();
         }
     };
 
@@ -63,9 +72,10 @@ export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, la
                         type="number"
                         value={value}
                         onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
                         min={min}
                         max={max}
-                        step={step}
+                        step={integerOnly ? 1 : step}
                         className={cn(
                             'h-12 w-20 rounded-xl border-2 border-border bg-background text-center text-lg font-semibold text-foreground',
                             'focus:border-primary focus:ring-4 focus:ring-primary/10 focus:outline-none',

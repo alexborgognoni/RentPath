@@ -267,6 +267,61 @@ The Specifications wizard step shows different fields based on property type. Fi
 - **Elevator expanded**: Relevant for houses (accessibility), rooms (building access), and parking (garage accessibility)
 - **Year Built excluded from Room/Parking**: Not relevant for individual room rentals or parking spaces
 
+### Type-Specific Required Fields
+
+Different property types have different required fields in the Specifications step. These requirements are enforced at all layers (frontend Zod, backend Laravel, database constraints).
+
+| Field     | Apartment |  House  |  Room   | Commercial | Industrial | Parking  |
+| --------- | :-------: | :-----: | :-----: | :--------: | :--------: | :------: |
+| Bedrooms  |    ≥0     |   ≥1    |    —    |     —      |     —      |    —     |
+| Bathrooms |    ≥1     |   ≥1    |   ≥0    |     —      |     —      |    —     |
+| Size      |  **req**  | **req** | **req** |  **req**   |  **req**   | optional |
+
+**Notes**:
+
+- Apartment bedrooms minimum is 0 (studios are valid)
+- House must have at least 1 bedroom
+- Apartment/House must have at least 1 bathroom (you can't live without one)
+- Room requires bathrooms but minimum is 0 (shared bathroom scenarios)
+- Commercial/Industrial only require size (the essential metric for business planning)
+- Parking has no required specification fields
+
+### Range Constraints
+
+All numeric specification fields have range constraints enforced at frontend (Zod), backend (Laravel), and database (CHECK constraints) layers.
+
+| Field            | Min  |    Max     | Type    | Notes                              |
+| ---------------- | :--: | :--------: | ------- | ---------------------------------- |
+| bedrooms         |  0   |     20     | integer | 0 for studios                      |
+| bathrooms        |  0   |     10     | decimal | 0.5 increments allowed (half bath) |
+| size             |  1   |  100,000   | decimal | m², must be >0 when provided       |
+| balcony_size     |  0   |   10,000   | decimal | m², optional                       |
+| land_size        |  0   | 1,000,000  | decimal | m², only for houses                |
+| floor_level      | -10  |    200     | integer | negative = basement levels         |
+| year_built       | 1800 |  current   | year    | validated against current year     |
+| parking*spots*\* |  0   |     20     | integer | interior and exterior separate     |
+| rent_amount      | 0.01 | 999,999.99 | decimal | currency stored separately         |
+
+### Database CHECK Constraints
+
+MySQL 8.0+ CHECK constraints provide the final layer of data integrity (see migration `add_check_constraints_to_properties_table`):
+
+```sql
+-- Range constraints
+chk_bedrooms:        bedrooms >= 0 AND bedrooms <= 20
+chk_bathrooms:       bathrooms >= 0 AND bathrooms <= 10
+chk_size:            size IS NULL OR (size >= 1 AND size <= 100000)
+chk_floor_level:     floor_level IS NULL OR (floor_level >= -10 AND floor_level <= 200)
+chk_year_built:      year_built IS NULL OR (year_built >= 1800 AND year_built <= 2100)
+chk_parking_interior: parking_spots_interior >= 0 AND parking_spots_interior <= 20
+chk_parking_exterior: parking_spots_exterior >= 0 AND parking_spots_exterior <= 20
+chk_balcony_size:    balcony_size IS NULL OR (balcony_size >= 0 AND balcony_size <= 10000)
+chk_land_size:       land_size IS NULL OR (land_size >= 0 AND land_size <= 1000000)
+chk_rent_amount:     rent_amount >= 0 AND rent_amount <= 999999.99
+```
+
+**Note**: Type-specific required fields cannot be enforced at database level since they depend on the `type` column value. These are enforced at application level only.
+
 ---
 
 ## Status Workflows

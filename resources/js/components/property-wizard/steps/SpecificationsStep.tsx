@@ -16,6 +16,29 @@ interface SpecificationsStepProps {
 export function SpecificationsStep({ data, updateData, errors, onBlur }: SpecificationsStepProps) {
     const propertyType = data.type;
 
+    // Prevent negative number input for size fields
+    const handleSizeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === '-' || e.key === 'e') {
+            e.preventDefault();
+        }
+    };
+
+    // Format size value to show decimals (e.g., 45 -> "45.00")
+    const formatSizeValue = (value: number | undefined | null): string => {
+        if (value === undefined || value === null || value === 0) return '';
+        return value.toFixed(2);
+    };
+
+    // Parse size input and update
+    const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'size' | 'balcony_size' | 'land_size') => {
+        const value = parseFloat(e.target.value);
+        if (e.target.value === '' || isNaN(value)) {
+            updateData(field, undefined);
+        } else if (value >= 0) {
+            updateData(field, value);
+        }
+    };
+
     // Determine which fields to show based on property type
     const showBedrooms = ['apartment', 'house'].includes(propertyType); // Room IS the bedroom
     const showBathrooms = ['apartment', 'house', 'room', 'commercial', 'industrial'].includes(propertyType);
@@ -78,6 +101,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                     max={20}
                                     label="Bedrooms"
                                     icon={<Bed className="h-4 w-4" />}
+                                    integerOnly
                                 />
                             )}
                             {showBathrooms && (
@@ -118,13 +142,15 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                         <input
                                             type="number"
                                             id="size"
-                                            value={data.size || ''}
-                                            onChange={(e) => updateData('size', parseFloat(e.target.value) || undefined)}
+                                            value={formatSizeValue(data.size)}
+                                            onChange={(e) => handleSizeChange(e, 'size')}
+                                            onKeyDown={handleSizeKeyDown}
                                             onBlur={() => handleBlur('size')}
                                             className={inputClassName(!!errors.size)}
-                                            placeholder="0"
-                                            min={PROPERTY_CONSTRAINTS.size.min}
+                                            placeholder="0.00"
+                                            min={0}
                                             max={PROPERTY_CONSTRAINTS.size.max}
+                                            step="0.01"
                                             aria-invalid={!!errors.size}
                                         />
                                         <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
@@ -145,13 +171,15 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                         <input
                                             type="number"
                                             id="balcony_size"
-                                            value={data.balcony_size || ''}
-                                            onChange={(e) => updateData('balcony_size', parseFloat(e.target.value) || undefined)}
+                                            value={formatSizeValue(data.balcony_size)}
+                                            onChange={(e) => handleSizeChange(e, 'balcony_size')}
+                                            onKeyDown={handleSizeKeyDown}
                                             onBlur={() => handleBlur('balcony_size')}
                                             className={inputClassName(!!errors.balcony_size)}
-                                            placeholder="0"
-                                            min={PROPERTY_CONSTRAINTS.balcony_size.min}
+                                            placeholder="0.00"
+                                            min={0}
                                             max={PROPERTY_CONSTRAINTS.balcony_size.max}
+                                            step="0.01"
                                             aria-invalid={!!errors.balcony_size}
                                         />
                                         <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
@@ -172,13 +200,15 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                         <input
                                             type="number"
                                             id="land_size"
-                                            value={data.land_size || ''}
-                                            onChange={(e) => updateData('land_size', parseFloat(e.target.value) || undefined)}
+                                            value={formatSizeValue(data.land_size)}
+                                            onChange={(e) => handleSizeChange(e, 'land_size')}
+                                            onKeyDown={handleSizeKeyDown}
                                             onBlur={() => handleBlur('land_size')}
                                             className={inputClassName(!!errors.land_size)}
-                                            placeholder="0"
-                                            min={PROPERTY_CONSTRAINTS.land_size.min}
+                                            placeholder="0.00"
+                                            min={0}
                                             max={PROPERTY_CONSTRAINTS.land_size.max}
+                                            step="0.01"
                                             aria-invalid={!!errors.land_size}
                                         />
                                         <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
@@ -212,6 +242,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 max={10}
                                 label="Indoor Spots"
                                 icon={<Car className="h-4 w-4" />}
+                                integerOnly
                             />
                             <NumberStepper
                                 value={data.parking_spots_exterior}
@@ -220,6 +251,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 max={10}
                                 label="Outdoor Spots"
                                 icon={<Car className="h-4 w-4" />}
+                                integerOnly
                             />
                         </div>
                     </motion.div>
@@ -319,11 +351,13 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 <input
                                     type="number"
                                     id="parking_size"
-                                    value={data.size || ''}
-                                    onChange={(e) => updateData('size', parseFloat(e.target.value) || undefined)}
+                                    value={formatSizeValue(data.size)}
+                                    onChange={(e) => handleSizeChange(e, 'size')}
+                                    onKeyDown={handleSizeKeyDown}
                                     className={inputClassName()}
-                                    placeholder="0"
-                                    min="0"
+                                    placeholder="0.00"
+                                    min={0}
+                                    step="0.01"
                                 />
                                 <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
                                     m²

@@ -3,6 +3,8 @@
 use App\Models\Property;
 use App\Models\PropertyManager;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
@@ -398,6 +400,8 @@ describe('Publish Validation', function () {
     });
 
     test('it publishes successfully with all valid data', function () {
+        Storage::fake('private');
+
         $response = $this->actingAs($this->user)
             ->post(managerUrl("/properties/{$this->draft->id}/publish"), [
                 'type' => 'apartment',
@@ -410,11 +414,14 @@ describe('Publish Validation', function () {
                 'country' => 'CH',
                 'bedrooms' => 1,
                 'bathrooms' => 1,
+                'size' => 45, // Required for apartments
                 'rent_amount' => 1500,
                 'rent_currency' => 'eur',
+                'images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
             ]);
 
         $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
 
         $this->draft->refresh();
         expect($this->draft->status)->toBe('inactive');
@@ -483,6 +490,8 @@ describe('Update Published Property Validation', function () {
     });
 
     test('it updates property with valid data', function () {
+        Storage::fake('private');
+
         $response = $this->actingAs($this->user)
             ->put(managerUrl("/properties/{$this->property->id}"), [
                 'type' => 'apartment',
@@ -495,11 +504,14 @@ describe('Update Published Property Validation', function () {
                 'country' => 'CH',
                 'bedrooms' => 2,
                 'bathrooms' => 1,
+                'size' => 55, // Required for apartments
                 'rent_amount' => 2000,
                 'rent_currency' => 'chf',
+                'images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
             ]);
 
         $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
 
         $this->property->refresh();
         expect($this->property->title)->toBe('Updated Title');
@@ -917,6 +929,8 @@ describe('Complete Wizard Flow', function () {
         $response->assertStatus(200);
 
         // Step 8: Publish
+        Storage::fake('private');
+
         $response = $this->actingAs($this->user)
             ->post(managerUrl("/properties/{$propertyId}/publish"), [
                 'type' => 'apartment',
@@ -935,9 +949,11 @@ describe('Complete Wizard Flow', function () {
                 'has_elevator' => '1',
                 'rent_amount' => 1800,
                 'rent_currency' => 'chf',
+                'images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
             ]);
 
         $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
 
         // Verify property is published
         $property = Property::find($propertyId);

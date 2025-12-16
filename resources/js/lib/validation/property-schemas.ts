@@ -13,9 +13,11 @@ import {
     HEATING_TYPES,
     PROPERTY_CONSTRAINTS,
     PROPERTY_TYPES,
+    SPECS_REQUIRED_BY_TYPE,
     THERMAL_INSULATION_CLASSES,
     getCurrentYear,
     isValidSubtypeForType,
+    type PropertyType,
 } from './property-validation';
 
 // ============================================================================
@@ -65,7 +67,10 @@ export const locationSchema = z.object({
 const coerceOptionalNullableNumber = (message: string) =>
     z.preprocess((val) => (val === '' || val === null || val === undefined ? null : Number(val)), z.number({ error: message }).nullable());
 
-export const specificationsSchema = z.object({
+// Base specifications schema with range validation only
+const baseSpecificationsSchema = z.object({
+    // Include type for conditional validation
+    type: z.enum([...PROPERTY_TYPES]).optional(),
     bedrooms: z.coerce
         .number({ error: PROPERTY_MESSAGES.bedrooms.integer })
         .int(PROPERTY_MESSAGES.bedrooms.integer)
@@ -125,6 +130,45 @@ export const specificationsSchema = z.object({
             .max(PROPERTY_CONSTRAINTS.land_size.max, PROPERTY_MESSAGES.land_size.max)
             .nullable(),
     ),
+});
+
+// Specifications schema with type-specific required field validation
+export const specificationsSchema = baseSpecificationsSchema.superRefine((data, ctx) => {
+    const propertyType = (data.type || 'apartment') as PropertyType;
+    const requirements = SPECS_REQUIRED_BY_TYPE[propertyType];
+
+    // Validate bedrooms requirement
+    if (requirements.bedrooms !== undefined) {
+        const minBedrooms = requirements.bedrooms.min;
+        if (data.bedrooms < minBedrooms) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: minBedrooms === 1 ? PROPERTY_MESSAGES.bedrooms.minHouse : PROPERTY_MESSAGES.bedrooms.required,
+                path: ['bedrooms'],
+            });
+        }
+    }
+
+    // Validate bathrooms requirement
+    if (requirements.bathrooms !== undefined) {
+        const minBathrooms = requirements.bathrooms.min;
+        if (data.bathrooms < minBathrooms) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: minBathrooms >= 1 ? PROPERTY_MESSAGES.bathrooms.minResidential : PROPERTY_MESSAGES.bathrooms.required,
+                path: ['bathrooms'],
+            });
+        }
+    }
+
+    // Validate size requirement
+    if (requirements.size && (data.size === null || data.size === undefined)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: PROPERTY_MESSAGES.size.required,
+            path: ['size'],
+        });
+    }
 });
 
 // ============================================================================

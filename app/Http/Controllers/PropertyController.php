@@ -154,6 +154,52 @@ class PropertyController extends Controller
     }
 
     /**
+     * Type-specific required fields for specifications step.
+     * Must match SPECS_REQUIRED_BY_TYPE in property-validation.ts
+     */
+    private static array $specsRequiredByType = [
+        'apartment' => ['bedrooms' => ['min' => 0], 'bathrooms' => ['min' => 1], 'size' => true],
+        'house' => ['bedrooms' => ['min' => 1], 'bathrooms' => ['min' => 1], 'size' => true],
+        'room' => ['bathrooms' => ['min' => 0], 'size' => true],
+        'commercial' => ['size' => true],
+        'industrial' => ['size' => true],
+        'parking' => [], // No required fields
+    ];
+
+    /**
+     * Validate specifications step for a given property type.
+     */
+    private function validateSpecsStep(Property $property): bool
+    {
+        $requirements = self::$specsRequiredByType[$property->type] ?? [];
+
+        // Validate bedrooms requirement
+        if (isset($requirements['bedrooms'])) {
+            $minBedrooms = $requirements['bedrooms']['min'];
+            if ($property->bedrooms < $minBedrooms) {
+                return false;
+            }
+        }
+
+        // Validate bathrooms requirement
+        if (isset($requirements['bathrooms'])) {
+            $minBathrooms = $requirements['bathrooms']['min'];
+            if ($property->bathrooms < $minBathrooms) {
+                return false;
+            }
+        }
+
+        // Validate size requirement
+        if (isset($requirements['size']) && $requirements['size'] === true) {
+            if ($property->size === null || $property->size <= 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Calculate the maximum valid wizard step based on property data.
      * Returns 1-indexed step number.
      */
@@ -166,8 +212,8 @@ class PropertyController extends Controller
             fn () => ! empty($property->house_number) && ! empty($property->street_name)
                  && ! empty($property->city) && ! empty($property->postal_code)
                  && ! empty($property->country),
-            // Step 3: specifications (optional)
-            fn () => true,
+            // Step 3: specifications (type-specific validation)
+            fn () => $this->validateSpecsStep($property),
             // Step 4: amenities (optional)
             fn () => true,
             // Step 5: energy (optional)

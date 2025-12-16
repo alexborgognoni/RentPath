@@ -56,6 +56,26 @@ export type Country = (typeof COUNTRIES)[number];
 // Validation Constraints
 // ============================================================================
 
+/**
+ * Type-specific required fields for specifications step.
+ * Maps property type to which fields are required and their minimum values.
+ */
+export const SPECS_REQUIRED_BY_TYPE: Record<
+    PropertyType,
+    {
+        bedrooms?: { min: number };
+        bathrooms?: { min: number };
+        size?: boolean;
+    }
+> = {
+    apartment: { bedrooms: { min: 0 }, bathrooms: { min: 1 }, size: true },
+    house: { bedrooms: { min: 1 }, bathrooms: { min: 1 }, size: true },
+    room: { bathrooms: { min: 0 }, size: true },
+    commercial: { size: true },
+    industrial: { size: true },
+    parking: {}, // No required fields
+};
+
 export const PROPERTY_CONSTRAINTS = {
     // Step 1: Property Type
     type: {
@@ -98,18 +118,16 @@ export const PROPERTY_CONSTRAINTS = {
     },
 
     // Step 3: Specifications
+    // Note: Required status depends on property type - see SPECS_REQUIRED_BY_TYPE
     bedrooms: {
-        required: true,
         min: 0,
         max: 20,
     },
     bathrooms: {
-        required: true,
         min: 0,
         max: 10,
     },
     size: {
-        required: false,
         min: 1,
         max: 100000,
     },

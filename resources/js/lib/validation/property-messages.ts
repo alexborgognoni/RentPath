@@ -55,16 +55,19 @@ export const PROPERTY_MESSAGES = {
     bedrooms: {
         required: 'Number of bedrooms is required',
         min: `Bedrooms cannot be less than ${PROPERTY_CONSTRAINTS.bedrooms.min}`,
+        minHouse: 'Houses must have at least 1 bedroom',
         max: `Bedrooms cannot exceed ${PROPERTY_CONSTRAINTS.bedrooms.max}`,
         integer: 'Bedrooms must be a whole number',
     },
     bathrooms: {
         required: 'Number of bathrooms is required',
         min: `Bathrooms cannot be less than ${PROPERTY_CONSTRAINTS.bathrooms.min}`,
+        minResidential: 'Residential properties must have at least 1 bathroom',
         max: `Bathrooms cannot exceed ${PROPERTY_CONSTRAINTS.bathrooms.max}`,
         number: 'Bathrooms must be a number',
     },
     size: {
+        required: 'Living space size is required',
         min: 'Size must be greater than 0',
         max: `Size cannot exceed ${PROPERTY_CONSTRAINTS.size.max.toLocaleString()} sqm`,
         number: 'Size must be a valid number',

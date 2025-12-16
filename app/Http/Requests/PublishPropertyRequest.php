@@ -72,6 +72,12 @@ class PublishPropertyRequest extends FormRequest
                     'Please select a valid subtype for the selected property type'
                 );
             }
+
+            // Validate type-specific specifications requirements
+            $specsErrors = $this->validateSpecsForType($this->all());
+            foreach ($specsErrors as $field => $message) {
+                $validator->errors()->add($field, $message);
+            }
         });
     }
 
