@@ -222,6 +222,53 @@ Property Manager creates token with email → Sends to specific person
 
 ---
 
+## Property Specifications by Type
+
+The Specifications wizard step shows different fields based on property type. Fields are organized into 4 sections (Rooms, Space, Parking, Building), each section only appears if at least one field within it is visible.
+
+### Field Visibility Matrix
+
+| Field                | Apartment | House | Room | Commercial | Industrial | Parking |
+| -------------------- | :-------: | :---: | :--: | :--------: | :--------: | :-----: |
+| **Rooms Section**    |
+| Bedrooms             |     ✓     |   ✓   |  —   |     —      |     —      |    —    |
+| Bathrooms            |     ✓     |   ✓   |  ✓   |     ✓      |     ✓      |    —    |
+| **Space Section**    |
+| Living Space         |     ✓     |   ✓   |  ✓   |     ✓      |     ✓      |   —\*   |
+| Balcony/Terrace      |     ✓     |   ✓   |  ✓   |     —      |     —      |    —    |
+| Land Size            |     —     |   ✓   |  —   |     —      |     —      |    —    |
+| **Parking Section**  |
+| Indoor Spots         |     ✓     |   ✓   |  —   |     ✓      |     ✓      |    —    |
+| Outdoor Spots        |     ✓     |   ✓   |  —   |     ✓      |     ✓      |    —    |
+| **Building Section** |
+| Floor Level          |     ✓     |   —   |  ✓   |     ✓      |     —      |    ✓    |
+| Year Built           |     ✓     |   ✓   |  —   |     ✓      |     ✓      |    —    |
+| Has Elevator         |     ✓     |   ✓   |  ✓   |     ✓      |     —      |    ✓    |
+
+\*Parking type has a special "Parking Space Size (optional)" field instead of Living Space.
+
+### Section Visibility
+
+| Type       | Rooms | Space | Parking | Building |
+| ---------- | :---: | :---: | :-----: | :------: |
+| Apartment  |   ✓   |   ✓   |    ✓    |    ✓     |
+| House      |   ✓   |   ✓   |    ✓    |    ✓     |
+| Room       |   ✓   |   ✓   |    —    |    ✓     |
+| Commercial |   ✓   |   ✓   |    ✓    |    ✓     |
+| Industrial |   ✓   |   ✓   |    ✓    |    ✓     |
+| Parking    |   —   |  ✓\*  |    —    |    ✓     |
+
+### Design Rationale
+
+- **Bedrooms excluded from Room**: A room listing IS the bedroom
+- **Bathrooms added to Industrial**: Warehouses/factories have worker facilities
+- **Balcony added to Room**: Rooms can have private or shared balcony access
+- **Floor Level added to Parking**: Multi-level parking garages have floor numbers
+- **Elevator expanded**: Relevant for houses (accessibility), rooms (building access), and parking (garage accessibility)
+- **Year Built excluded from Room/Parking**: Not relevant for individual room rentals or parking spaces
+
+---
+
 ## Status Workflows
 
 ### Property Status
@@ -361,6 +408,7 @@ Frontend updates maxStepReached from backend response
 3. **Immediate feedback**: Errors shown as soon as field loses focus
 4. **No orphaned progress**: Editing step 2 and making it invalid locks you out of step 3+
 5. **Data preservation**: Invalid states don't delete data from later steps, just lock access
+6. **Lazy draft creation**: Only create the database record on first user interaction, not on page load
 
 ### State Management
 
@@ -412,6 +460,46 @@ useEffect(() => {
     }
 }, [data]);
 ```
+
+### Validation UX Feedback
+
+When the user clicks "Continue" with invalid data, two UX enhancements provide immediate feedback:
+
+#### 1. Button Shake Animation
+
+The Continue button shakes horizontally to indicate validation failure:
+
+```typescript
+// Shake keyframes: alternating left-right with decay
+x: [0, -8, 8, -8, 8, -4, 4, 0]  // pixels
+duration: 0.4s
+```
+
+This provides instant visual feedback without being intrusive or blocking.
+
+#### 2. Scroll to First Error
+
+After validation fails, the page automatically:
+
+1. Finds the first element with `aria-invalid="true"`
+2. Smoothly scrolls it into view (centered)
+3. Focuses the field for immediate correction
+
+```typescript
+const firstInvalidField = document.querySelector('[aria-invalid="true"]');
+if (firstInvalidField) {
+    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    firstInvalidField.focus({ preventScroll: true });
+}
+```
+
+**Important**: All form inputs that can be invalid must set `aria-invalid={!!errors.fieldName}` for this to work.
+
+#### Design Rationale
+
+- **Button always enabled**: Disabled buttons are poor UX - users don't know why they can't proceed. Keeping it enabled and showing errors on click is more discoverable.
+- **Non-blocking feedback**: Shake + scroll doesn't prevent interaction, just guides the user
+- **Accessibility**: `aria-invalid` serves dual purpose - screen readers announce invalid state, and scroll-to-error uses it as a selector
 
 ---
 

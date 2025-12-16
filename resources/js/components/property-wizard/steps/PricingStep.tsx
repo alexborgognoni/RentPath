@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import type { Property } from '@/types/dashboard';
 import { motion } from 'framer-motion';
-import { Calendar, DollarSign, Zap } from 'lucide-react';
+import { Calendar, Zap } from 'lucide-react';
 
 interface PricingStepProps {
     data: PropertyWizardData;
@@ -22,14 +22,6 @@ const currencies = [
 
 export function PricingStep({ data, updateData, errors, onBlur }: PricingStepProps) {
     const selectedCurrency = currencies.find((c) => c.value === data.rent_currency) || currencies[0];
-
-    const formatRentDisplay = (amount: number): string => {
-        if (!amount) return '0';
-        return new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2,
-        }).format(amount);
-    };
 
     const handleBlur = (field: keyof PropertyWizardData) => {
         if (onBlur) {
@@ -100,24 +92,6 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                         ))}
                     </div>
                 </motion.div>
-
-                {/* Price preview */}
-                {data.rent_amount > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="mb-10 rounded-2xl border border-border bg-muted/30 p-6"
-                    >
-                        <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                            <DollarSign className="h-5 w-5" />
-                            <span>Your listing will show:</span>
-                        </div>
-                        <p className="mt-2 text-center text-2xl font-bold text-foreground">
-                            {selectedCurrency.symbol}
-                            {formatRentDisplay(data.rent_amount)} <span className="text-lg font-normal text-muted-foreground">per month</span>
-                        </p>
-                    </motion.div>
-                )}
 
                 {/* Availability date */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>

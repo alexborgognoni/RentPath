@@ -126,15 +126,6 @@ export function PropertyTypeStep({ data, updateData, errors }: PropertyTypeStepP
                                         : 'border-border bg-card hover:border-primary/50 hover:bg-muted/50',
                                 )}
                             >
-                                {/* Selection indicator */}
-                                {isSelected && (
-                                    <motion.div
-                                        layoutId="type-selection"
-                                        className="absolute inset-0 rounded-2xl border-2 border-primary"
-                                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                                    />
-                                )}
-
                                 {/* Icon */}
                                 <div
                                     className={cn(

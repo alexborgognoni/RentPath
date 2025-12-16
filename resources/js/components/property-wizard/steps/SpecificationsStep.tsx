@@ -4,7 +4,7 @@ import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import { motion } from 'framer-motion';
-import { Bath, Bed, Calendar, Car, Expand, Layers, TreePine } from 'lucide-react';
+import { Bath, Bed, Building2, Calendar, Car, Expand, Layers, TreePine } from 'lucide-react';
 
 interface SpecificationsStepProps {
     data: PropertyWizardData;
@@ -17,15 +17,21 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
     const propertyType = data.type;
 
     // Determine which fields to show based on property type
-    const showBedrooms = ['apartment', 'house', 'room'].includes(propertyType);
-    const showBathrooms = ['apartment', 'house', 'room', 'commercial'].includes(propertyType);
+    const showBedrooms = ['apartment', 'house'].includes(propertyType); // Room IS the bedroom
+    const showBathrooms = ['apartment', 'house', 'room', 'commercial', 'industrial'].includes(propertyType);
     const showParking = ['apartment', 'house', 'commercial', 'industrial'].includes(propertyType);
     const showSize = propertyType !== 'parking';
-    const showBalcony = ['apartment', 'house'].includes(propertyType);
+    const showBalcony = ['apartment', 'house', 'room'].includes(propertyType); // Rooms can have balcony access
     const showLandSize = propertyType === 'house';
-    const showFloor = ['apartment', 'room', 'commercial'].includes(propertyType);
-    const showElevator = ['apartment', 'commercial'].includes(propertyType);
+    const showFloor = ['apartment', 'room', 'commercial', 'parking'].includes(propertyType); // Parking garages have levels
+    const showElevator = ['apartment', 'house', 'room', 'commercial', 'parking'].includes(propertyType); // Multi-story buildings/garages
     const showYearBuilt = ['apartment', 'house', 'commercial', 'industrial'].includes(propertyType);
+
+    // Determine which sections to show
+    const showRoomsSection = showBedrooms || showBathrooms;
+    const showSpaceSection = showSize || showBalcony || showLandSize;
+    const showParkingSection = showParking;
+    const showBuildingSection = showFloor || showYearBuilt || showElevator;
 
     const handleBlur = (field: keyof PropertyWizardData) => {
         if (onBlur) {
@@ -42,13 +48,27 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
             hasError ? 'border-destructive bg-destructive/5' : 'border-border hover:border-primary/30',
         );
 
+    // Calculate grid columns for space section
+    const spaceFieldCount = [showSize, showBalcony, showLandSize].filter(Boolean).length;
+    const spaceGridCols = spaceFieldCount === 3 ? 'md:grid-cols-3' : spaceFieldCount === 2 ? 'md:grid-cols-2' : '';
+
+    let sectionIndex = 0;
+
     return (
         <StepContainer title="Tell us about the space" description="These details help tenants find the perfect match">
-            <div className="mx-auto max-w-3xl">
-                {/* Primary specs: Bedrooms & Bathrooms */}
-                {(showBedrooms || showBathrooms) && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-                        <h3 className="mb-6 text-center text-lg font-medium text-foreground">Rooms</h3>
+            <div className="mx-auto max-w-4xl space-y-6">
+                {/* Section 1: Rooms */}
+                {showRoomsSection && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: sectionIndex++ * 0.1 }}
+                        className="rounded-2xl border border-border/50 bg-card/30 p-6"
+                    >
+                        <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
+                            <Bed className="h-5 w-5 text-primary" />
+                            Rooms
+                        </h3>
                         <div className="flex flex-wrap justify-center gap-8">
                             {showBedrooms && (
                                 <NumberStepper
@@ -75,35 +95,45 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                     </motion.div>
                 )}
 
-                {/* Size Fields */}
-                {showSize && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
-                        <h3 className="mb-6 text-center text-lg font-medium text-foreground">Size</h3>
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                            <div>
-                                <label htmlFor="size" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                                    <Expand className="h-4 w-4 text-muted-foreground" />
-                                    Living Space
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type="number"
-                                        id="size"
-                                        value={data.size || ''}
-                                        onChange={(e) => updateData('size', parseFloat(e.target.value) || undefined)}
-                                        onBlur={() => handleBlur('size')}
-                                        className={inputClassName(!!errors.size)}
-                                        placeholder="0"
-                                        min={PROPERTY_CONSTRAINTS.size.min}
-                                        max={PROPERTY_CONSTRAINTS.size.max}
-                                        aria-invalid={!!errors.size}
-                                    />
-                                    <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
-                                        m²
-                                    </span>
+                {/* Section 2: Space */}
+                {showSpaceSection && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: sectionIndex++ * 0.1 }}
+                        className="rounded-2xl border border-border/50 bg-card/30 p-6"
+                    >
+                        <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
+                            <Expand className="h-5 w-5 text-primary" />
+                            Space
+                        </h3>
+                        <div className={cn('grid grid-cols-1 gap-4', spaceGridCols)}>
+                            {showSize && (
+                                <div>
+                                    <label htmlFor="size" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
+                                        <Expand className="h-4 w-4 text-muted-foreground" />
+                                        Living Space
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            id="size"
+                                            value={data.size || ''}
+                                            onChange={(e) => updateData('size', parseFloat(e.target.value) || undefined)}
+                                            onBlur={() => handleBlur('size')}
+                                            className={inputClassName(!!errors.size)}
+                                            placeholder="0"
+                                            min={PROPERTY_CONSTRAINTS.size.min}
+                                            max={PROPERTY_CONSTRAINTS.size.max}
+                                            aria-invalid={!!errors.size}
+                                        />
+                                        <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
+                                            m²
+                                        </span>
+                                    </div>
+                                    {errors.size && <p className="mt-1.5 text-sm text-destructive">{errors.size}</p>}
                                 </div>
-                                {errors.size && <p className="mt-1.5 text-sm text-destructive">{errors.size}</p>}
-                            </div>
+                            )}
 
                             {showBalcony && (
                                 <div>
@@ -162,10 +192,18 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                     </motion.div>
                 )}
 
-                {/* Parking */}
-                {showParking && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-10">
-                        <h3 className="mb-6 text-center text-lg font-medium text-foreground">Parking</h3>
+                {/* Section 3: Parking */}
+                {showParkingSection && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: sectionIndex++ * 0.1 }}
+                        className="rounded-2xl border border-border/50 bg-card/30 p-6"
+                    >
+                        <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
+                            <Car className="h-5 w-5 text-primary" />
+                            Parking
+                        </h3>
                         <div className="flex flex-wrap justify-center gap-8">
                             <NumberStepper
                                 value={data.parking_spots_interior}
@@ -187,13 +225,21 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                     </motion.div>
                 )}
 
-                {/* Building Details */}
-                {(showFloor || showYearBuilt || showElevator) && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-6">
-                        <h3 className="mb-6 text-center text-lg font-medium text-foreground">Building</h3>
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                {/* Section 4: Building */}
+                {showBuildingSection && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: sectionIndex++ * 0.1 }}
+                        className="rounded-2xl border border-border/50 bg-card/30 p-6"
+                    >
+                        <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
+                            <Building2 className="h-5 w-5 text-primary" />
+                            Building
+                        </h3>
+                        <div className="flex flex-wrap items-end justify-center gap-6">
                             {showFloor && (
-                                <div>
+                                <div className="w-40">
                                     <label htmlFor="floor_level" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                         <Layers className="h-4 w-4 text-muted-foreground" />
                                         Floor Level
@@ -215,7 +261,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                             )}
 
                             {showYearBuilt && (
-                                <div>
+                                <div className="w-40">
                                     <label htmlFor="year_built" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                         <Calendar className="h-4 w-4 text-muted-foreground" />
                                         Year Built
@@ -237,36 +283,45 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                             )}
 
                             {showElevator && (
-                                <div className="flex items-end">
-                                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-border bg-card px-4 py-3 transition-all hover:border-primary/50">
-                                        <input
-                                            type="checkbox"
-                                            checked={data.has_elevator}
-                                            onChange={(e) => updateData('has_elevator', e.target.checked)}
-                                            className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
-                                        />
-                                        <span className="font-medium text-foreground">Has Elevator</span>
-                                    </label>
-                                </div>
+                                <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-border bg-card px-4 py-3 transition-all hover:border-primary/50">
+                                    <input
+                                        type="checkbox"
+                                        checked={data.has_elevator}
+                                        onChange={(e) => updateData('has_elevator', e.target.checked)}
+                                        className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
+                                    />
+                                    <span className="font-medium text-foreground">Has Elevator</span>
+                                </label>
                             )}
                         </div>
                     </motion.div>
                 )}
 
-                {/* Parking-specific options */}
+                {/* Parking-specific size field */}
                 {propertyType === 'parking' && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-                        <div className="mx-auto max-w-md">
-                            <label htmlFor="size" className="mb-2 block text-sm font-medium text-foreground">
-                                Parking Space Size (optional)
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: sectionIndex++ * 0.1 }}
+                        className="rounded-2xl border border-border/50 bg-card/30 p-6"
+                    >
+                        <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
+                            <Expand className="h-5 w-5 text-primary" />
+                            Space
+                        </h3>
+                        <div className="mx-auto max-w-xs">
+                            <label htmlFor="parking_size" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
+                                <Expand className="h-4 w-4 text-muted-foreground" />
+                                Parking Space Size
+                                <span className="text-xs text-muted-foreground">(optional)</span>
                             </label>
                             <div className="relative">
                                 <input
                                     type="number"
-                                    id="size"
+                                    id="parking_size"
                                     value={data.size || ''}
                                     onChange={(e) => updateData('size', parseFloat(e.target.value) || undefined)}
-                                    className={inputClassName}
+                                    className={inputClassName()}
                                     placeholder="0"
                                     min="0"
                                 />

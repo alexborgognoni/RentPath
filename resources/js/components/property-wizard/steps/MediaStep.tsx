@@ -3,7 +3,7 @@ import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import { motion, Reorder } from 'framer-motion';
-import { Camera, GripVertical, ImagePlus, Star, Trash2, Upload } from 'lucide-react';
+import { Camera, ImagePlus, Star, Trash2, Upload } from 'lucide-react';
 import { useCallback } from 'react';
 
 interface MediaStepProps {
@@ -208,22 +208,31 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                         {/* Overlay controls */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 
-                                        {/* Drag handle */}
-                                        <div className="absolute top-2 left-2 rounded-lg bg-black/50 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                            <GripVertical className="h-4 w-4" />
+                                        {/* Badges - top left: order number + Main badge if applicable */}
+                                        <div className="absolute top-2 left-2 flex items-center gap-1.5">
+                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs font-medium text-white">
+                                                {index + 1}
+                                            </div>
+                                            {data.mainImageIndex === index && (
+                                                <div className="flex items-center gap-1 rounded-lg bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
+                                                    <Star className="h-3 w-3 fill-current" />
+                                                    Main
+                                                </div>
+                                            )}
                                         </div>
 
-                                        {/* Main badge */}
-                                        {data.mainImageIndex === index && (
-                                            <div className="absolute top-2 left-2 flex items-center gap-1 rounded-lg bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
-                                                <Star className="h-3 w-3 fill-current" />
-                                                Main
-                                            </div>
-                                        )}
+                                        {/* Delete button - top right */}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveImage(index)}
+                                            className="absolute top-2 right-2 rounded-lg bg-destructive p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive/90"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
 
-                                        {/* Action buttons */}
-                                        <div className="absolute right-2 bottom-2 left-2 flex justify-between opacity-0 transition-opacity group-hover:opacity-100">
-                                            {data.mainImageIndex !== index && (
+                                        {/* Set as main button - bottom */}
+                                        {data.mainImageIndex !== index && (
+                                            <div className="absolute right-2 bottom-2 left-2 flex justify-center opacity-0 transition-opacity group-hover:opacity-100">
                                                 <button
                                                     type="button"
                                                     onClick={() => handleSetMainImage(index)}
@@ -232,15 +241,8 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                                     <Star className="h-3 w-3" />
                                                     Set as main
                                                 </button>
-                                            )}
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveImage(index)}
-                                                className="ml-auto rounded-lg bg-destructive p-2 text-white transition-colors hover:bg-destructive/90"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </div>
+                                            </div>
+                                        )}
                                     </Reorder.Item>
                                 ))}
 
@@ -257,14 +259,16 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                             </Reorder.Group>
 
                             <p className="text-center text-xs text-muted-foreground">
-                                Drag to reorder. The first image will be your main photo. ({data.imagePreviews.length}/
-                                {PROPERTY_CONSTRAINTS.images.maxCount})
+                                Drag to reorder. Hover to set the main photo. ({data.imagePreviews.length}/{PROPERTY_CONSTRAINTS.images.maxCount})
                             </p>
                         </div>
                     ) : (
                         <label
                             htmlFor="property-images"
-                            className="flex h-64 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30 transition-all hover:border-primary/50 hover:bg-muted/50"
+                            className={cn(
+                                'flex h-64 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed bg-muted/30 transition-all hover:border-primary/50 hover:bg-muted/50',
+                                errors.images ? 'border-destructive bg-destructive/5' : 'border-border',
+                            )}
                         >
                             <Upload className="mb-4 h-12 w-12 text-muted-foreground" />
                             <p className="mb-1 font-medium text-foreground">Upload property photos</p>
@@ -274,6 +278,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                             </p>
                         </label>
                     )}
+                    {errors.images && <p className="mt-3 text-center text-sm text-destructive">{errors.images}</p>}
                 </motion.div>
             </div>
         </StepContainer>

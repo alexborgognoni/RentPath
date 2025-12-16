@@ -136,6 +136,8 @@ export const PROPERTY_MESSAGES = {
         maxLength: `Description cannot exceed ${PROPERTY_CONSTRAINTS.description.maxLength.toLocaleString()} characters`,
     },
     images: {
+        required: 'At least one photo is required',
+        minCount: 'At least one photo is required',
         maxCount: `You can upload a maximum of ${PROPERTY_CONSTRAINTS.images.maxCount} images`,
         maxSize: 'Each image must be less than 10MB',
         invalidType: 'Images must be JPEG, PNG, or WebP format',

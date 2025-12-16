@@ -189,8 +189,9 @@ trait PropertyValidationRules
             'title' => 'required|string|max:'.self::$constraints['title']['max'],
             'description' => 'nullable|string|max:'.self::$constraints['description']['max'],
 
-            // Images
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
+            // Images - at least one required for publishing new properties
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:10240',
             'main_image_index' => 'nullable|integer|min:0',
 
             // Extras
@@ -276,6 +277,8 @@ trait PropertyValidationRules
             'description.max' => 'Description cannot exceed '.number_format(self::$constraints['description']['max']).' characters',
 
             // Images
+            'images.required' => 'At least one photo is required',
+            'images.min' => 'At least one photo is required',
             'images.*.image' => 'Each file must be an image',
             'images.*.mimes' => 'Images must be JPEG, PNG, or WebP format',
             'images.*.max' => 'Each image must be less than 10MB',

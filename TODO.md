@@ -75,6 +75,19 @@
 - [ ] [feature] Admin dashboard (user management, property approval, system stats)
 - [ ] [feature] Admin profile verification workflow UI
 - [ ] [feature] Property status transitions UI (manager-side)
+- [ ] [feature] Revise property type-specific logic across wizard steps
+    - [ ] Make amenities/features type-specific (e.g., commercial: reception, meeting rooms; industrial: loading dock, 3-phase power)
+    - [ ] Add more amenities per type (currently same 12 amenities for all types)
+    - [ ] Consider type-specific validation rules
+    - [ ] Review energy step relevance per type
+- [ ] [feature] Error reporting and user feedback system
+    - [ ] Automatic error detection with global error boundary
+    - [ ] "Report Bug" button that captures error context (URL, user action, stack trace)
+    - [ ] Database schema for storing bug reports (user_id, error_type, context, status, resolved_at)
+    - [ ] Admin dashboard for viewing and managing bug reports
+    - [ ] General feedback form (feature requests, suggestions, complaints)
+    - [ ] Feedback categories and priority levels
+    - [ ] Optional: integrate with external issue tracker (GitHub Issues, Linear, etc.)
 
 #### Polish & Refinements
 
@@ -111,6 +124,7 @@
 
 ### Medium Value
 
+- [ ] [feature] Property wizard draft image persistence (upload images immediately, store in DB, re-fetch on resume) - ~8h
 - [ ] [backend] Soft deletes for properties and applications - ~3h
 - [ ] [feature] Document management UI (view thumbnails, download, delete) - ~12h
 - [ ] [feature] Property status transitions UI beyond active/inactive - ~10h
@@ -127,7 +141,6 @@
 ### Can Wait Until Post-Launch
 
 - [ ] [backend] Email notification templates (make them pretty vs functional) - ~4h
-- [ ] [ux] "Report Bug" button - ~2h
 - [ ] [frontend] Tenant-side authenticated user menu polish - ~3h
 - [ ] [config] Fix tsconfig build file exclusion - ~2h
 - [ ] [i18n] Migrate localization logic to use [laravel-react-i18n](https://github.com/EugeneMeles/laravel-react-i18n) - ~10h
@@ -137,7 +150,7 @@
 ## 🟪 Done
 
 - [x] [feature] Invite token management system with custom links ✅ _(2025-11-10)_
-- [x] [feature] Application access control (requires_invite flag) ✅ _(2025-11-10)_
+- [x] [feature] Application access control (requires*invite flag) ✅ *(2025-11-10)\_
 - [x] [i18n] Fix translation types ✅
 - [x] [infra] AWS CodePipeline deployment (V1 migration) ✅
 - [x] [infra] AWS infrastructure cost optimization (~60% reduction) ✅

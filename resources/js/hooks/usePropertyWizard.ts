@@ -1,9 +1,10 @@
-import type { AutosaveStatus } from '@/hooks/useAutosave';
-import { useAutosave } from '@/hooks/useAutosave';
+import axios from '@/lib/axios';
+import { PROPERTY_MESSAGES } from '@/lib/validation/property-messages';
 import { findFirstInvalidStep, validateField, validateForPublish, validateStep, type StepId } from '@/lib/validation/property-schemas';
 import type { Property, PropertyFormData } from '@/types/dashboard';
-import axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+export type AutosaveStatus = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
 
 export type WizardStep = 'property-type' | 'location' | 'specifications' | 'amenities' | 'energy' | 'pricing' | 'media' | 'review';
 
@@ -80,6 +81,19 @@ export interface PropertyWizardData extends Omit<PropertyFormData, 'images'> {
     }>;
 }
 
+/** Safely coerce a value to number, returning undefined for empty/null/undefined */
+function toNumber(value: unknown): number | undefined {
+    if (value === null || value === undefined || value === '') return undefined;
+    const num = Number(value);
+    return isNaN(num) ? undefined : num;
+}
+
+/** Safely coerce a value to integer, returning undefined for empty/null/undefined */
+function toInt(value: unknown): number | undefined {
+    const num = toNumber(value);
+    return num !== undefined ? Math.floor(num) : undefined;
+}
+
 const getInitialData = (property?: Property): PropertyWizardData => ({
     // Type
     type: property?.type || 'apartment',
@@ -94,35 +108,35 @@ const getInitialData = (property?: Property): PropertyWizardData => ({
     postal_code: property?.postal_code || '',
     country: property?.country || 'CH',
 
-    // Specifications
-    bedrooms: property?.bedrooms || 0,
-    bathrooms: property?.bathrooms || 0,
-    parking_spots_interior: property?.parking_spots_interior || 0,
-    parking_spots_exterior: property?.parking_spots_exterior || 0,
-    size: property?.size || undefined,
-    balcony_size: property?.balcony_size || undefined,
-    land_size: property?.land_size || undefined,
-    floor_level: property?.floor_level || undefined,
-    has_elevator: property?.has_elevator || false,
-    year_built: property?.year_built || undefined,
+    // Specifications - coerce to proper numeric types
+    bedrooms: toInt(property?.bedrooms) ?? 0,
+    bathrooms: toNumber(property?.bathrooms) ?? 0,
+    parking_spots_interior: toInt(property?.parking_spots_interior) ?? 0,
+    parking_spots_exterior: toInt(property?.parking_spots_exterior) ?? 0,
+    size: toNumber(property?.size),
+    balcony_size: toNumber(property?.balcony_size),
+    land_size: toNumber(property?.land_size),
+    floor_level: toInt(property?.floor_level),
+    has_elevator: Boolean(property?.has_elevator),
+    year_built: toInt(property?.year_built),
 
     // Amenities
-    kitchen_equipped: property?.kitchen_equipped || false,
-    kitchen_separated: property?.kitchen_separated || false,
-    has_cellar: property?.has_cellar || false,
-    has_laundry: property?.has_laundry || false,
-    has_fireplace: property?.has_fireplace || false,
-    has_air_conditioning: property?.has_air_conditioning || false,
-    has_garden: property?.has_garden || false,
-    has_rooftop: property?.has_rooftop || false,
+    kitchen_equipped: Boolean(property?.kitchen_equipped),
+    kitchen_separated: Boolean(property?.kitchen_separated),
+    has_cellar: Boolean(property?.has_cellar),
+    has_laundry: Boolean(property?.has_laundry),
+    has_fireplace: Boolean(property?.has_fireplace),
+    has_air_conditioning: Boolean(property?.has_air_conditioning),
+    has_garden: Boolean(property?.has_garden),
+    has_rooftop: Boolean(property?.has_rooftop),
 
     // Energy
     energy_class: property?.energy_class || undefined,
     thermal_insulation_class: property?.thermal_insulation_class || undefined,
     heating_type: property?.heating_type || undefined,
 
-    // Pricing
-    rent_amount: property?.rent_amount || 0,
+    // Pricing - coerce to proper numeric types
+    rent_amount: toNumber(property?.rent_amount) ?? 0,
     rent_currency: property?.rent_currency || 'eur',
     available_date: property?.available_date || undefined,
 
@@ -165,7 +179,7 @@ export interface UsePropertyWizardReturn {
 
     // Navigation
     goToStep: (step: WizardStep) => void;
-    goToNextStep: () => void;
+    goToNextStep: () => boolean; // Returns true if navigation succeeded, false if validation failed
     goToPreviousStep: () => void;
     canGoToStep: (step: WizardStep) => boolean;
 
@@ -227,6 +241,7 @@ export function usePropertyWizard({
     // Draft/autosave state
     const [propertyId, setPropertyId] = useState<number | null>(property?.id ?? null);
     const [isInitialized, setIsInitialized] = useState(!!property?.id);
+    const [hasUserInteracted, setHasUserInteracted] = useState(!!property?.id); // Only create draft after user interaction
 
     // Track if we should skip the next step lock check (for forward navigation)
     const skipNextLockCheck = useRef(false);
@@ -237,9 +252,9 @@ export function usePropertyWizard({
     const isLastStep = currentStepIndex === WIZARD_STEPS.length - 1;
     const progress = ((currentStepIndex + 1) / WIZARD_STEPS.length) * 100;
 
-    // Create draft on mount if no property exists
+    // Create draft only after user has interacted (to avoid creating drafts for accidental visits)
     useEffect(() => {
-        if (!property?.id && !propertyId && !isInitialized) {
+        if (!property?.id && !propertyId && !isInitialized && hasUserInteracted) {
             const createDraft = async () => {
                 try {
                     const response = await axios.post('/properties/draft', {
@@ -260,7 +275,7 @@ export function usePropertyWizard({
         } else if (property?.id) {
             setIsInitialized(true);
         }
-    }, [property?.id, propertyId, isInitialized, data.type, data.subtype, onDraftCreated]);
+    }, [property?.id, propertyId, isInitialized, hasUserInteracted, data.type, data.subtype, onDraftCreated]);
 
     // Effect to lock steps when data changes make earlier steps invalid
     useEffect(() => {
@@ -289,61 +304,142 @@ export function usePropertyWizard({
         }
     }, [data, maxStepReached, currentStepIndex]);
 
-    // Autosave handler - includes wizard_step
-    const handleAutosave = useCallback(
-        async (autosaveData: AutosaveData) => {
-            if (!propertyId) {
-                throw new Error('No property ID for autosave');
-            }
+    // Autosave state
+    const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>('idle');
+    const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+    const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const lastSavedDataRef = useRef<string | null>(null);
 
-            const response = await axios.patch(`/properties/${propertyId}/draft`, {
-                ...autosaveData,
-                wizard_step: maxStepReached + 1, // 1-indexed for backend
-            });
-
-            // Backend may reduce max_valid_step if validation failed
-            if (response.data.max_valid_step !== undefined) {
-                const backendMaxStep = response.data.max_valid_step - 1; // Convert to 0-indexed
-                if (backendMaxStep < maxStepReached) {
-                    setMaxStepReached(backendMaxStep);
-                    if (currentStepIndex > backendMaxStep) {
-                        setCurrentStep(WIZARD_STEPS[backendMaxStep].id);
-                    }
-                }
-            }
-        },
-        [propertyId, maxStepReached, currentStepIndex],
-    );
-
-    // Memoize autosave data to prevent unnecessary saves
+    // Memoize autosave data
     const autosaveData = useMemo(() => getAutosaveData(data), [data]);
 
-    // Setup autosave
-    const {
-        status: autosaveStatus,
-        lastSavedAt,
-        saveNow,
-    } = useAutosave({
-        data: autosaveData,
-        onSave: handleAutosave,
-        debounceMs: 1000,
-        enabled: isInitialized && !!propertyId,
-        onError: (error) => {
-            console.error('Autosave failed:', error);
-        },
-    });
+    // Simple debounced autosave effect
+    useEffect(() => {
+        // Skip if not ready
+        if (!isInitialized || !propertyId) {
+            return;
+        }
+
+        // Skip if data hasn't changed from last save
+        const dataStr = JSON.stringify(autosaveData);
+        if (lastSavedDataRef.current === dataStr) {
+            return;
+        }
+
+        // Mark as pending
+        setAutosaveStatus('pending');
+
+        // Clear existing timer
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        // Set debounce timer
+        debounceTimerRef.current = setTimeout(async () => {
+            setAutosaveStatus('saving');
+            try {
+                const response = await axios.patch(`/properties/${propertyId}/draft`, {
+                    ...autosaveData,
+                    wizard_step: maxStepReached + 1,
+                });
+
+                lastSavedDataRef.current = dataStr;
+                setLastSavedAt(new Date());
+                setAutosaveStatus('saved');
+
+                // Backend may reduce max_valid_step if validation failed
+                if (response.data.max_valid_step !== undefined) {
+                    const backendMaxStep = response.data.max_valid_step - 1;
+                    if (backendMaxStep < maxStepReached) {
+                        setMaxStepReached(backendMaxStep);
+                        if (currentStepIndex > backendMaxStep) {
+                            setCurrentStep(WIZARD_STEPS[backendMaxStep].id);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Autosave failed:', error);
+                setAutosaveStatus('error');
+            }
+        }, 1000);
+
+        // Cleanup
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [autosaveData, isInitialized, propertyId, maxStepReached, currentStepIndex]);
+
+    // Manual save function
+    const saveNow = useCallback(async () => {
+        if (!propertyId) return;
+
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        setAutosaveStatus('saving');
+        try {
+            await axios.patch(`/properties/${propertyId}/draft`, {
+                ...autosaveData,
+                wizard_step: maxStepReached + 1,
+            });
+            lastSavedDataRef.current = JSON.stringify(autosaveData);
+            setLastSavedAt(new Date());
+            setAutosaveStatus('saved');
+        } catch (error) {
+            console.error('Save failed:', error);
+            setAutosaveStatus('error');
+        }
+    }, [propertyId, autosaveData, maxStepReached]);
 
     const updateData = useCallback(<K extends keyof PropertyWizardData>(key: K, value: PropertyWizardData[K]) => {
-        setData((prev) => ({ ...prev, [key]: value }));
+        setHasUserInteracted(true); // Mark that user has interacted
+        setData((prev) => {
+            // When property type changes, clear specification fields that may not apply to the new type
+            if (key === 'type' && value !== prev.type) {
+                return {
+                    ...prev,
+                    [key]: value,
+                    // Reset all specification fields to defaults
+                    bedrooms: 0,
+                    bathrooms: 0,
+                    parking_spots_interior: 0,
+                    parking_spots_exterior: 0,
+                    size: undefined,
+                    balcony_size: undefined,
+                    land_size: undefined,
+                    floor_level: undefined,
+                    has_elevator: false,
+                    year_built: undefined,
+                };
+            }
+            return { ...prev, [key]: value };
+        });
         // Clear error when field is updated
         setErrors((prev) => {
             const newErrors = { ...prev };
             delete newErrors[key];
+            // Also clear specification errors when type changes
+            if (key === 'type') {
+                delete newErrors.bedrooms;
+                delete newErrors.bathrooms;
+                delete newErrors.parking_spots_interior;
+                delete newErrors.parking_spots_exterior;
+                delete newErrors.size;
+                delete newErrors.balcony_size;
+                delete newErrors.land_size;
+                delete newErrors.floor_level;
+                delete newErrors.has_elevator;
+                delete newErrors.year_built;
+            }
             return newErrors;
         });
     }, []);
 
     const updateMultipleFields = useCallback((updates: Partial<PropertyWizardData>) => {
+        setHasUserInteracted(true); // Mark that user has interacted
         setData((prev) => ({ ...prev, ...updates }));
         // Clear errors for updated fields
         setErrors((prev) => {
@@ -399,14 +495,26 @@ export function usePropertyWizard({
      */
     const validateForPublishFn = useCallback((): boolean => {
         const result = validateForPublish(data);
+        const errors: Partial<Record<keyof PropertyWizardData, string>> = {};
 
-        if (result.success) {
-            setErrors({});
-            return true;
+        if (!result.success) {
+            Object.assign(errors, result.errors);
         }
 
-        setErrors(result.errors as Partial<Record<keyof PropertyWizardData, string>>);
-        return false;
+        // Validate images separately (File objects can't be validated with Zod)
+        // Check both new images and existing images (for editing)
+        const totalImages = data.images.length + (data.existingImages?.length || 0);
+        if (totalImages === 0) {
+            errors.images = PROPERTY_MESSAGES.images.required;
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setErrors(errors);
+            return false;
+        }
+
+        setErrors({});
+        return true;
     }, [data]);
 
     const goToStep = useCallback(
@@ -427,13 +535,26 @@ export function usePropertyWizard({
         [currentStepIndex, maxStepReached],
     );
 
-    const goToNextStep = useCallback(() => {
+    const goToNextStep = useCallback((): boolean => {
         const stepId = currentStep as StepId;
         const result = validateStep(stepId, data);
+        const stepErrors: Partial<Record<keyof PropertyWizardData, string>> = {};
 
         if (!result.success) {
-            setErrors(result.errors as Partial<Record<keyof PropertyWizardData, string>>);
-            return;
+            Object.assign(stepErrors, result.errors);
+        }
+
+        // Additional image validation for media step
+        if (stepId === 'media') {
+            const totalImages = data.images.length + (data.existingImages?.length || 0);
+            if (totalImages === 0) {
+                stepErrors.images = PROPERTY_MESSAGES.images.required;
+            }
+        }
+
+        if (Object.keys(stepErrors).length > 0) {
+            setErrors(stepErrors);
+            return false; // Validation failed
         }
 
         const nextIndex = currentStepIndex + 1;
@@ -447,6 +568,7 @@ export function usePropertyWizard({
             setCurrentStep(WIZARD_STEPS[nextIndex].id);
             setErrors({}); // Clear errors when moving to next step
         }
+        return true; // Navigation succeeded
     }, [currentStep, currentStepIndex, data, maxStepReached]);
 
     const goToPreviousStep = useCallback(() => {

@@ -195,7 +195,8 @@ export const PROPERTY_CONSTRAINTS = {
         maxLength: 10000,
     },
     images: {
-        required: false,
+        required: true,
+        minCount: 1,
         maxCount: 20,
         maxSizeBytes: 10 * 1024 * 1024, // 10MB
         allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],

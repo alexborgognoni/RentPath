@@ -1,11 +1,12 @@
 import { cn } from '@/lib/utils';
 import type { AutosaveStatus } from '@/hooks/useAutosave';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, Check, Cloud, Loader2 } from 'lucide-react';
+import { AlertCircle, Check, Cloud, Loader2, Save } from 'lucide-react';
 
 interface SaveStatusProps {
     status: AutosaveStatus;
     lastSavedAt: Date | null;
+    onSave?: () => void;
     className?: string;
 }
 
@@ -59,12 +60,13 @@ const statusConfig: Record<AutosaveStatus, {
     },
 };
 
-export function SaveStatus({ status, lastSavedAt, className }: SaveStatusProps) {
+export function SaveStatus({ status, lastSavedAt, onSave, className }: SaveStatusProps) {
     const config = statusConfig[status];
     const Icon = config.icon;
+    const showSaveButton = onSave && (status === 'error' || status === 'pending');
 
     return (
-        <div className={cn('flex items-center gap-1.5 text-sm', className)}>
+        <div className={cn('flex items-center gap-3 text-sm', className)}>
             <AnimatePresence mode="wait">
                 <motion.div
                     key={status}
@@ -82,6 +84,28 @@ export function SaveStatus({ status, lastSavedAt, className }: SaveStatusProps) 
                         )}
                     </span>
                 </motion.div>
+            </AnimatePresence>
+
+            {/* Manual save button */}
+            <AnimatePresence>
+                {showSaveButton && (
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.15 }}
+                        onClick={onSave}
+                        className={cn(
+                            'flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
+                            status === 'error'
+                                ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground',
+                        )}
+                    >
+                        <Save className="h-3.5 w-3.5" />
+                        Save now
+                    </motion.button>
+                )}
             </AnimatePresence>
         </div>
     );

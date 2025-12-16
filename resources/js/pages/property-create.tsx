@@ -180,7 +180,7 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
                         </div>
 
                         {/* Save status indicator */}
-                        <SaveStatus status={wizard.autosaveStatus} lastSavedAt={wizard.lastSavedAt} />
+                        <SaveStatus status={wizard.autosaveStatus} lastSavedAt={wizard.lastSavedAt} onSave={wizard.saveNow} />
                     </div>
 
                     {/* Progress indicator */}

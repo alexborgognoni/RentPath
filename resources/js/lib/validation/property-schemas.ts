@@ -61,63 +61,73 @@ export const locationSchema = z.object({
 // Step 3: Specifications Schema
 // ============================================================================
 
+// Helper to handle nullable/optional numeric fields that may come as strings or empty strings
+const coerceOptionalNullableNumber = (message: string) =>
+    z.preprocess(
+        (val) => (val === '' || val === null || val === undefined ? null : Number(val)),
+        z.number({ invalid_type_error: message }).nullable(),
+    );
+
 export const specificationsSchema = z.object({
-    bedrooms: z
+    bedrooms: z.coerce
         .number({ invalid_type_error: PROPERTY_MESSAGES.bedrooms.integer })
         .int(PROPERTY_MESSAGES.bedrooms.integer)
         .min(PROPERTY_CONSTRAINTS.bedrooms.min, PROPERTY_MESSAGES.bedrooms.min)
         .max(PROPERTY_CONSTRAINTS.bedrooms.max, PROPERTY_MESSAGES.bedrooms.max),
-    bathrooms: z
+    bathrooms: z.coerce
         .number({ invalid_type_error: PROPERTY_MESSAGES.bathrooms.number })
         .min(PROPERTY_CONSTRAINTS.bathrooms.min, PROPERTY_MESSAGES.bathrooms.min)
         .max(PROPERTY_CONSTRAINTS.bathrooms.max, PROPERTY_MESSAGES.bathrooms.max),
-    size: z
-        .number({ invalid_type_error: PROPERTY_MESSAGES.size.number })
-        .min(PROPERTY_CONSTRAINTS.size.min, PROPERTY_MESSAGES.size.min)
-        .max(PROPERTY_CONSTRAINTS.size.max, PROPERTY_MESSAGES.size.max)
-        .optional()
-        .nullable(),
-    floor_level: z
-        .number({ invalid_type_error: PROPERTY_MESSAGES.floor_level.integer })
-        .int(PROPERTY_MESSAGES.floor_level.integer)
-        .min(PROPERTY_CONSTRAINTS.floor_level.min, PROPERTY_MESSAGES.floor_level.min)
-        .max(PROPERTY_CONSTRAINTS.floor_level.max, PROPERTY_MESSAGES.floor_level.max)
-        .optional()
-        .nullable(),
+    size: coerceOptionalNullableNumber(PROPERTY_MESSAGES.size.number).pipe(
+        z
+            .number()
+            .min(PROPERTY_CONSTRAINTS.size.min, PROPERTY_MESSAGES.size.min)
+            .max(PROPERTY_CONSTRAINTS.size.max, PROPERTY_MESSAGES.size.max)
+            .nullable(),
+    ),
+    floor_level: coerceOptionalNullableNumber(PROPERTY_MESSAGES.floor_level.integer).pipe(
+        z
+            .number()
+            .int(PROPERTY_MESSAGES.floor_level.integer)
+            .min(PROPERTY_CONSTRAINTS.floor_level.min, PROPERTY_MESSAGES.floor_level.min)
+            .max(PROPERTY_CONSTRAINTS.floor_level.max, PROPERTY_MESSAGES.floor_level.max)
+            .nullable(),
+    ),
     has_elevator: z.boolean().optional(),
-    year_built: z
-        .number({ invalid_type_error: PROPERTY_MESSAGES.year_built.integer })
-        .int(PROPERTY_MESSAGES.year_built.integer)
-        .min(PROPERTY_CONSTRAINTS.year_built.min, PROPERTY_MESSAGES.year_built.min)
-        .max(getCurrentYear(), PROPERTY_MESSAGES.year_built.max)
-        .optional()
-        .nullable(),
-    parking_spots_interior: z
+    year_built: coerceOptionalNullableNumber(PROPERTY_MESSAGES.year_built.integer).pipe(
+        z
+            .number()
+            .int(PROPERTY_MESSAGES.year_built.integer)
+            .min(PROPERTY_CONSTRAINTS.year_built.min, PROPERTY_MESSAGES.year_built.min)
+            .max(getCurrentYear(), PROPERTY_MESSAGES.year_built.max)
+            .nullable(),
+    ),
+    parking_spots_interior: z.coerce
         .number({ invalid_type_error: PROPERTY_MESSAGES.parking_spots_interior.integer })
         .int(PROPERTY_MESSAGES.parking_spots_interior.integer)
         .min(PROPERTY_CONSTRAINTS.parking_spots_interior.min, PROPERTY_MESSAGES.parking_spots_interior.min)
         .max(PROPERTY_CONSTRAINTS.parking_spots_interior.max, PROPERTY_MESSAGES.parking_spots_interior.max)
-        .optional()
-        .or(z.literal(0)),
-    parking_spots_exterior: z
+        .default(0),
+    parking_spots_exterior: z.coerce
         .number({ invalid_type_error: PROPERTY_MESSAGES.parking_spots_exterior.integer })
         .int(PROPERTY_MESSAGES.parking_spots_exterior.integer)
         .min(PROPERTY_CONSTRAINTS.parking_spots_exterior.min, PROPERTY_MESSAGES.parking_spots_exterior.min)
         .max(PROPERTY_CONSTRAINTS.parking_spots_exterior.max, PROPERTY_MESSAGES.parking_spots_exterior.max)
-        .optional()
-        .or(z.literal(0)),
-    balcony_size: z
-        .number({ invalid_type_error: PROPERTY_MESSAGES.balcony_size.number })
-        .min(PROPERTY_CONSTRAINTS.balcony_size.min, PROPERTY_MESSAGES.balcony_size.min)
-        .max(PROPERTY_CONSTRAINTS.balcony_size.max, PROPERTY_MESSAGES.balcony_size.max)
-        .optional()
-        .nullable(),
-    land_size: z
-        .number({ invalid_type_error: PROPERTY_MESSAGES.land_size.number })
-        .min(PROPERTY_CONSTRAINTS.land_size.min, PROPERTY_MESSAGES.land_size.min)
-        .max(PROPERTY_CONSTRAINTS.land_size.max, PROPERTY_MESSAGES.land_size.max)
-        .optional()
-        .nullable(),
+        .default(0),
+    balcony_size: coerceOptionalNullableNumber(PROPERTY_MESSAGES.balcony_size.number).pipe(
+        z
+            .number()
+            .min(PROPERTY_CONSTRAINTS.balcony_size.min, PROPERTY_MESSAGES.balcony_size.min)
+            .max(PROPERTY_CONSTRAINTS.balcony_size.max, PROPERTY_MESSAGES.balcony_size.max)
+            .nullable(),
+    ),
+    land_size: coerceOptionalNullableNumber(PROPERTY_MESSAGES.land_size.number).pipe(
+        z
+            .number()
+            .min(PROPERTY_CONSTRAINTS.land_size.min, PROPERTY_MESSAGES.land_size.min)
+            .max(PROPERTY_CONSTRAINTS.land_size.max, PROPERTY_MESSAGES.land_size.max)
+            .nullable(),
+    ),
 });
 
 // ============================================================================
@@ -165,7 +175,7 @@ export const energySchema = z.object({
 // ============================================================================
 
 export const pricingSchema = z.object({
-    rent_amount: z
+    rent_amount: z.coerce
         .number({ invalid_type_error: PROPERTY_MESSAGES.rent_amount.number })
         .min(PROPERTY_CONSTRAINTS.rent_amount.min, PROPERTY_MESSAGES.rent_amount.min)
         .max(PROPERTY_CONSTRAINTS.rent_amount.max, PROPERTY_MESSAGES.rent_amount.max),
@@ -218,6 +228,7 @@ export const publishPropertySchema = propertyTypeSchema
 // ============================================================================
 
 // For drafts, we only require type and subtype (which are needed to create the draft)
+// All numeric fields use coercion to handle string inputs from forms/database
 export const draftPropertySchema = z.object({
     type: z.enum(PROPERTY_TYPES).optional(),
     subtype: z.string().optional(),
@@ -228,17 +239,17 @@ export const draftPropertySchema = z.object({
     city: z.string().max(PROPERTY_CONSTRAINTS.city.maxLength).optional().or(z.literal('')),
     state: z.string().max(PROPERTY_CONSTRAINTS.state.maxLength).optional().or(z.literal('')),
     postal_code: z.string().max(PROPERTY_CONSTRAINTS.postal_code.maxLength).optional().or(z.literal('')),
-    country: z.string().length(PROPERTY_CONSTRAINTS.country.length).optional().or(z.literal('')),
-    bedrooms: z.number().int().min(0).max(PROPERTY_CONSTRAINTS.bedrooms.max).optional(),
-    bathrooms: z.number().min(0).max(PROPERTY_CONSTRAINTS.bathrooms.max).optional(),
-    size: z.number().min(0).max(PROPERTY_CONSTRAINTS.size.max).optional().nullable(),
-    floor_level: z.number().int().optional().nullable(),
+    country: z.string().max(PROPERTY_CONSTRAINTS.country.length).optional().or(z.literal('')),
+    bedrooms: z.coerce.number().int().min(0).max(PROPERTY_CONSTRAINTS.bedrooms.max).optional(),
+    bathrooms: z.coerce.number().min(0).max(PROPERTY_CONSTRAINTS.bathrooms.max).optional(),
+    size: coerceOptionalNullableNumber('Must be a number').pipe(z.number().min(0).max(PROPERTY_CONSTRAINTS.size.max).nullable()),
+    floor_level: coerceOptionalNullableNumber('Must be a number').pipe(z.number().int().nullable()),
     has_elevator: z.boolean().optional(),
-    year_built: z.number().int().optional().nullable(),
-    parking_spots_interior: z.number().int().min(0).optional(),
-    parking_spots_exterior: z.number().int().min(0).optional(),
-    balcony_size: z.number().min(0).optional().nullable(),
-    land_size: z.number().min(0).optional().nullable(),
+    year_built: coerceOptionalNullableNumber('Must be a number').pipe(z.number().int().nullable()),
+    parking_spots_interior: z.coerce.number().int().min(0).optional(),
+    parking_spots_exterior: z.coerce.number().int().min(0).optional(),
+    balcony_size: coerceOptionalNullableNumber('Must be a number').pipe(z.number().min(0).nullable()),
+    land_size: coerceOptionalNullableNumber('Must be a number').pipe(z.number().min(0).nullable()),
     kitchen_equipped: z.boolean().optional(),
     kitchen_separated: z.boolean().optional(),
     has_cellar: z.boolean().optional(),
@@ -250,7 +261,7 @@ export const draftPropertySchema = z.object({
     energy_class: z.enum(ENERGY_CLASSES).optional().nullable(),
     thermal_insulation_class: z.enum(THERMAL_INSULATION_CLASSES).optional().nullable(),
     heating_type: z.enum(HEATING_TYPES).optional().nullable(),
-    rent_amount: z.number().min(0).optional(),
+    rent_amount: z.coerce.number().min(0).optional(),
     rent_currency: z.enum(CURRENCIES).optional(),
     available_date: z.string().optional().nullable(),
     title: z.string().max(PROPERTY_CONSTRAINTS.title.maxLength).optional().or(z.literal('')),
