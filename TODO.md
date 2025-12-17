@@ -91,6 +91,18 @@
     - [ ] Feedback categories and priority levels
     - [ ] Optional: integrate with external issue tracker (GitHub Issues, Linear, etc.)
 
+#### Notification System
+
+- [ ] [backend] Laravel Events for application lifecycle (ApplicationSubmitted, ApplicationApproved, ApplicationRejected, VisitScheduled, etc.)
+- [ ] [backend] Laravel Notifications with database + mail channels
+- [ ] [backend] Notification preferences per user (email frequency, notification types)
+- [ ] [backend] Email templates with Blade/Markdown (branded, responsive)
+- [ ] [backend] Queue-based email sending for performance
+- [ ] [frontend] In-app notification center (bell icon, unread count, dropdown list)
+- [ ] [frontend] Real-time notifications with Laravel Echo/Pusher (optional)
+- [ ] [backend] Property manager notifications (new application, tenant message, visit reminder)
+- [ ] [backend] Tenant notifications (application status change, visit scheduled, lease ready)
+
 #### Polish & Refinements
 
 - [ ] [refactor] Frontend architecture cleanup
