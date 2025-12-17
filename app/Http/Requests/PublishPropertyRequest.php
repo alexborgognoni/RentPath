@@ -48,7 +48,22 @@ class PublishPropertyRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->publishRules();
+        $rules = $this->publishRules();
+
+        // Remove old images rule
+        unset($rules['images']);
+
+        // Delta image handling rules
+        $rules['new_images'] = 'nullable|array';
+        $rules['new_images.*'] = 'image|mimes:jpeg,png,webp|max:5120';
+        $rules['deleted_image_ids'] = 'nullable|array';
+        $rules['deleted_image_ids.*'] = 'integer';
+        $rules['image_order'] = 'nullable|array';
+        $rules['image_order.*'] = 'string';
+        $rules['main_image_id'] = 'nullable|integer';
+        $rules['main_image_index'] = 'nullable|integer';
+
+        return $rules;
     }
 
     /**
@@ -77,6 +92,18 @@ class PublishPropertyRequest extends FormRequest
             $specsErrors = $this->validateSpecsForType($this->all());
             foreach ($specsErrors as $field => $message) {
                 $validator->errors()->add($field, $message);
+            }
+
+            // Calculate final image count after delta changes
+            $property = $this->route('property');
+            $existingCount = $property ? $property->images()->count() : 0;
+            $deletedCount = count($this->input('deleted_image_ids', []));
+            $newCount = count($this->file('new_images', []));
+            $finalCount = $existingCount - $deletedCount + $newCount;
+
+            // Must have at least one image to publish
+            if ($finalCount < 1) {
+                $validator->errors()->add('images', 'At least one photo is required');
             }
         });
     }

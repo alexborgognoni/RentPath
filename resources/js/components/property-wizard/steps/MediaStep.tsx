@@ -1,5 +1,5 @@
 import { StepContainer } from '@/components/property-wizard/components/StepContainer';
-import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
+import type { PropertyWizardData, WizardImage } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import { motion, Reorder } from 'framer-motion';
@@ -21,26 +21,37 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
         }
     };
 
+    // Check if an image is the main image
+    const isMainImage = (image: WizardImage, index: number): boolean => {
+        if (image.id !== null && data.mainImageId !== null) {
+            return image.id === data.mainImageId;
+        }
+        return index === data.mainImageIndex;
+    };
+
     const handleImageSelect = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const files = Array.from(e.target.files || []);
             if (files.length === 0) return;
 
-            const newImages = [...data.images];
-            const newPreviews = [...data.imagePreviews];
-
+            // Process files and add them one by one as they're read
             files.forEach((file) => {
                 if (!file.type.startsWith('image/')) return;
                 if (file.size > PROPERTY_CONSTRAINTS.images.maxSizeBytes) return;
 
-                newImages.push(file);
-
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    newPreviews.push(event.target?.result as string);
+                    const newImage: WizardImage = {
+                        id: null,
+                        file: file,
+                        image_url: event.target?.result as string,
+                    };
+
+                    // Use functional update to handle async reads
                     updateMultipleFields({
-                        images: [...newImages],
-                        imagePreviews: [...newPreviews],
+                        images: [...data.images, newImage],
+                        // If this is the first image, set it as main
+                        ...(data.images.length === 0 ? { mainImageIndex: 0 } : {}),
                     });
                 };
                 reader.readAsDataURL(file);
@@ -49,62 +60,71 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
             // Reset input
             e.target.value = '';
         },
-        [data.images, data.imagePreviews, updateMultipleFields],
+        [data.images, updateMultipleFields],
     );
 
     const handleRemoveImage = useCallback(
         (index: number) => {
+            const imageToRemove = data.images[index];
             const newImages = data.images.filter((_, i) => i !== index);
-            const newPreviews = data.imagePreviews.filter((_, i) => i !== index);
 
-            let newMainIndex = data.mainImageIndex;
-            if (index === data.mainImageIndex) {
-                newMainIndex = 0;
+            // Track deleted existing images (those with an ID)
+            const newDeletedIds = [...data.deletedImageIds];
+            if (imageToRemove.id !== null) {
+                newDeletedIds.push(imageToRemove.id);
+            }
+
+            // Update main image tracking
+            let newMainImageId = data.mainImageId;
+            let newMainImageIndex = data.mainImageIndex;
+
+            // If we're removing the main image, reset to first image
+            if (isMainImage(imageToRemove, index)) {
+                if (newImages.length > 0) {
+                    newMainImageId = newImages[0].id;
+                    newMainImageIndex = 0;
+                } else {
+                    newMainImageId = null;
+                    newMainImageIndex = 0;
+                }
             } else if (index < data.mainImageIndex) {
-                newMainIndex = data.mainImageIndex - 1;
+                // Adjust index if we removed an image before the main one
+                newMainImageIndex = data.mainImageIndex - 1;
             }
 
             updateMultipleFields({
                 images: newImages,
-                imagePreviews: newPreviews,
-                mainImageIndex: Math.min(newMainIndex, Math.max(0, newImages.length - 1)),
+                deletedImageIds: newDeletedIds,
+                mainImageId: newMainImageId,
+                mainImageIndex: Math.max(0, Math.min(newMainImageIndex, newImages.length - 1)),
             });
         },
-        [data.images, data.imagePreviews, data.mainImageIndex, updateMultipleFields],
+        [data.images, data.deletedImageIds, data.mainImageId, data.mainImageIndex, updateMultipleFields],
     );
 
     const handleSetMainImage = useCallback(
         (index: number) => {
-            updateData('mainImageIndex', index);
+            const image = data.images[index];
+            updateMultipleFields({
+                mainImageId: image.id,
+                mainImageIndex: index,
+            });
         },
-        [updateData],
+        [data.images, updateMultipleFields],
     );
 
     const handleReorder = useCallback(
-        (newOrder: string[]) => {
-            // Find the new positions based on preview URLs
-            const newImages: File[] = [];
-            const newPreviews: string[] = [];
-            let newMainIndex = 0;
-
-            newOrder.forEach((preview, newIndex) => {
-                const oldIndex = data.imagePreviews.indexOf(preview);
-                if (oldIndex !== -1) {
-                    newImages.push(data.images[oldIndex]);
-                    newPreviews.push(preview);
-                    if (oldIndex === data.mainImageIndex) {
-                        newMainIndex = newIndex;
-                    }
-                }
-            });
+        (newOrder: WizardImage[]) => {
+            // Find the new index of the main image
+            const currentMainImage = data.images.find((img, idx) => isMainImage(img, idx));
+            const newMainIndex = currentMainImage ? newOrder.indexOf(currentMainImage) : 0;
 
             updateMultipleFields({
-                images: newImages,
-                imagePreviews: newPreviews,
-                mainImageIndex: newMainIndex,
+                images: newOrder,
+                mainImageIndex: newMainIndex >= 0 ? newMainIndex : 0,
             });
         },
-        [data.images, data.imagePreviews, data.mainImageIndex, updateMultipleFields],
+        [data.images, data.mainImageId, data.mainImageIndex, updateMultipleFields],
     );
 
     const inputClassName = (hasError: boolean) =>
@@ -188,32 +208,27 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                         id="property-images"
                     />
 
-                    {data.imagePreviews.length > 0 ? (
+                    {data.images.length > 0 ? (
                         <div className="space-y-4">
                             {/* Draggable image grid */}
-                            <Reorder.Group
-                                axis="x"
-                                values={data.imagePreviews}
-                                onReorder={handleReorder}
-                                className="grid grid-cols-2 gap-4 md:grid-cols-3"
-                            >
-                                {data.imagePreviews.map((preview, index) => (
+                            <Reorder.Group axis="x" values={data.images} onReorder={handleReorder} className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                                {data.images.map((image, index) => (
                                     <Reorder.Item
-                                        key={preview}
-                                        value={preview}
+                                        key={image.id !== null ? `existing-${image.id}` : `new-${image.image_url}`}
+                                        value={image}
                                         className="group relative aspect-[4/3] cursor-grab overflow-hidden rounded-xl active:cursor-grabbing"
                                     >
-                                        <img src={preview} alt={`Property image ${index + 1}`} className="h-full w-full object-cover" />
+                                        <img src={image.image_url} alt={`Property image ${index + 1}`} className="h-full w-full object-cover" />
 
                                         {/* Overlay controls */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 
-                                        {/* Badges - top left: order number + Main badge if applicable */}
+                                        {/* Badges */}
                                         <div className="absolute top-2 left-2 flex items-center gap-1.5">
                                             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs font-medium text-white">
                                                 {index + 1}
                                             </div>
-                                            {data.mainImageIndex === index && (
+                                            {isMainImage(image, index) && (
                                                 <div className="flex items-center gap-1 rounded-lg bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
                                                     <Star className="h-3 w-3 fill-current" />
                                                     Main
@@ -221,7 +236,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                             )}
                                         </div>
 
-                                        {/* Delete button - top right */}
+                                        {/* Delete button */}
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveImage(index)}
@@ -230,8 +245,8 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                             <Trash2 className="h-4 w-4" />
                                         </button>
 
-                                        {/* Set as main button - bottom */}
-                                        {data.mainImageIndex !== index && (
+                                        {/* Set as main button */}
+                                        {!isMainImage(image, index) && (
                                             <div className="absolute right-2 bottom-2 left-2 flex justify-center opacity-0 transition-opacity group-hover:opacity-100">
                                                 <button
                                                     type="button"
@@ -247,7 +262,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                 ))}
 
                                 {/* Add more button */}
-                                {data.imagePreviews.length < PROPERTY_CONSTRAINTS.images.maxCount && (
+                                {data.images.length < PROPERTY_CONSTRAINTS.images.maxCount && (
                                     <label
                                         htmlFor="property-images"
                                         className="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 transition-all hover:border-primary/50 hover:bg-muted/50"
@@ -259,7 +274,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                             </Reorder.Group>
 
                             <p className="text-center text-xs text-muted-foreground">
-                                Drag to reorder. Hover to set the main photo. ({data.imagePreviews.length}/{PROPERTY_CONSTRAINTS.images.maxCount})
+                                Drag to reorder. Hover to set the main photo. ({data.images.length}/{PROPERTY_CONSTRAINTS.images.maxCount})
                             </p>
                         </div>
                     ) : (

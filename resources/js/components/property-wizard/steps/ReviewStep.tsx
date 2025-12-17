@@ -29,6 +29,7 @@ interface ReviewStepProps {
     data: PropertyWizardData;
     errors: Partial<Record<keyof PropertyWizardData, string>>;
     onEditStep: (step: WizardStep) => void;
+    isEditMode?: boolean;
 }
 
 const propertyTypeLabels: Record<string, string> = {
@@ -92,8 +93,17 @@ const heatingLabels: Record<string, string> = {
     other: 'Other',
 };
 
-export function ReviewStep({ data, errors, onEditStep }: ReviewStepProps) {
+export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: ReviewStepProps) {
     const hasErrors = Object.keys(errors).length > 0;
+
+    // Find main image from unified images array
+    const mainImage = data.images.find((img, idx) => {
+        if (img.id !== null && data.mainImageId !== null) {
+            return img.id === data.mainImageId;
+        }
+        return idx === data.mainImageIndex;
+    });
+    const mainImageSrc = mainImage?.image_url || (data.images.length > 0 ? data.images[0].image_url : null);
 
     const formatPrice = (amount: number, currency: string) => {
         const symbol = currencySymbols[currency] || currency.toUpperCase();
@@ -148,7 +158,10 @@ export function ReviewStep({ data, errors, onEditStep }: ReviewStepProps) {
     );
 
     return (
-        <StepContainer title="Review your listing" description="Make sure everything looks good before publishing">
+        <StepContainer
+            title={isEditMode ? 'Your Property Listing' : 'Review your listing'}
+            description={isEditMode ? 'Click Edit on any section to make changes' : 'Make sure everything looks good before publishing'}
+        >
             <div className="mx-auto max-w-3xl space-y-6">
                 {/* Error banner */}
                 {hasErrors && (
@@ -173,16 +186,12 @@ export function ReviewStep({ data, errors, onEditStep }: ReviewStepProps) {
                     className="overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
                 >
                     {/* Image preview */}
-                    {data.imagePreviews.length > 0 ? (
+                    {mainImageSrc ? (
                         <div className="relative aspect-video w-full overflow-hidden bg-muted">
-                            <img
-                                src={data.imagePreviews[data.mainImageIndex] || data.imagePreviews[0]}
-                                alt="Main property image"
-                                className="h-full w-full object-cover"
-                            />
-                            {data.imagePreviews.length > 1 && (
+                            <img src={mainImageSrc} alt="Main property image" className="h-full w-full object-cover" />
+                            {data.images.length > 1 && (
                                 <div className="absolute right-4 bottom-4 rounded-lg bg-black/60 px-3 py-1.5 text-sm font-medium text-white">
-                                    +{data.imagePreviews.length - 1} more photos
+                                    +{data.images.length - 1} more photos
                                 </div>
                             )}
                         </div>
@@ -379,14 +388,16 @@ export function ReviewStep({ data, errors, onEditStep }: ReviewStepProps) {
                 )}
 
                 {/* Final note */}
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="text-center text-sm text-muted-foreground"
-                >
-                    By publishing, you confirm that the information above is accurate and complete.
-                </motion.p>
+                {!isEditMode && (
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="text-center text-sm text-muted-foreground"
+                    >
+                        By publishing, you confirm that the information above is accurate and complete.
+                    </motion.p>
+                )}
             </div>
         </StepContainer>
     );

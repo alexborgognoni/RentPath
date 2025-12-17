@@ -243,36 +243,67 @@ class PropertyController extends Controller
         // Get validated data with boolean conversions
         $validated = $request->validatedWithBooleans();
 
-        // Handle images
-        $images = $request->file('images', []);
+        // Extract image-related data
+        $newImages = $request->file('new_images', []);
+        $deletedImageIds = $request->input('deleted_image_ids', []);
+        $imageOrder = $request->input('image_order', []);
+        $mainImageId = $request->input('main_image_id');
         $mainImageIndex = $request->input('main_image_index', 0);
 
         // Update property and change status based on list_immediately preference
         $listImmediately = $request->boolean('list_immediately', true);
         $validated['status'] = $listImmediately ? 'available' : 'inactive';
-        unset($validated['images'], $validated['main_image_index'], $validated['list_immediately']);
+
+        // Remove image fields from validated data
+        unset($validated['new_images'], $validated['deleted_image_ids'], $validated['image_order'],
+            $validated['main_image_id'], $validated['main_image_index'], $validated['list_immediately']);
 
         $property->fill($validated);
         $property->save();
 
-        // Handle image uploads if new images provided
-        if (! empty($images)) {
-            // Delete old images
-            $disk = StorageHelper::getDisk('private');
-            foreach ($property->images as $oldImage) {
-                Storage::disk($disk)->delete($oldImage->image_path);
-                $oldImage->delete();
-            }
+        $disk = StorageHelper::getDisk('private');
 
-            // Upload new images
-            foreach ($images as $index => $image) {
-                $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
-                $property->images()->create([
-                    'image_path' => $path,
-                    'sort_order' => $index,
-                    'is_main' => $index === (int) $mainImageIndex,
-                ]);
+        // 1. Delete removed images
+        if (! empty($deletedImageIds)) {
+            $imagesToDelete = $property->images()->whereIn('id', $deletedImageIds)->get();
+            foreach ($imagesToDelete as $image) {
+                Storage::disk($disk)->delete($image->image_path);
+                $image->delete();
             }
+        }
+
+        // 2. Upload new images and track their IDs for ordering
+        $newImageRecords = [];
+        foreach ($newImages as $image) {
+            $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
+            $newImageRecords[] = $property->images()->create([
+                'image_path' => $path,
+                'sort_order' => 999, // Temporary, will be updated below
+                'is_main' => false,
+            ]);
+        }
+
+        // 3. Update ordering based on image_order array
+        foreach ($imageOrder as $index => $orderValue) {
+            if (str_starts_with($orderValue, 'new:')) {
+                $newIndex = (int) substr($orderValue, 4);
+                if (isset($newImageRecords[$newIndex])) {
+                    $newImageRecords[$newIndex]->update(['sort_order' => $index]);
+                }
+            } else {
+                $imageId = (int) $orderValue;
+                $property->images()->where('id', $imageId)->update(['sort_order' => $index]);
+            }
+        }
+
+        // 4. Set main image
+        $property->images()->update(['is_main' => false]);
+        if ($mainImageId !== null) {
+            $property->images()->where('id', $mainImageId)->update(['is_main' => true]);
+        } elseif (! empty($newImageRecords) && isset($newImageRecords[$mainImageIndex])) {
+            $newImageRecords[$mainImageIndex]->update(['is_main' => true]);
+        } elseif ($property->images()->count() > 0) {
+            $property->images()->orderBy('sort_order')->first()?->update(['is_main' => true]);
         }
 
         return redirect()->route('manager.properties.index')
@@ -374,8 +405,14 @@ class PropertyController extends Controller
             'rent_currency' => ['required', Rule::in(['eur', 'usd', 'gbp', 'chf'])],
             'available_date' => 'nullable|date|after_or_equal:today',
 
-            // Images
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240', // 10MB max
+            // Delta image handling
+            'new_images' => 'nullable|array',
+            'new_images.*' => 'image|mimes:jpeg,png,webp|max:5120',
+            'deleted_image_ids' => 'nullable|array',
+            'deleted_image_ids.*' => 'integer',
+            'image_order' => 'nullable|array',
+            'image_order.*' => 'string',
+            'main_image_id' => 'nullable|integer',
             'main_image_index' => 'nullable|integer|min:0',
         ]);
 
@@ -401,24 +438,47 @@ class PropertyController extends Controller
             }
         }
 
-        // Remove images from validated data
-        $images = $request->file('images', []);
-        $mainImageIndex = $validated['main_image_index'] ?? 0;
-        unset($validated['images'], $validated['main_image_index']);
+        // Extract image-related data
+        $newImages = $request->file('new_images', []);
+        $imageOrder = $request->input('image_order', []);
+        $mainImageId = $request->input('main_image_id');
+        $mainImageIndex = $request->input('main_image_index', 0);
+
+        // Remove image fields from validated data
+        unset($validated['new_images'], $validated['deleted_image_ids'], $validated['image_order'],
+            $validated['main_image_id'], $validated['main_image_index']);
 
         // Create the property
         $property = $propertyManager->properties()->create($validated);
 
-        // Handle image uploads
-        if (! empty($images)) {
-            foreach ($images as $index => $image) {
-                $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
+        // Handle image uploads (for new property, all images are new)
+        $newImageRecords = [];
+        foreach ($newImages as $image) {
+            $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
+            $newImageRecords[] = $property->images()->create([
+                'image_path' => $path,
+                'sort_order' => 999,
+                'is_main' => false,
+            ]);
+        }
 
-                $property->images()->create([
-                    'image_path' => $path,
-                    'sort_order' => $index,
-                    'is_main' => $index === $mainImageIndex,
-                ]);
+        // Update ordering based on image_order array
+        foreach ($imageOrder as $index => $orderValue) {
+            if (str_starts_with($orderValue, 'new:')) {
+                $newIndex = (int) substr($orderValue, 4);
+                if (isset($newImageRecords[$newIndex])) {
+                    $newImageRecords[$newIndex]->update(['sort_order' => $index]);
+                }
+            }
+        }
+
+        // Set main image
+        if (! empty($newImageRecords)) {
+            $property->images()->update(['is_main' => false]);
+            if (isset($newImageRecords[$mainImageIndex])) {
+                $newImageRecords[$mainImageIndex]->update(['is_main' => true]);
+            } else {
+                $newImageRecords[0]->update(['is_main' => true]);
             }
         }
 
@@ -486,9 +546,20 @@ class PropertyController extends Controller
         // Load property with images
         $property->load('images');
 
-        return Inertia::render('property-create', [
-            'property' => $property,
-            'isEditing' => true,
+        // Transform images to include URLs
+        $propertyData = $property->toArray();
+        $propertyData['images'] = $property->images->map(function ($image) {
+            return [
+                'id' => $image->id,
+                'image_url' => StorageHelper::url($image->image_path, 'private', 1440),
+                'image_path' => $image->image_path,
+                'is_main' => $image->is_main,
+                'sort_order' => $image->sort_order,
+            ];
+        })->sortBy('sort_order')->values();
+
+        return Inertia::render('property-edit', [
+            'property' => $propertyData,
         ]);
     }
 
@@ -500,33 +571,72 @@ class PropertyController extends Controller
         // Get validated data with boolean conversions
         $validated = $request->validatedWithBooleans();
 
-        // Remove images from validated data
-        $images = $request->file('images', []);
-        $mainImageIndex = $validated['main_image_index'] ?? 0;
-        unset($validated['images'], $validated['main_image_index']);
+        // Handle list_immediately to update status
+        if ($request->has('list_immediately')) {
+            $listImmediately = $request->boolean('list_immediately', true);
+            $validated['status'] = $listImmediately ? 'available' : 'inactive';
+        }
+
+        // Extract image-related data
+        $newImages = $request->file('new_images', []);
+        $deletedImageIds = $request->input('deleted_image_ids', []);
+        $imageOrder = $request->input('image_order', []);
+        $mainImageId = $request->input('main_image_id');
+        $mainImageIndex = $request->input('main_image_index', 0);
+
+        // Remove image fields from validated data
+        unset($validated['new_images'], $validated['deleted_image_ids'], $validated['image_order'],
+            $validated['main_image_id'], $validated['main_image_index'], $validated['list_immediately']);
 
         // Update the property
         $property->update($validated);
 
-        // Handle new image uploads
-        if (! empty($images)) {
-            // Delete old images
-            $disk = StorageHelper::getDisk('private');
-            foreach ($property->images as $oldImage) {
-                Storage::disk($disk)->delete($oldImage->image_path);
-                $oldImage->delete();
-            }
+        $disk = StorageHelper::getDisk('private');
 
-            // Upload new images
-            foreach ($images as $index => $image) {
-                $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
-
-                $property->images()->create([
-                    'image_path' => $path,
-                    'sort_order' => $index,
-                    'is_main' => $index === $mainImageIndex,
-                ]);
+        // 1. Delete removed images
+        if (! empty($deletedImageIds)) {
+            $imagesToDelete = $property->images()->whereIn('id', $deletedImageIds)->get();
+            foreach ($imagesToDelete as $image) {
+                Storage::disk($disk)->delete($image->image_path);
+                $image->delete();
             }
+        }
+
+        // 2. Upload new images and track their IDs for ordering
+        $newImageRecords = [];
+        foreach ($newImages as $image) {
+            $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
+            $newImageRecords[] = $property->images()->create([
+                'image_path' => $path,
+                'sort_order' => 999, // Temporary, will be updated below
+                'is_main' => false,
+            ]);
+        }
+
+        // 3. Update ordering based on image_order array
+        foreach ($imageOrder as $index => $orderValue) {
+            if (str_starts_with($orderValue, 'new:')) {
+                // New image - get the record from newImageRecords
+                $newIndex = (int) substr($orderValue, 4);
+                if (isset($newImageRecords[$newIndex])) {
+                    $newImageRecords[$newIndex]->update(['sort_order' => $index]);
+                }
+            } else {
+                // Existing image - update by ID
+                $imageId = (int) $orderValue;
+                $property->images()->where('id', $imageId)->update(['sort_order' => $index]);
+            }
+        }
+
+        // 4. Set main image
+        $property->images()->update(['is_main' => false]);
+        if ($mainImageId !== null) {
+            $property->images()->where('id', $mainImageId)->update(['is_main' => true]);
+        } elseif (! empty($newImageRecords) && isset($newImageRecords[$mainImageIndex])) {
+            $newImageRecords[$mainImageIndex]->update(['is_main' => true]);
+        } elseif ($property->images()->count() > 0) {
+            // Fallback: set first image as main
+            $property->images()->orderBy('sort_order')->first()?->update(['is_main' => true]);
         }
 
         return redirect()->route('manager.properties.index')

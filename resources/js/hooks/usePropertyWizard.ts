@@ -68,17 +68,18 @@ export const WIZARD_STEPS: WizardStepConfig[] = [
     },
 ];
 
+/** Unified image object - works for both existing and new images */
+export interface WizardImage {
+    id: number | null; // null = new image (not yet on server)
+    file: File | null; // File object for new images only
+    image_url: string; // Display URL (data URL for new, server URL for existing)
+}
+
 export interface PropertyWizardData extends Omit<PropertyFormData, 'images'> {
-    images: File[];
-    imagePreviews: string[];
-    mainImageIndex: number;
-    existingImages?: Array<{
-        id: number;
-        image_url: string;
-        image_path: string;
-        is_main: boolean;
-        sort_order: number;
-    }>;
+    images: WizardImage[];
+    mainImageId: number | null; // ID of main image (null if main is a new image)
+    mainImageIndex: number; // Index in array (used when main is new image or as fallback)
+    deletedImageIds: number[]; // IDs of existing images marked for deletion
 }
 
 /** Safely coerce a value to number, returning undefined for empty/null/undefined */
@@ -144,18 +145,26 @@ const getInitialData = (property?: Property): PropertyWizardData => ({
     // Media
     title: property?.title || '',
     description: property?.description || '',
-    images: [],
-    imagePreviews: [],
-    mainImageIndex: 0,
-    existingImages: property?.images as PropertyWizardData['existingImages'],
+    // Convert existing images to unified format
+    images: (property?.images || [])
+        .filter((img) => img.image_url) // Only include images with URLs
+        .map((img) => ({
+            id: img.id,
+            file: null,
+            image_url: img.image_url!,
+        })),
+    // Find the main image ID, or null if no images
+    mainImageId: property?.images?.find((img) => img.is_main)?.id ?? null,
+    mainImageIndex: property?.images?.findIndex((img) => img.is_main) ?? 0,
+    deletedImageIds: [],
 });
 
 /** Data fields that should be autosaved (excludes images which need special handling) */
-type AutosaveData = Omit<PropertyWizardData, 'images' | 'imagePreviews' | 'mainImageIndex' | 'existingImages'>;
+type AutosaveData = Omit<PropertyWizardData, 'images' | 'mainImageId' | 'mainImageIndex' | 'deletedImageIds'>;
 
 function getAutosaveData(data: PropertyWizardData): AutosaveData {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { images, imagePreviews, mainImageIndex, existingImages, ...autosaveData } = data;
+    const { images, mainImageId, mainImageIndex, deletedImageIds, ...autosaveData } = data;
     return autosaveData;
 }
 
@@ -167,6 +176,7 @@ function calculateMaxValidStep(data: PropertyWizardData): number {
 export interface UsePropertyWizardOptions {
     property?: Property;
     isDraft?: boolean;
+    isEditMode?: boolean;
     onDraftCreated?: (propertyId: number) => void;
 }
 
@@ -193,6 +203,7 @@ export interface UsePropertyWizardReturn {
     errors: Partial<Record<keyof PropertyWizardData, string>>;
     setErrors: React.Dispatch<React.SetStateAction<Partial<Record<keyof PropertyWizardData, string>>>>;
     validateCurrentStep: () => boolean;
+    validateSpecificStep: (step: WizardStep) => boolean;
     validateForPublish: () => boolean;
     validateFieldOnBlur: (field: keyof PropertyWizardData, value: unknown) => void;
 
@@ -218,6 +229,7 @@ export function usePropertyWizard({
     property,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     isDraft = false,
+    isEditMode = false,
     onDraftCreated,
 }: UsePropertyWizardOptions = {}): UsePropertyWizardReturn {
     const [currentStep, setCurrentStep] = useState<WizardStep>(() => {
@@ -254,7 +266,16 @@ export function usePropertyWizard({
     const progress = ((currentStepIndex + 1) / WIZARD_STEPS.length) * 100;
 
     // Create draft only after user has interacted (to avoid creating drafts for accidental visits)
+    // Skip draft creation in edit mode - property already exists
     useEffect(() => {
+        if (isEditMode) {
+            // In edit mode, property already exists, just mark as initialized
+            if (property?.id) {
+                setIsInitialized(true);
+            }
+            return;
+        }
+
         if (!property?.id && !propertyId && !isInitialized && hasUserInteracted) {
             const createDraft = async () => {
                 try {
@@ -276,7 +297,7 @@ export function usePropertyWizard({
         } else if (property?.id) {
             setIsInitialized(true);
         }
-    }, [property?.id, propertyId, isInitialized, hasUserInteracted, data.type, data.subtype, onDraftCreated]);
+    }, [property?.id, propertyId, isInitialized, hasUserInteracted, data.type, data.subtype, onDraftCreated, isEditMode]);
 
     // Effect to lock steps when data changes make earlier steps invalid
     useEffect(() => {
@@ -316,6 +337,11 @@ export function usePropertyWizard({
 
     // Simple debounced autosave effect
     useEffect(() => {
+        // Skip autosave in edit mode - changes are saved explicitly via Save button
+        if (isEditMode) {
+            return;
+        }
+
         // Skip if not ready
         if (!isInitialized || !propertyId) {
             return;
@@ -370,7 +396,7 @@ export function usePropertyWizard({
                 clearTimeout(debounceTimerRef.current);
             }
         };
-    }, [autosaveData, isInitialized, propertyId, maxStepReached, currentStepIndex]);
+    }, [autosaveData, isInitialized, propertyId, maxStepReached, currentStepIndex, isEditMode]);
 
     // Manual save function
     const saveNow = useCallback(async () => {
@@ -492,6 +518,34 @@ export function usePropertyWizard({
     }, [currentStep, data]);
 
     /**
+     * Validate a specific step using Zod schema (for edit mode)
+     */
+    const validateSpecificStepFn = useCallback(
+        (step: WizardStep): boolean => {
+            const stepId = step as StepId;
+
+            // Special handling for media step - check images
+            if (stepId === 'media') {
+                if (data.images.length === 0) {
+                    setErrors({ images: PROPERTY_MESSAGES.images.required });
+                    return false;
+                }
+            }
+
+            const result = validateStep(stepId, data);
+
+            if (result.success) {
+                setErrors({});
+                return true;
+            }
+
+            setErrors(result.errors as Partial<Record<keyof PropertyWizardData, string>>);
+            return false;
+        },
+        [data],
+    );
+
+    /**
      * Validate all data for publishing using Zod schema
      */
     const validateForPublishFn = useCallback((): boolean => {
@@ -503,9 +557,7 @@ export function usePropertyWizard({
         }
 
         // Validate images separately (File objects can't be validated with Zod)
-        // Check both new images and existing images (for editing)
-        const totalImages = data.images.length + (data.existingImages?.length || 0);
-        if (totalImages === 0) {
+        if (data.images.length === 0) {
             errors.images = PROPERTY_MESSAGES.images.required;
         }
 
@@ -547,8 +599,7 @@ export function usePropertyWizard({
 
         // Additional image validation for media step
         if (stepId === 'media') {
-            const totalImages = data.images.length + (data.existingImages?.length || 0);
-            if (totalImages === 0) {
+            if (data.images.length === 0) {
                 stepErrors.images = PROPERTY_MESSAGES.images.required;
             }
         }
@@ -608,6 +659,7 @@ export function usePropertyWizard({
         errors,
         setErrors,
         validateCurrentStep: validateCurrentStepFn,
+        validateSpecificStep: validateSpecificStepFn,
         validateForPublish: validateForPublishFn,
         validateFieldOnBlur,
         maxStepReached,

@@ -27,7 +27,7 @@ import {
 export const propertyTypeSchema = z
     .object({
         type: z.enum([...PROPERTY_TYPES], {
-            error: PROPERTY_MESSAGES.type.required,
+            message: PROPERTY_MESSAGES.type.required,
         }),
         subtype: z.string().min(1, PROPERTY_MESSAGES.subtype.required),
     })
@@ -380,23 +380,33 @@ export function validateField(stepId: StepId, field: string, value: unknown, all
 
 /**
  * Validate all data for publishing
+ * Note: We validate each step separately instead of using the merged schema
+ * because Zod's .merge() doesn't properly handle refinements from schemas
+ * that use .refine() or .superRefine()
  */
 export function validateForPublish(data: unknown): { success: true } | { success: false; errors: Record<string, string> } {
-    const result = publishPropertySchema.safeParse(data);
+    const allErrors: Record<string, string> = {};
 
-    if (result.success) {
+    // Validate each step schema and collect all errors
+    const stepSchemas = [propertyTypeSchema, locationSchema, specificationsSchema, amenitiesSchema, energySchema, pricingSchema, mediaSchema];
+
+    for (const schema of stepSchemas) {
+        const result = schema.safeParse(data);
+        if (!result.success) {
+            result.error.issues.forEach((issue) => {
+                const path = issue.path.join('.');
+                if (!allErrors[path]) {
+                    allErrors[path] = issue.message;
+                }
+            });
+        }
+    }
+
+    if (Object.keys(allErrors).length === 0) {
         return { success: true };
     }
 
-    const errors: Record<string, string> = {};
-    result.error.issues.forEach((issue) => {
-        const path = issue.path.join('.');
-        if (!errors[path]) {
-            errors[path] = issue.message;
-        }
-    });
-
-    return { success: false, errors };
+    return { success: false, errors: allErrors };
 }
 
 /**

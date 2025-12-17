@@ -53,11 +53,12 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
 
         const formData = new FormData();
 
-        // Add all form fields
+        // Add all form fields (excluding image-related fields which are handled separately)
         const { data } = wizard;
+        const imageFields = ['images', 'mainImageId', 'mainImageIndex', 'deletedImageIds'];
         Object.keys(data).forEach((key) => {
             const value = data[key as keyof typeof data];
-            if (value !== undefined && value !== null && key !== 'images' && key !== 'imagePreviews' && key !== 'existingImages') {
+            if (value !== undefined && value !== null && !imageFields.includes(key)) {
                 if (typeof value === 'boolean') {
                     formData.append(key, value ? '1' : '0');
                 } else if (typeof value === 'object' && !Array.isArray(value)) {
@@ -68,11 +69,32 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
             }
         });
 
-        // Add images
-        data.images.forEach((image, index) => {
-            formData.append(`images[${index}]`, image);
+        // Delta image handling
+        // 1. New images (those without an ID)
+        const newImages = data.images.filter((img) => img.id === null);
+        newImages.forEach((img, i) => {
+            if (img.file) {
+                formData.append(`new_images[${i}]`, img.file);
+            }
         });
-        formData.append('main_image_index', String(data.mainImageIndex));
+
+        // 2. Deleted image IDs (if any)
+        data.deletedImageIds.forEach((id, i) => {
+            formData.append(`deleted_image_ids[${i}]`, String(id));
+        });
+
+        // 3. Image order (existing IDs or "new:index" for new images)
+        data.images.forEach((img, i) => {
+            const orderValue = img.id !== null ? String(img.id) : `new:${newImages.indexOf(img)}`;
+            formData.append(`image_order[${i}]`, orderValue);
+        });
+
+        // 4. Main image
+        if (data.mainImageId !== null) {
+            formData.append('main_image_id', String(data.mainImageId));
+        } else {
+            formData.append('main_image_index', String(data.mainImageIndex));
+        }
 
         // Use the appropriate endpoint based on whether this is a draft or an existing property
         if (wizard.propertyId && !isEditing) {
