@@ -197,8 +197,8 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
 
                 {/* Main content area */}
                 <div className="flex flex-1 flex-col rounded-2xl border border-border bg-card shadow-sm">
-                    {/* Step content */}
-                    <div className="flex-1 overflow-y-auto p-6 md:p-10">
+                    {/* Step content - min-h prevents collapse during AnimatePresence transitions */}
+                    <div className="min-h-[400px] flex-1 overflow-y-auto p-6 md:p-10">
                         <AnimatePresence mode="wait">
                             <motion.div key={wizard.currentStep}>{renderCurrentStep()}</motion.div>
                         </AnimatePresence>
