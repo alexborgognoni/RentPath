@@ -5,17 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { isManagerSubdomain } from '@/utils/route';
-import { Form } from '@inertiajs/react';
+import type { SharedData } from '@/types';
+import { getWayfinderDomain, isManagerSubdomain } from '@/utils/route';
+import { Form, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 
-const getProfileRoute = () => {
-    const domain = isManagerSubdomain() ? 'manager.rentpath.test' : 'rentpath.test';
-    return `//${domain}/settings/profile` as keyof typeof ProfileController.destroy;
-};
-
 export default function DeleteUser() {
+    const { subdomain, managerSubdomain, appDomain } = usePage<SharedData>().props;
     const passwordInput = useRef<HTMLInputElement>(null);
+
+    // Don't render on manager subdomain - settings handled differently there
+    if (isManagerSubdomain(subdomain, managerSubdomain)) {
+        return null;
+    }
+
+    const getProfileRoute = () => {
+        const domain = getWayfinderDomain(subdomain, managerSubdomain, appDomain);
+        return `//${domain}/settings/profile` as keyof typeof ProfileController.destroy;
+    };
 
     return (
         <div className="space-y-6">

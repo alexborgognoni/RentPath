@@ -17,7 +17,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
     const page = usePage<SharedData>();
-    const { auth, translations } = page.props;
+    const { auth, translations, subdomain, managerSubdomain } = page.props;
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -187,7 +187,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
 
                                             <div className="py-1">
                                                 <Link
-                                                    href={settingsRoute('profile')}
+                                                    href={settingsRoute('profile', subdomain, managerSubdomain)}
                                                     className="text-text-secondary flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background"
                                                 >
                                                     <Settings size={16} />

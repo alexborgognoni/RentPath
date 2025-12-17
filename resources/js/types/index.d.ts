@@ -24,6 +24,11 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    subdomain: string | null; // Current subdomain (e.g., 'manager') or null (root domain)
+    managerSubdomain: string; // The configured manager subdomain prefix (from MANAGER_SUBDOMAIN env)
+    appUrlScheme: string; // http or https - for URL generation only, not actual encryption (from APP_URL_SCHEME env)
+    appDomain: string; // The base domain (e.g., 'rentpath.app' or 'rentpath.test')
+    appPort: string | null; // Optional port (e.g., '8000' for local, null for production)
     locale: string;
     translations: Translations;
     [key: string]: unknown;

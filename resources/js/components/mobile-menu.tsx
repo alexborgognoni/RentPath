@@ -23,7 +23,7 @@ interface MobileMenuProps {
 
 export function MobileMenu({ getUserInitials }: MobileMenuProps) {
     const page = usePage<SharedData>();
-    const { auth, translations, locale } = page.props;
+    const { auth, translations, locale, subdomain, managerSubdomain } = page.props;
     const [isOpen, setIsOpen] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -364,7 +364,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                         {auth.user && (
                             <div className="space-y-2 pt-4">
                                 <Button variant="outline" className="h-11 w-full justify-start text-base" asChild>
-                                    <a href={settingsRoute('profile')} onClick={() => setIsOpen(false)}>
+                                    <a href={settingsRoute('profile', subdomain, managerSubdomain)} onClick={() => setIsOpen(false)}>
                                         <Settings size={20} />
                                         <span>{t(translations.header, 'settings')}</span>
                                     </a>

@@ -14,7 +14,7 @@ interface UserMenuContentProps {
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
-    const { translations } = usePage<SharedData>().props;
+    const { translations, subdomain, managerSubdomain } = usePage<SharedData>().props;
     const cleanup = useMobileNavigation();
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
 
@@ -41,7 +41,13 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={settingsRoute('profile')} as="button" prefetch onClick={cleanup}>
+                    <Link
+                        className="block w-full"
+                        href={settingsRoute('profile', subdomain, managerSubdomain)}
+                        as="button"
+                        prefetch
+                        onClick={cleanup}
+                    >
                         <Settings className="mr-2" />
                         {t(translations.header, 'settings')}
                     </Link>

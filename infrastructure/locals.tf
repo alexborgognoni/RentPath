@@ -21,8 +21,9 @@ locals {
     APP_ENV                 = var.eb_laravel_config.app_env
     APP_KEY                 = local.app_config.APP_KEY  # Sensitive - from secret
     APP_DEBUG               = tostring(var.eb_laravel_config.app_debug)
-    APP_URL                 = local.app_config.APP_URL  # Sensitive - from secret
+    APP_URL_SCHEME          = var.eb_laravel_config.app_url_scheme  # For URL generation only
     APP_DOMAIN              = var.eb_laravel_config.app_domain
+    # APP_PORT not needed in production (empty = no port in URLs)
     APP_LOCALE              = var.eb_laravel_config.app_locale
     APP_FALLBACK_LOCALE     = var.eb_laravel_config.app_fallback_locale
     APP_FAKER_LOCALE        = var.eb_laravel_config.app_faker_locale
@@ -97,10 +98,7 @@ locals {
     AWS_SDK_LOAD_NONDEFAULT_CONFIG = "1"
     AWS_EC2_METADATA_DISABLED      = "false"
 
-    # Vite Configuration
-    VITE_APP_NAME           = var.eb_laravel_config.app_name
-    VITE_APP_DOMAIN         = var.eb_laravel_config.app_domain
-    VITE_MANAGER_SUBDOMAIN  = var.eb_laravel_config.manager_subdomain
+    # Note: All app config (name, domain, etc.) is passed via Inertia props, not VITE env vars
   }
 }
 

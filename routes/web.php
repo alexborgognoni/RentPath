@@ -157,7 +157,17 @@ Route::domain(config('app.domain'))->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::domain('manager.'.config('app.domain'))->middleware('subdomain:manager')->group(function () {
+Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middleware('subdomain:'.config('app.manager_subdomain'))->group(function () {
+
+    // Locale switching (must be available on manager subdomain too)
+    Route::post('/locale', function (Request $request) {
+        $locale = $request->input('locale');
+        if (in_array($locale, config('app.available_locales', ['en']))) {
+            session(['locale' => $locale]);
+        }
+
+        return response()->json(['locale' => session('locale')]);
+    })->name(config('app.manager_subdomain').'.locale.update');
 
     // Redirect root to properties
     Route::get('/', function () {

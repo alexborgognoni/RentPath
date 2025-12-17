@@ -144,6 +144,7 @@ variable "eb_laravel_config" {
     app_name               = string
     app_env                = string
     app_debug              = bool
+    app_url_scheme         = string  # http or https - for URL generation only
     app_domain             = string
     app_locale             = string
     app_fallback_locale    = string

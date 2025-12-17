@@ -8,22 +8,22 @@ import { Link, usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    const { translations } = usePage<SharedData>().props;
+    const { translations, subdomain, managerSubdomain } = usePage<SharedData>().props;
 
     const sidebarNavItems: NavItem[] = [
         {
             title: t(translations.settings, 'menu.account'),
-            href: settingsRoute('profile'),
+            href: settingsRoute('profile', subdomain, managerSubdomain),
             icon: null,
         },
         {
             title: t(translations.settings, 'menu.password'),
-            href: settingsRoute('password'),
+            href: settingsRoute('password', subdomain, managerSubdomain),
             icon: null,
         },
         {
             title: t(translations.settings, 'menu.appearance'),
-            href: settingsRoute('appearance'),
+            href: settingsRoute('appearance', subdomain, managerSubdomain),
             icon: null,
         },
     ];

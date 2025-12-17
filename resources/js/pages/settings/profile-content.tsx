@@ -1,7 +1,7 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import { send } from '@/routes/verification';
 import { type SharedData } from '@/types';
-import { isManagerSubdomain } from '@/utils/route';
+import { getWayfinderDomain, isManagerSubdomain } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Transition } from '@headlessui/react';
 import { Form, Link, usePage } from '@inertiajs/react';
@@ -10,18 +10,23 @@ import { Trash2, User } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 
-const getProfileRoute = () => {
-    const domain = isManagerSubdomain() ? 'manager.rentpath.test' : 'rentpath.test';
-    return `//${domain}/settings/profile` as keyof typeof ProfileController.update;
-};
-
 interface ProfileContentProps {
     mustVerifyEmail: boolean;
     status?: string;
 }
 
 export default function ProfileContent({ mustVerifyEmail, status }: ProfileContentProps) {
-    const { auth, translations } = usePage<SharedData>().props;
+    const { auth, translations, subdomain, managerSubdomain, appDomain } = usePage<SharedData>().props;
+
+    // Don't render on manager subdomain - settings handled differently there
+    if (isManagerSubdomain(subdomain, managerSubdomain)) {
+        return null;
+    }
+
+    const getProfileRoute = () => {
+        const domain = getWayfinderDomain(subdomain, managerSubdomain, appDomain);
+        return `//${domain}/settings/profile` as keyof typeof ProfileController.update;
+    };
 
     return (
         <div className="space-y-6">

@@ -7,6 +7,8 @@
 /resources/js/actions
 /resources/js/routes
 /resources/js/wayfinder
+/resources/js/ziggy.js
+/resources/js/ziggy.d.ts
 /storage/*.key
 /storage/pail
 /vendor

@@ -43,44 +43,38 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application URL
+    | URL Components
     |--------------------------------------------------------------------------
     |
-    | This URL is used by the console to properly generate URLs when using
-    | the Artisan command line tool. You should set this to the root of
-    | the application so that it's available within Artisan commands.
+    | Instead of a single APP_URL, we use separate components for consistent
+    | URL generation across backend and frontend:
+    | - url_scheme: http or https (for URL generation only, not actual encryption)
+    | - domain: base domain (e.g., rentpath.app or rentpath.test)
+    | - port: optional, only needed for local development (e.g., 8000)
+    |
+    | Note: APP_URL_SCHEME only affects generated URLs. Actual SSL/TLS encryption
+    | is handled by your web server (nginx/Apache) or load balancer, not Laravel.
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url_scheme' => env('APP_URL_SCHEME', 'https'),
+    'domain' => env('APP_DOMAIN', 'localhost'),
+    'port' => env('APP_PORT'),
+
+    // Computed full URL for Laravel's internal use (Artisan commands, etc.)
+    'url' => env('APP_URL_SCHEME', 'https').'://'.env('APP_DOMAIN', 'localhost').(env('APP_PORT') ? ':'.env('APP_PORT') : ''),
 
     /*
     |--------------------------------------------------------------------------
-    | Manager Portal Domain
+    | Manager Portal Subdomain
     |--------------------------------------------------------------------------
     |
-    | This value determines the domain for the manager portal subdomain.
-    | Locally, this will be 'manager.localhost:8000' and in production
-    | 'manager.rentpath.app'. Used for subdomain-based route separation.
+    | The subdomain prefix for the property manager portal.
+    | Full manager URL is computed from: {manager_subdomain}.{domain}:{port}
     |
     */
 
-    'manager_domain' => env('APP_ENV') === 'local'
-        ? env('MANAGER_SUBDOMAIN', 'manager').'.'.parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST).(parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) ? ':'.parse_url(env('APP_URL', 'http://localhost'), PHP_URL_PORT) : '')
-        : env('MANAGER_SUBDOMAIN', 'manager').'.'.env('APP_DOMAIN'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Application Domain
-    |--------------------------------------------------------------------------
-    |
-    | The base domain for the application (e.g., 'rentpath.app' for production,
-    | 'localhost' for local development). Used for generating subdomain URLs
-    | and cookie configuration. This should be set in your .env file.
-    |
-    */
-
-    'domain' => env('APP_DOMAIN'),
+    'manager_subdomain' => env('MANAGER_SUBDOMAIN', 'manager'),
 
     /*
     |--------------------------------------------------------------------------

@@ -16,7 +16,7 @@ import { translate as t } from '@/utils/translate-utils';
 
 export default function Register() {
     const page = usePage<SharedData>();
-    const { translations } = page.props;
+    const { translations, managerSubdomain, appDomain } = page.props;
 
     // Determine initial user type based on priority:
     // 1. Deduce from 'redirect' URL subdomain (if present, hide toggle)
@@ -30,9 +30,7 @@ export default function Register() {
 
         try {
             const redirectUrl = new URL(redirect, window.location.origin);
-            const managerSubdomain = import.meta.env.VITE_MANAGER_SUBDOMAIN || 'manager';
-            const baseDomain = import.meta.env.VITE_APP_DOMAIN || window.location.hostname;
-            const managerDomain = `${managerSubdomain}.${baseDomain}`;
+            const managerDomain = `${managerSubdomain}.${appDomain}`;
 
             if (redirectUrl.hostname === managerDomain) {
                 return 'property-manager' as const;

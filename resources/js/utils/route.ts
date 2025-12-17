@@ -39,19 +39,61 @@ export function useRoute() {
 
 export { routeHelper as route };
 
-// Helper to check if we're on the manager subdomain
-export function isManagerSubdomain(): boolean {
-    if (typeof window === 'undefined') return false;
-    return window.location.hostname.startsWith('manager.');
+/**
+ * Check if we're on the manager subdomain
+ * @param subdomain - Current subdomain from Inertia props (props.subdomain)
+ * @param managerSubdomain - Manager subdomain prefix from Inertia props (props.managerSubdomain)
+ */
+export function isManagerSubdomain(subdomain: string | null, managerSubdomain: string): boolean {
+    return subdomain === managerSubdomain;
 }
 
-// Helper to get the correct settings route based on current subdomain
+/**
+ * Build a full URL from components (all from backend config via Inertia props)
+ * @param scheme - http or https (from props.appUrlScheme) - for URL generation only
+ * @param domain - base domain (from props.appDomain)
+ * @param port - optional port (from props.appPort)
+ */
+export function buildUrl(scheme: string, domain: string, port: string | null): string {
+    const portSuffix = port ? `:${port}` : '';
+    return `${scheme}://${domain}${portSuffix}`;
+}
+
+/**
+ * Get the root domain URL (without subdomain) - for navigation/links
+ * Uses backend config values for consistency across environments
+ */
+export function getRootDomainUrl(appUrlScheme: string, appDomain: string, appPort: string | null): string {
+    return buildUrl(appUrlScheme, appDomain, appPort);
+}
+
+/**
+ * Get domain string for Wayfinder key lookup (never includes port)
+ * Wayfinder generates keys without ports, so lookups must match
+ * @param subdomain - Current subdomain from Inertia props
+ * @param managerSubdomain - Manager subdomain prefix from Inertia props
+ * @param appDomain - Base domain from Inertia props
+ */
+export function getWayfinderDomain(subdomain: string | null, managerSubdomain: string, appDomain: string): string {
+    return isManagerSubdomain(subdomain, managerSubdomain) ? `${managerSubdomain}.${appDomain}` : appDomain;
+}
+
+/**
+ * Get the correct settings route based on current subdomain
+ * @param name - Settings route name
+ * @param subdomain - Current subdomain from Inertia props
+ * @param managerSubdomain - Manager subdomain prefix from Inertia props
+ * @param params - Route parameters
+ * @param absolute - Whether to return absolute URL
+ */
 export function settingsRoute(
     name: 'profile' | 'password' | 'appearance' | 'profile.update' | 'profile.destroy' | 'password.update',
+    subdomain: string | null,
+    managerSubdomain: string,
     params?: Record<string, string | number | boolean> | string | number,
     absolute?: boolean,
 ): string {
-    const prefix = isManagerSubdomain() ? 'manager.settings' : 'tenant.settings';
+    const prefix = isManagerSubdomain(subdomain, managerSubdomain) ? `${managerSubdomain}.settings` : 'tenant.settings';
     return routeHelper(`${prefix}.${name}`, params, absolute);
 }
 

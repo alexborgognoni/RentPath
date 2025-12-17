@@ -1,5 +1,7 @@
+import type { SharedData } from '@/types';
 import { copyToClipboard } from '@/utils/clipboard';
-import { route } from '@/utils/route';
+import { getRootDomainUrl, route } from '@/utils/route';
+import { usePage } from '@inertiajs/react';
 import { Check, Copy, Plus, RefreshCw, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CreateTokenForm } from './create-token-form';
@@ -22,6 +24,7 @@ interface InviteTokensModalProps {
 }
 
 export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensModalProps) {
+    const { appUrlScheme, appDomain, appPort } = usePage<SharedData>().props;
     const [tokens, setTokens] = useState<InviteToken[]>([]);
     const [loading, setLoading] = useState(false);
     const [copiedTokenId, setCopiedTokenId] = useState<number | null>(null);
@@ -63,7 +66,7 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
     };
 
     const handleCopyToken = async (token: InviteToken) => {
-        const rootDomain = window.location.origin.replace('manager.', '');
+        const rootDomain = getRootDomainUrl(appUrlScheme, appDomain, appPort);
         const inviteUrl = `${rootDomain}/properties/${propertyId}?token=${token.token}`;
 
         const success = await copyToClipboard(inviteUrl);

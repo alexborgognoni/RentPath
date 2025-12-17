@@ -1,7 +1,8 @@
+import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { copyToClipboard } from '@/utils/clipboard';
-import { route } from '@/utils/route';
-import { router } from '@inertiajs/react';
+import { getRootDomainUrl, route } from '@/utils/route';
+import { router, usePage } from '@inertiajs/react';
 import { Check, Copy, Edit, FileText, Link2, RefreshCw, Settings, Share, Trash2, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { InviteTokensModal } from './invite-tokens-modal';
@@ -12,6 +13,7 @@ interface PropertySidebarProps {
 }
 
 export function PropertySidebar({ property, tenantCount }: PropertySidebarProps) {
+    const { appUrlScheme, appDomain, appPort } = usePage<SharedData>().props;
     const [requiresInvite, setRequiresInvite] = useState(property.requires_invite ?? true);
     const [defaultToken, setDefaultToken] = useState<{ token: string; used_count: number } | null>(property.default_token || null);
     const [copiedToken, setCopiedToken] = useState(false);
@@ -120,7 +122,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     };
 
     const handleCopyLink = async () => {
-        const rootDomain = window.location.origin.replace('manager.', '');
+        const rootDomain = getRootDomainUrl(appUrlScheme, appDomain, appPort);
         const propertyUrl =
             requiresInvite && defaultToken?.token
                 ? `${rootDomain}/properties/${property.id}?token=${defaultToken.token}`

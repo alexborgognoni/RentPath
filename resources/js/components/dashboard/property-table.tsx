@@ -5,7 +5,7 @@ import type { Property } from '@/types/dashboard';
 import { copyToClipboard } from '@/utils/clipboard';
 import { formatAddress } from '@/utils/country-utils';
 import { getCurrency } from '@/utils/currency-utils';
-import { route } from '@/utils/route';
+import { getRootDomainUrl, route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { type ColumnDef, createColumnHelper } from '@tanstack/react-table';
@@ -82,11 +82,11 @@ function formatPrice(amount: number | undefined, currencyCode: string = 'eur'): 
 }
 
 export function PropertyTable({ properties, onEditProperty }: PropertyTableProps) {
-    const { translations } = usePage<SharedData>().props;
+    const { translations, appUrlScheme, appDomain, appPort } = usePage<SharedData>().props;
 
     const handleInvite = async (e: React.MouseEvent, property: Property) => {
         e.stopPropagation();
-        const rootDomain = window.location.origin.replace('manager.', '');
+        const rootDomain = getRootDomainUrl(appUrlScheme, appDomain, appPort);
         const applicationUrl = property.default_token
             ? `${rootDomain}/properties/${property.id}?token=${property.default_token.token}`
             : `${rootDomain}/properties/${property.id}`;

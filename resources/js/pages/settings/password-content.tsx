@@ -3,22 +3,27 @@ import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { type SharedData } from '@/types';
-import { isManagerSubdomain } from '@/utils/route';
+import { getWayfinderDomain, isManagerSubdomain } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Transition } from '@headlessui/react';
 import { Form, usePage } from '@inertiajs/react';
 import { Lock } from 'lucide-react';
 import { useRef } from 'react';
 
-const getPasswordRoute = () => {
-    const domain = isManagerSubdomain() ? 'manager.rentpath.test' : 'rentpath.test';
-    return `//${domain}/settings/password` as keyof typeof PasswordController.update;
-};
-
 export default function PasswordContent() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
-    const { translations } = usePage<SharedData>().props;
+    const { translations, subdomain, managerSubdomain, appDomain } = usePage<SharedData>().props;
+
+    // Don't render on manager subdomain - settings handled differently there
+    if (isManagerSubdomain(subdomain, managerSubdomain)) {
+        return null;
+    }
+
+    const getPasswordRoute = () => {
+        const domain = getWayfinderDomain(subdomain, managerSubdomain, appDomain);
+        return `//${domain}/settings/password` as keyof typeof PasswordController.update;
+    };
 
     return (
         <div className="space-y-6">
