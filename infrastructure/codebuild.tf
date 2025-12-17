@@ -13,9 +13,15 @@ resource "aws_codebuild_project" "build" {
     type            = "LINUX_CONTAINER"
     privileged_mode = true # needed if you use npm/yarn builds
 
+    # Required for Wayfinder route generation at build time
     environment_variable {
-      name  = "VITE_APP_NAME"
-      value = var.eb_laravel_config.app_name
+      name  = "APP_DOMAIN"
+      value = var.eb_laravel_config.app_domain
+    }
+
+    environment_variable {
+      name  = "APP_URL_SCHEME"
+      value = var.eb_laravel_config.app_url_scheme
     }
   }
 
