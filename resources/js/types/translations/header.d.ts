@@ -1,5 +1,6 @@
 interface HeaderTranslations {
     login: string;
+    dashboard: string;
     settings: string;
     sign_out: string;
     logout_confirmation: {

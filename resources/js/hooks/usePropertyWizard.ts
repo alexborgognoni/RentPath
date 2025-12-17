@@ -1,8 +1,11 @@
 import axios from '@/lib/axios';
 import { PROPERTY_MESSAGES } from '@/lib/validation/property-messages';
 import { findFirstInvalidStep, validateField, validateForPublish, validateStep, type StepId } from '@/lib/validation/property-schemas';
+import type { SharedData } from '@/types';
 import type { Property, PropertyFormData } from '@/types/dashboard';
-import { useCallback, useEffect, useState } from 'react';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useWizard, type AutosaveStatus, type WizardStepConfig } from './useWizard';
 
 export type { AutosaveStatus } from './useWizard';
@@ -470,4 +473,68 @@ export function usePropertyWizard({
         saveNow: wizard.saveNow,
         isInitialized,
     };
+}
+
+/**
+ * Hook to get translated wizard steps
+ * Returns the WIZARD_STEPS array with translated titles and descriptions
+ */
+export function useWizardSteps(): WizardStepConfig<WizardStep>[] {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+
+    return useMemo(
+        () => [
+            {
+                id: 'property-type',
+                title: t('wizard.steps.propertyType.title'),
+                shortTitle: t('wizard.steps.propertyType.shortTitle'),
+                description: t('wizard.steps.propertyType.description'),
+            },
+            {
+                id: 'location',
+                title: t('wizard.steps.location.title'),
+                shortTitle: t('wizard.steps.location.shortTitle'),
+                description: t('wizard.steps.location.description'),
+            },
+            {
+                id: 'specifications',
+                title: t('wizard.steps.specifications.title'),
+                shortTitle: t('wizard.steps.specifications.shortTitle'),
+                description: t('wizard.steps.specifications.description'),
+            },
+            {
+                id: 'amenities',
+                title: t('wizard.steps.amenities.title'),
+                shortTitle: t('wizard.steps.amenities.shortTitle'),
+                description: t('wizard.steps.amenities.description'),
+            },
+            {
+                id: 'energy',
+                title: t('wizard.steps.energy.title'),
+                shortTitle: t('wizard.steps.energy.shortTitle'),
+                description: t('wizard.steps.energy.description'),
+                optional: true,
+            },
+            {
+                id: 'pricing',
+                title: t('wizard.steps.pricing.title'),
+                shortTitle: t('wizard.steps.pricing.shortTitle'),
+                description: t('wizard.steps.pricing.description'),
+            },
+            {
+                id: 'media',
+                title: t('wizard.steps.media.title'),
+                shortTitle: t('wizard.steps.media.shortTitle'),
+                description: t('wizard.steps.media.description'),
+            },
+            {
+                id: 'review',
+                title: t('wizard.steps.review.title'),
+                shortTitle: t('wizard.steps.review.shortTitle'),
+                description: t('wizard.steps.review.description'),
+            },
+        ],
+        [translations],
+    );
 }

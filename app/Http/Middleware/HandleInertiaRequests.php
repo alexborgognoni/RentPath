@@ -73,6 +73,7 @@ class HandleInertiaRequests extends Middleware
                 'properties' => trans('properties'),
                 'tenant' => trans('tenant'),
                 'sidebar' => trans('sidebar'),
+                'wizard' => trans('wizard'),
             ],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),

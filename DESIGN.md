@@ -703,6 +703,177 @@ class PublishPropertyRequest extends FormRequest
 
 ---
 
+## Internationalization (i18n)
+
+### Overview
+
+RentPath supports 4 languages (English, French, German, Dutch) using a **server-side translation** approach. Laravel loads translations on each request, passes them to React via Inertia shared props, and the frontend accesses them via a utility function.
+
+### Supported Languages
+
+| Code | Language   | File Directory       |
+| ---- | ---------- | -------------------- |
+| `en` | English    | `resources/lang/en/` |
+| `fr` | Français   | `resources/lang/fr/` |
+| `de` | Deutsch    | `resources/lang/de/` |
+| `nl` | Nederlands | `resources/lang/nl/` |
+
+### Architecture
+
+```
+┌───────────────────────────────────────────────────────────┐
+│  Backend (Laravel)                                        │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │  resources/lang/{locale}/*.php                      │  │
+│  │  - Per-feature/page translation files               │  │
+│  │  - Nested arrays for organization                   │  │
+│  │  - E.g., auth.php, header.php, properties.php       │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                         ↓                                 │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │  SetLocale Middleware                               │  │
+│  │  - Reads locale from session                        │  │
+│  │  - Falls back to browser Accept-Language            │  │
+│  │  - Falls back to config default (en)                │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                         ↓                                 │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │  HandleInertiaRequests Middleware                   │  │
+│  │  - Loads all translation files via trans()          │  │
+│  │  - Passes as shared props to all pages              │  │
+│  └─────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────┘
+                          ↓
+┌───────────────────────────────────────────────────────────┐
+│  Frontend (React/TypeScript)                              │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │  usePage<SharedData>().props.translations           │  │
+│  │  - All translations available on every page         │  │
+│  │  - Current locale in props.locale                   │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                         ↓                                 │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │  translate(translations, 'key.path')                │  │
+│  │  - Dot notation: 'auth.login.title'                 │  │
+│  │  - Array access: 'landing.slides[0].title'          │  │
+│  │  - Returns key as fallback if not found             │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                         ↓                                 │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │  TypeScript Types (resources/js/types/translations/)│  │
+│  │  - Interface per translation file                   │  │
+│  │  - Full autocomplete and type safety                │  │
+│  └─────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────┘
+```
+
+### File Organization
+
+Translations are organized **per feature/page**, not flat:
+
+```
+resources/lang/en/
+├── auth.php           # Login, register, password reset
+├── header.php         # Navigation header
+├── sidebar.php        # Sidebar navigation
+├── landing.php        # Marketing landing page
+├── properties.php     # Property management (manager portal)
+├── tenant.php         # Tenant portal specific
+├── profile.php        # Profile setup/verification
+├── settings.php       # User settings
+├── cookie-banner.php  # Cookie consent
+├── contact-us.php     # Contact form
+├── privacy-policy.php # Legal
+└── terms-of-use.php   # Legal
+```
+
+### Translation File Structure
+
+```php
+// resources/lang/en/auth.php
+return [
+    'user_types' => [
+        'tenant' => 'Tenant',
+        'property_manager' => 'Property Manager',
+    ],
+    'login' => [
+        'title' => 'Log in to your account',
+        'email_label' => 'Email address',
+        'password_label' => 'Password',
+        'submit' => 'Sign in',
+    ],
+];
+```
+
+### TypeScript Type Safety
+
+Each translation file has a corresponding TypeScript interface:
+
+```typescript
+// resources/js/types/translations/auth.d.ts
+export interface AuthTranslations {
+    user_types: {
+        tenant: string;
+        property_manager: string;
+    };
+    login: {
+        title: string;
+        email_label: string;
+        password_label: string;
+        submit: string;
+    };
+}
+
+// resources/js/types/translations/index.d.ts
+export interface Translations {
+    auth: AuthTranslations;
+    header: HeaderTranslations;
+    // ... other translation interfaces
+}
+```
+
+### Usage in Components
+
+```tsx
+import { usePage } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
+import type { SharedData } from '@/types';
+
+export function LoginForm() {
+    const { translations } = usePage<SharedData>().props;
+
+    return <h1>{translate(translations, 'auth.login.title')}</h1>;
+}
+```
+
+### Language Switching
+
+```
+User clicks language → POST /locale { locale: 'de' }
+                              ↓
+                    Session stores locale
+                              ↓
+                    Page reloads with new translations
+```
+
+### Adding New Translations
+
+1. **Add PHP file** in all 4 locale directories
+2. **Create TypeScript interface** in `resources/js/types/translations/`
+3. **Update `Translations` interface** in `index.d.ts`
+4. **Register in `HandleInertiaRequests`** middleware
+5. **Use in components** via `translate()` utility
+
+### Design Rationale
+
+- **Server-side loading**: Translations loaded once per request, no client-side HTTP calls
+- **Per-feature organization**: Easy to find, modify, and maintain translations
+- **Type safety**: Full TypeScript support prevents typos and missing keys
+- **No external i18n library**: Simple, lightweight approach using Laravel's built-in `trans()`
+- **Session-based persistence**: User's language preference persists across sessions
+
+---
+
 ## Technology Stack
 
 **Backend**: Laravel 12 (PHP 8.3) + Inertia.js

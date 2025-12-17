@@ -2,6 +2,7 @@
 
 return [
     'login' => 'Se Connecter',
+    'dashboard' => 'Tableau de bord',
     'settings' => 'Paramètres',
     'sign_out' => 'Se Déconnecter',
     'logout_confirmation' => [

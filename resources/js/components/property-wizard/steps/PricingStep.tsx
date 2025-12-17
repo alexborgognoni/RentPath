@@ -2,7 +2,10 @@ import { StepContainer } from '@/components/property-wizard/components/StepConta
 import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
+import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Calendar, DoorOpen, Pause, Zap } from 'lucide-react';
 
@@ -21,6 +24,8 @@ const currencies = [
 ] as const;
 
 export function PricingStep({ data, updateData, errors, onBlur }: PricingStepProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
     const selectedCurrency = currencies.find((c) => c.value === data.rent_currency) || currencies[0];
 
     const handleBlur = (field: keyof PropertyWizardData) => {
@@ -30,7 +35,7 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
     };
 
     return (
-        <StepContainer title="Set your pricing" description="How much will you charge for rent?">
+        <StepContainer title={t('wizard.pricingStep.title')} description={t('wizard.pricingStep.description')}>
             <div className="mx-auto max-w-2xl">
                 {/* Main rent input - Hero style */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
@@ -63,7 +68,7 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
 
                         {/* Per month label */}
                         <div className="absolute top-1/2 right-6 -translate-y-1/2">
-                            <span className="text-lg text-muted-foreground">/month</span>
+                            <span className="text-lg text-muted-foreground">{t('wizard.pricingStep.perMonth')}</span>
                         </div>
                     </div>
 
@@ -97,7 +102,7 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Calendar className="h-5 w-5 text-primary" />
-                        When is it available?
+                        {t('wizard.pricingStep.whenAvailable')}
                     </h3>
 
                     <div className="mx-auto max-w-sm">
@@ -120,13 +125,13 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                             )}
                         >
                             <Zap className="h-4 w-4" />
-                            Available Immediately
+                            {t('wizard.pricingStep.availableImmediately')}
                         </button>
 
                         {/* Or separator */}
                         <div className="mb-4 flex items-center gap-4">
                             <div className="h-px flex-1 bg-border" />
-                            <span className="text-sm text-muted-foreground">or choose a date</span>
+                            <span className="text-sm text-muted-foreground">{t('wizard.pricingStep.orChooseDate')}</span>
                             <div className="h-px flex-1 bg-border" />
                         </div>
 
@@ -157,7 +162,7 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-12">
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <DoorOpen className="h-5 w-5 text-primary" />
-                        Accept applications?
+                        {t('wizard.pricingStep.acceptApplications')}
                     </h3>
 
                     <div className="mx-auto flex max-w-md gap-3">
@@ -172,8 +177,8 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                             )}
                         >
                             <DoorOpen className="h-6 w-6" />
-                            <span className="font-medium">Open for applications</span>
-                            <span className="text-xs text-muted-foreground">Start receiving applications</span>
+                            <span className="font-medium">{t('wizard.pricingStep.openForApplications')}</span>
+                            <span className="text-xs text-muted-foreground">{t('wizard.pricingStep.startReceiving')}</span>
                         </button>
 
                         <button
@@ -187,8 +192,8 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                             )}
                         >
                             <Pause className="h-6 w-6" />
-                            <span className="font-medium">Not yet</span>
-                            <span className="text-xs text-muted-foreground">Open for applications later</span>
+                            <span className="font-medium">{t('wizard.pricingStep.notYet')}</span>
+                            <span className="text-xs text-muted-foreground">{t('wizard.pricingStep.openLater')}</span>
                         </button>
                     </div>
                 </motion.div>

@@ -1,7 +1,10 @@
 import { AppLayout } from '@/layouts/app-layout';
+import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { useReactiveCurrency } from '@/utils/currency-utils';
 import { route } from '@/utils/route';
-import { Head, Link } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Bath, BedDouble, Home, MapPin, Maximize } from 'lucide-react';
 
 interface PropertiesPageProps {
@@ -9,23 +12,25 @@ interface PropertiesPageProps {
 }
 
 export default function PropertiesPage({ properties }: PropertiesPageProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+    const { formatRent } = useReactiveCurrency();
+
     return (
         <AppLayout>
-            <Head title="Browse Properties" />
+            <Head title={t('properties.browse.title')} />
 
             <div className="container mx-auto max-w-7xl px-4 py-8">
                 <div className="mb-8">
-                    <h1 className="mb-2 text-3xl font-bold text-foreground">Browse Properties</h1>
-                    <p className="text-muted-foreground">Discover available rental properties</p>
+                    <h1 className="mb-2 text-3xl font-bold text-foreground">{t('properties.browse.title')}</h1>
+                    <p className="text-muted-foreground">{t('properties.browse.subtitle')}</p>
                 </div>
 
                 {properties.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-12 text-center">
                         <Home className="mb-4 h-16 w-16 text-muted-foreground opacity-50" />
-                        <h2 className="mb-2 text-xl font-semibold text-foreground">No Properties Available</h2>
-                        <p className="max-w-md text-muted-foreground">
-                            There are currently no publicly available properties. Check back soon for new listings!
-                        </p>
+                        <h2 className="mb-2 text-xl font-semibold text-foreground">{t('properties.browse.empty_title')}</h2>
+                        <p className="max-w-md text-muted-foreground">{t('properties.browse.empty_description')}</p>
                     </div>
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -100,10 +105,12 @@ export default function PropertiesPage({ properties }: PropertiesPageProps) {
                                         {/* Price and CTA */}
                                         <div className="flex items-center justify-between border-t border-border pt-4">
                                             <div>
-                                                <div className="text-2xl font-bold text-foreground">{property.formatted_rent}</div>
-                                                <div className="text-xs text-muted-foreground">per month</div>
+                                                <div className="text-2xl font-bold text-foreground">
+                                                    {formatRent(property.rent_amount, property.rent_currency)}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground">{t('properties.perMonth')}</div>
                                             </div>
-                                            <span className="text-sm font-medium text-primary">View Details →</span>
+                                            <span className="text-sm font-medium text-primary">{t('properties.browse.view_details')}</span>
                                         </div>
                                     </div>
                                 </Link>

@@ -1,4 +1,7 @@
 import { Button } from '@/components/ui/button';
+import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion, useAnimation } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { useCallback } from 'react';
@@ -28,12 +31,22 @@ export function WizardNavigation({
     isLastStep,
     isSubmitting = false,
     nextLabel,
-    backLabel = 'Back',
+    backLabel,
     showSkip = false,
-    skipLabel = 'Skip for now',
-    submitLabel = 'Submit',
-    submittingLabel = 'Submitting...',
+    skipLabel,
+    submitLabel,
+    submittingLabel,
 }: WizardNavigationProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+
+    // Use provided labels or fall back to translations
+    const resolvedBackLabel = backLabel ?? t('wizard.nav.back');
+    const resolvedSkipLabel = skipLabel ?? t('wizard.nav.skip');
+    const resolvedSubmitLabel = submitLabel ?? t('wizard.nav.submit');
+    const resolvedSubmittingLabel = submittingLabel ?? t('wizard.nav.submitting');
+    const continueLabel = t('wizard.nav.continue');
+
     const shakeAnimation = useAnimation();
 
     const scrollToFirstError = useCallback(() => {
@@ -82,7 +95,7 @@ export function WizardNavigation({
                         className="gap-2 text-muted-foreground hover:text-foreground"
                     >
                         <ArrowLeft className="h-4 w-4" />
-                        {backLabel}
+                        {resolvedBackLabel}
                     </Button>
                 )}
             </div>
@@ -97,7 +110,7 @@ export function WizardNavigation({
                         disabled={isSubmitting}
                         className="text-muted-foreground hover:text-foreground"
                     >
-                        {skipLabel}
+                        {resolvedSkipLabel}
                     </Button>
                 )}
 
@@ -112,11 +125,11 @@ export function WizardNavigation({
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                {submittingLabel}
+                                {resolvedSubmittingLabel}
                             </>
                         ) : (
                             <>
-                                {nextLabel || (isLastStep ? submitLabel : 'Continue')}
+                                {nextLabel || (isLastStep ? resolvedSubmitLabel : continueLabel)}
                                 {!isLastStep && <ArrowRight className="h-4 w-4" />}
                             </>
                         )}

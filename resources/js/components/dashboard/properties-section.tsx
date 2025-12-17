@@ -83,18 +83,18 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
 
     // Handle deleting a draft
     const handleDeleteDraft = async (draft: Property) => {
-        if (!confirm('Are you sure you want to delete this draft? This action cannot be undone.')) {
+        if (!confirm(translate(translations, 'properties.deleteDraftConfirm'))) {
             return;
         }
 
         try {
             await axios.delete(`/properties/${draft.id}/draft`);
-            toast.success('Draft deleted successfully');
+            toast.success(translate(translations, 'properties.draftDeleted'));
             // Refresh the page to update the list
             router.reload();
         } catch (error) {
             console.error('Failed to delete draft:', error);
-            toast.error('Failed to delete draft');
+            toast.error(translate(translations, 'properties.draftDeleteFailed'));
         }
     };
 
@@ -329,8 +329,8 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                     <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
                         <Building size={40} className="text-muted-foreground" />
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-foreground">No properties match your filters</h3>
-                    <p className="mx-auto max-w-md text-muted-foreground">Try adjusting your search criteria to find more properties.</p>
+                    <h3 className="mb-2 text-xl font-semibold text-foreground">{translate(translations, 'properties.noMatchingFilters')}</h3>
+                    <p className="mx-auto max-w-md text-muted-foreground">{translate(translations, 'properties.adjustFilters')}</p>
                 </div>
             ) : (
                 <PropertyTable properties={filteredProperties} onEditProperty={onEditProperty} />

@@ -1,7 +1,8 @@
 import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { copyToClipboard } from '@/utils/clipboard';
-import { route } from '@/utils/route';
+import { useReactiveCurrency } from '@/utils/currency-utils';
+import { getRootDomainUrl, route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { Copy, ExternalLink, Users } from 'lucide-react';
@@ -12,9 +13,8 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, onEdit }: PropertyCardProps) {
-    const { translations } = usePage<SharedData>().props;
-    // Mock currency formatting for now (since backend doesn't exist yet)
-    const formatCurrency = (amount: number) => `€${amount.toLocaleString()}`;
+    const { translations, appUrlScheme, appDomain, appPort } = usePage<SharedData>().props;
+    const { formatRent } = useReactiveCurrency();
 
     // Format address from separate fields
     const formatAddress = (property: Property): string => {
@@ -27,7 +27,7 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
         return fullAddress;
     };
 
-    const rootDomain = window.location.origin.replace('manager.', '');
+    const rootDomain = getRootDomainUrl(appUrlScheme, appDomain, appPort);
     const applicationUrl = property.default_token
         ? `${rootDomain}/properties/${property.id}?token=${property.default_token.token}`
         : `${rootDomain}/properties/${property.id}`;
@@ -73,7 +73,7 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             <h3 className="mb-2 text-xl font-bold text-foreground">{property.title}</h3>
             <p className="mb-3 text-muted-foreground">{formatAddress(property)}</p>
             <p className="mb-4 text-lg font-bold text-primary">
-                {formatCurrency(property.rent_amount)}/{translate(translations, 'properties.month')}
+                {formatRent(property.rent_amount, property.rent_currency)}/{translate(translations, 'properties.month')}
             </p>
 
             <div className="mb-6 flex items-center justify-between text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
                         <button
                             onClick={handleEditClick}
                             className="flex items-center justify-center rounded-xl border border-border bg-muted p-3 text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/80"
-                            title="Edit Property"
+                            title={translate(translations, 'properties.editProperty')}
                         >
                             <ExternalLink size={16} />
                         </button>

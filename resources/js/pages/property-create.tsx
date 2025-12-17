@@ -8,12 +8,13 @@ import { ReviewStep } from '@/components/property-wizard/steps/ReviewStep';
 import { SpecificationsStep } from '@/components/property-wizard/steps/SpecificationsStep';
 import { SaveStatus } from '@/components/ui/save-status';
 import { WizardNavigation, WizardProgress } from '@/components/wizard';
-import { usePropertyWizard, WIZARD_STEPS } from '@/hooks/usePropertyWizard';
+import { usePropertyWizard, useWizardSteps } from '@/hooks/usePropertyWizard';
 import { ManagerLayout } from '@/layouts/manager-layout';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { route } from '@/utils/route';
-import { Head, router } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
+import { Head, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Home } from 'lucide-react';
 import { useCallback } from 'react';
@@ -25,6 +26,9 @@ interface PropertyCreateWizardProps {
 }
 
 export default function PropertyCreateWizard({ property, isEditing = false, isDraft = false }: PropertyCreateWizardProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+    const WIZARD_STEPS = useWizardSteps();
     const wizard = usePropertyWizard({
         property,
         isDraft,
@@ -37,11 +41,11 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
     const breadcrumbs: BreadcrumbItem[] =
         isEditing && property
             ? [
-                  { title: 'Properties', href: route('manager.properties.index') },
-                  { title: property.title || 'Property', href: route('properties.show', { property: property.id }) },
-                  { title: 'Edit' },
+                  { title: t('properties.title'), href: route('manager.properties.index') },
+                  { title: property.title || t('properties.property'), href: route('properties.show', { property: property.id }) },
+                  { title: t('wizard.reviewStep.edit') },
               ]
-            : [{ title: 'Properties', href: route('manager.properties.index') }, { title: 'Add Property' }];
+            : [{ title: t('properties.title'), href: route('manager.properties.index') }, { title: t('wizard.page.addProperty') }];
 
     const handleSubmit = useCallback(() => {
         if (!wizard.validateForPublish()) {
@@ -185,7 +189,7 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
 
     return (
         <ManagerLayout breadcrumbs={breadcrumbs}>
-            <Head title={isEditing ? 'Edit Property' : 'Add New Property'} />
+            <Head title={isEditing ? t('wizard.page.editProperty') : t('wizard.page.addProperty')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] flex-col">
                 {/* Header */}
@@ -196,7 +200,9 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
                                 <Home className="h-6 w-6 text-primary" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-foreground">{isEditing ? 'Edit Property' : 'Add New Property'}</h1>
+                                <h1 className="text-2xl font-bold text-foreground">
+                                    {isEditing ? t('wizard.page.editProperty') : t('wizard.page.addProperty')}
+                                </h1>
                                 <p className="text-sm text-muted-foreground">{currentStepConfig?.description}</p>
                             </div>
                         </div>
@@ -235,7 +241,11 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
                         isLastStep={wizard.isLastStep}
                         isSubmitting={wizard.isSubmitting}
                         showSkip={currentStepConfig?.optional}
-                        nextLabel={wizard.isLastStep ? 'Publish Listing' : undefined}
+                        nextLabel={wizard.isLastStep ? (isEditing ? t('wizard.page.updateListing') : t('wizard.page.publishListing')) : undefined}
+                        backLabel={t('wizard.nav.back')}
+                        skipLabel={t('wizard.nav.skip')}
+                        submitLabel={isEditing ? t('wizard.page.updateListing') : t('wizard.page.publishListing')}
+                        submittingLabel={t('wizard.nav.submitting')}
                     />
                 </div>
             </div>

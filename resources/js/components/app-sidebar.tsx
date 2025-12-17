@@ -9,11 +9,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { SharedData } from '@/types';
-import { route, settingsRoute } from '@/utils/route';
+import { currencies, getCurrencyFromStorage, setCurrencyInStorage, type CurrencyCode } from '@/utils/currency-utils';
+import { route } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Building2, ChevronsUpDown, Globe, Home, LogOut, PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react';
+import { Building2, ChevronsUpDown, CircleDollarSign, Globe, Home, LogOut, PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -28,12 +30,25 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
-    const { auth, translations, locale } = usePage<SharedData>().props;
+    const { auth, translations, locale, subdomain, managerSubdomain } = usePage<SharedData>().props;
     const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
     const currentLang = languages.find((l) => l.code === locale) || languages[0];
 
+    // Currency state
+    const [currentCurrency, setCurrentCurrency] = useState<CurrencyCode>(() => getCurrencyFromStorage());
+    const currentCurrencyData = currencies.find((c) => c.code === currentCurrency) || currencies[0];
+
+    useEffect(() => {
+        const handleCurrencyChange = (event: Event) => {
+            const customEvent = event as CustomEvent<CurrencyCode>;
+            setCurrentCurrency(customEvent.detail);
+        };
+
+        window.addEventListener('currencyChange', handleCurrencyChange);
+        return () => window.removeEventListener('currencyChange', handleCurrencyChange);
+    }, []);
+
     const isPropertiesActive = currentPath.startsWith('/properties') || currentPath.startsWith('/property');
-    const isSettingsActive = currentPath.startsWith('/settings');
 
     const getUserInitials = () => {
         if (auth.user?.name) {
@@ -49,9 +64,17 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
 
     const handleLogout = () => router.post(route('manager.logout'));
 
+    const handleCurrencyChange = (code: CurrencyCode) => {
+        setCurrencyInStorage(code);
+        setCurrentCurrency(code);
+        window.dispatchEvent(new CustomEvent<CurrencyCode>('currencyChange', { detail: code }));
+    };
+
     const handleLanguageChange = async (code: string) => {
         try {
-            await axios.post(route('locale.update'), { locale: code });
+            // Use correct route based on subdomain - all values from backend config
+            const localeRoute = subdomain === managerSubdomain ? `${managerSubdomain}.locale.update` : 'locale.update';
+            await axios.post(route(localeRoute), { locale: code });
             window.location.reload();
         } catch (err) {
             console.error('Failed to change language', err);
@@ -73,7 +96,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                                     <PanelLeftOpen className="h-5 w-5" />
                                 </button>
                             </TooltipTrigger>
-                            <TooltipContent side="right">Expand sidebar</TooltipContent>
+                            <TooltipContent side="right">{t(translations.sidebar, 'expandSidebar')}</TooltipContent>
                         </Tooltip>
                     ) : (
                         <div className="flex w-full items-center justify-between">
@@ -92,7 +115,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                                         <PanelLeftClose className="h-5 w-5" />
                                     </button>
                                 </TooltipTrigger>
-                                <TooltipContent side="right">Collapse sidebar</TooltipContent>
+                                <TooltipContent side="right">{t(translations.sidebar, 'collapseSidebar')}</TooltipContent>
                             </Tooltip>
                         </div>
                     )}
@@ -109,15 +132,45 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                     />
                 </nav>
 
-                {/* Settings Section */}
+                {/* Currency, Language & Settings Section */}
                 <div className="space-y-1 border-t border-border px-3 py-4">
-                    <NavItem
-                        href={settingsRoute('profile')}
-                        icon={<Settings className="h-5 w-5" />}
-                        label={t(translations.sidebar, 'settings')}
-                        isActive={isSettingsActive}
-                        isCollapsed={isCollapsed}
-                    />
+                    {/* Currency Selector */}
+                    <DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        className={`flex h-10 w-full items-center rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground ${
+                                            isCollapsed ? 'justify-center' : 'gap-3 px-3'
+                                        }`}
+                                    >
+                                        <CircleDollarSign className="h-5 w-5 shrink-0" />
+                                        {!isCollapsed && (
+                                            <span>
+                                                {currentCurrencyData.flag} {currentCurrencyData.code}
+                                            </span>
+                                        )}
+                                    </button>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            {isCollapsed && <TooltipContent side="right">{t(translations.sidebar, 'currency')}</TooltipContent>}
+                        </Tooltip>
+                        <DropdownMenuContent side="right" align="start" className="w-48">
+                            <DropdownMenuLabel>{t(translations.sidebar, 'selectCurrency')}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {currencies.map((currency) => (
+                                <DropdownMenuItem
+                                    key={currency.code}
+                                    onClick={() => handleCurrencyChange(currency.code)}
+                                    className={currentCurrency === currency.code ? 'bg-accent' : ''}
+                                >
+                                    <span className="mr-2">{currency.flag}</span>
+                                    <span>{currency.code}</span>
+                                    <span className="ml-auto text-xs text-muted-foreground">{currency.symbol}</span>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     {/* Language Selector */}
                     <DropdownMenu>
@@ -155,6 +208,21 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                             ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
+
+                    {/* Settings button - placeholder for future implementation */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                className={`flex h-10 w-full items-center rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground ${
+                                    isCollapsed ? 'justify-center' : 'gap-3 px-3'
+                                }`}
+                            >
+                                <Settings className="h-5 w-5 shrink-0" />
+                                {!isCollapsed && <span>{t(translations.sidebar, 'settings')}</span>}
+                            </button>
+                        </TooltipTrigger>
+                        {isCollapsed && <TooltipContent side="right">{t(translations.sidebar, 'settings')}</TooltipContent>}
+                    </Tooltip>
                 </div>
 
                 {/* User Section */}
@@ -204,11 +272,9 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
-                                <DropdownMenuItem asChild>
-                                    <Link href={settingsRoute('profile')}>
-                                        <Settings className="h-4 w-4" />
-                                        <span>{t(translations.sidebar, 'settings')}</span>
-                                    </Link>
+                                <DropdownMenuItem>
+                                    <Settings className="h-4 w-4" />
+                                    <span>{t(translations.sidebar, 'settings')}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />

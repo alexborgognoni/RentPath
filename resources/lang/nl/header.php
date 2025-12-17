@@ -2,6 +2,7 @@
 
 return [
     'login' => 'Inloggen',
+    'dashboard' => 'Dashboard',
     'settings' => 'Instellingen',
     'sign_out' => 'Uitloggen',
     'logout_confirmation' => [

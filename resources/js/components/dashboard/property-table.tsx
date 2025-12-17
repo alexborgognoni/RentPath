@@ -4,7 +4,7 @@ import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { copyToClipboard } from '@/utils/clipboard';
 import { formatAddress } from '@/utils/country-utils';
-import { getCurrency } from '@/utils/currency-utils';
+import { useReactiveCurrency } from '@/utils/currency-utils';
 import { getRootDomainUrl, route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
@@ -75,14 +75,9 @@ function formatNumber(num: number | string | undefined): string {
     }).format(numValue);
 }
 
-function formatPrice(amount: number | undefined, currencyCode: string = 'eur'): string {
-    if (!amount) return '€0';
-    const currency = getCurrency(currencyCode.toUpperCase() as 'EUR' | 'USD' | 'GBP' | 'CHF');
-    return `${currency.symbol}${formatNumber(amount)}`;
-}
-
 export function PropertyTable({ properties, onEditProperty }: PropertyTableProps) {
     const { translations, appUrlScheme, appDomain, appPort } = usePage<SharedData>().props;
+    const { formatRent } = useReactiveCurrency();
 
     const handleInvite = async (e: React.MouseEvent, property: Property) => {
         e.stopPropagation();
@@ -130,7 +125,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
                     return (
                         <div className="flex h-16 w-20 items-center justify-center rounded-lg border border-border bg-muted">
-                            <span className="text-xs text-muted-foreground">No image</span>
+                            <span className="text-xs text-muted-foreground">{translate(translations, 'properties.noImage')}</span>
                         </div>
                     );
                 },
@@ -157,7 +152,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                     const property = row.original;
                     return (
                         <div className="flex flex-col items-center">
-                            <div className="font-bold text-foreground">{formatPrice(property.rent_amount, property.rent_currency)}</div>
+                            <div className="font-bold text-foreground">{formatRent(property.rent_amount, property.rent_currency)}</div>
                             <div className="text-sm text-muted-foreground">{translate(translations, 'properties.perMonth')}</div>
                         </div>
                     );
@@ -166,7 +161,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
             // Size column
             columnHelper.accessor('size', {
-                header: 'Size',
+                header: () => translate(translations, 'properties.columnSize'),
                 cell: ({ getValue }) => {
                     const size = getValue();
                     return (
@@ -196,7 +191,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
             // Beds column
             columnHelper.accessor('bedrooms', {
-                header: 'Beds',
+                header: () => translate(translations, 'properties.columnBeds'),
                 cell: ({ getValue }) => (
                     <div className="flex items-center justify-center gap-2 text-sm">
                         <Bed size={14} className="text-muted-foreground" />
@@ -207,7 +202,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
 
             // Baths column
             columnHelper.accessor('bathrooms', {
-                header: 'Baths',
+                header: () => translate(translations, 'properties.columnBaths'),
                 cell: ({ getValue }) => (
                     <div className="flex items-center justify-center gap-2 text-sm">
                         <Bath size={14} className="text-muted-foreground" />
@@ -219,7 +214,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             // Parking column
             columnHelper.display({
                 id: 'parking',
-                header: 'Parking',
+                header: () => translate(translations, 'properties.columnParking'),
                 cell: ({ row }) => {
                     const property = row.original;
                     const totalParkingSpots = (property.parking_spots_interior || 0) + (property.parking_spots_exterior || 0);
@@ -285,7 +280,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 },
             }),
         ],
-        [translations],
+        [translations, formatRent],
     );
 
     return <DataTable columns={columns} data={properties} onRowClick={handleRowClick} />;

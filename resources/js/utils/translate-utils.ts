@@ -1,6 +1,6 @@
 import type { Translations } from '@/types/translations';
 
-export const translate = (translations: Translations, key: string): string => {
+export const translate = (translations: Translations, key: string, params?: Record<string, string | number>): string => {
     // Safety check: ensure both parameters are provided
     if (!translations || typeof translations !== 'object') {
         console.error('translate() called without translations object. Did you forget to pass translations as the first argument?');
@@ -44,5 +44,16 @@ export const translate = (translations: Translations, key: string): string => {
         }
     }
 
-    return typeof current === 'string' ? current : key;
+    if (typeof current !== 'string') {
+        return key;
+    }
+
+    // Replace Laravel-style :param placeholders
+    if (params) {
+        return Object.entries(params).reduce((result, [paramKey, paramValue]) => {
+            return result.replace(new RegExp(`:${paramKey}`, 'g'), String(paramValue));
+        }, current);
+    }
+
+    return current;
 };

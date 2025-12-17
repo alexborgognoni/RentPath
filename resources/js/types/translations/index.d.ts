@@ -10,6 +10,8 @@ export interface Translations {
     'cookie-banner': CookieBannerTranslations;
     dashboard: DashboardTranslations;
     sidebar: SidebarTranslations;
+    properties: PropertiesTranslations;
+    tenant: TenantTranslations;
 }
 
 export type TranslationKey = string;

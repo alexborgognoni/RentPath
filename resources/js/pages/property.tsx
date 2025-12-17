@@ -32,12 +32,12 @@ export default function PropertyPage() {
                 <Head title={translate(translations, 'properties.propertyNotFound')} />
                 <div className="rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm">
                     <h2 className="mb-4 text-2xl font-bold text-destructive">{error || translate(translations, 'properties.propertyNotFound')}</h2>
-                    <p className="mb-6 text-muted-foreground">The property you're looking for doesn't exist or you don't have access to it.</p>
+                    <p className="mb-6 text-muted-foreground">{translate(translations, 'properties.notFoundMessage')}</p>
                     <Link
                         href={route('manager.properties.index')}
                         className="rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3 font-medium text-white shadow-lg transition-all hover:scale-105"
                     >
-                        Back to Properties
+                        {translate(translations, 'properties.backToProperties')}
                     </Link>
                 </div>
             </ManagerLayout>

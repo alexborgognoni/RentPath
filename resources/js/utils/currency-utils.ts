@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 // Common currencies with their symbols and conversion rates (base: EUR)
 // Exchange rates updated September 2025
 export const currencies = [
@@ -88,7 +90,7 @@ export const convertAndRoundUpPrice = (basePrice: number, baseCurrency: Currency
     return Math.ceil(convertedPrice); // Always round up to nearest whole number
 };
 
-// Hook for currency conversion
+// Hook for currency conversion (non-reactive, reads from storage on each call)
 export const useCurrency = () => {
     const currentCurrency = getCurrencyFromStorage();
 
@@ -113,5 +115,58 @@ export const useCurrency = () => {
         convertPrice,
         currencies,
         getCurrency: () => getCurrency(currentCurrency),
+    };
+};
+
+// Format amount with currency symbol (whole numbers, no decimals)
+const formatWithSymbol = (amount: number, currencyCode: CurrencyCode): string => {
+    const currency = getCurrency(currencyCode);
+    const formatted = Math.round(amount).toLocaleString();
+
+    if (['USD'].includes(currencyCode)) {
+        return `${currency.symbol}${formatted}`;
+    } else if (currencyCode === 'CHF') {
+        return `${currency.symbol} ${formatted}`;
+    }
+    return `${currency.symbol}${formatted}`;
+};
+
+/**
+ * React hook for reactive currency formatting.
+ * Re-renders component when user changes currency via CurrencySelector.
+ *
+ * Usage:
+ *   const { formatRent } = useReactiveCurrency();
+ *   <span>{formatRent(property.rent_amount, property.rent_currency)}</span>
+ */
+export const useReactiveCurrency = () => {
+    const [currentCurrency, setCurrentCurrency] = useState<CurrencyCode>(() => getCurrencyFromStorage());
+
+    useEffect(() => {
+        const handleCurrencyChange = () => {
+            setCurrentCurrency(getCurrencyFromStorage());
+        };
+
+        window.addEventListener('currencyChange', handleCurrencyChange);
+        return () => window.removeEventListener('currencyChange', handleCurrencyChange);
+    }, []);
+
+    /**
+     * Format rent amount with currency conversion
+     * @param amount - The rent amount (e.g., 1500)
+     * @param baseCurrency - The currency the amount is in (e.g., 'eur', 'EUR')
+     */
+    const formatRent = (amount: number | undefined | null, baseCurrency?: string): string => {
+        if (!amount) return '—';
+
+        const normalizedBase = (baseCurrency?.toUpperCase() || 'EUR') as CurrencyCode;
+        const convertedAmount = convertCurrency(amount, normalizedBase, currentCurrency);
+
+        return formatWithSymbol(convertedAmount, currentCurrency);
+    };
+
+    return {
+        currentCurrency,
+        formatRent,
     };
 };

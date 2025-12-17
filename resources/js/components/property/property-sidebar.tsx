@@ -2,6 +2,7 @@ import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { copyToClipboard } from '@/utils/clipboard';
 import { getRootDomainUrl, route } from '@/utils/route';
+import { translate } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';
 import { Check, Copy, Edit, FileText, Link2, RefreshCw, Settings, Share, Trash2, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -13,7 +14,8 @@ interface PropertySidebarProps {
 }
 
 export function PropertySidebar({ property, tenantCount }: PropertySidebarProps) {
-    const { appUrlScheme, appDomain, appPort } = usePage<SharedData>().props;
+    const { appUrlScheme, appDomain, appPort, translations } = usePage<SharedData>().props;
+    const t = (key: string, params?: Record<string, string | number>) => translate(translations, key, params);
     const [requiresInvite, setRequiresInvite] = useState(property.requires_invite ?? true);
     const [defaultToken, setDefaultToken] = useState<{ token: string; used_count: number } | null>(property.default_token || null);
     const [copiedToken, setCopiedToken] = useState(false);
@@ -58,7 +60,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     };
 
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
+        if (confirm(t('properties.sidebar.deletePropertyConfirm'))) {
             router.delete(route('properties.destroy', { property: property.id }), {
                 onSuccess: () => {
                     router.visit(route('manager.properties.index'));
@@ -136,48 +138,48 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     };
 
     const getStatusBadge = () => {
-        const statusConfig: Record<string, { label: string; className: string }> = {
+        const statusConfig: Record<string, { labelKey: string; className: string }> = {
             inactive: {
-                label: 'Inactive',
+                labelKey: 'properties.statusInactive',
                 className: 'bg-muted/50 text-muted-foreground',
             },
             available: {
-                label: 'Available',
+                labelKey: 'properties.statusAvailable',
                 className: 'bg-success/10 text-success',
             },
             application_received: {
-                label: 'Applications',
+                labelKey: 'properties.statusApplicationReceived',
                 className: 'bg-blue-500/10 text-blue-400',
             },
             under_review: {
-                label: 'Under Review',
+                labelKey: 'properties.statusUnderReview',
                 className: 'bg-amber-500/10 text-amber-400',
             },
             visit_scheduled: {
-                label: 'Visit Scheduled',
+                labelKey: 'properties.statusVisitScheduled',
                 className: 'bg-purple-500/10 text-purple-400',
             },
             approved: {
-                label: 'Approved',
+                labelKey: 'properties.statusApproved',
                 className: 'bg-emerald-500/10 text-emerald-400',
             },
             leased: {
-                label: 'Leased',
+                labelKey: 'properties.statusLeased',
                 className: 'bg-cyan-500/10 text-cyan-400',
             },
             maintenance: {
-                label: 'Maintenance',
+                labelKey: 'properties.statusMaintenance',
                 className: 'bg-orange-500/10 text-orange-400',
             },
             archived: {
-                label: 'Archived',
+                labelKey: 'properties.statusArchived',
                 className: 'bg-muted/50 text-muted-foreground',
             },
         };
 
         const config = statusConfig[property.status] || statusConfig.inactive;
 
-        return <span className={`rounded-full px-2 py-1 text-xs font-medium ${config.className}`}>{config.label}</span>;
+        return <span className={`rounded-full px-2 py-1 text-xs font-medium ${config.className}`}>{t(config.labelKey)}</span>;
     };
 
     return (
@@ -186,17 +188,17 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
                     <FileText className="mr-2 text-primary" size={18} />
-                    Quick Stats
+                    {t('properties.sidebar.quickStats')}
                 </h3>
 
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Monthly Rent</span>
+                        <span className="text-sm text-muted-foreground">{t('properties.sidebar.monthlyRent')}</span>
                         <span className="text-sm font-semibold text-foreground">{formatCurrency(property.rent_amount, property.rent_currency)}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Applications</span>
+                        <span className="text-sm text-muted-foreground">{t('properties.sidebar.applications')}</span>
                         <span className="flex items-center text-sm font-semibold text-foreground">
                             <Users className="mr-1" size={14} />
                             {tenantCount}
@@ -204,7 +206,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Status</span>
+                        <span className="text-sm text-muted-foreground">{t('properties.sidebar.status')}</span>
                         {getStatusBadge()}
                     </div>
                 </div>
@@ -214,7 +216,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
                     <Settings className="mr-2 text-primary" size={18} />
-                    Actions
+                    {t('properties.sidebar.actions')}
                 </h3>
 
                 <button
@@ -222,7 +224,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
                 >
                     <Edit className="mr-3" size={16} />
-                    Edit Property
+                    {t('properties.sidebar.editProperty')}
                 </button>
             </div>
 
@@ -230,14 +232,14 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
                     <Share className="mr-2 text-primary" size={18} />
-                    Application Access
+                    {t('properties.sidebar.applicationAccess')}
                 </h3>
 
                 {/* Invite Requirement Toggle */}
                 <div className="mb-3 flex items-center justify-between rounded-lg border border-border bg-background/50 p-3">
                     <div className="flex items-center">
                         <Link2 className="mr-2 text-muted-foreground" size={16} />
-                        <span className="text-sm font-medium">Require Invite</span>
+                        <span className="text-sm font-medium">{t('properties.sidebar.requireInvite')}</span>
                     </div>
                     <button
                         onClick={handleTogglePublicAccess}
@@ -253,18 +255,18 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
                 {requiresInvite && (
                     <>
-                        <p className="mb-3 text-sm text-muted-foreground">
-                            Invite required. Share the default invite link or create custom links with specific restrictions.
-                        </p>
+                        <p className="mb-3 text-sm text-muted-foreground">{t('properties.sidebar.inviteRequiredDesc')}</p>
 
                         {defaultToken && (
                             <div className="space-y-3">
                                 {/* Default Token Info */}
                                 <div className="rounded-lg border border-border bg-background/30 p-3">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-muted-foreground">Default Invite Link</span>
+                                        <span className="text-sm font-medium text-muted-foreground">{t('properties.sidebar.defaultInviteLink')}</span>
                                         <span className="text-sm text-muted-foreground">
-                                            Used {defaultToken.used_count} {defaultToken.used_count === 1 ? 'time' : 'times'}
+                                            {defaultToken.used_count === 1
+                                                ? t('properties.sidebar.usedTime', { count: defaultToken.used_count })
+                                                : t('properties.sidebar.usedTimes', { count: defaultToken.used_count })}
                                         </span>
                                     </div>
                                 </div>
@@ -277,12 +279,12 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     {copiedToken ? (
                                         <>
                                             <Check className="mr-2" size={16} />
-                                            Copied!
+                                            {t('properties.sidebar.copied')}
                                         </>
                                     ) : (
                                         <>
                                             <Copy className="mr-2" size={16} />
-                                            Copy Invite Link
+                                            {t('properties.sidebar.copyInviteLink')}
                                         </>
                                     )}
                                 </button>
@@ -294,7 +296,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-background disabled:opacity-50"
                                 >
                                     <RefreshCw className={`mr-2 ${regeneratingToken ? 'animate-spin' : ''}`} size={16} />
-                                    Regenerate Default Link
+                                    {t('properties.sidebar.regenerateLink')}
                                 </button>
 
                                 {/* Manage Custom Tokens Button */}
@@ -303,7 +305,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition-all hover:bg-primary/20"
                                 >
                                     <Settings className="mr-2" size={16} />
-                                    Manage Custom Invite Links
+                                    {t('properties.sidebar.manageCustomLinks')}
                                 </button>
                             </div>
                         )}
@@ -312,7 +314,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
                 {!requiresInvite && (
                     <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground">Anyone with the property link can apply. No invite token needed.</p>
+                        <p className="text-sm text-muted-foreground">{t('properties.sidebar.publicAccessDesc')}</p>
 
                         {/* Copy Public Link Button */}
                         <button
@@ -322,12 +324,12 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                             {copiedToken ? (
                                 <>
                                     <Check className="mr-2" size={16} />
-                                    Copied!
+                                    {t('properties.sidebar.copied')}
                                 </>
                             ) : (
                                 <>
                                     <Copy className="mr-2" size={16} />
-                                    Copy Link
+                                    {t('properties.sidebar.copyLink')}
                                 </>
                             )}
                         </button>
@@ -339,17 +341,17 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             <div className="rounded-2xl border border-destructive/20 bg-card p-4 shadow-sm">
                 <h3 className="mb-3 flex items-center text-base font-semibold text-destructive">
                     <Trash2 className="mr-2" size={18} />
-                    Danger Zone
+                    {t('properties.sidebar.dangerZone')}
                 </h3>
 
-                <p className="mb-3 text-sm text-muted-foreground">Deleting this property will permanently remove all associated data.</p>
+                <p className="mb-3 text-sm text-muted-foreground">{t('properties.sidebar.deleteWarning')}</p>
 
                 <button
                     onClick={handleDelete}
                     className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-destructive bg-destructive/10 px-4 py-2.5 text-sm font-medium text-destructive transition-all hover:bg-destructive/20"
                 >
                     <Trash2 className="mr-2" size={16} />
-                    Delete Property
+                    {t('properties.sidebar.deleteProperty')}
                 </button>
             </div>
 

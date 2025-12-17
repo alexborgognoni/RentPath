@@ -1,8 +1,12 @@
 import { StepContainer } from '@/components/property-wizard/components/StepContainer';
 import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
+import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AirVent, ChefHat, Fence, Flame, Package, Sunrise, UtensilsCrossed, WashingMachine } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface AmenitiesStepProps {
     data: PropertyWizardData;
@@ -10,47 +14,70 @@ interface AmenitiesStepProps {
     errors: Partial<Record<keyof PropertyWizardData, string>>;
 }
 
+type AmenityKey = keyof Pick<
+    PropertyWizardData,
+    'kitchen_equipped' | 'kitchen_separated' | 'has_cellar' | 'has_laundry' | 'has_fireplace' | 'has_air_conditioning' | 'has_garden' | 'has_rooftop'
+>;
+
 interface AmenityOption {
-    key: keyof Pick<
-        PropertyWizardData,
-        | 'kitchen_equipped'
-        | 'kitchen_separated'
-        | 'has_cellar'
-        | 'has_laundry'
-        | 'has_fireplace'
-        | 'has_air_conditioning'
-        | 'has_garden'
-        | 'has_rooftop'
-    >;
+    key: AmenityKey;
     label: string;
     icon: React.ElementType;
     category: 'kitchen' | 'building' | 'outdoor';
 }
 
-const amenities: AmenityOption[] = [
-    { key: 'kitchen_equipped', label: 'Equipped Kitchen', icon: ChefHat, category: 'kitchen' },
-    { key: 'kitchen_separated', label: 'Separate Kitchen', icon: UtensilsCrossed, category: 'kitchen' },
-    { key: 'has_cellar', label: 'Cellar Storage', icon: Package, category: 'building' },
-    { key: 'has_laundry', label: 'Laundry Room', icon: WashingMachine, category: 'building' },
-    { key: 'has_fireplace', label: 'Fireplace', icon: Flame, category: 'building' },
-    { key: 'has_air_conditioning', label: 'Air Conditioning', icon: AirVent, category: 'building' },
-    { key: 'has_garden', label: 'Garden Access', icon: Fence, category: 'outdoor' },
-    { key: 'has_rooftop', label: 'Rooftop Access', icon: Sunrise, category: 'outdoor' },
+const AMENITY_KEYS: { key: AmenityKey; translationKey: string; icon: React.ElementType; category: 'kitchen' | 'building' | 'outdoor' }[] = [
+    { key: 'kitchen_equipped', translationKey: 'equippedKitchen', icon: ChefHat, category: 'kitchen' },
+    { key: 'kitchen_separated', translationKey: 'separateKitchen', icon: UtensilsCrossed, category: 'kitchen' },
+    { key: 'has_cellar', translationKey: 'cellarStorage', icon: Package, category: 'building' },
+    { key: 'has_laundry', translationKey: 'laundryRoom', icon: WashingMachine, category: 'building' },
+    { key: 'has_fireplace', translationKey: 'fireplace', icon: Flame, category: 'building' },
+    { key: 'has_air_conditioning', translationKey: 'airConditioning', icon: AirVent, category: 'building' },
+    { key: 'has_garden', translationKey: 'gardenAccess', icon: Fence, category: 'outdoor' },
+    { key: 'has_rooftop', translationKey: 'rooftopAccess', icon: Sunrise, category: 'outdoor' },
 ];
 
-const categories = [
-    { id: 'kitchen', label: 'Kitchen' },
-    { id: 'building', label: 'Building Features' },
-    { id: 'outdoor', label: 'Outdoor Spaces' },
-];
+function useAmenities() {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+
+    return useMemo(
+        () =>
+            AMENITY_KEYS.map((amenity) => ({
+                key: amenity.key,
+                label: t(`wizard.amenitiesStep.amenities.${amenity.translationKey}`),
+                icon: amenity.icon,
+                category: amenity.category,
+            })),
+        [translations],
+    );
+}
+
+function useCategories() {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+
+    return useMemo(
+        () => [
+            { id: 'kitchen' as const, label: t('wizard.amenitiesStep.categories.kitchen') },
+            { id: 'building' as const, label: t('wizard.amenitiesStep.categories.building') },
+            { id: 'outdoor' as const, label: t('wizard.amenitiesStep.categories.outdoor') },
+        ],
+        [translations],
+    );
+}
 
 export function AmenitiesStep({ data, updateData }: AmenitiesStepProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+    const amenities = useAmenities();
+    const categories = useCategories();
     const toggleAmenity = (key: AmenityOption['key']) => {
         updateData(key, !data[key]);
     };
 
     return (
-        <StepContainer title="What does your property offer?" description="Select all the features and amenities included">
+        <StepContainer title={t('wizard.amenitiesStep.title')} description={t('wizard.amenitiesStep.description')}>
             <div className="mx-auto max-w-3xl">
                 {categories.map((category, categoryIndex) => {
                     const categoryAmenities = amenities.filter((a) => a.category === category.id);
@@ -135,7 +162,7 @@ export function AmenitiesStep({ data, updateData }: AmenitiesStepProps) {
                     transition={{ delay: 0.4 }}
                     className="text-center text-sm text-muted-foreground"
                 >
-                    Don't worry if something isn't listed — you can add more details in the description later
+                    {t('wizard.amenitiesStep.helperText')}
                 </motion.p>
             </div>
         </StepContainer>

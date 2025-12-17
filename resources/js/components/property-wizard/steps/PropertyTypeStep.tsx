@@ -1,9 +1,13 @@
 import { StepContainer } from '@/components/property-wizard/components/StepContainer';
 import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
+import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Building2, Car, Factory, Home, Hotel, Users } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface PropertyTypeStepProps {
     data: PropertyWizardData;
@@ -19,91 +23,102 @@ interface PropertyTypeOption {
     subtypes: { value: Property['subtype']; label: string }[];
 }
 
-const propertyTypes: PropertyTypeOption[] = [
-    {
-        value: 'apartment',
-        label: 'Apartment',
-        description: 'Flats, studios, penthouses',
-        icon: Building2,
-        subtypes: [
-            { value: 'studio', label: 'Studio' },
-            { value: 'loft', label: 'Loft' },
-            { value: 'duplex', label: 'Duplex' },
-            { value: 'triplex', label: 'Triplex' },
-            { value: 'penthouse', label: 'Penthouse' },
-            { value: 'serviced', label: 'Serviced Apartment' },
+function usePropertyTypes(): PropertyTypeOption[] {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+
+    return useMemo(
+        () => [
+            {
+                value: 'apartment',
+                label: t('wizard.propertyTypeStep.types.apartment'),
+                description: t('wizard.propertyTypeStep.types.apartmentDesc'),
+                icon: Building2,
+                subtypes: [
+                    { value: 'studio', label: t('wizard.propertyTypeStep.subtypes.studio') },
+                    { value: 'loft', label: t('wizard.propertyTypeStep.subtypes.loft') },
+                    { value: 'duplex', label: t('wizard.propertyTypeStep.subtypes.duplex') },
+                    { value: 'triplex', label: t('wizard.propertyTypeStep.subtypes.triplex') },
+                    { value: 'penthouse', label: t('wizard.propertyTypeStep.subtypes.penthouse') },
+                    { value: 'serviced', label: t('wizard.propertyTypeStep.subtypes.serviced') },
+                ],
+            },
+            {
+                value: 'house',
+                label: t('wizard.propertyTypeStep.types.house'),
+                description: t('wizard.propertyTypeStep.types.houseDesc'),
+                icon: Home,
+                subtypes: [
+                    { value: 'detached', label: t('wizard.propertyTypeStep.subtypes.detached') },
+                    { value: 'semi-detached', label: t('wizard.propertyTypeStep.subtypes.semi-detached') },
+                    { value: 'villa', label: t('wizard.propertyTypeStep.subtypes.villa') },
+                    { value: 'bungalow', label: t('wizard.propertyTypeStep.subtypes.bungalow') },
+                ],
+            },
+            {
+                value: 'room',
+                label: t('wizard.propertyTypeStep.types.room'),
+                description: t('wizard.propertyTypeStep.types.roomDesc'),
+                icon: Users,
+                subtypes: [
+                    { value: 'private_room', label: t('wizard.propertyTypeStep.subtypes.private_room') },
+                    { value: 'student_room', label: t('wizard.propertyTypeStep.subtypes.student_room') },
+                    { value: 'co-living', label: t('wizard.propertyTypeStep.subtypes.co-living') },
+                ],
+            },
+            {
+                value: 'commercial',
+                label: t('wizard.propertyTypeStep.types.commercial'),
+                description: t('wizard.propertyTypeStep.types.commercialDesc'),
+                icon: Hotel,
+                subtypes: [
+                    { value: 'office', label: t('wizard.propertyTypeStep.subtypes.office') },
+                    { value: 'retail', label: t('wizard.propertyTypeStep.subtypes.retail') },
+                ],
+            },
+            {
+                value: 'industrial',
+                label: t('wizard.propertyTypeStep.types.industrial'),
+                description: t('wizard.propertyTypeStep.types.industrialDesc'),
+                icon: Factory,
+                subtypes: [
+                    { value: 'warehouse', label: t('wizard.propertyTypeStep.subtypes.warehouse') },
+                    { value: 'factory', label: t('wizard.propertyTypeStep.subtypes.factory') },
+                ],
+            },
+            {
+                value: 'parking',
+                label: t('wizard.propertyTypeStep.types.parking'),
+                description: t('wizard.propertyTypeStep.types.parkingDesc'),
+                icon: Car,
+                subtypes: [
+                    { value: 'garage', label: t('wizard.propertyTypeStep.subtypes.garage') },
+                    { value: 'indoor_spot', label: t('wizard.propertyTypeStep.subtypes.indoor_spot') },
+                    { value: 'outdoor_spot', label: t('wizard.propertyTypeStep.subtypes.outdoor_spot') },
+                ],
+            },
         ],
-    },
-    {
-        value: 'house',
-        label: 'House',
-        description: 'Detached, villas, bungalows',
-        icon: Home,
-        subtypes: [
-            { value: 'detached', label: 'Detached House' },
-            { value: 'semi-detached', label: 'Semi-detached' },
-            { value: 'villa', label: 'Villa' },
-            { value: 'bungalow', label: 'Bungalow' },
-        ],
-    },
-    {
-        value: 'room',
-        label: 'Room',
-        description: 'Private rooms, co-living',
-        icon: Users,
-        subtypes: [
-            { value: 'private_room', label: 'Private Room' },
-            { value: 'student_room', label: 'Student Room' },
-            { value: 'co-living', label: 'Co-living Space' },
-        ],
-    },
-    {
-        value: 'commercial',
-        label: 'Commercial',
-        description: 'Offices, retail spaces',
-        icon: Hotel,
-        subtypes: [
-            { value: 'office', label: 'Office Space' },
-            { value: 'retail', label: 'Retail Shop' },
-        ],
-    },
-    {
-        value: 'industrial',
-        label: 'Industrial',
-        description: 'Warehouses, factories',
-        icon: Factory,
-        subtypes: [
-            { value: 'warehouse', label: 'Warehouse' },
-            { value: 'factory', label: 'Factory' },
-        ],
-    },
-    {
-        value: 'parking',
-        label: 'Parking',
-        description: 'Garages, parking spots',
-        icon: Car,
-        subtypes: [
-            { value: 'garage', label: 'Garage' },
-            { value: 'indoor_spot', label: 'Indoor Parking Spot' },
-            { value: 'outdoor_spot', label: 'Outdoor Parking Spot' },
-        ],
-    },
-];
+        [translations],
+    );
+}
 
 export function PropertyTypeStep({ data, updateData, errors }: PropertyTypeStepProps) {
-    const selectedType = propertyTypes.find((t) => t.value === data.type);
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string, params?: Record<string, string | number>) => translate(translations, key, params);
+    const propertyTypes = usePropertyTypes();
+    const selectedType = propertyTypes.find((pt) => pt.value === data.type);
 
     const handleTypeSelect = (type: Property['type']) => {
         updateData('type', type);
         // Auto-select first subtype when type changes
-        const typeOption = propertyTypes.find((t) => t.value === type);
+        const typeOption = propertyTypes.find((pt) => pt.value === type);
         if (typeOption && typeOption.subtypes.length > 0) {
             updateData('subtype', typeOption.subtypes[0].value);
         }
     };
 
     return (
-        <StepContainer title="What type of property are you listing?" description="Choose the category that best describes your property">
+        <StepContainer title={t('wizard.propertyTypeStep.title')} description={t('wizard.propertyTypeStep.description')}>
             {/* Property Type Cards */}
             <div className="mx-auto max-w-4xl">
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
@@ -160,7 +175,9 @@ export function PropertyTypeStep({ data, updateData, errors }: PropertyTypeStepP
                         transition={{ duration: 0.3 }}
                         className="mt-8"
                     >
-                        <h3 className="mb-4 text-center text-lg font-medium text-foreground">What kind of {selectedType.label.toLowerCase()}?</h3>
+                        <h3 className="mb-4 text-center text-lg font-medium text-foreground">
+                            {t('wizard.propertyTypeStep.whatKind', { type: selectedType.label.toLowerCase() })}
+                        </h3>
 
                         <div className="flex flex-wrap justify-center gap-3">
                             {selectedType.subtypes.map((subtype, index) => {

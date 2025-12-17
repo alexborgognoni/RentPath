@@ -1,5 +1,8 @@
 import type { WizardStepConfig } from '@/hooks/useWizard';
 import { cn } from '@/lib/utils';
+import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 
@@ -20,13 +23,16 @@ export function WizardProgress<TStepId extends string>({
     onStepClick,
     canGoToStep,
 }: WizardProgressProps<TStepId>) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string, params?: Record<string, string | number>) => translate(translations, key, params);
+
     return (
         <div className="w-full">
             {/* Mobile: Simple progress bar with step counter */}
             <div className="md:hidden">
                 <div className="mb-2 flex items-center justify-between text-sm">
                     <span className="font-medium text-foreground">
-                        Step {currentStepIndex + 1} of {steps.length}
+                        {t('wizard.progress.stepOf', { current: currentStepIndex + 1, total: steps.length })}
                     </span>
                     <span className="text-muted-foreground">{steps[currentStepIndex].shortTitle}</span>
                 </div>
@@ -113,7 +119,7 @@ export function WizardProgress<TStepId extends string>({
                                     )}
                                 >
                                     {step.shortTitle}
-                                    {step.optional && <span className="ml-1 text-muted-foreground">(opt)</span>}
+                                    {step.optional && <span className="ml-1 text-muted-foreground">{t('wizard.progress.optional')}</span>}
                                 </span>
                             </button>
                         );

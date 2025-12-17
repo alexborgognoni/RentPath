@@ -2,6 +2,7 @@
 
 return [
     'login' => 'Login',
+    'dashboard' => 'Dashboard',
     'settings' => 'Settings',
     'sign_out' => 'Sign Out',
     'logout_confirmation' => [

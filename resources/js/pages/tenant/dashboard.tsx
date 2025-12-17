@@ -1,7 +1,10 @@
 import { AppLayout } from '@/layouts/app-layout';
+import type { SharedData } from '@/types';
 import type { Application, PropertyImage } from '@/types/dashboard';
+import { useReactiveCurrency } from '@/utils/currency-utils';
 import { route } from '@/utils/route';
-import { Head, Link } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Calendar, Home, MapPin } from 'lucide-react';
 
 interface TenantDashboardProps {
@@ -9,6 +12,10 @@ interface TenantDashboardProps {
 }
 
 export default function TenantDashboard({ applications }: TenantDashboardProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+    const { formatRent } = useReactiveCurrency();
+
     const getStatusColor = (status: string) => {
         const statusColors: Record<string, string> = {
             draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
@@ -26,42 +33,43 @@ export default function TenantDashboard({ applications }: TenantDashboardProps) 
     };
 
     const formatStatus = (status: string) => {
-        return status
-            .split('_')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+        return (
+            t(`tenant.dashboard.status.${status}`) ||
+            status
+                .split('_')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')
+        );
     };
 
     return (
         <AppLayout>
-            <Head title="My Applications" />
+            <Head title={t('tenant.dashboard.title')} />
 
             <div className="container mx-auto max-w-7xl px-4 py-8">
                 <div className="mb-8 flex items-start justify-between">
                     <div>
-                        <h1 className="mb-2 text-3xl font-bold text-foreground">My Applications</h1>
-                        <p className="text-muted-foreground">Track and manage your rental applications</p>
+                        <h1 className="mb-2 text-3xl font-bold text-foreground">{t('tenant.dashboard.title')}</h1>
+                        <p className="text-muted-foreground">{t('tenant.dashboard.subtitle')}</p>
                     </div>
                     <Link
                         href={route('properties.index')}
                         className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
                     >
-                        Browse Properties
+                        {t('tenant.dashboard.browse_properties')}
                     </Link>
                 </div>
 
                 {applications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-12 text-center">
                         <Home className="mb-4 h-16 w-16 text-muted-foreground opacity-50" />
-                        <h2 className="mb-2 text-xl font-semibold text-foreground">No Applications Yet</h2>
-                        <p className="mb-6 max-w-md text-muted-foreground">
-                            You haven't applied to any properties yet. Start browsing available properties to submit your first application.
-                        </p>
+                        <h2 className="mb-2 text-xl font-semibold text-foreground">{t('tenant.dashboard.empty.title')}</h2>
+                        <p className="mb-6 max-w-md text-muted-foreground">{t('tenant.dashboard.empty.description')}</p>
                         <Link
                             href={route('properties.index')}
                             className="rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary/90"
                         >
-                            Browse Properties
+                            {t('tenant.dashboard.browse_properties')}
                         </Link>
                     </div>
                 ) : (
@@ -114,13 +122,17 @@ export default function TenantDashboard({ applications }: TenantDashboardProps) 
 
                                             <div className="flex items-center gap-2">
                                                 <Calendar className="h-4 w-4 flex-shrink-0" />
-                                                <span>Applied {new Date(application.created_at).toLocaleDateString()}</span>
+                                                <span>
+                                                    {t('tenant.dashboard.card.applied_on')} {new Date(application.created_at).toLocaleDateString()}
+                                                </span>
                                             </div>
                                         </div>
 
                                         <div className="flex items-center justify-between border-t border-border pt-4">
-                                            <span className="text-xl font-bold text-foreground">{property?.formatted_rent}</span>
-                                            <span className="text-sm font-medium text-primary">View Details →</span>
+                                            <span className="text-xl font-bold text-foreground">
+                                                {formatRent(property?.rent_amount, property?.rent_currency)}
+                                            </span>
+                                            <span className="text-sm font-medium text-primary">{t('tenant.dashboard.card.view_details')}</span>
                                         </div>
                                     </div>
                                 </Link>

@@ -1,8 +1,12 @@
 import { StepContainer } from '@/components/property-wizard/components/StepContainer';
 import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
+import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Flame, Leaf, Thermometer, Zap } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface EnergyStepProps {
     data: PropertyWizardData;
@@ -13,14 +17,31 @@ interface EnergyStepProps {
 const energyClasses = ['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'] as const;
 const thermalClasses = ['A', 'B', 'C', 'D', 'E', 'F', 'G'] as const;
 
-const heatingTypes = [
-    { value: 'gas', label: 'Gas', icon: Flame },
-    { value: 'electric', label: 'Electric', icon: Zap },
-    { value: 'district', label: 'District Heating', icon: Thermometer },
-    { value: 'heat_pump', label: 'Heat Pump', icon: Leaf },
-    { value: 'wood', label: 'Wood', icon: Flame },
-    { value: 'other', label: 'Other', icon: Thermometer },
-] as const;
+const HEATING_ICONS = {
+    gas: Flame,
+    electric: Zap,
+    district: Thermometer,
+    heat_pump: Leaf,
+    wood: Flame,
+    other: Thermometer,
+} as const;
+
+function useHeatingTypes() {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+
+    return useMemo(
+        () => [
+            { value: 'gas' as const, label: t('wizard.energyStep.heatingTypes.gas'), icon: HEATING_ICONS.gas },
+            { value: 'electric' as const, label: t('wizard.energyStep.heatingTypes.electric'), icon: HEATING_ICONS.electric },
+            { value: 'district' as const, label: t('wizard.energyStep.heatingTypes.district'), icon: HEATING_ICONS.district },
+            { value: 'heat_pump' as const, label: t('wizard.energyStep.heatingTypes.heat_pump'), icon: HEATING_ICONS.heat_pump },
+            { value: 'wood' as const, label: t('wizard.energyStep.heatingTypes.wood'), icon: HEATING_ICONS.wood },
+            { value: 'other' as const, label: t('wizard.energyStep.heatingTypes.other'), icon: HEATING_ICONS.other },
+        ],
+        [translations],
+    );
+}
 
 const getEnergyColor = (rating: string): string => {
     const colors: Record<string, string> = {
@@ -37,14 +58,18 @@ const getEnergyColor = (rating: string): string => {
 };
 
 export function EnergyStep({ data, updateData }: EnergyStepProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, key);
+    const heatingTypes = useHeatingTypes();
+
     return (
-        <StepContainer title="Energy & Efficiency" description="Help eco-conscious tenants find your property">
+        <StepContainer title={t('wizard.energyStep.title')} description={t('wizard.energyStep.description')}>
             <div className="mx-auto max-w-3xl">
                 {/* Optional step indicator */}
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex items-center justify-center">
                     <div className="flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm text-muted-foreground">
                         <Leaf className="h-4 w-4" />
-                        <span>This step is optional</span>
+                        <span>{t('wizard.energyStep.optionalNote')}</span>
                     </div>
                 </motion.div>
 
@@ -52,7 +77,7 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Zap className="h-5 w-5 text-primary" />
-                        Energy Performance Rating
+                        {t('wizard.energyStep.energyPerformance')}
                     </h3>
 
                     <div className="flex flex-wrap justify-center gap-2">
@@ -85,14 +110,14 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                             );
                         })}
                     </div>
-                    <p className="mt-2 text-center text-xs text-muted-foreground">A+ is the most efficient, G is the least</p>
+                    <p className="mt-2 text-center text-xs text-muted-foreground">{t('wizard.energyStep.energyHelp')}</p>
                 </motion.div>
 
                 {/* Thermal Insulation */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Thermometer className="h-5 w-5 text-primary" />
-                        Thermal Insulation Rating
+                        {t('wizard.energyStep.thermalInsulation')}
                     </h3>
 
                     <div className="flex flex-wrap justify-center gap-2">
@@ -131,7 +156,7 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Flame className="h-5 w-5 text-primary" />
-                        Heating System
+                        {t('wizard.energyStep.heatingSystem')}
                     </h3>
 
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3">

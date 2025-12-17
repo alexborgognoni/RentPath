@@ -8,4 +8,6 @@ interface SidebarTranslations {
     selectLanguage: string;
     account: string;
     signOut: string;
+    expandSidebar: string;
+    collapseSidebar: string;
 }
