@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import { motion } from 'framer-motion';
 import { Bath, Bed, Building2, Calendar, Car, Expand, Layers, TreePine } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface SpecificationsStepProps {
     data: PropertyWizardData;
@@ -16,6 +17,26 @@ interface SpecificationsStepProps {
 export function SpecificationsStep({ data, updateData, errors, onBlur }: SpecificationsStepProps) {
     const propertyType = data.type;
 
+    // Track display values for size inputs to allow natural typing
+    const [sizeDisplay, setSizeDisplay] = useState<string>(() => (data.size != null && data.size > 0 ? String(data.size) : ''));
+    const [balconySizeDisplay, setBalconySizeDisplay] = useState<string>(() =>
+        data.balcony_size != null && data.balcony_size > 0 ? String(data.balcony_size) : '',
+    );
+    const [landSizeDisplay, setLandSizeDisplay] = useState<string>(() =>
+        data.land_size != null && data.land_size > 0 ? String(data.land_size) : '',
+    );
+
+    // Sync display values when data changes externally (e.g., from autosave restore)
+    useEffect(() => {
+        setSizeDisplay(data.size != null && data.size > 0 ? String(data.size) : '');
+    }, [data.size]);
+    useEffect(() => {
+        setBalconySizeDisplay(data.balcony_size != null && data.balcony_size > 0 ? String(data.balcony_size) : '');
+    }, [data.balcony_size]);
+    useEffect(() => {
+        setLandSizeDisplay(data.land_size != null && data.land_size > 0 ? String(data.land_size) : '');
+    }, [data.land_size]);
+
     // Prevent negative number input for size fields
     const handleSizeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === '-' || e.key === 'e') {
@@ -23,19 +44,36 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
         }
     };
 
-    // Format size value to show decimals (e.g., 45 -> "45.00")
-    const formatSizeValue = (value: number | undefined | null): string => {
-        if (value === undefined || value === null || value === 0) return '';
-        return value.toFixed(2);
+    // Handle size input change - update display value and parse for data
+    const handleSizeInputChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        field: 'size' | 'balcony_size' | 'land_size',
+        setDisplay: React.Dispatch<React.SetStateAction<string>>,
+    ) => {
+        const inputValue = e.target.value;
+        setDisplay(inputValue);
+
+        // Parse and update data
+        if (inputValue === '') {
+            updateData(field, undefined);
+        } else {
+            const value = parseFloat(inputValue);
+            if (!isNaN(value) && value >= 0) {
+                updateData(field, value);
+            }
+        }
     };
 
-    // Parse size input and update
-    const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'size' | 'balcony_size' | 'land_size') => {
-        const value = parseFloat(e.target.value);
-        if (e.target.value === '' || isNaN(value)) {
-            updateData(field, undefined);
-        } else if (value >= 0) {
-            updateData(field, value);
+    // Format on blur to show proper decimal places
+    const handleSizeBlur = (field: 'size' | 'balcony_size' | 'land_size', setDisplay: React.Dispatch<React.SetStateAction<string>>) => {
+        const value = data[field];
+        if (value != null && value > 0) {
+            setDisplay(value.toFixed(2));
+        } else {
+            setDisplay('');
+        }
+        if (onBlur) {
+            onBlur(field, value);
         }
     };
 
@@ -60,6 +98,19 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
         if (onBlur) {
             onBlur(field, data[field]);
         }
+    };
+
+    // Get display values for size inputs
+    const getSizeDisplayValue = (field: 'size' | 'balcony_size' | 'land_size'): string => {
+        if (field === 'size') return sizeDisplay;
+        if (field === 'balcony_size') return balconySizeDisplay;
+        return landSizeDisplay;
+    };
+
+    const getSizeDisplaySetter = (field: 'size' | 'balcony_size' | 'land_size'): React.Dispatch<React.SetStateAction<string>> => {
+        if (field === 'size') return setSizeDisplay;
+        if (field === 'balcony_size') return setBalconySizeDisplay;
+        return setLandSizeDisplay;
     };
 
     const inputClassName = (hasError?: boolean) =>
@@ -102,6 +153,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                     label="Bedrooms"
                                     icon={<Bed className="h-4 w-4" />}
                                     integerOnly
+                                    error={errors.bedrooms}
                                 />
                             )}
                             {showBathrooms && (
@@ -113,6 +165,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                     step={0.5}
                                     label="Bathrooms"
                                     icon={<Bath className="h-4 w-4" />}
+                                    error={errors.bathrooms}
                                 />
                             )}
                         </div>
@@ -142,10 +195,10 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                         <input
                                             type="number"
                                             id="size"
-                                            value={formatSizeValue(data.size)}
-                                            onChange={(e) => handleSizeChange(e, 'size')}
+                                            value={getSizeDisplayValue('size')}
+                                            onChange={(e) => handleSizeInputChange(e, 'size', getSizeDisplaySetter('size'))}
                                             onKeyDown={handleSizeKeyDown}
-                                            onBlur={() => handleBlur('size')}
+                                            onBlur={() => handleSizeBlur('size', getSizeDisplaySetter('size'))}
                                             className={inputClassName(!!errors.size)}
                                             placeholder="0.00"
                                             min={0}
@@ -171,10 +224,10 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                         <input
                                             type="number"
                                             id="balcony_size"
-                                            value={formatSizeValue(data.balcony_size)}
-                                            onChange={(e) => handleSizeChange(e, 'balcony_size')}
+                                            value={getSizeDisplayValue('balcony_size')}
+                                            onChange={(e) => handleSizeInputChange(e, 'balcony_size', getSizeDisplaySetter('balcony_size'))}
                                             onKeyDown={handleSizeKeyDown}
-                                            onBlur={() => handleBlur('balcony_size')}
+                                            onBlur={() => handleSizeBlur('balcony_size', getSizeDisplaySetter('balcony_size'))}
                                             className={inputClassName(!!errors.balcony_size)}
                                             placeholder="0.00"
                                             min={0}
@@ -200,10 +253,10 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                         <input
                                             type="number"
                                             id="land_size"
-                                            value={formatSizeValue(data.land_size)}
-                                            onChange={(e) => handleSizeChange(e, 'land_size')}
+                                            value={getSizeDisplayValue('land_size')}
+                                            onChange={(e) => handleSizeInputChange(e, 'land_size', getSizeDisplaySetter('land_size'))}
                                             onKeyDown={handleSizeKeyDown}
-                                            onBlur={() => handleBlur('land_size')}
+                                            onBlur={() => handleSizeBlur('land_size', getSizeDisplaySetter('land_size'))}
                                             className={inputClassName(!!errors.land_size)}
                                             placeholder="0.00"
                                             min={0}
@@ -243,6 +296,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 label="Indoor Spots"
                                 icon={<Car className="h-4 w-4" />}
                                 integerOnly
+                                error={errors.parking_spots_interior}
                             />
                             <NumberStepper
                                 value={data.parking_spots_exterior}
@@ -252,6 +306,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 label="Outdoor Spots"
                                 icon={<Car className="h-4 w-4" />}
                                 integerOnly
+                                error={errors.parking_spots_exterior}
                             />
                         </div>
                     </motion.div>
@@ -351,9 +406,10 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 <input
                                     type="number"
                                     id="parking_size"
-                                    value={formatSizeValue(data.size)}
-                                    onChange={(e) => handleSizeChange(e, 'size')}
+                                    value={getSizeDisplayValue('size')}
+                                    onChange={(e) => handleSizeInputChange(e, 'size', getSizeDisplaySetter('size'))}
                                     onKeyDown={handleSizeKeyDown}
+                                    onBlur={() => handleSizeBlur('size', getSizeDisplaySetter('size'))}
                                     className={inputClassName()}
                                     placeholder="0.00"
                                     min={0}

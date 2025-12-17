@@ -12,9 +12,10 @@ interface NumberStepperProps {
     icon?: React.ReactNode;
     suffix?: string;
     integerOnly?: boolean;
+    error?: string;
 }
 
-export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, label, icon, suffix, integerOnly = false }: NumberStepperProps) {
+export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, label, icon, suffix, integerOnly = false, error }: NumberStepperProps) {
     const handleDecrement = () => {
         if (value > min) {
             onChange(value - step);
@@ -45,8 +46,8 @@ export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, la
     return (
         <div className="flex flex-col items-center gap-3">
             {/* Label with optional icon */}
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                {icon && <span className="text-muted-foreground">{icon}</span>}
+            <div className={cn('flex items-center gap-2 text-sm font-medium', error ? 'text-destructive' : 'text-foreground')}>
+                {icon && <span className={error ? 'text-destructive' : 'text-muted-foreground'}>{icon}</span>}
                 <span>{label}</span>
             </div>
 
@@ -61,7 +62,9 @@ export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, la
                         'flex h-12 w-12 items-center justify-center rounded-xl border-2 transition-all',
                         value <= min
                             ? 'cursor-not-allowed border-border bg-muted text-muted-foreground/40'
-                            : 'border-border bg-card text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground',
+                            : error
+                              ? 'border-destructive bg-card text-foreground hover:border-destructive hover:bg-destructive hover:text-destructive-foreground'
+                              : 'border-border bg-card text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground',
                     )}
                 >
                     <Minus className="h-5 w-5" />
@@ -76,10 +79,14 @@ export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, la
                         min={min}
                         max={max}
                         step={integerOnly ? 1 : step}
+                        aria-invalid={!!error}
                         className={cn(
-                            'h-12 w-20 rounded-xl border-2 border-border bg-background text-center text-lg font-semibold text-foreground',
-                            'focus:border-primary focus:ring-4 focus:ring-primary/10 focus:outline-none',
+                            'h-12 w-20 rounded-xl border-2 bg-background text-center text-lg font-semibold text-foreground',
+                            'focus:ring-4 focus:outline-none',
                             '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+                            error
+                                ? 'border-destructive bg-destructive/5 focus:border-destructive focus:ring-destructive/10'
+                                : 'border-border focus:border-primary focus:ring-primary/10',
                         )}
                     />
                     {suffix && (
@@ -96,12 +103,17 @@ export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, la
                         'flex h-12 w-12 items-center justify-center rounded-xl border-2 transition-all',
                         value >= max
                             ? 'cursor-not-allowed border-border bg-muted text-muted-foreground/40'
-                            : 'border-border bg-card text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground',
+                            : error
+                              ? 'border-destructive bg-card text-foreground hover:border-destructive hover:bg-destructive hover:text-destructive-foreground'
+                              : 'border-border bg-card text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground',
                     )}
                 >
                     <Plus className="h-5 w-5" />
                 </motion.button>
             </div>
+
+            {/* Error message */}
+            {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
     );
 }
