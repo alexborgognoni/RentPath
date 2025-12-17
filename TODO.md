@@ -63,6 +63,7 @@
 - [ ] [devops] Verify localhost subdomain routing works without /etc/hosts modification (update docs if needed)
 - [ ] [devops] Create setup script for local subdomain configuration
 - [ ] [devops] Laravel Sail setup for local mail testing and service isolation
+- [ ] [devops] Remove SQLite-specific code from migrations and codebase (now using MySQL locally)
 - [ ] [backend] OAuth integration (Google, Apple, Facebook)
 - [ ] [tests] Increase test coverage for core features (properties, applications, tokens)
 
