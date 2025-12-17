@@ -93,7 +93,7 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                                     transition={{ delay: 0.1 + index * 0.03 }}
                                     onClick={() => updateData('energy_class', isSelected ? undefined : rating)}
                                     className={cn(
-                                        'relative flex h-14 w-14 items-center justify-center rounded-xl border-2 font-bold transition-all',
+                                        'relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-xl border-2 font-bold transition-all',
                                         isSelected
                                             ? 'border-foreground text-white shadow-lg ' + getEnergyColor(rating)
                                             : 'border-border bg-card text-foreground hover:border-primary/50',
@@ -133,7 +133,7 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                                     transition={{ delay: 0.2 + index * 0.03 }}
                                     onClick={() => updateData('thermal_insulation_class', isSelected ? undefined : rating)}
                                     className={cn(
-                                        'relative flex h-14 w-14 items-center justify-center rounded-xl border-2 font-bold transition-all',
+                                        'relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-xl border-2 font-bold transition-all',
                                         isSelected
                                             ? 'border-foreground text-white shadow-lg ' + getEnergyColor(rating)
                                             : 'border-border bg-card text-foreground hover:border-primary/50',
@@ -173,7 +173,7 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                                     transition={{ delay: 0.3 + index * 0.03 }}
                                     onClick={() => updateData('heating_type', isSelected ? undefined : heating.value)}
                                     className={cn(
-                                        'flex items-center gap-3 rounded-xl border-2 px-4 py-3 transition-all',
+                                        'flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 transition-all',
                                         isSelected ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card hover:border-primary/40',
                                     )}
                                 >

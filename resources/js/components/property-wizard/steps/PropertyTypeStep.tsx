@@ -135,7 +135,7 @@ export function PropertyTypeStep({ data, updateData, errors }: PropertyTypeStepP
                                 transition={{ delay: index * 0.05 }}
                                 onClick={() => handleTypeSelect(type.value)}
                                 className={cn(
-                                    'group relative flex flex-col items-center gap-3 rounded-2xl border-2 p-6 text-center transition-all duration-200',
+                                    'group relative flex cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 p-6 text-center transition-all duration-200',
                                     isSelected
                                         ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10'
                                         : 'border-border bg-card hover:border-primary/50 hover:bg-muted/50',
@@ -192,7 +192,7 @@ export function PropertyTypeStep({ data, updateData, errors }: PropertyTypeStepP
                                         transition={{ delay: index * 0.05 }}
                                         onClick={() => updateData('subtype', subtype.value)}
                                         className={cn(
-                                            'rounded-full border-2 px-5 py-2.5 text-sm font-medium transition-all duration-200',
+                                            'cursor-pointer rounded-full border-2 px-5 py-2.5 text-sm font-medium transition-all duration-200',
                                             isSubtypeSelected
                                                 ? 'border-primary bg-primary text-primary-foreground shadow-md'
                                                 : 'border-border bg-card text-foreground hover:border-primary/50 hover:bg-muted',

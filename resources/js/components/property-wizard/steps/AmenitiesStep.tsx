@@ -107,7 +107,7 @@ export function AmenitiesStep({ data, updateData }: AmenitiesStepProps) {
                                             transition={{ delay: categoryIndex * 0.1 + index * 0.03 }}
                                             onClick={() => toggleAmenity(amenity.key)}
                                             className={cn(
-                                                'group relative flex flex-col items-center gap-3 rounded-2xl border-2 p-4 transition-all duration-200',
+                                                'group relative flex cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 p-4 transition-all duration-200',
                                                 isSelected
                                                     ? 'border-primary bg-primary/5 shadow-md'
                                                     : 'border-border bg-card hover:border-primary/40 hover:bg-muted/50',

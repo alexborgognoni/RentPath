@@ -252,7 +252,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
             <div className="flex items-center justify-between border-t border-border pt-4">
                 <button
                     onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    className="flex cursor-pointer items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <SlidersHorizontal size={16} />
                     {translate(translations, 'properties.moreFilters')}
@@ -264,7 +264,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                 {hasActiveMoreFilters && (
                     <button
                         onClick={clearMoreFilters}
-                        className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        className="flex cursor-pointer items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <X size={14} />
                         {translate(translations, 'properties.clearAdvancedFilters')}

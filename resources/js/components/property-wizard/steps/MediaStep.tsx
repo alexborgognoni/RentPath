@@ -247,7 +247,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveImage(index)}
-                                            className="absolute top-2 right-2 rounded-lg bg-destructive p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive/90"
+                                            className="absolute top-2 right-2 cursor-pointer rounded-lg bg-destructive p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive/90"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </button>
@@ -258,7 +258,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                                 <button
                                                     type="button"
                                                     onClick={() => handleSetMainImage(index)}
-                                                    className="flex items-center gap-1 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-900 transition-colors hover:bg-white"
+                                                    className="flex cursor-pointer items-center gap-1 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-900 transition-colors hover:bg-white"
                                                 >
                                                     <Star className="h-3 w-3" />
                                                     {t('wizard.mediaStep.setAsMain')}

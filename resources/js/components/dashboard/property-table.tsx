@@ -256,13 +256,13 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                             <button
                                 onClick={(e) => handleInvite(e, property)}
                                 title={translate(translations, 'properties.invite')}
-                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-muted/80"
+                                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-muted/80"
                             >
                                 <LinkIcon size={14} />
                             </button>
                             <button
                                 onClick={(e) => handleEdit(e, property)}
-                                className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+                                className="cursor-pointer rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
                             >
                                 {translate(translations, 'properties.edit')}
                             </button>
@@ -271,7 +271,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                                     e.stopPropagation();
                                     handleRowClick(property);
                                 }}
-                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-muted/80"
+                                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-muted/80"
                             >
                                 <ChevronRight size={16} />
                             </button>

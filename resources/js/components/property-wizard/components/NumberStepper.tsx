@@ -63,8 +63,8 @@ export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, la
                         value <= min
                             ? 'cursor-not-allowed border-border bg-muted text-muted-foreground/40'
                             : error
-                              ? 'border-destructive bg-card text-foreground hover:border-destructive hover:bg-destructive hover:text-destructive-foreground'
-                              : 'border-border bg-card text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground',
+                              ? 'cursor-pointer border-destructive bg-card text-foreground hover:border-destructive hover:bg-destructive hover:text-destructive-foreground'
+                              : 'cursor-pointer border-border bg-card text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground',
                     )}
                 >
                     <Minus className="h-5 w-5" />
@@ -104,8 +104,8 @@ export function NumberStepper({ value, onChange, min = 0, max = 99, step = 1, la
                         value >= max
                             ? 'cursor-not-allowed border-border bg-muted text-muted-foreground/40'
                             : error
-                              ? 'border-destructive bg-card text-foreground hover:border-destructive hover:bg-destructive hover:text-destructive-foreground'
-                              : 'border-border bg-card text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground',
+                              ? 'cursor-pointer border-destructive bg-card text-foreground hover:border-destructive hover:bg-destructive hover:text-destructive-foreground'
+                              : 'cursor-pointer border-border bg-card text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground',
                     )}
                 >
                     <Plus className="h-5 w-5" />

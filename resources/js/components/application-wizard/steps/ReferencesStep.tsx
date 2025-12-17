@@ -81,7 +81,7 @@ export function ReferencesStep({
                     <div key={index} className="mb-4 rounded-lg border border-border p-4">
                         <div className="mb-2 flex items-center justify-between">
                             <h4 className="font-medium">Reference {index + 1}</h4>
-                            <button type="button" onClick={() => removeReference(index)} className="text-red-500 hover:text-red-700">
+                            <button type="button" onClick={() => removeReference(index)} className="cursor-pointer text-red-500 hover:text-red-700">
                                 <Trash2 size={16} />
                             </button>
                         </div>
@@ -202,7 +202,7 @@ export function ReferencesStep({
                     </div>
                 ))}
 
-                <button type="button" onClick={addReference} className="flex items-center gap-2 text-sm text-primary hover:underline">
+                <button type="button" onClick={addReference} className="flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline">
                     <Plus size={16} />
                     Add Reference
                 </button>

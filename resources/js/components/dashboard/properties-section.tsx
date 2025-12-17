@@ -7,7 +7,7 @@ import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { ArrowRight, Building, FileEdit, Filter, Home, Plus, Trash2 } from 'lucide-react';
+import { ArrowRight, Building, ChevronDown, FileEdit, Filter, Home, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 interface PropertiesSectionProps {
@@ -18,6 +18,7 @@ interface PropertiesSectionProps {
 
 export function PropertiesSection({ properties = [], onAddProperty, onEditProperty }: PropertiesSectionProps) {
     const { translations } = usePage<SharedData>().props;
+    const [draftsOpen, setDraftsOpen] = useState(true);
     const [filtersOpen, setFiltersOpen] = useState(true);
     const [filters, setFilters] = useState<PropertyFilterState>({
         search: '',
@@ -238,58 +239,70 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
             {/* Drafts Section */}
             {drafts.length > 0 && (
                 <div className="rounded-xl border border-orange-500/30 bg-orange-500/5">
-                    <div className="flex items-center gap-2 border-b border-orange-500/20 px-4 py-3">
-                        <FileEdit size={18} className="text-orange-400" />
-                        <span className="font-medium text-foreground">
-                            {translate(translations, 'properties.drafts')} ({drafts.length})
-                        </span>
-                    </div>
-                    <div className="divide-y divide-orange-500/10">
-                        {drafts.map((draft) => (
-                            <div key={draft.id} className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-orange-500/5">
-                                <div className="flex items-center gap-4">
-                                    {/* Draft image or placeholder */}
-                                    {draft.images?.[0]?.image_url ? (
-                                        <img
-                                            src={draft.images[0].image_url}
-                                            alt="Draft"
-                                            className="h-12 w-16 rounded-lg border border-orange-500/20 object-cover"
-                                        />
-                                    ) : (
-                                        <div className="flex h-12 w-16 items-center justify-center rounded-lg border border-orange-500/20 bg-orange-500/10">
-                                            <FileEdit size={20} className="text-orange-400" />
-                                        </div>
-                                    )}
-                                    <div>
-                                        <div className="font-medium text-foreground">
-                                            {draft.title || translate(translations, 'properties.untitledDraft')}
-                                        </div>
-                                        <div className="text-sm text-muted-foreground">
-                                            {draft.type && draft.city
-                                                ? `${draft.type} in ${draft.city}`
-                                                : draft.type || translate(translations, 'properties.draftIncomplete')}
+                    <button
+                        type="button"
+                        onClick={() => setDraftsOpen(!draftsOpen)}
+                        className={`flex w-full cursor-pointer items-center justify-between px-4 py-3 transition-colors hover:bg-orange-500/10 ${draftsOpen ? 'rounded-t-xl border-b border-orange-500/20' : 'rounded-xl'}`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <FileEdit size={18} className="text-orange-400" />
+                            <span className="font-medium text-foreground">
+                                {translate(translations, 'properties.drafts')} ({drafts.length})
+                            </span>
+                        </div>
+                        <ChevronDown size={18} className={`text-orange-400 transition-transform duration-200 ${draftsOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {draftsOpen && (
+                        <div className="divide-y divide-orange-500/10">
+                            {drafts.map((draft, index) => (
+                                <div
+                                    key={draft.id}
+                                    className={`flex items-center justify-between px-4 py-3 transition-colors hover:bg-orange-500/5 ${index === drafts.length - 1 ? 'rounded-b-xl' : ''}`}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        {/* Draft image or placeholder */}
+                                        {draft.images?.[0]?.image_url ? (
+                                            <img
+                                                src={draft.images[0].image_url}
+                                                alt="Draft"
+                                                className="h-12 w-16 rounded-lg border border-orange-500/20 object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex h-12 w-16 items-center justify-center rounded-lg border border-orange-500/20 bg-orange-500/10">
+                                                <FileEdit size={20} className="text-orange-400" />
+                                            </div>
+                                        )}
+                                        <div>
+                                            <div className="font-medium text-foreground">
+                                                {draft.title || translate(translations, 'properties.untitledDraft')}
+                                            </div>
+                                            <div className="text-sm text-muted-foreground">
+                                                {draft.type && draft.city
+                                                    ? `${draft.type} in ${draft.city}`
+                                                    : draft.type || translate(translations, 'properties.draftIncomplete')}
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => handleDeleteDraft(draft)}
+                                            className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                        >
+                                            <Trash2 size={14} />
+                                            <span>{translate(translations, 'properties.delete')}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleContinueDraft(draft)}
+                                            className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+                                        >
+                                            <span>{translate(translations, 'properties.continue')}</span>
+                                            <ArrowRight size={14} />
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => handleDeleteDraft(draft)}
-                                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                    >
-                                        <Trash2 size={14} />
-                                        <span>{translate(translations, 'properties.delete')}</span>
-                                    </button>
-                                    <button
-                                        onClick={() => handleContinueDraft(draft)}
-                                        className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
-                                    >
-                                        <span>{translate(translations, 'properties.continue')}</span>
-                                        <ArrowRight size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 

@@ -91,7 +91,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                             <TooltipTrigger asChild>
                                 <button
                                     onClick={onToggle}
-                                    className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
                                 >
                                     <PanelLeftOpen className="h-5 w-5" />
                                 </button>
@@ -110,7 +110,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                                 <TooltipTrigger asChild>
                                     <button
                                         onClick={onToggle}
-                                        className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                                        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
                                     >
                                         <PanelLeftClose className="h-5 w-5" />
                                     </button>
@@ -140,7 +140,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                             <TooltipTrigger asChild>
                                 <DropdownMenuTrigger asChild>
                                     <button
-                                        className={`flex h-10 w-full items-center rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground ${
+                                        className={`flex h-10 w-full cursor-pointer items-center rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground ${
                                             isCollapsed ? 'justify-center' : 'gap-3 px-3'
                                         }`}
                                     >
@@ -178,7 +178,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                             <TooltipTrigger asChild>
                                 <DropdownMenuTrigger asChild>
                                     <button
-                                        className={`flex h-10 w-full items-center rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground ${
+                                        className={`flex h-10 w-full cursor-pointer items-center rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground ${
                                             isCollapsed ? 'justify-center' : 'gap-3 px-3'
                                         }`}
                                     >
@@ -213,7 +213,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
-                                className={`flex h-10 w-full items-center rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground ${
+                                className={`flex h-10 w-full cursor-pointer items-center rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground ${
                                     isCollapsed ? 'justify-center' : 'gap-3 px-3'
                                 }`}
                             >
@@ -232,7 +232,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                             <TooltipTrigger asChild>
                                 <DropdownMenuTrigger asChild>
                                     <button
-                                        className={`flex w-full items-center rounded-lg text-sm hover:bg-muted ${
+                                        className={`flex w-full cursor-pointer items-center rounded-lg text-sm hover:bg-muted ${
                                             isCollapsed ? 'h-10 justify-center' : 'h-12 gap-3 px-2'
                                         }`}
                                     >
