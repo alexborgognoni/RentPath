@@ -417,14 +417,14 @@ describe('Publish Validation', function () {
                 'size' => 45, // Required for apartments
                 'rent_amount' => 1500,
                 'rent_currency' => 'eur',
-                'images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
+                'new_images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
             ]);
 
         $response->assertRedirect();
         $response->assertSessionHasNoErrors();
 
         $this->draft->refresh();
-        expect($this->draft->status)->toBe('inactive');
+        expect($this->draft->status)->toBe('available');
         expect($this->draft->title)->toBe('Beautiful Studio in Zurich');
     });
 
@@ -507,7 +507,7 @@ describe('Update Published Property Validation', function () {
                 'size' => 55, // Required for apartments
                 'rent_amount' => 2000,
                 'rent_currency' => 'chf',
-                'images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
+                'new_images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
             ]);
 
         $response->assertRedirect();
@@ -949,7 +949,7 @@ describe('Complete Wizard Flow', function () {
                 'has_elevator' => '1',
                 'rent_amount' => 1800,
                 'rent_currency' => 'chf',
-                'images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
+                'new_images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
             ]);
 
         $response->assertRedirect();
@@ -957,7 +957,7 @@ describe('Complete Wizard Flow', function () {
 
         // Verify property is published
         $property = Property::find($propertyId);
-        expect($property->status)->toBe('inactive');
+        expect($property->status)->toBe('available');
         expect($property->title)->toBe('Cozy Studio in Zurich Center');
         expect((float) $property->rent_amount)->toBe(1800.0);
     });

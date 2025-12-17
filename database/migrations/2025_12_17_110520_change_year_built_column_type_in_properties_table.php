@@ -5,13 +5,16 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Change year_built from YEAR type (1901-2155) to SMALLINT UNSIGNED
+ * to support historic buildings built before 1901.
+ *
+ * Note: MySQL YEAR type only supports 1901-2155, but we need 1800+ for historic buildings.
+ */
 return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * Change year_built from YEAR type (1901-2155) to SMALLINT UNSIGNED
-     * to support historic buildings built before 1901.
      */
     public function up(): void
     {
