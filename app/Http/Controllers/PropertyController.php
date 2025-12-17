@@ -250,13 +250,13 @@ class PropertyController extends Controller
         $mainImageId = $request->input('main_image_id');
         $mainImageIndex = $request->input('main_image_index', 0);
 
-        // Update property and change status based on list_immediately preference
-        $listImmediately = $request->boolean('list_immediately', true);
-        $validated['status'] = $listImmediately ? 'available' : 'inactive';
+        // Update property and change status based on is_active preference
+        $isActive = $request->boolean('is_active', true);
+        $validated['status'] = $isActive ? 'available' : 'inactive';
 
         // Remove image fields from validated data
         unset($validated['new_images'], $validated['deleted_image_ids'], $validated['image_order'],
-            $validated['main_image_id'], $validated['main_image_index'], $validated['list_immediately']);
+            $validated['main_image_id'], $validated['main_image_index'], $validated['is_active']);
 
         $property->fill($validated);
         $property->save();
@@ -424,10 +424,10 @@ class PropertyController extends Controller
                 ->with('error', 'You need to set up your property manager profile first.');
         }
 
-        // Set status based on list_immediately preference (default to available)
-        $listImmediately = $request->boolean('list_immediately', true);
-        $validated['status'] = $listImmediately ? 'available' : 'inactive';
-        unset($validated['list_immediately']);
+        // Set status based on is_active preference (default to available)
+        $isActive = $request->boolean('is_active', true);
+        $validated['status'] = $isActive ? 'available' : 'inactive';
+        unset($validated['is_active']);
 
         // Convert boolean fields from strings to actual booleans
         $booleanFields = ['has_elevator', 'kitchen_equipped', 'kitchen_separated', 'has_cellar',
@@ -571,10 +571,10 @@ class PropertyController extends Controller
         // Get validated data with boolean conversions
         $validated = $request->validatedWithBooleans();
 
-        // Handle list_immediately to update status
-        if ($request->has('list_immediately')) {
-            $listImmediately = $request->boolean('list_immediately', true);
-            $validated['status'] = $listImmediately ? 'available' : 'inactive';
+        // Handle is_active to update status
+        if ($request->has('is_active')) {
+            $isActive = $request->boolean('is_active', true);
+            $validated['status'] = $isActive ? 'available' : 'inactive';
         }
 
         // Extract image-related data
@@ -586,7 +586,7 @@ class PropertyController extends Controller
 
         // Remove image fields from validated data
         unset($validated['new_images'], $validated['deleted_image_ids'], $validated['image_order'],
-            $validated['main_image_id'], $validated['main_image_index'], $validated['list_immediately']);
+            $validated['main_image_id'], $validated['main_image_index'], $validated['is_active']);
 
         // Update the property
         $property->update($validated);

@@ -140,7 +140,7 @@ const getInitialData = (property?: Property): PropertyWizardData => ({
     rent_amount: toNumber(property?.rent_amount) ?? 0,
     rent_currency: property?.rent_currency || 'eur',
     available_date: property?.available_date || undefined,
-    list_immediately: true, // Default to listing immediately (status = 'available')
+    is_active: true, // Default to active (status = 'available')
 
     // Media
     title: property?.title || '',

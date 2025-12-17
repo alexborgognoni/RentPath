@@ -163,10 +163,10 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                     <div className="mx-auto flex max-w-md gap-3">
                         <button
                             type="button"
-                            onClick={() => updateData('list_immediately', true)}
+                            onClick={() => updateData('is_active', true)}
                             className={cn(
                                 'flex flex-1 flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
-                                data.list_immediately
+                                data.is_active
                                     ? 'border-primary bg-primary/5 text-primary'
                                     : 'border-border bg-card text-foreground hover:border-primary/50',
                             )}
@@ -178,10 +178,10 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
 
                         <button
                             type="button"
-                            onClick={() => updateData('list_immediately', false)}
+                            onClick={() => updateData('is_active', false)}
                             className={cn(
                                 'flex flex-1 flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
-                                !data.list_immediately
+                                !data.is_active
                                     ? 'border-primary bg-primary/5 text-primary'
                                     : 'border-border bg-card text-foreground hover:border-primary/50',
                             )}
