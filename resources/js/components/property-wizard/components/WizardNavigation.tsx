@@ -66,12 +66,7 @@ export function WizardNavigation({
     }, [isLastStep, onSubmit, onNext, triggerShake, scrollToFirstError]);
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-center justify-between rounded-b-2xl border-t border-border bg-card/50 px-6 py-4 backdrop-blur-sm"
-        >
+        <div className="flex items-center justify-between rounded-b-2xl border-t border-border bg-card/50 px-6 py-4 backdrop-blur-sm">
             {/* Left side: Back button */}
             <div>
                 {!isFirstStep && (
@@ -124,6 +119,6 @@ export function WizardNavigation({
                     </Button>
                 </motion.div>
             </div>
-        </motion.div>
+        </div>
     );
 }
