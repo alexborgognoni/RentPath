@@ -1,5 +1,3 @@
-import { WizardNavigation } from '@/components/property-wizard/components/WizardNavigation';
-import { WizardProgress } from '@/components/property-wizard/components/WizardProgress';
 import { AmenitiesStep } from '@/components/property-wizard/steps/AmenitiesStep';
 import { EnergyStep } from '@/components/property-wizard/steps/EnergyStep';
 import { LocationStep } from '@/components/property-wizard/steps/LocationStep';
@@ -9,6 +7,7 @@ import { PropertyTypeStep } from '@/components/property-wizard/steps/PropertyTyp
 import { ReviewStep } from '@/components/property-wizard/steps/ReviewStep';
 import { SpecificationsStep } from '@/components/property-wizard/steps/SpecificationsStep';
 import { SaveStatus } from '@/components/ui/save-status';
+import { WizardNavigation, WizardProgress } from '@/components/wizard';
 import { usePropertyWizard, WIZARD_STEPS } from '@/hooks/usePropertyWizard';
 import { ManagerLayout } from '@/layouts/manager-layout';
 import type { BreadcrumbItem } from '@/types';

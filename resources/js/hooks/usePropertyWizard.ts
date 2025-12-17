@@ -2,21 +2,16 @@ import axios from '@/lib/axios';
 import { PROPERTY_MESSAGES } from '@/lib/validation/property-messages';
 import { findFirstInvalidStep, validateField, validateForPublish, validateStep, type StepId } from '@/lib/validation/property-schemas';
 import type { Property, PropertyFormData } from '@/types/dashboard';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useWizard, type AutosaveStatus, type WizardStepConfig } from './useWizard';
 
-export type AutosaveStatus = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
+export type { AutosaveStatus } from './useWizard';
 
 export type WizardStep = 'property-type' | 'location' | 'specifications' | 'amenities' | 'energy' | 'pricing' | 'media' | 'review';
 
-export interface WizardStepConfig {
-    id: WizardStep;
-    title: string;
-    shortTitle: string;
-    description: string;
-    optional?: boolean;
-}
+export type { WizardStepConfig };
 
-export const WIZARD_STEPS: WizardStepConfig[] = [
+export const WIZARD_STEPS: WizardStepConfig<WizardStep>[] = [
     {
         id: 'property-type',
         title: 'Property Type',
@@ -168,11 +163,6 @@ function getAutosaveData(data: PropertyWizardData): AutosaveData {
     return autosaveData;
 }
 
-/** Calculate the maximum valid step based on current data using Zod validation */
-function calculateMaxValidStep(data: PropertyWizardData): number {
-    return findFirstInvalidStep(data);
-}
-
 export interface UsePropertyWizardOptions {
     property?: Property;
     isDraft?: boolean;
@@ -184,7 +174,7 @@ export interface UsePropertyWizardReturn {
     // Current step state
     currentStep: WizardStep;
     currentStepIndex: number;
-    currentStepConfig: WizardStepConfig;
+    currentStepConfig: WizardStepConfig<WizardStep>;
     isFirstStep: boolean;
     isLastStep: boolean;
 
@@ -232,38 +222,67 @@ export function usePropertyWizard({
     isEditMode = false,
     onDraftCreated,
 }: UsePropertyWizardOptions = {}): UsePropertyWizardReturn {
-    const [currentStep, setCurrentStep] = useState<WizardStep>(() => {
-        // Initialize to the saved wizard step if resuming a draft
-        if (property?.wizard_step) {
-            const stepIndex = Math.min(property.wizard_step - 1, WIZARD_STEPS.length - 1);
-            return WIZARD_STEPS[Math.max(0, stepIndex)].id;
-        }
-        return 'property-type';
-    });
-    const [data, setData] = useState<PropertyWizardData>(() => getInitialData(property));
-    const [errors, setErrors] = useState<Partial<Record<keyof PropertyWizardData, string>>>({});
-    const [maxStepReached, setMaxStepReached] = useState<number>(() => {
-        // Initialize from property's wizard_step or calculate from data
-        if (property?.wizard_step) {
-            return property.wizard_step - 1; // Convert 1-indexed DB to 0-indexed
-        }
-        return 0;
-    });
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Draft/autosave state
+    // Property-specific state
     const [propertyId, setPropertyId] = useState<number | null>(property?.id ?? null);
     const [isInitialized, setIsInitialized] = useState(!!property?.id);
-    const [hasUserInteracted, setHasUserInteracted] = useState(!!property?.id); // Only create draft after user interaction
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Track if we should skip the next step lock check (for forward navigation)
-    const skipNextLockCheck = useRef(false);
+    // Calculate initial step from property's wizard_step
+    const initialStepIndex = property?.wizard_step ? Math.min(property.wizard_step - 1, WIZARD_STEPS.length - 1) : 0;
+    const initialMaxStepReached = property?.wizard_step ? property.wizard_step - 1 : 0;
 
-    const currentStepIndex = WIZARD_STEPS.findIndex((s) => s.id === currentStep);
-    const currentStepConfig = WIZARD_STEPS[currentStepIndex];
-    const isFirstStep = currentStepIndex === 0;
-    const isLastStep = currentStepIndex === WIZARD_STEPS.length - 1;
-    const progress = ((currentStepIndex + 1) / WIZARD_STEPS.length) * 100;
+    // Property-specific validation wrapper
+    const validateStepWrapper = useCallback((stepId: WizardStep, data: PropertyWizardData) => {
+        // Additional image validation for media step
+        if (stepId === 'media') {
+            if (data.images.length === 0) {
+                return { success: false, errors: { images: PROPERTY_MESSAGES.images.required } };
+            }
+        }
+
+        const result = validateStep(stepId as StepId, data);
+        return {
+            success: result.success,
+            errors: result.success ? {} : (result.errors as Record<string, string>),
+        };
+    }, []);
+
+    // Property-specific find first invalid step wrapper
+    const findFirstInvalidStepWrapper = useCallback((data: PropertyWizardData): number => {
+        return findFirstInvalidStep(data);
+    }, []);
+
+    // Property-specific save function
+    const handleSave = useCallback(
+        async (data: PropertyWizardData, wizardStep: number) => {
+            if (!propertyId || isEditMode) {
+                return {};
+            }
+
+            const autosaveData = getAutosaveData(data);
+            const response = await axios.patch(`/properties/${propertyId}/draft`, {
+                ...autosaveData,
+                wizard_step: wizardStep,
+            });
+
+            return {
+                maxValidStep: response.data.max_valid_step,
+            };
+        },
+        [propertyId, isEditMode],
+    );
+
+    // Use the generic wizard hook
+    const wizard = useWizard<PropertyWizardData, WizardStep>({
+        steps: WIZARD_STEPS,
+        initialData: getInitialData(property),
+        initialStepIndex: Math.max(0, initialStepIndex),
+        initialMaxStepReached: Math.max(0, initialMaxStepReached),
+        validateStep: validateStepWrapper,
+        findFirstInvalidStep: findFirstInvalidStepWrapper,
+        onSave: handleSave,
+        enableAutosave: !isEditMode && isInitialized && !!propertyId,
+    });
 
     // Create draft only after user has interacted (to avoid creating drafts for accidental visits)
     // Skip draft creation in edit mode - property already exists
@@ -276,12 +295,12 @@ export function usePropertyWizard({
             return;
         }
 
-        if (!property?.id && !propertyId && !isInitialized && hasUserInteracted) {
+        if (!property?.id && !propertyId && !isInitialized && wizard.hasUserInteracted) {
             const createDraft = async () => {
                 try {
                     const response = await axios.post('/properties/draft', {
-                        type: data.type,
-                        subtype: data.subtype,
+                        type: wizard.data.type,
+                        subtype: wizard.data.subtype,
                     });
                     const newId = response.data.id;
                     setPropertyId(newId);
@@ -297,139 +316,15 @@ export function usePropertyWizard({
         } else if (property?.id) {
             setIsInitialized(true);
         }
-    }, [property?.id, propertyId, isInitialized, hasUserInteracted, data.type, data.subtype, onDraftCreated, isEditMode]);
+    }, [property?.id, propertyId, isInitialized, wizard.hasUserInteracted, wizard.data.type, wizard.data.subtype, onDraftCreated, isEditMode]);
 
-    // Effect to lock steps when data changes make earlier steps invalid
-    useEffect(() => {
-        // Skip lock check during forward navigation
-        if (skipNextLockCheck.current) {
-            skipNextLockCheck.current = false;
-            return;
-        }
-
-        const maxValid = calculateMaxValidStep(data);
-
-        // If current data invalidates a previous step, lock user to that step
-        if (maxValid < maxStepReached) {
-            setMaxStepReached(maxValid);
-        }
-
-        // If currently viewing a step beyond maxValid, navigate back
-        if (currentStepIndex > maxValid) {
-            setCurrentStep(WIZARD_STEPS[maxValid].id);
-            // Show errors for the step they're being locked to
-            const stepId = WIZARD_STEPS[maxValid].id as StepId;
-            const result = validateStep(stepId, data);
-            if (!result.success) {
-                setErrors(result.errors as Partial<Record<keyof PropertyWizardData, string>>);
-            }
-        }
-    }, [data, maxStepReached, currentStepIndex]);
-
-    // Autosave state
-    const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>('idle');
-    const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-    const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const lastSavedDataRef = useRef<string | null>(null);
-
-    // Memoize autosave data
-    const autosaveData = useMemo(() => getAutosaveData(data), [data]);
-
-    // Simple debounced autosave effect
-    useEffect(() => {
-        // Skip autosave in edit mode - changes are saved explicitly via Save button
-        if (isEditMode) {
-            return;
-        }
-
-        // Skip if not ready
-        if (!isInitialized || !propertyId) {
-            return;
-        }
-
-        // Skip if data hasn't changed from last save
-        const dataStr = JSON.stringify(autosaveData);
-        if (lastSavedDataRef.current === dataStr) {
-            return;
-        }
-
-        // Mark as pending
-        setAutosaveStatus('pending');
-
-        // Clear existing timer
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-
-        // Set debounce timer
-        debounceTimerRef.current = setTimeout(async () => {
-            setAutosaveStatus('saving');
-            try {
-                const response = await axios.patch(`/properties/${propertyId}/draft`, {
-                    ...autosaveData,
-                    wizard_step: maxStepReached + 1,
-                });
-
-                lastSavedDataRef.current = dataStr;
-                setLastSavedAt(new Date());
-                setAutosaveStatus('saved');
-
-                // Backend may reduce max_valid_step if validation failed
-                if (response.data.max_valid_step !== undefined) {
-                    const backendMaxStep = response.data.max_valid_step - 1;
-                    if (backendMaxStep < maxStepReached) {
-                        setMaxStepReached(backendMaxStep);
-                        if (currentStepIndex > backendMaxStep) {
-                            setCurrentStep(WIZARD_STEPS[backendMaxStep].id);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Autosave failed:', error);
-                setAutosaveStatus('error');
-            }
-        }, 1000);
-
-        // Cleanup
-        return () => {
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
-            }
-        };
-    }, [autosaveData, isInitialized, propertyId, maxStepReached, currentStepIndex, isEditMode]);
-
-    // Manual save function
-    const saveNow = useCallback(async () => {
-        if (!propertyId) return;
-
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-
-        setAutosaveStatus('saving');
-        try {
-            await axios.patch(`/properties/${propertyId}/draft`, {
-                ...autosaveData,
-                wizard_step: maxStepReached + 1,
-            });
-            lastSavedDataRef.current = JSON.stringify(autosaveData);
-            setLastSavedAt(new Date());
-            setAutosaveStatus('saved');
-        } catch (error) {
-            console.error('Save failed:', error);
-            setAutosaveStatus('error');
-        }
-    }, [propertyId, autosaveData, maxStepReached]);
-
-    const updateData = useCallback(<K extends keyof PropertyWizardData>(key: K, value: PropertyWizardData[K]) => {
-        setHasUserInteracted(true); // Mark that user has interacted
-        setData((prev) => {
-            // When property type changes, clear specification fields that may not apply to the new type
-            if (key === 'type' && value !== prev.type) {
-                return {
-                    ...prev,
+    // Property-specific: reset specification fields when type changes
+    const updateData = useCallback(
+        <K extends keyof PropertyWizardData>(key: K, value: PropertyWizardData[K]) => {
+            if (key === 'type' && value !== wizard.data.type) {
+                // Reset all specification fields to defaults when type changes
+                wizard.updateFields({
                     [key]: value,
-                    // Reset all specification fields to defaults
                     bedrooms: 0,
                     bathrooms: 0,
                     parking_spots_interior: 0,
@@ -440,116 +335,79 @@ export function usePropertyWizard({
                     floor_level: undefined,
                     has_elevator: false,
                     year_built: undefined,
-                };
+                } as Partial<PropertyWizardData>);
+                // Clear specification errors
+                wizard.setErrors((prev) => {
+                    const newErrors = { ...prev };
+                    delete newErrors.bedrooms;
+                    delete newErrors.bathrooms;
+                    delete newErrors.parking_spots_interior;
+                    delete newErrors.parking_spots_exterior;
+                    delete newErrors.size;
+                    delete newErrors.balcony_size;
+                    delete newErrors.land_size;
+                    delete newErrors.floor_level;
+                    delete newErrors.has_elevator;
+                    delete newErrors.year_built;
+                    return newErrors;
+                });
+            } else {
+                wizard.updateField(key, value);
             }
-            return { ...prev, [key]: value };
-        });
-        // Clear error when field is updated
-        setErrors((prev) => {
-            const newErrors = { ...prev };
-            delete newErrors[key];
-            // Also clear specification errors when type changes
-            if (key === 'type') {
-                delete newErrors.bedrooms;
-                delete newErrors.bathrooms;
-                delete newErrors.parking_spots_interior;
-                delete newErrors.parking_spots_exterior;
-                delete newErrors.size;
-                delete newErrors.balcony_size;
-                delete newErrors.land_size;
-                delete newErrors.floor_level;
-                delete newErrors.has_elevator;
-                delete newErrors.year_built;
-            }
-            return newErrors;
-        });
-    }, []);
+        },
+        [wizard],
+    );
 
-    const updateMultipleFields = useCallback((updates: Partial<PropertyWizardData>) => {
-        setHasUserInteracted(true); // Mark that user has interacted
-        setData((prev) => ({ ...prev, ...updates }));
-        // Clear errors for updated fields
-        setErrors((prev) => {
-            const newErrors = { ...prev };
-            Object.keys(updates).forEach((key) => {
-                delete newErrors[key as keyof PropertyWizardData];
-            });
-            return newErrors;
-        });
-    }, []);
-
-    /**
-     * Validate a single field on blur using Zod schema
-     */
+    // Property-specific field validation on blur
     const validateFieldOnBlur = useCallback(
         (field: keyof PropertyWizardData, value: unknown) => {
-            const stepId = currentStep as StepId;
+            const stepId = wizard.currentStep as StepId;
             if (stepId === 'review') return; // Review step uses full validation
 
-            const error = validateField(stepId, field as string, value, data as unknown as Record<string, unknown>);
+            const error = validateField(stepId, field as string, value, wizard.data as unknown as Record<string, unknown>);
 
-            setErrors((prev) => {
+            wizard.setErrors((prev) => {
                 if (error) {
                     return { ...prev, [field]: error };
                 } else {
                     const newErrors = { ...prev };
-                    delete newErrors[field];
+                    delete newErrors[field as string];
                     return newErrors;
                 }
             });
         },
-        [currentStep, data],
+        [wizard],
     );
 
-    /**
-     * Validate the current step using Zod schema
-     */
-    const validateCurrentStepFn = useCallback((): boolean => {
-        const stepId = currentStep as StepId;
-        const result = validateStep(stepId, data);
-
-        if (result.success) {
-            setErrors({});
-            return true;
-        }
-
-        setErrors(result.errors as Partial<Record<keyof PropertyWizardData, string>>);
-        return false;
-    }, [currentStep, data]);
-
-    /**
-     * Validate a specific step using Zod schema (for edit mode)
-     */
-    const validateSpecificStepFn = useCallback(
+    // Property-specific: validate a specific step (for edit mode)
+    const validateSpecificStep = useCallback(
         (step: WizardStep): boolean => {
             const stepId = step as StepId;
 
             // Special handling for media step - check images
             if (stepId === 'media') {
-                if (data.images.length === 0) {
-                    setErrors({ images: PROPERTY_MESSAGES.images.required });
+                if (wizard.data.images.length === 0) {
+                    wizard.setErrors({ images: PROPERTY_MESSAGES.images.required });
                     return false;
                 }
             }
 
-            const result = validateStep(stepId, data);
+            const result = validateStep(stepId, wizard.data);
 
             if (result.success) {
-                setErrors({});
+                wizard.setErrors({});
                 return true;
             }
 
-            setErrors(result.errors as Partial<Record<keyof PropertyWizardData, string>>);
+            wizard.setErrors(result.errors as Partial<Record<keyof PropertyWizardData, string>>);
             return false;
         },
-        [data],
+        [wizard],
     );
 
-    /**
-     * Validate all data for publishing using Zod schema
-     */
+    // Property-specific: validate all data for publishing
     const validateForPublishFn = useCallback((): boolean => {
-        const result = validateForPublish(data);
+        const result = validateForPublish(wizard.data);
         const errors: Partial<Record<keyof PropertyWizardData, string>> = {};
 
         if (!result.success) {
@@ -557,120 +415,59 @@ export function usePropertyWizard({
         }
 
         // Validate images separately (File objects can't be validated with Zod)
-        if (data.images.length === 0) {
+        if (wizard.data.images.length === 0) {
             errors.images = PROPERTY_MESSAGES.images.required;
         }
 
         if (Object.keys(errors).length > 0) {
-            setErrors(errors);
+            wizard.setErrors(errors);
             return false;
         }
 
-        setErrors({});
+        wizard.setErrors({});
         return true;
-    }, [data]);
-
-    const goToStep = useCallback(
-        (step: WizardStep) => {
-            const targetIndex = WIZARD_STEPS.findIndex((s) => s.id === step);
-
-            // Can always go back
-            if (targetIndex <= currentStepIndex) {
-                setCurrentStep(step);
-                return;
-            }
-
-            // Can only go forward if all previous steps are valid
-            if (targetIndex <= maxStepReached) {
-                setCurrentStep(step);
-            }
-        },
-        [currentStepIndex, maxStepReached],
-    );
-
-    const goToNextStep = useCallback((): boolean => {
-        const stepId = currentStep as StepId;
-        const result = validateStep(stepId, data);
-        const stepErrors: Partial<Record<keyof PropertyWizardData, string>> = {};
-
-        if (!result.success) {
-            Object.assign(stepErrors, result.errors);
-        }
-
-        // Additional image validation for media step
-        if (stepId === 'media') {
-            if (data.images.length === 0) {
-                stepErrors.images = PROPERTY_MESSAGES.images.required;
-            }
-        }
-
-        if (Object.keys(stepErrors).length > 0) {
-            setErrors(stepErrors);
-            return false; // Validation failed
-        }
-
-        const nextIndex = currentStepIndex + 1;
-        if (nextIndex < WIZARD_STEPS.length) {
-            // Mark user interaction to trigger draft creation if not already done
-            setHasUserInteracted(true);
-            // Update maxStepReached if advancing beyond current max
-            if (nextIndex > maxStepReached) {
-                // Skip the lock check since we're intentionally advancing
-                skipNextLockCheck.current = true;
-                setMaxStepReached(nextIndex);
-            }
-            setCurrentStep(WIZARD_STEPS[nextIndex].id);
-            setErrors({}); // Clear errors when moving to next step
-        }
-        return true; // Navigation succeeded
-    }, [currentStep, currentStepIndex, data, maxStepReached]);
-
-    const goToPreviousStep = useCallback(() => {
-        const prevIndex = currentStepIndex - 1;
-        if (prevIndex >= 0) {
-            setCurrentStep(WIZARD_STEPS[prevIndex].id);
-        }
-    }, [currentStepIndex]);
-
-    const canGoToStep = useCallback(
-        (step: WizardStep): boolean => {
-            const stepIndex = WIZARD_STEPS.findIndex((s) => s.id === step);
-            // Can always go back
-            if (stepIndex <= currentStepIndex) return true;
-            // Can only go forward if within maxStepReached
-            return stepIndex <= maxStepReached;
-        },
-        [currentStepIndex, maxStepReached],
-    );
+    }, [wizard]);
 
     return {
-        currentStep,
-        currentStepIndex,
-        currentStepConfig,
-        isFirstStep,
-        isLastStep,
-        goToStep,
-        goToNextStep,
-        goToPreviousStep,
-        canGoToStep,
-        data,
+        // Step state
+        currentStep: wizard.currentStep,
+        currentStepIndex: wizard.currentStepIndex,
+        currentStepConfig: wizard.currentStepConfig,
+        isFirstStep: wizard.isFirstStep,
+        isLastStep: wizard.isLastStep,
+        maxStepReached: wizard.maxStepReached,
+
+        // Navigation
+        goToStep: wizard.goToStep,
+        goToNextStep: wizard.goToNextStep,
+        goToPreviousStep: wizard.goToPreviousStep,
+        canGoToStep: wizard.canGoToStep,
+
+        // Data
+        data: wizard.data,
         updateData,
-        updateMultipleFields,
-        errors,
-        setErrors,
-        validateCurrentStep: validateCurrentStepFn,
-        validateSpecificStep: validateSpecificStepFn,
+        updateMultipleFields: wizard.updateFields,
+
+        // Validation
+        errors: wizard.errors as Partial<Record<keyof PropertyWizardData, string>>,
+        setErrors: wizard.setErrors as React.Dispatch<React.SetStateAction<Partial<Record<keyof PropertyWizardData, string>>>>,
+        validateCurrentStep: wizard.validateCurrentStep,
+        validateSpecificStep,
         validateForPublish: validateForPublishFn,
         validateFieldOnBlur,
-        maxStepReached,
+
+        // Submission
         isSubmitting,
         setIsSubmitting,
-        progress,
+
+        // Progress
+        progress: wizard.progress,
+
         // Autosave
         propertyId,
-        autosaveStatus,
-        lastSavedAt,
-        saveNow,
+        autosaveStatus: wizard.autosaveStatus,
+        lastSavedAt: wizard.lastSavedAt,
+        saveNow: wizard.saveNow,
         isInitialized,
     };
 }
