@@ -198,6 +198,7 @@ export interface PropertyFormData {
     available_date?: string;
     rent_amount: number;
     rent_currency: Property['rent_currency'];
+    list_immediately: boolean;
     // Images
     images?: File[];
     main_image_index?: number;

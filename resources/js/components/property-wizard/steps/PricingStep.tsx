@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import type { Property } from '@/types/dashboard';
 import { motion } from 'framer-motion';
-import { Calendar, Zap } from 'lucide-react';
+import { Calendar, DoorOpen, Pause, Zap } from 'lucide-react';
 
 interface PricingStepProps {
     data: PropertyWizardData;
@@ -150,6 +150,46 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                                 {errors.available_date}
                             </p>
                         )}
+                    </div>
+                </motion.div>
+
+                {/* Application status */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-12">
+                    <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
+                        <DoorOpen className="h-5 w-5 text-primary" />
+                        Accept applications?
+                    </h3>
+
+                    <div className="mx-auto flex max-w-md gap-3">
+                        <button
+                            type="button"
+                            onClick={() => updateData('list_immediately', true)}
+                            className={cn(
+                                'flex flex-1 flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
+                                data.list_immediately
+                                    ? 'border-primary bg-primary/5 text-primary'
+                                    : 'border-border bg-card text-foreground hover:border-primary/50',
+                            )}
+                        >
+                            <DoorOpen className="h-6 w-6" />
+                            <span className="font-medium">Open for applications</span>
+                            <span className="text-xs text-muted-foreground">Start receiving applications</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => updateData('list_immediately', false)}
+                            className={cn(
+                                'flex flex-1 flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
+                                !data.list_immediately
+                                    ? 'border-primary bg-primary/5 text-primary'
+                                    : 'border-border bg-card text-foreground hover:border-primary/50',
+                            )}
+                        >
+                            <Pause className="h-6 w-6" />
+                            <span className="font-medium">Not yet</span>
+                            <span className="text-xs text-muted-foreground">Open for applications later</span>
+                        </button>
                     </div>
                 </motion.div>
             </div>

@@ -247,9 +247,10 @@ class PropertyController extends Controller
         $images = $request->file('images', []);
         $mainImageIndex = $request->input('main_image_index', 0);
 
-        // Update property and change status
-        $validated['status'] = 'inactive';
-        unset($validated['images'], $validated['main_image_index']);
+        // Update property and change status based on list_immediately preference
+        $listImmediately = $request->boolean('list_immediately', true);
+        $validated['status'] = $listImmediately ? 'available' : 'inactive';
+        unset($validated['images'], $validated['main_image_index'], $validated['list_immediately']);
 
         $property->fill($validated);
         $property->save();
@@ -386,8 +387,10 @@ class PropertyController extends Controller
                 ->with('error', 'You need to set up your property manager profile first.');
         }
 
-        // Set default status
-        $validated['status'] = 'inactive';
+        // Set status based on list_immediately preference (default to available)
+        $listImmediately = $request->boolean('list_immediately', true);
+        $validated['status'] = $listImmediately ? 'available' : 'inactive';
+        unset($validated['list_immediately']);
 
         // Convert boolean fields from strings to actual booleans
         $booleanFields = ['has_elevator', 'kitchen_equipped', 'kitchen_separated', 'has_cellar',
