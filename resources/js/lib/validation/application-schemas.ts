@@ -17,9 +17,13 @@ export const APPLICATION_MESSAGES = {
     message_to_landlord: {
         maxLength: 'Message cannot exceed 2000 characters',
     },
+    additional_occupants: {
+        max: 'Cannot have more than 20 additional occupants',
+    },
     occupant: {
         name: {
             required: 'Name is required',
+            maxLength: 'Name cannot exceed 255 characters',
         },
         age: {
             required: 'Age is required',
@@ -27,17 +31,27 @@ export const APPLICATION_MESSAGES = {
         },
         relationship: {
             required: 'Relationship is required',
+            maxLength: 'Relationship cannot exceed 100 characters',
         },
         relationship_other: {
             required: 'Please specify the relationship',
+            maxLength: 'Relationship cannot exceed 100 characters',
         },
     },
     pet: {
         type: {
             required: 'Pet type is required',
+            maxLength: 'Pet type cannot exceed 100 characters',
         },
         type_other: {
             required: 'Please specify the pet type',
+            maxLength: 'Pet type cannot exceed 100 characters',
+        },
+        breed: {
+            maxLength: 'Breed cannot exceed 100 characters',
+        },
+        age: {
+            max: 'Pet age cannot exceed 50 years',
         },
         required: 'At least one pet is required when "I have pets" is checked',
     },
@@ -67,7 +81,7 @@ export const APPLICATION_MESSAGES = {
 
 // ===== Shared Sub-Schemas =====
 const occupantSchema = z.object({
-    name: z.string().min(1, APPLICATION_MESSAGES.occupant.name.required),
+    name: z.string().min(1, APPLICATION_MESSAGES.occupant.name.required).max(255, APPLICATION_MESSAGES.occupant.name.maxLength),
     age: z
         .string()
         .min(1, APPLICATION_MESSAGES.occupant.age.required)
@@ -78,8 +92,11 @@ const occupantSchema = z.object({
             },
             { message: APPLICATION_MESSAGES.occupant.age.invalid },
         ),
-    relationship: z.string().min(1, APPLICATION_MESSAGES.occupant.relationship.required),
-    relationship_other: z.string(),
+    relationship: z
+        .string()
+        .min(1, APPLICATION_MESSAGES.occupant.relationship.required)
+        .max(100, APPLICATION_MESSAGES.occupant.relationship.maxLength),
+    relationship_other: z.string().max(100, APPLICATION_MESSAGES.occupant.relationship_other.maxLength),
 });
 
 const occupantWithOtherSchema = occupantSchema.refine(
@@ -96,10 +113,17 @@ const occupantWithOtherSchema = occupantSchema.refine(
 );
 
 const petSchema = z.object({
-    type: z.string().min(1, APPLICATION_MESSAGES.pet.type.required),
-    type_other: z.string(),
-    breed: z.string(),
-    age: z.string(),
+    type: z.string().min(1, APPLICATION_MESSAGES.pet.type.required).max(100, APPLICATION_MESSAGES.pet.type.maxLength),
+    type_other: z.string().max(100, APPLICATION_MESSAGES.pet.type_other.maxLength),
+    breed: z.string().max(100, APPLICATION_MESSAGES.pet.breed.maxLength),
+    age: z.string().refine(
+        (val) => {
+            if (!val) return true; // Optional
+            const num = parseInt(val);
+            return !isNaN(num) && num >= 0 && num <= 50;
+        },
+        { message: APPLICATION_MESSAGES.pet.age.max },
+    ),
     weight: z.string(),
 });
 
@@ -136,7 +160,7 @@ export const detailsStepSchema = z
             .min(1, APPLICATION_MESSAGES.lease_duration_months.min)
             .max(60, APPLICATION_MESSAGES.lease_duration_months.max),
         message_to_landlord: z.string().max(2000, APPLICATION_MESSAGES.message_to_landlord.maxLength),
-        additional_occupants: z.number(),
+        additional_occupants: z.number().min(0).max(20, APPLICATION_MESSAGES.additional_occupants.max),
         occupants_details: z.array(occupantSchema),
         has_pets: z.boolean(),
         pets_details: z.array(petSchema),

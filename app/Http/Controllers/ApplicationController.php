@@ -298,21 +298,40 @@ class ApplicationController extends Controller
                 $rules = [
                     'desired_move_in_date' => 'required|date|after:today',
                     'lease_duration_months' => 'required|integer|min:1|max:60',
+                    'message_to_landlord' => 'nullable|string|max:2000',
                     'additional_occupants' => 'required|integer|min:0|max:20',
                     'occupants_details' => 'nullable|array',
                     'occupants_details.*.name' => 'required|string|max:255',
                     'occupants_details.*.age' => 'required|integer|min:0|max:120',
                     'occupants_details.*.relationship' => 'required|string|max:100',
+                    'occupants_details.*.relationship_other' => 'nullable|string|max:100',
                     'has_pets' => 'required|boolean',
                 ];
+
+                // Validate relationship_other when relationship is "Other"
+                $occupants = $data['occupants_details'] ?? [];
+                foreach ($occupants as $index => $occupant) {
+                    if (isset($occupant['relationship']) && $occupant['relationship'] === 'Other') {
+                        $rules["occupants_details.{$index}.relationship_other"] = 'required|string|max:100';
+                    }
+                }
 
                 // Add pets validation only if has_pets is true
                 if (isset($data['has_pets']) && $data['has_pets'] === true) {
                     $rules['pets_details'] = 'required|array|min:1';
                     $rules['pets_details.*.type'] = 'required|string|max:100';
+                    $rules['pets_details.*.type_other'] = 'nullable|string|max:100';
                     $rules['pets_details.*.breed'] = 'nullable|string|max:100';
                     $rules['pets_details.*.age'] = 'nullable|integer|min:0|max:50';
                     $rules['pets_details.*.weight'] = 'nullable|numeric|min:0';
+
+                    // Validate type_other when type is "Other"
+                    $pets = $data['pets_details'] ?? [];
+                    foreach ($pets as $index => $pet) {
+                        if (isset($pet['type']) && $pet['type'] === 'Other') {
+                            $rules["pets_details.{$index}.type_other"] = 'required|string|max:100';
+                        }
+                    }
                 }
 
                 return $rules;
