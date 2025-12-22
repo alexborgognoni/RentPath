@@ -2,6 +2,8 @@ interface SidebarTranslations {
     managerPortal: string;
     navigation: string;
     properties: string;
+    applications: string;
+    leads: string;
     preferences: string;
     settings: string;
     language: string;

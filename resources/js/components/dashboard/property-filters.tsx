@@ -169,10 +169,10 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
                         <option value="">{translate(translations, 'properties.allStatuses')}</option>
-                        <option value="available">{translate(translations, 'properties.statusAvailable')}</option>
+                        <option value="draft">{translate(translations, 'properties.statusDraft')}</option>
+                        <option value="vacant">{translate(translations, 'properties.statusVacant')}</option>
                         <option value="leased">{translate(translations, 'properties.statusLeased')}</option>
                         <option value="maintenance">{translate(translations, 'properties.statusMaintenance')}</option>
-                        <option value="under_review">{translate(translations, 'properties.statusUnderReview')}</option>
                         <option value="archived">{translate(translations, 'properties.statusArchived')}</option>
                     </select>
                 </div>

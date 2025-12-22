@@ -165,8 +165,18 @@ export const useReactiveCurrency = () => {
         return formatWithSymbol(convertedAmount, currentCurrency);
     };
 
+    /**
+     * Format any amount with currency conversion (alias for formatRent)
+     * @param amount - The amount (e.g., 1500)
+     * @param baseCurrency - The currency the amount is in (e.g., 'eur', 'EUR')
+     */
+    const formatAmount = (amount: number | undefined | null, baseCurrency?: string): string => {
+        return formatRent(amount, baseCurrency);
+    };
+
     return {
         currentCurrency,
         formatRent,
+        formatAmount,
     };
 };

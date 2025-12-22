@@ -10,6 +10,7 @@ return [
     'noPropertiesDesc' => 'Begin met het toevoegen van uw eerste huurwoning om te delen met potentiële huurders.',
     'editProperty' => 'Eigenschap bewerken',
     'viewDetails' => 'Details bekijken',
+    'viewProperty' => 'Woning bekijken',
     'propertyAdded' => 'Eigenschap succesvol toegevoegd',
     'propertyUpdated' => 'Eigenschap succesvol bijgewerkt',
     'propertyDeleted' => 'Eigenschap succesvol verwijderd',
@@ -112,18 +113,22 @@ return [
     'columnBaths' => 'Badkamers',
     'columnParking' => 'Parkeren',
 
-    // Status badges
+    // Status badges (lifecycle only - funnel stage is derived from applications)
     'statusDraft' => 'Concept',
-    'statusInactive' => 'Inactief',
-    'statusAvailable' => 'Beschikbaar',
-    'statusApplicationReceived' => 'Aanvraag ontvangen',
-    'statusUnderReview' => 'In beoordeling',
-    'statusVisitScheduled' => 'Bezichtiging gepland',
-    'statusApproved' => 'Goedgekeurd',
+    'statusVacant' => 'Leeg',
     'statusLeased' => 'Verhuurd',
     'statusMaintenance' => 'Onderhoud',
     'statusArchived' => 'Gearchiveerd',
-    'statusReserved' => 'Gereserveerd',
+
+    // Visibility labels
+    'visibilityPublic' => 'Openbaar',
+    'visibilityUnlisted' => 'Niet vermeld',
+    'visibilityPrivate' => 'Privé',
+
+    // Application access labels
+    'accessOpen' => 'Open',
+    'accessLinkRequired' => 'Link vereist',
+    'accessInviteOnly' => 'Alleen op uitnodiging',
 
     // Draft section
     'drafts' => 'Concepten',

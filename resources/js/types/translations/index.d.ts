@@ -12,6 +12,8 @@ export interface Translations {
     sidebar: SidebarTranslations;
     properties: PropertiesTranslations;
     tenant: TenantTranslations;
+    applications: ApplicationsTranslations;
+    leads: LeadsTranslations;
 }
 
 export type TranslationKey = string;

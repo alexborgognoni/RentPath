@@ -10,6 +10,7 @@ return [
     'noPropertiesDesc' => 'Fügen Sie Ihre erste Mietimmobilie hinzu, um sie mit potenziellen Mietern zu teilen.',
     'editProperty' => 'Immobilie bearbeiten',
     'viewDetails' => 'Details anzeigen',
+    'viewProperty' => 'Immobilie anzeigen',
     'propertyAdded' => 'Immobilie erfolgreich hinzugefügt',
     'propertyUpdated' => 'Immobilie erfolgreich aktualisiert',
     'propertyDeleted' => 'Immobilie erfolgreich gelöscht',
@@ -112,18 +113,22 @@ return [
     'columnBaths' => 'Bäder',
     'columnParking' => 'Parkplätze',
 
-    // Status badges
+    // Status badges (lifecycle only - funnel stage is derived from applications)
     'statusDraft' => 'Entwurf',
-    'statusInactive' => 'Inaktiv',
-    'statusAvailable' => 'Verfügbar',
-    'statusApplicationReceived' => 'Bewerbung eingegangen',
-    'statusUnderReview' => 'In Prüfung',
-    'statusVisitScheduled' => 'Besichtigung geplant',
-    'statusApproved' => 'Genehmigt',
+    'statusVacant' => 'Leer',
     'statusLeased' => 'Vermietet',
     'statusMaintenance' => 'Wartung',
     'statusArchived' => 'Archiviert',
-    'statusReserved' => 'Reserviert',
+
+    // Visibility labels
+    'visibilityPublic' => 'Öffentlich',
+    'visibilityUnlisted' => 'Nicht gelistet',
+    'visibilityPrivate' => 'Privat',
+
+    // Application access labels
+    'accessOpen' => 'Offen',
+    'accessLinkRequired' => 'Link erforderlich',
+    'accessInviteOnly' => 'Nur auf Einladung',
 
     // Draft section
     'drafts' => 'Entwürfe',

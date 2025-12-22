@@ -10,6 +10,7 @@ return [
     'noPropertiesDesc' => 'Start by adding your first rental property to share with potential tenants.',
     'editProperty' => 'Edit Property',
     'viewDetails' => 'View Details',
+    'viewProperty' => 'View Property',
     'propertyAdded' => 'Property added successfully',
     'propertyUpdated' => 'Property updated successfully',
     'propertyDeleted' => 'Property deleted successfully',
@@ -112,18 +113,22 @@ return [
     'columnBaths' => 'Baths',
     'columnParking' => 'Parking',
 
-    // Status badges
+    // Status badges (lifecycle only - funnel stage is derived from applications)
     'statusDraft' => 'Draft',
-    'statusInactive' => 'Inactive',
-    'statusAvailable' => 'Available',
-    'statusApplicationReceived' => 'Application Received',
-    'statusUnderReview' => 'Under Review',
-    'statusVisitScheduled' => 'Visit Scheduled',
-    'statusApproved' => 'Approved',
+    'statusVacant' => 'Vacant',
     'statusLeased' => 'Leased',
     'statusMaintenance' => 'Maintenance',
     'statusArchived' => 'Archived',
-    'statusReserved' => 'Reserved',
+
+    // Visibility labels
+    'visibilityPublic' => 'Public',
+    'visibilityUnlisted' => 'Unlisted',
+    'visibilityPrivate' => 'Private',
+
+    // Application access labels
+    'accessOpen' => 'Open',
+    'accessLinkRequired' => 'Link Required',
+    'accessInviteOnly' => 'Invite Only',
 
     // Draft section
     'drafts' => 'Drafts',

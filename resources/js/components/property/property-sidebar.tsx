@@ -16,8 +16,12 @@ interface PropertySidebarProps {
 export function PropertySidebar({ property, tenantCount }: PropertySidebarProps) {
     const { appUrlScheme, appDomain, appPort, translations } = usePage<SharedData>().props;
     const t = (key: string, params?: Record<string, string | number>) => translate(translations, key, params);
-    const [requiresInvite, setRequiresInvite] = useState(property.requires_invite ?? true);
-    const [defaultToken, setDefaultToken] = useState<{ token: string; used_count: number } | null>(property.default_token || null);
+    // Application access: 'link_required' = needs invite token, 'open' = anyone can apply
+    const [applicationAccess, setApplicationAccess] = useState<'open' | 'link_required' | 'invite_only'>(property.application_access ?? 'open');
+    const requiresToken = applicationAccess === 'link_required' || applicationAccess === 'invite_only';
+    const [defaultToken, setDefaultToken] = useState<{ token: string; used_count: number; view_count: number } | null>(
+        property.default_token || null,
+    );
     const [copiedToken, setCopiedToken] = useState(false);
     const [regeneratingToken, setRegeneratingToken] = useState(false);
 
@@ -69,7 +73,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
         }
     };
 
-    const handleTogglePublicAccess = async () => {
+    const handleToggleApplicationAccess = async () => {
         try {
             const response = await fetch(route('properties.togglePublicAccess', { property: property.id }), {
                 method: 'POST',
@@ -81,20 +85,21 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
             if (response.ok) {
                 const data = await response.json();
-                setRequiresInvite(data.requires_invite);
+                setApplicationAccess(data.application_access);
 
-                // If enabling and default token was created/returned, update state
+                // If enabling link_required and default token was created/returned, update state
                 if (data.default_token) {
                     setDefaultToken({
                         token: data.default_token.token,
                         used_count: data.default_token.used_count,
+                        view_count: data.default_token.view_count ?? 0,
                     });
                 } else {
                     setDefaultToken(null);
                 }
             }
         } catch (error) {
-            console.error('Failed to toggle invite requirement:', error);
+            console.error('Failed to toggle application access:', error);
         }
     };
 
@@ -114,6 +119,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                 setDefaultToken({
                     token: data.token,
                     used_count: data.used_count,
+                    view_count: data.view_count ?? 0,
                 });
             }
         } catch (error) {
@@ -126,7 +132,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     const handleCopyLink = async () => {
         const rootDomain = getRootDomainUrl(appUrlScheme, appDomain, appPort);
         const propertyUrl =
-            requiresInvite && defaultToken?.token
+            requiresToken && defaultToken?.token
                 ? `${rootDomain}/properties/${property.id}?token=${defaultToken.token}`
                 : `${rootDomain}/properties/${property.id}`;
 
@@ -138,30 +144,15 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     };
 
     const getStatusBadge = () => {
+        // Property lifecycle status (simplified)
         const statusConfig: Record<string, { labelKey: string; className: string }> = {
-            inactive: {
-                labelKey: 'properties.statusInactive',
+            draft: {
+                labelKey: 'properties.statusDraft',
                 className: 'bg-muted/50 text-muted-foreground',
             },
-            available: {
-                labelKey: 'properties.statusAvailable',
+            vacant: {
+                labelKey: 'properties.statusVacant',
                 className: 'bg-success/10 text-success',
-            },
-            application_received: {
-                labelKey: 'properties.statusApplicationReceived',
-                className: 'bg-blue-500/10 text-blue-400',
-            },
-            under_review: {
-                labelKey: 'properties.statusUnderReview',
-                className: 'bg-amber-500/10 text-amber-400',
-            },
-            visit_scheduled: {
-                labelKey: 'properties.statusVisitScheduled',
-                className: 'bg-purple-500/10 text-purple-400',
-            },
-            approved: {
-                labelKey: 'properties.statusApproved',
-                className: 'bg-emerald-500/10 text-emerald-400',
             },
             leased: {
                 labelKey: 'properties.statusLeased',
@@ -177,7 +168,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             },
         };
 
-        const config = statusConfig[property.status] || statusConfig.inactive;
+        const config = statusConfig[property.status] || statusConfig.draft;
 
         return <span className={`rounded-full px-2 py-1 text-xs font-medium ${config.className}`}>{t(config.labelKey)}</span>;
     };
@@ -219,13 +210,23 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     {t('properties.sidebar.actions')}
                 </h3>
 
-                <button
-                    onClick={handleEdit}
-                    className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
-                >
-                    <Edit className="mr-3" size={16} />
-                    {t('properties.sidebar.editProperty')}
-                </button>
+                <div className="space-y-2">
+                    <button
+                        onClick={handleEdit}
+                        className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
+                    >
+                        <Edit className="mr-3" size={16} />
+                        {t('properties.sidebar.editProperty')}
+                    </button>
+
+                    <button
+                        onClick={() => router.visit(route('manager.applications.index', { property: property.id }))}
+                        className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
+                    >
+                        <Users className="mr-3" size={16} />
+                        {t('applications.viewApplications')} ({tenantCount})
+                    </button>
+                </div>
             </div>
 
             {/* Application Access */}
@@ -235,25 +236,25 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     {t('properties.sidebar.applicationAccess')}
                 </h3>
 
-                {/* Invite Requirement Toggle */}
+                {/* Application Access Toggle */}
                 <div className="mb-3 flex items-center justify-between rounded-lg border border-border bg-background/50 p-3">
                     <div className="flex items-center">
                         <Link2 className="mr-2 text-muted-foreground" size={16} />
                         <span className="text-sm font-medium">{t('properties.sidebar.requireInvite')}</span>
                     </div>
                     <button
-                        onClick={handleTogglePublicAccess}
-                        className={`relative h-6 w-11 rounded-full transition-colors ${requiresInvite ? 'bg-primary' : 'bg-muted'}`}
+                        onClick={handleToggleApplicationAccess}
+                        className={`relative h-6 w-11 rounded-full transition-colors ${requiresToken ? 'bg-primary' : 'bg-muted'}`}
                     >
                         <span
                             className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
-                                requiresInvite ? 'right-0.5' : 'left-0.5'
+                                requiresToken ? 'right-0.5' : 'left-0.5'
                             }`}
                         />
                     </button>
                 </div>
 
-                {requiresInvite && (
+                {requiresToken && (
                     <>
                         <p className="mb-3 text-sm text-muted-foreground">{t('properties.sidebar.inviteRequiredDesc')}</p>
 
@@ -312,7 +313,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     </>
                 )}
 
-                {!requiresInvite && (
+                {!requiresToken && (
                     <div className="space-y-3">
                         <p className="text-sm text-muted-foreground">{t('properties.sidebar.publicAccessDesc')}</p>
 

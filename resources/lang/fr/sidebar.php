@@ -4,6 +4,8 @@ return [
     'managerPortal' => 'Portail Manager',
     'navigation' => 'Navigation',
     'properties' => 'Propriétés',
+    'applications' => 'Candidatures',
+    'leads' => 'Prospects',
     'preferences' => 'Préférences',
     'settings' => 'Paramètres',
     'currency' => 'Devise',

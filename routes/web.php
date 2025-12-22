@@ -84,9 +84,9 @@ Route::domain(config('app.domain'))->group(function () {
 
     // Browse all public properties
     Route::get('/properties', function () {
-        // Fetch all properties that don't require invite
-        $properties = \App\Models\Property::where('requires_invite', false)
-            ->where('status', 'available')
+        // Fetch all publicly visible properties that are accepting applications
+        $properties = \App\Models\Property::where('visibility', \App\Models\Property::VISIBILITY_PUBLIC)
+            ->where('accepting_applications', true)
             ->with(['images', 'propertyManager.user'])
             ->orderBy('created_at', 'desc')
             ->get()
@@ -200,6 +200,9 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
 
         $properties = $user->properties()
             ->with('images')
+            ->withCount(['applications as tenant_count' => function ($query) {
+                $query->visibleToManager();
+            }])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($property) {
@@ -350,6 +353,28 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
         Route::delete('properties/{property}/invite-tokens/{tokenId}', [PropertyController::class, 'deleteCustomToken'])
             ->name('properties.deleteCustomToken');
 
+        // Lead routes
+        Route::get('leads', [\App\Http\Controllers\LeadController::class, 'index'])
+            ->name('manager.leads.index');
+
+        Route::get('leads/{lead}', [\App\Http\Controllers\LeadController::class, 'show'])
+            ->name('manager.leads.show');
+
+        Route::post('leads', [\App\Http\Controllers\LeadController::class, 'store'])
+            ->name('manager.leads.store');
+
+        Route::put('leads/{lead}', [\App\Http\Controllers\LeadController::class, 'update'])
+            ->name('manager.leads.update');
+
+        Route::delete('leads/{lead}', [\App\Http\Controllers\LeadController::class, 'destroy'])
+            ->name('manager.leads.destroy');
+
+        Route::post('leads/{lead}/resend', [\App\Http\Controllers\LeadController::class, 'resendInvite'])
+            ->name('manager.leads.resend');
+
+        Route::post('leads/{lead}/archive', [\App\Http\Controllers\LeadController::class, 'archive'])
+            ->name('manager.leads.archive');
+
         // Image upload/delete routes (legacy - not currently used)
         Route::post('api/images/upload', [ImageUploadController::class, 'upload'])
             ->name('images.upload');
@@ -365,6 +390,16 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
 
             return Storage::disk($disk)->response($path);
         })->where('path', '.*')->middleware('signed')->name('private.storage');
+
+        // Application management routes
+        Route::get('applications', [\App\Http\Controllers\ApplicationController::class, 'indexManager'])
+            ->name('manager.applications.index');
+
+        Route::get('applications/{application}', [\App\Http\Controllers\ApplicationController::class, 'showManager'])
+            ->name('manager.applications.show');
+
+        Route::post('applications/{application}/status', [\App\Http\Controllers\ApplicationController::class, 'updateStatus'])
+            ->name('manager.applications.updateStatus');
     });
 
     // Manager logout

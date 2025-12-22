@@ -4,6 +4,8 @@ return [
     'managerPortal' => 'Manager Portal',
     'navigation' => 'Navigation',
     'properties' => 'Properties',
+    'applications' => 'Applications',
+    'leads' => 'Leads',
     'preferences' => 'Preferences',
     'settings' => 'Settings',
     'currency' => 'Currency',

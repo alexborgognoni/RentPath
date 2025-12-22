@@ -10,6 +10,7 @@ return [
     'noPropertiesDesc' => 'Commencez par ajouter votre première propriété locative à partager avec des locataires potentiels.',
     'editProperty' => 'Modifier la propriété',
     'viewDetails' => 'Voir les détails',
+    'viewProperty' => 'Voir la propriété',
     'propertyAdded' => 'Propriété ajoutée avec succès',
     'propertyUpdated' => 'Propriété mise à jour avec succès',
     'propertyDeleted' => 'Propriété supprimée avec succès',
@@ -112,18 +113,22 @@ return [
     'columnBaths' => 'Bains',
     'columnParking' => 'Parking',
 
-    // Status badges
+    // Status badges (lifecycle only - funnel stage is derived from applications)
     'statusDraft' => 'Brouillon',
-    'statusInactive' => 'Inactif',
-    'statusAvailable' => 'Disponible',
-    'statusApplicationReceived' => 'Candidature reçue',
-    'statusUnderReview' => 'En révision',
-    'statusVisitScheduled' => 'Visite planifiée',
-    'statusApproved' => 'Approuvé',
+    'statusVacant' => 'Vacant',
     'statusLeased' => 'Loué',
     'statusMaintenance' => 'Maintenance',
     'statusArchived' => 'Archivé',
-    'statusReserved' => 'Réservé',
+
+    // Visibility labels
+    'visibilityPublic' => 'Public',
+    'visibilityUnlisted' => 'Non répertorié',
+    'visibilityPrivate' => 'Privé',
+
+    // Application access labels
+    'accessOpen' => 'Ouvert',
+    'accessLinkRequired' => 'Lien requis',
+    'accessInviteOnly' => 'Sur invitation',
 
     // Draft section
     'drafts' => 'Brouillons',

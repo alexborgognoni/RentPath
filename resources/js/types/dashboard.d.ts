@@ -99,23 +99,18 @@ export interface Property {
     utilities_included?: boolean;
     pets_allowed?: boolean;
     smoking_allowed?: boolean;
-    // Property status
-    status:
-        | 'draft'
-        | 'inactive'
-        | 'available'
-        | 'application_received'
-        | 'under_review'
-        | 'visit_scheduled'
-        | 'approved'
-        | 'leased'
-        | 'maintenance'
-        | 'archived';
+    // Property status (lifecycle only, funnel stage is derived from applications)
+    status: 'draft' | 'vacant' | 'leased' | 'maintenance' | 'archived';
     wizard_step?: number; // 1-indexed step for draft properties
     tenant_count?: number; // This will be computed/added by backend
-    // Application access control and invite tokens
-    requires_invite: boolean;
-    default_token?: { token: string; used_count: number } | null;
+    // Visibility and access control
+    visibility: 'public' | 'unlisted' | 'private';
+    accepting_applications: boolean;
+    application_access: 'open' | 'link_required' | 'invite_only';
+    // Derived funnel stage from applications (computed attribute)
+    funnel_stage?: string;
+    // Invite tokens
+    default_token?: { token: string; used_count: number; view_count: number } | null;
     created_at: string;
     updated_at: string;
     // Computed attributes
@@ -198,7 +193,11 @@ export interface PropertyFormData {
     available_date?: string;
     rent_amount: number;
     rent_currency: Property['rent_currency'];
-    is_active: boolean;
+    // Visibility and access control
+    visibility?: Property['visibility'];
+    accepting_applications?: boolean;
+    application_access?: Property['application_access'];
+    is_active?: boolean; // Legacy - maps to visibility + accepting_applications
     // Images
     images?: File[];
     main_image_index?: number;
@@ -219,6 +218,32 @@ export interface TenantApplication {
     notes?: string;
     created_at: string;
     updated_at: string;
+}
+
+export interface Lead {
+    id: number;
+    property_id: number;
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
+    token: string;
+    source: 'manual' | 'invite' | 'token_signup' | 'application' | 'inquiry';
+    status: 'invited' | 'viewed' | 'drafting' | 'applied' | 'archived';
+    user_id?: number;
+    application_id?: number;
+    invite_token_id?: number;
+    invited_at?: string;
+    viewed_at?: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+    // Relationships
+    property?: Property;
+    user?: User;
+    application?: Application;
+    // Computed
+    full_name?: string;
 }
 
 export interface Application {

@@ -14,7 +14,19 @@ import { route } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Building2, ChevronsUpDown, CircleDollarSign, Globe, Home, LogOut, PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react';
+import {
+    Building2,
+    ChevronsUpDown,
+    CircleDollarSign,
+    FileText,
+    Globe,
+    Home,
+    LogOut,
+    PanelLeftClose,
+    PanelLeftOpen,
+    Settings,
+    Users,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const languages = [
@@ -49,6 +61,8 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
     }, []);
 
     const isPropertiesActive = currentPath.startsWith('/properties') || currentPath.startsWith('/property');
+    const isApplicationsActive = currentPath.startsWith('/applications');
+    const isLeadsActive = currentPath.startsWith('/leads');
 
     const getUserInitials = () => {
         if (auth.user?.name) {
@@ -128,6 +142,20 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                         icon={<Building2 className="h-5 w-5" />}
                         label={t(translations.sidebar, 'properties')}
                         isActive={isPropertiesActive}
+                        isCollapsed={isCollapsed}
+                    />
+                    <NavItem
+                        href={route('manager.applications.index')}
+                        icon={<FileText className="h-5 w-5" />}
+                        label={t(translations.sidebar, 'applications')}
+                        isActive={isApplicationsActive}
+                        isCollapsed={isCollapsed}
+                    />
+                    <NavItem
+                        href={route('manager.leads.index')}
+                        icon={<Users className="h-5 w-5" />}
+                        label={t(translations.sidebar, 'leads')}
+                        isActive={isLeadsActive}
                         isCollapsed={isCollapsed}
                     />
                 </nav>

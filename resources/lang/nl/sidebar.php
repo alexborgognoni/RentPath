@@ -4,6 +4,8 @@ return [
     'managerPortal' => 'Manager Portaal',
     'navigation' => 'Navigatie',
     'properties' => 'Woningen',
+    'applications' => 'Aanvragen',
+    'leads' => 'Leads',
     'preferences' => 'Voorkeuren',
     'settings' => 'Instellingen',
     'currency' => 'Valuta',

@@ -19,35 +19,15 @@ interface PropertyTableProps {
 
 const columnHelper = createColumnHelper<Property>();
 
-// Status badge configuration for all 10 statuses
+// Status badge configuration for simplified lifecycle statuses
 const statusConfig: Record<string, { labelKey: string; className: string }> = {
     draft: {
         labelKey: 'properties.statusDraft',
         className: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     },
-    inactive: {
-        labelKey: 'properties.statusInactive',
-        className: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-    },
-    available: {
-        labelKey: 'properties.statusAvailable',
+    vacant: {
+        labelKey: 'properties.statusVacant',
         className: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-    },
-    application_received: {
-        labelKey: 'properties.statusApplicationReceived',
-        className: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
-    },
-    under_review: {
-        labelKey: 'properties.statusUnderReview',
-        className: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-    },
-    visit_scheduled: {
-        labelKey: 'properties.statusVisitScheduled',
-        className: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
-    },
-    approved: {
-        labelKey: 'properties.statusApproved',
-        className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     },
     leased: {
         labelKey: 'properties.statusLeased',
@@ -177,8 +157,8 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
             columnHelper.accessor('status', {
                 header: () => translate(translations, 'properties.columnStatus'),
                 cell: ({ getValue }) => {
-                    const status = getValue() || 'available';
-                    const config = statusConfig[status] || statusConfig.available;
+                    const status = getValue() || 'vacant';
+                    const config = statusConfig[status] || statusConfig.vacant;
                     return (
                         <div className="flex justify-center">
                             <span className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium ${config.className}`}>
