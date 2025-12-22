@@ -25,8 +25,8 @@
 
 #### Phase 3: Manager Review (Week 4, ~30-35h)
 
-- [ ] [feature] Manager application review dashboard (list, basic filtering) - ~15h
-- [ ] [feature] Manager application detail page with actions (approve, reject, schedule visit) - ~15h
+- [x] [feature] Manager application review dashboard (list, basic filtering) - ~15h ✅ _(2025-12-22)_
+- [x] [feature] Manager application detail page with actions (approve, reject, schedule visit) - ~15h ✅ _(2025-12-22)_
 
 #### Phase 4: Workflow & Notifications (Weeks 5-6, ~25-30h)
 
@@ -90,6 +90,15 @@
     - [ ] General feedback form (feature requests, suggestions, complaints)
     - [ ] Feedback categories and priority levels
     - [ ] Optional: integrate with external issue tracker (GitHub Issues, Linear, etc.)
+
+#### Visit Scheduling System
+
+- [ ] [feature] Full calendar/scheduling UI for property visits - ~15h
+    - [ ] Date/time picker with availability slots
+    - [ ] Email notifications to tenant when visit scheduled
+    - [ ] Calendar integration (Google Calendar, iCal export)
+    - [ ] Reschedule/cancel functionality with notifications
+    - [ ] Visit reminder emails
 
 #### Notification System
 
@@ -164,8 +173,10 @@
 
 ## 🟪 Done
 
+- [x] [feature] Leads management system (track interested tenants, invite via email, manual lead creation) ✅ _(2025-12-22)_
+- [x] [feature] Simplified property status model (draft/vacant/leased/maintenance/archived) with visibility & access control ✅ _(2025-12-22)_
 - [x] [feature] Invite token management system with custom links ✅ _(2025-11-10)_
-- [x] [feature] Application access control (requires*invite flag) ✅ *(2025-11-10)\_
+- [x] [feature] Application access control (visibility + application*access fields) ✅ *(2025-11-10, refactored 2025-12-22)\_
 - [x] [i18n] Fix translation types ✅
 - [x] [infra] AWS CodePipeline deployment (V1 migration) ✅
 - [x] [infra] AWS infrastructure cost optimization (~60% reduction) ✅

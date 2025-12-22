@@ -1,6 +1,14 @@
 # RentPath
 
-A rental property management platform built with Laravel and React.
+A rental property management platform for the European market. Streamlines the rental process from property listing to tenant applications.
+
+## Features
+
+- **Property Management** - Guided wizard to list rentals with photos, specs, and terms
+- **Lead Tracking** - Manage prospective tenants from initial interest through application
+- **Invite System** - Private tokens for targeted prospects or public listings for broader reach
+- **Application Management** - Review tenant applications with employment, income, and documents
+- **Multi-language Support** - English, German, French, Dutch
 
 ## Tech Stack
 

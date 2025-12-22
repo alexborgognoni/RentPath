@@ -35,7 +35,9 @@ For prospective tenants:
 - Dual S3 storage (public + private) behind CloudFront with signed URLs
 - Users can have both PropertyManager AND TenantProfile
 - Profile verification gates with field-level rejection feedback
-- Invite token system with usage limits and expiration
+- Property visibility (public/unlisted/private) and application access control (open/link_required/invite_only)
+- Lead tracking system: tracks interested tenants from invite through application
+- Shareable token links with usage limits and expiration
 - Server-side i18n: PHP translations in `resources/lang/{en,fr,de,nl}/` loaded via Inertia shared props, accessed in React with `translate(translations, 'key.path')`
 
 ## Environment (Critical)
@@ -497,15 +499,15 @@ defaults
 
 - When listing items, use gap utilities for spacing, don't use margins.
 
-            <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
-                <div class="flex gap-8">
-                    <div>Superior</div>
-                    <div>Michigan</div>
-                    <div>Erie</div>
-                </div>
+              <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
+                  <div class="flex gap-8">
+                      <div>Superior</div>
+                      <div>Michigan</div>
+                      <div>Erie</div>
                   </div>
+                    </div>
 
-      </code-snippet>
+        </code-snippet>
 
 === inertia-react/core rules ===
 
@@ -573,13 +575,13 @@ defaults
 
 - When listing items, use gap utilities for spacing, don't use margins.
 
-          <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
-              <div class="flex gap-8">
-                  <div>Superior</div>
-                  <div>Michigan</div>
-                  <div>Erie</div>
-              </div>
-          </code-snippet>
+            <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
+                <div class="flex gap-8">
+                    <div>Superior</div>
+                    <div>Michigan</div>
+                    <div>Erie</div>
+                </div>
+            </code-snippet>
 
 ### Dark Mode
 

@@ -23,8 +23,9 @@ rentpath.app (Root Domain)
 manager.rentpath.app (Manager Subdomain)
 └─ Property manager portal (100% authenticated)
    ├─ Dashboard
-   ├─ Property management
-   ├─ Application review
+   ├─ Properties (property management)
+   ├─ Applications (review & manage)
+   ├─ Leads (track interested tenants)
    └─ Settings
 ```
 
@@ -78,14 +79,40 @@ tenant_profiles (optional profile, 1:1 with users)
 - Energy ratings (energy class, insulation, heating)
 - Rental info (rent, currency, available date)
 - Address (full address fields)
-- Status (inactive → available → application_received → ... → leased → archived)
+- Status (lifecycle only - see below)
 
-**Access Control**:
+**Status** (simplified lifecycle):
 
-- `requires_invite`: Boolean - when true, only invite tokens grant access; when false, direct URLs work
-- `invite_token`: 64-char token for private/controlled access
-- `invite_token_expires_at`: Token expiration
-- Note: Future enhancement will add `is_listed` for public listing visibility (separate from application access)
+| Status        | Description                       |
+| ------------- | --------------------------------- |
+| `draft`       | Manager setting up, incomplete    |
+| `vacant`      | No tenant, ready for market       |
+| `leased`      | Tenant in place with active lease |
+| `maintenance` | Off market for repairs/renovation |
+| `archived`    | No longer managing this property  |
+
+Note: Funnel stage (has applications, under review, etc.) is **derived from applications**, not stored on property.
+
+**Visibility & Access Control**:
+
+| Field                    | Values                           | Description                                 |
+| ------------------------ | -------------------------------- | ------------------------------------------- |
+| `visibility`             | public, unlisted, private        | Who can SEE the property                    |
+| `accepting_applications` | boolean                          | Whether applications are currently accepted |
+| `application_access`     | open, link_required, invite_only | Who can APPLY                               |
+
+- `visibility = public`: Searchable, on listings page, SEO indexed
+- `visibility = unlisted`: Only via direct link (like YouTube unlisted)
+- `visibility = private`: Only manager can see
+- `application_access = open`: Anyone who can view can apply
+- `application_access = link_required`: Need a shareable token link
+- `application_access = invite_only`: Only personally invited leads can apply
+
+**Rules**:
+
+- `status = draft` forces `visibility = private` and `accepting_applications = false`
+- Other statuses: manager's choice
+- Settings are preserved when changing status
 
 **Images**: Multiple images via `property_images` table (has `is_main` flag, sort order)
 
@@ -118,26 +145,67 @@ draft → submitted → under_review → visit_scheduled → visit_completed
 
 **Uniqueness**: One active (non-draft, non-archived) application per tenant per property (enforced in application code).
 
-### 3. Application Invite Tokens
+### 3. Leads
 
-**Purpose**: Control property access for applications
-
-**Token Types**:
-
-- `private`: Shareable link, anyone can view until expiry
-- `invite`: Email-restricted, only specific user can view
+A Lead is a person (identified by email) who has shown interest in a property OR who the manager wants to have interested (bidirectional).
 
 **Key Fields**:
 
-- `property_id`: Property this grants access to
-- `token`: 64-char unique string
-- `type`: private | invite
-- `email`: Required if type=invite
-- `max_uses`: Optional usage limit
-- `used_count`: Current uses
-- `expires_at`: Token expiration
-- `status`: active | revoked | expired
-- `created_by_user_id`: Token creator
+| Field             | Description                                        |
+| ----------------- | -------------------------------------------------- |
+| `property_id`     | FK to properties                                   |
+| `email`           | Required, indexed                                  |
+| `first_name`      | Optional                                           |
+| `last_name`       | Optional                                           |
+| `phone`           | Optional                                           |
+| `token`           | Unique string for personal invite link             |
+| `source`          | manual, invite, token_signup, application, inquiry |
+| `status`          | invited, viewed, drafting, applied, archived       |
+| `user_id`         | FK to users (nullable, linked on signup)           |
+| `application_id`  | FK to applications (nullable)                      |
+| `invite_token_id` | FK to tokens (if created via token)                |
+| `invited_at`      | When invite was sent                               |
+| `viewed_at`       | When they first viewed property                    |
+| `notes`           | Manager's private notes                            |
+
+**Status Flow**:
+
+```
+invited → viewed → drafting → applied
+    ↓        ↓         ↓          ↓
+archived  archived  archived  archived
+```
+
+**Sources**:
+
+- `manual`: Manager added (showing, phone call, referral, open house)
+- `invite`: Manager sent personal invite to apply
+- `token_signup`: User signed up after clicking anonymous token link
+- `application`: Auto-created when user starts a draft application
+- `inquiry`: Property inquiry form (future)
+
+**Auto-Lead Creation**:
+
+1. When a user creates a draft Application → Lead created with `source: application`, `status: drafting`
+2. When application is submitted → Lead status updated to `applied`
+
+### 4. Application Invite Tokens
+
+**Purpose**: Anonymous shareable links for property access (personal invites moved to Leads)
+
+**Key Fields**:
+
+| Field         | Description                        |
+| ------------- | ---------------------------------- |
+| `property_id` | Property this grants access to     |
+| `name`        | Optional label ("Open House Link") |
+| `token`       | 64-char unique string              |
+| `max_uses`    | Optional usage limit               |
+| `used_count`  | Current application count          |
+| `view_count`  | Link click count                   |
+| `expires_at`  | Token expiration                   |
+
+Note: `type` and `email` fields removed - personal invites are now tracked via Leads.
 
 ---
 
@@ -175,21 +243,23 @@ draft → submitted → under_review → visit_scheduled → visit_completed
 
 ## Token Access Control
 
-### Public Shareable Token (`type=private`)
+### Anonymous Shareable Token
 
 ```
-Property Manager creates token → Shares URL publicly
-→ Anyone can view property until expiry
+Property Manager creates token → Shares URL publicly or privately
+→ Anyone with link can view property until expiry
+→ view_count incremented on each access
 → Must register/login to apply
+→ On signup: Lead created with source=token_signup
 ```
 
-### Email-Restricted Token (`type=invite`)
+### Personal Invites (via Leads)
 
 ```
-Property Manager creates token with email → Sends to specific person
-→ Only user with that email can view property
-→ Must login with invited email to access
-→ Tracks usage (optional max_uses)
+Property Manager creates Lead with email → Sends invite
+→ Lead tracks engagement (invited → viewed → drafting → applied)
+→ Lead has unique token for personal invite link
+→ Linked to Application when tenant applies
 ```
 
 ---
@@ -326,19 +396,27 @@ chk_rent_amount:     rent_amount >= 0 AND rent_amount <= 999999.99
 
 ## Status Workflows
 
-### Property Status
+### Property Status (Simplified Lifecycle)
 
-| Status                 | Description                | Next States                                         |
-| ---------------------- | -------------------------- | --------------------------------------------------- |
-| `inactive`             | Not accepting applications | available, maintenance, archived                    |
-| `available`            | Open for applications      | application_received, leased, inactive, maintenance |
-| `application_received` | Has pending applications   | under_review, available, archived                   |
-| `under_review`         | Reviewing applications     | visit_scheduled, approved, rejected, available      |
-| `visit_scheduled`      | Visit confirmed            | leased, available, maintenance                      |
-| `approved`             | Tenant approved            | leased, available                                   |
-| `leased`               | Currently rented           | available, maintenance, archived                    |
-| `maintenance`          | Under repair               | available, inactive                                 |
-| `archived`             | Permanently closed         | —                                                   |
+| Status        | Description                    | Next States                   |
+| ------------- | ------------------------------ | ----------------------------- |
+| `draft`       | Manager setting up, incomplete | vacant                        |
+| `vacant`      | No tenant, ready for market    | leased, maintenance, archived |
+| `leased`      | Tenant in place                | vacant, maintenance, archived |
+| `maintenance` | Off market for repairs         | vacant, archived              |
+| `archived`    | No longer managing             | —                             |
+
+Note: Application-related stages (under_review, visit_scheduled, approved) are now derived from the `applications` table, not stored on property.
+
+### Lead Status
+
+| Status     | Description                        | Next States        |
+| ---------- | ---------------------------------- | ------------------ |
+| `invited`  | Manager invited, no engagement yet | viewed, archived   |
+| `viewed`   | Clicked invite link / viewed       | drafting, archived |
+| `drafting` | Started application, not submitted | applied, archived  |
+| `applied`  | Submitted application              | archived           |
+| `archived` | No longer tracking                 | —                  |
 
 ### Application Status
 
