@@ -2,7 +2,8 @@ import { BaseLayout } from '@/layouts/base-layout';
 import { type Application, type SharedData } from '@/types';
 import { route } from '@/utils/route';
 import { Head, router, usePage } from '@inertiajs/react';
-import { AlertCircle, Calendar, CheckCircle, Clock, FileText, Home, User, XCircle } from 'lucide-react';
+import { AlertCircle, Calendar, CheckCircle, Clock, FileText, Home, MessageCircle, User, XCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface ApplicationViewProps extends SharedData {
     application: Application;
@@ -10,6 +11,12 @@ interface ApplicationViewProps extends SharedData {
 
 export default function ApplicationView() {
     const { application } = usePage<ApplicationViewProps>().props;
+    const [isStartingChat, setIsStartingChat] = useState(false);
+
+    const handleMessageLandlord = () => {
+        setIsStartingChat(true);
+        router.get(route('tenant.messages.index'));
+    };
 
     const handleWithdraw = () => {
         router.post(
@@ -267,10 +274,19 @@ export default function ApplicationView() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap gap-4">
                         <a href={route('dashboard')} className="rounded-lg border border-border px-6 py-3 font-medium hover:bg-muted">
                             Back to Dashboard
                         </a>
+
+                        <button
+                            onClick={handleMessageLandlord}
+                            disabled={isStartingChat}
+                            className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                        >
+                            <MessageCircle className="h-5 w-5" />
+                            Message Landlord
+                        </button>
 
                         {canWithdraw && (
                             <button

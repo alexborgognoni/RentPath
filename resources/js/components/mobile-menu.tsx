@@ -6,7 +6,7 @@ import { route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { ChevronDown, LogOut, Menu, Settings, X } from 'lucide-react';
+import { ChevronDown, LogOut, Menu, MessageCircle, Settings, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -360,9 +360,15 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                             )}
                         </div>
 
-                        {/* Settings/Sign Out Section - Bottom (logged in) */}
+                        {/* Navigation & Settings Section - Bottom (logged in) */}
                         {auth.user && (
                             <div className="space-y-2 pt-4">
+                                <Button variant="outline" className="h-11 w-full justify-start text-base" asChild>
+                                    <a href={route('tenant.messages.index')} onClick={() => setIsOpen(false)}>
+                                        <MessageCircle size={20} />
+                                        <span>{t(translations.header, 'messages') || 'Messages'}</span>
+                                    </a>
+                                </Button>
                                 <Button variant="outline" className="h-11 w-full justify-start text-base" asChild>
                                     <a href={settingsRoute('profile', subdomain, managerSubdomain)} onClick={() => setIsOpen(false)}>
                                         <Settings size={20} />

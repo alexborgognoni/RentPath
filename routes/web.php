@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyManagerController;
 use App\Http\Controllers\PropertyViewController;
 use App\Http\Controllers\SchemaViewerController;
+use App\Http\Controllers\TenantMessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -400,6 +402,22 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
 
         Route::post('applications/{application}/status', [\App\Http\Controllers\ApplicationController::class, 'updateStatus'])
             ->name('manager.applications.updateStatus');
+
+        // Message routes
+        Route::get('messages', [MessageController::class, 'index'])
+            ->name('manager.messages.index');
+
+        Route::post('messages/start', [MessageController::class, 'startConversation'])
+            ->name('manager.messages.start');
+
+        Route::get('messages/{conversation}', [MessageController::class, 'show'])
+            ->name('manager.messages.show');
+
+        Route::post('messages/{conversation}', [MessageController::class, 'store'])
+            ->name('manager.messages.store');
+
+        Route::get('api/messages/unread-count', [MessageController::class, 'unreadCount'])
+            ->name('manager.messages.unreadCount');
     });
 
     // Manager logout
@@ -513,6 +531,19 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
 
     Route::post('applications/{application}/withdraw', [\App\Http\Controllers\ApplicationController::class, 'withdraw'])
         ->name('applications.withdraw');
+
+    // Message routes
+    Route::get('messages', [TenantMessageController::class, 'index'])
+        ->name('tenant.messages.index');
+
+    Route::get('messages/{conversation}', [TenantMessageController::class, 'show'])
+        ->name('tenant.messages.show');
+
+    Route::post('messages/{conversation}', [TenantMessageController::class, 'store'])
+        ->name('tenant.messages.store');
+
+    Route::get('api/messages/unread-count', [TenantMessageController::class, 'unreadCount'])
+        ->name('tenant.messages.unreadCount');
 
     // Settings routes (tenant/root domain)
     if (file_exists(__DIR__.'/settings.php')) {

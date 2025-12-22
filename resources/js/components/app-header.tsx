@@ -7,7 +7,7 @@ import { type BreadcrumbItem, type SharedData } from '@/types';
 import { route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
+import { ChevronsUpDown, LogOut, MessageCircle, Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface AppHeaderProps {
@@ -149,6 +149,13 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                         {/* Auth Buttons or User Menu */}
                         {auth?.user ? (
                             <>
+                                <Link
+                                    href={route('tenant.messages.index')}
+                                    className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                >
+                                    <MessageCircle className="h-4 w-4" />
+                                    {t(translations?.header, 'messages') || 'Messages'}
+                                </Link>
                                 <Link
                                     href={route('dashboard')}
                                     className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"

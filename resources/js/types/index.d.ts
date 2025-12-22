@@ -160,6 +160,7 @@ export interface Application {
     id: number;
     property_id: number;
     tenant_profile_id: number;
+    user_id?: number;
 
     // Status
     status:

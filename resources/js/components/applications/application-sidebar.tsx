@@ -5,7 +5,7 @@ import { useReactiveCurrency } from '@/utils/currency-utils';
 import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';
-import { AlertCircle, Archive, Calendar, CheckCircle, Clock, FileCheck, FileText, Home, Settings, XCircle } from 'lucide-react';
+import { AlertCircle, Archive, Calendar, CheckCircle, Clock, FileCheck, FileText, Home, MessageCircle, Settings, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface ApplicationSidebarProps {
@@ -73,6 +73,7 @@ export function ApplicationSidebar({ application, allowedTransitions }: Applicat
 
     const [actionDialog, setActionDialog] = useState<{ status: string; notes: string } | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isStartingChat, setIsStartingChat] = useState(false);
 
     const currentStatusConfig = statusConfig[application.status] || statusConfig.submitted;
     const StatusIcon = currentStatusConfig.icon;
@@ -88,6 +89,18 @@ export function ApplicationSidebar({ application, allowedTransitions }: Applicat
 
     const handleAction = (status: string) => {
         setActionDialog({ status, notes: '' });
+    };
+
+    const handleStartChat = () => {
+        if (!application.user_id) return;
+        setIsStartingChat(true);
+        router.post(
+            route('manager.messages.start'),
+            { participant_type: 'tenant', participant_id: application.user_id },
+            {
+                onFinish: () => setIsStartingChat(false),
+            },
+        );
     };
 
     const confirmAction = async () => {
@@ -143,6 +156,23 @@ export function ApplicationSidebar({ application, allowedTransitions }: Applicat
                     {t(currentStatusConfig.labelKey)}
                 </div>
             </div>
+
+            {/* Message Applicant Card */}
+            {application.user_id && (
+                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                    <button
+                        onClick={handleStartChat}
+                        disabled={isStartingChat}
+                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 p-3 text-left transition-colors hover:bg-primary/20 disabled:opacity-50"
+                    >
+                        <MessageCircle className="h-5 w-5 text-primary" />
+                        <div className="flex-1">
+                            <p className="text-sm font-medium text-primary">{t('messageApplicant') || 'Message Applicant'}</p>
+                            <p className="text-xs text-primary/70">{t('messageApplicantDesc') || 'Send a message to the applicant'}</p>
+                        </div>
+                    </button>
+                </div>
+            )}
 
             {/* Quick Stats Card */}
             <div className="rounded-xl border border-border bg-card p-6 shadow-sm">

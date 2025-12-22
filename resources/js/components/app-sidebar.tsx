@@ -22,6 +22,7 @@ import {
     Globe,
     Home,
     LogOut,
+    MessageCircle,
     PanelLeftClose,
     PanelLeftOpen,
     Settings,
@@ -63,6 +64,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
     const isPropertiesActive = currentPath.startsWith('/properties') || currentPath.startsWith('/property');
     const isApplicationsActive = currentPath.startsWith('/applications');
     const isLeadsActive = currentPath.startsWith('/leads');
+    const isMessagesActive = currentPath.startsWith('/messages');
 
     const getUserInitials = () => {
         if (auth.user?.name) {
@@ -156,6 +158,13 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                         icon={<Users className="h-5 w-5" />}
                         label={t(translations.sidebar, 'leads')}
                         isActive={isLeadsActive}
+                        isCollapsed={isCollapsed}
+                    />
+                    <NavItem
+                        href={route('manager.messages.index')}
+                        icon={<MessageCircle className="h-5 w-5" />}
+                        label={t(translations.sidebar, 'messages') || 'Messages'}
+                        isActive={isMessagesActive}
                         isCollapsed={isCollapsed}
                     />
                 </nav>

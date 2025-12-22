@@ -2,7 +2,7 @@ import type { Lead, SharedData } from '@/types';
 import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';
-import { Archive, Send, Trash2 } from 'lucide-react';
+import { Archive, MessageCircle, Send, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface LeadSidebarProps {
@@ -16,6 +16,7 @@ export function LeadSidebar({ lead }: LeadSidebarProps) {
     const [isResending, setIsResending] = useState(false);
     const [isArchiving, setIsArchiving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isStartingChat, setIsStartingChat] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const handleResendInvite = () => {
@@ -47,6 +48,17 @@ export function LeadSidebar({ lead }: LeadSidebarProps) {
         });
     };
 
+    const handleStartChat = () => {
+        setIsStartingChat(true);
+        router.post(
+            route('manager.messages.start'),
+            { participant_type: 'lead', participant_id: lead.id },
+            {
+                onFinish: () => setIsStartingChat(false),
+            },
+        );
+    };
+
     return (
         <div className="space-y-6">
             {/* Actions Card */}
@@ -54,6 +66,19 @@ export function LeadSidebar({ lead }: LeadSidebarProps) {
                 <h3 className="mb-4 font-semibold text-foreground">{t('actions')}</h3>
 
                 <div className="space-y-3">
+                    {/* Start Chat */}
+                    <button
+                        onClick={handleStartChat}
+                        disabled={isStartingChat}
+                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 p-3 text-left transition-colors hover:bg-primary/20 disabled:opacity-50"
+                    >
+                        <MessageCircle className="h-5 w-5 text-primary" />
+                        <div className="flex-1">
+                            <p className="text-sm font-medium text-primary">{t('startChat') || 'Start Chat'}</p>
+                            <p className="text-xs text-primary/70">{t('startChatDesc') || 'Send a message to this lead'}</p>
+                        </div>
+                    </button>
+
                     {/* Resend Invite */}
                     {lead.status !== 'archived' && lead.status !== 'applied' && (
                         <button
