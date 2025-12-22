@@ -37,6 +37,8 @@ return new class extends Migration
                 ->comment('Maximum allowed uses (null = unlimited)');
             $table->integer('used_count')->default(0)
                 ->comment('Current number of uses');
+            $table->integer('view_count')->default(0)
+                ->comment('Number of times token link was viewed');
 
             // Expiration
             $table->timestamp('expires_at')->nullable()

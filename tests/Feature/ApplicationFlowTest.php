@@ -17,7 +17,6 @@ beforeEach(function () {
     ]);
     $this->property = Property::factory()->create([
         'property_manager_id' => $propertyManager->id,
-        'status' => 'available',
     ]);
 
     // Create tenant with verified profile

@@ -88,7 +88,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(14),
                 'rent_amount' => 950,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '42',
                 'street_name' => 'Kinkerstraat',
                 'street_line2' => null,
@@ -96,7 +99,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '1053 DZ',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // APARTMENT - LOFT
@@ -130,7 +132,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(30),
                 'rent_amount' => 1650,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '125',
                 'street_name' => 'Deliplein',
                 'street_line2' => null,
@@ -138,7 +143,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '3013 AA',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // APARTMENT - DUPLEX
@@ -172,7 +176,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(21),
                 'rent_amount' => 1850,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '78',
                 'street_name' => 'Padualaan',
                 'street_line2' => null,
@@ -180,7 +187,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '3584 CH',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // APARTMENT - PENTHOUSE
@@ -214,7 +220,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(45),
                 'rent_amount' => 3950,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '156',
                 'street_name' => 'Van Alkemadelaan',
                 'street_line2' => null,
@@ -222,7 +231,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '2597 AT',
                 'country' => 'NL',
-                'requires_invite' => true,
             ],
 
             // HOUSE - DETACHED
@@ -256,7 +264,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(60),
                 'rent_amount' => 2650,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '23',
                 'street_name' => 'Boschdijk',
                 'street_line2' => null,
@@ -264,7 +275,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '5612 HB',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // HOUSE - SEMI-DETACHED
@@ -298,7 +308,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(28),
                 'rent_amount' => 1950,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '67',
                 'street_name' => 'Florapark',
                 'street_line2' => null,
@@ -306,7 +319,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '2012 HJ',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // HOUSE - VILLA
@@ -340,7 +352,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(90),
                 'rent_amount' => 7500,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '12',
                 'street_name' => 'Buurtweg',
                 'street_line2' => null,
@@ -348,7 +363,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '2242 KL',
                 'country' => 'NL',
-                'requires_invite' => true,
             ],
 
             // HOUSE - BUNGALOW
@@ -382,7 +396,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(35),
                 'rent_amount' => 1550,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '89',
                 'street_name' => 'Beekstraat',
                 'street_line2' => null,
@@ -390,7 +407,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '7314 GD',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // ROOM - PRIVATE_ROOM
@@ -424,7 +440,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(7),
                 'rent_amount' => 475,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '134',
                 'street_name' => 'Oosterstraat',
                 'street_line2' => null,
@@ -432,7 +451,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '9711 NT',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // ROOM - STUDENT_ROOM
@@ -466,7 +484,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(14),
                 'rent_amount' => 525,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '45',
                 'street_name' => 'Rapenburg',
                 'street_line2' => null,
@@ -474,7 +495,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '2311 GE',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // ROOM - CO-LIVING
@@ -508,7 +528,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(10),
                 'rent_amount' => 895,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '234',
                 'street_name' => 'Wibautstraat',
                 'street_line2' => null,
@@ -516,7 +539,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '1091 GS',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // APARTMENT - TRIPLEX
@@ -550,7 +572,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(42),
                 'rent_amount' => 1575,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '28',
                 'street_name' => 'Grote Staat',
                 'street_line2' => null,
@@ -558,7 +583,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '6211 BR',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // APARTMENT - SERVICED
@@ -592,7 +616,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(7),
                 'rent_amount' => 2100,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '88',
                 'street_name' => 'Weena',
                 'street_line2' => null,
@@ -600,7 +627,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '3012 CM',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // COMMERCIAL - OFFICE
@@ -634,7 +660,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(30),
                 'rent_amount' => 1850,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '450',
                 'street_name' => 'Stationsplein',
                 'street_line2' => null,
@@ -642,7 +671,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '3511 ED',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // COMMERCIAL - RETAIL
@@ -676,7 +704,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(14),
                 'rent_amount' => 3200,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '156',
                 'street_name' => 'Utrechtsestraat',
                 'street_line2' => null,
@@ -684,7 +715,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '1017 VT',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // INDUSTRIAL - WAREHOUSE
@@ -718,7 +748,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(21),
                 'rent_amount' => 2800,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '34',
                 'street_name' => 'Industrieweg',
                 'street_line2' => null,
@@ -726,7 +759,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '5045 AL',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // INDUSTRIAL - FACTORY
@@ -760,7 +792,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(60),
                 'rent_amount' => 4500,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '67',
                 'street_name' => 'Verlengde Halkade',
                 'street_line2' => null,
@@ -768,7 +803,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '1503 MA',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // PARKING - GARAGE
@@ -802,7 +836,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(7),
                 'rent_amount' => 125,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '89',
                 'street_name' => 'Laan van Meerdervoort',
                 'street_line2' => null,
@@ -810,7 +847,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '2563 AL',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // PARKING - INDOOR_SPOT
@@ -844,7 +880,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(1),
                 'rent_amount' => 175,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '201',
                 'street_name' => 'Coolsingel',
                 'street_line2' => null,
@@ -852,7 +891,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '3011 AJ',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
 
             // PARKING - OUTDOOR_SPOT
@@ -886,7 +924,10 @@ class PropertySeeder extends Seeder
                 'available_date' => now()->addDays(1),
                 'rent_amount' => 85,
                 'rent_currency' => 'eur',
-                'status' => 'available',
+                'status' => 'vacant',
+                'visibility' => 'unlisted',
+                'accepting_applications' => true,
+                'application_access' => 'open',
                 'house_number' => '12',
                 'street_name' => 'Stationsplein',
                 'street_line2' => null,
@@ -894,7 +935,6 @@ class PropertySeeder extends Seeder
                 'state' => null,
                 'postal_code' => '6811 KG',
                 'country' => 'NL',
-                'requires_invite' => false,
             ],
         ];
     }

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class ApplicationInviteToken extends Model
@@ -10,30 +12,44 @@ class ApplicationInviteToken extends Model
     protected $fillable = [
         'property_id',
         'token',
-        'type',
-        'email',
         'max_uses',
         'used_count',
+        'view_count',
         'expires_at',
         'name',
     ];
 
-    protected $casts = [
-        'max_uses' => 'integer',
-        'used_count' => 'integer',
-        'expires_at' => 'datetime',
-    ];
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'max_uses' => 'integer',
+            'used_count' => 'integer',
+            'view_count' => 'integer',
+            'expires_at' => 'datetime',
+        ];
+    }
 
     /**
-     * Relationship: Token belongs to a property
+     * Relationship: Token belongs to a property.
      */
-    public function property()
+    public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);
     }
 
     /**
-     * Check if this is the default token
+     * Relationship: Token may have created leads (when users sign up via this token).
+     */
+    public function leads(): HasMany
+    {
+        return $this->hasMany(Lead::class, 'invite_token_id');
+    }
+
+    /**
+     * Check if this is the default token.
      */
     public function isDefault(): bool
     {
@@ -41,16 +57,14 @@ class ApplicationInviteToken extends Model
     }
 
     /**
-     * Check if token is valid (not expired, not over usage limit)
+     * Check if token is valid (not expired, not over usage limit).
      */
     public function isValid(): bool
     {
-        // Check expiration
         if ($this->expires_at && $this->expires_at->isPast()) {
             return false;
         }
 
-        // Check usage limit
         if ($this->max_uses !== null && $this->used_count >= $this->max_uses) {
             return false;
         }
@@ -59,24 +73,16 @@ class ApplicationInviteToken extends Model
     }
 
     /**
-     * Check if token can be used (valid + type constraints)
+     * Check if token can be used for applications.
+     * Tokens are now anonymous shareable links only.
      */
-    public function canBeUsed(?string $email = null): bool
+    public function canBeUsed(): bool
     {
-        if (! $this->isValid()) {
-            return false;
-        }
-
-        // For 'invite' type, email must match
-        if ($this->type === 'invite' && $this->email !== $email) {
-            return false;
-        }
-
-        return true;
+        return $this->isValid();
     }
 
     /**
-     * Increment usage count
+     * Increment usage count (when someone applies using this token).
      */
     public function incrementUsage(): void
     {
@@ -84,7 +90,15 @@ class ApplicationInviteToken extends Model
     }
 
     /**
-     * Generate a new random token
+     * Increment view count (when someone clicks this token link).
+     */
+    public function incrementViewCount(): void
+    {
+        $this->increment('view_count');
+    }
+
+    /**
+     * Generate a new random token.
      */
     public static function generateToken(): string
     {
@@ -92,7 +106,7 @@ class ApplicationInviteToken extends Model
     }
 
     /**
-     * Scope: Get default token for a property
+     * Scope: Get default token for a property.
      */
     public function scopeDefault($query)
     {
@@ -100,7 +114,7 @@ class ApplicationInviteToken extends Model
     }
 
     /**
-     * Scope: Get custom (non-default) tokens
+     * Scope: Get custom (non-default) tokens.
      */
     public function scopeCustom($query)
     {
@@ -108,7 +122,7 @@ class ApplicationInviteToken extends Model
     }
 
     /**
-     * Scope: Get valid (non-expired, under limit) tokens
+     * Scope: Get valid (non-expired, under limit) tokens.
      */
     public function scopeValid($query)
     {

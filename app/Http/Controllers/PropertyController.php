@@ -252,7 +252,9 @@ class PropertyController extends Controller
 
         // Update property and change status based on is_active preference
         $isActive = $request->boolean('is_active', true);
-        $validated['status'] = $isActive ? 'available' : 'inactive';
+        $validated['status'] = Property::STATUS_VACANT;
+        $validated['visibility'] = $isActive ? Property::VISIBILITY_UNLISTED : Property::VISIBILITY_PRIVATE;
+        $validated['accepting_applications'] = $isActive;
 
         // Remove image fields from validated data
         unset($validated['new_images'], $validated['deleted_image_ids'], $validated['image_order'],
@@ -424,9 +426,11 @@ class PropertyController extends Controller
                 ->with('error', 'You need to set up your property manager profile first.');
         }
 
-        // Set status based on is_active preference (default to available)
+        // Set status based on is_active preference (default to vacant)
         $isActive = $request->boolean('is_active', true);
-        $validated['status'] = $isActive ? 'available' : 'inactive';
+        $validated['status'] = Property::STATUS_VACANT;
+        $validated['visibility'] = $isActive ? Property::VISIBILITY_UNLISTED : Property::VISIBILITY_PRIVATE;
+        $validated['accepting_applications'] = $isActive;
         unset($validated['is_active']);
 
         // Convert boolean fields from strings to actual booleans
@@ -514,11 +518,11 @@ class PropertyController extends Controller
         // Build property data
         $propertyData = $property->toArray();
         $propertyData['images'] = $imagesWithUrls;
-        $propertyData['tenant_count'] = 0; // Will be implemented later
+        $propertyData['tenant_count'] = $property->applications()->visibleToManager()->count();
 
-        // Add default token if requires_invite is enabled
+        // Add default token if application_access requires a token
         $propertyData['default_token'] = null;
-        if ($property->requires_invite) {
+        if ($property->application_access !== Property::ACCESS_OPEN) {
             $defaultTokenModel = $property->getOrCreateDefaultToken();
             $propertyData['default_token'] = [
                 'token' => $defaultTokenModel->token,
@@ -571,10 +575,11 @@ class PropertyController extends Controller
         // Get validated data with boolean conversions
         $validated = $request->validatedWithBooleans();
 
-        // Handle is_active to update status
+        // Handle is_active to update visibility and accepting_applications
         if ($request->has('is_active')) {
             $isActive = $request->boolean('is_active', true);
-            $validated['status'] = $isActive ? 'available' : 'inactive';
+            $validated['visibility'] = $isActive ? Property::VISIBILITY_UNLISTED : Property::VISIBILITY_PRIVATE;
+            $validated['accepting_applications'] = $isActive;
         }
 
         // Extract image-related data
@@ -738,8 +743,8 @@ class PropertyController extends Controller
     }
 
     /**
-     * Toggle invite requirement for applications.
-     * When enabling for the first time, creates default token.
+     * Toggle application access between 'open' and 'link_required'.
+     * When enabling link_required for the first time, creates default token.
      */
     public function togglePublicAccess(Property $property)
     {
@@ -749,20 +754,24 @@ class PropertyController extends Controller
             abort(403);
         }
 
-        $property->requires_invite = ! $property->requires_invite;
+        // Toggle between 'open' and 'link_required'
+        $property->application_access = $property->application_access === Property::ACCESS_OPEN
+            ? Property::ACCESS_LINK_REQUIRED
+            : Property::ACCESS_OPEN;
         $property->save();
 
-        // If enabling requires_invite for first time, create default token
+        // If enabling link_required, create default token
         $defaultToken = null;
-        if ($property->requires_invite) {
+        if ($property->application_access === Property::ACCESS_LINK_REQUIRED) {
             $defaultToken = $property->getOrCreateDefaultToken();
         }
 
         return response()->json([
-            'requires_invite' => $property->requires_invite,
+            'application_access' => $property->application_access,
             'default_token' => $defaultToken ? [
                 'token' => $defaultToken->token,
                 'used_count' => $defaultToken->used_count,
+                'view_count' => $defaultToken->view_count,
             ] : null,
         ]);
     }

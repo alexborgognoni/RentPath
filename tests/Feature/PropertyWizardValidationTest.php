@@ -246,7 +246,7 @@ describe('Draft Autosave Validation', function () {
     });
 
     test('it prevents autosave on non-draft properties', function () {
-        $this->draft->update(['status' => 'available']);
+        $this->draft->update(['status' => \App\Models\Property::STATUS_VACANT]);
 
         $response = $this->actingAs($this->user)
             ->patch(managerUrl("/properties/{$this->draft->id}/draft"), [
@@ -424,12 +424,12 @@ describe('Publish Validation', function () {
         $response->assertSessionHasNoErrors();
 
         $this->draft->refresh();
-        expect($this->draft->status)->toBe('available');
+        expect($this->draft->status)->toBe(\App\Models\Property::STATUS_VACANT);
         expect($this->draft->title)->toBe('Beautiful Studio in Zurich');
     });
 
     test('it prevents publishing non-draft properties', function () {
-        $this->draft->update(['status' => 'available']);
+        $this->draft->update(['status' => \App\Models\Property::STATUS_VACANT]);
 
         $response = $this->actingAs($this->user)
             ->post(managerUrl("/properties/{$this->draft->id}/publish"), [
@@ -485,7 +485,6 @@ describe('Update Published Property Validation', function () {
     beforeEach(function () {
         $this->property = Property::factory()->create([
             'property_manager_id' => $this->propertyManager->id,
-            'status' => 'available',
         ]);
     });
 
@@ -957,7 +956,7 @@ describe('Complete Wizard Flow', function () {
 
         // Verify property is published
         $property = Property::find($propertyId);
-        expect($property->status)->toBe('available');
+        expect($property->status)->toBe(\App\Models\Property::STATUS_VACANT);
         expect($property->title)->toBe('Cozy Studio in Zurich Center');
         expect((float) $property->rent_amount)->toBe(1800.0);
     });

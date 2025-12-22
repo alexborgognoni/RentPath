@@ -71,27 +71,19 @@ return new class extends Migration
             $table->decimal('rent_amount', 10, 2)->default(0);
             $table->enum('rent_currency', ['eur', 'usd', 'gbp', 'chf'])->default('eur');
 
-            // Property status
+            // Property lifecycle status (simplified)
             $table->enum('status', [
                 'draft',
-                'inactive',
-                'available',
-                'application_received',
-                'under_review',
-                'visit_scheduled',
-                'approved',
+                'vacant',
                 'leased',
                 'maintenance',
                 'archived',
             ])->default('draft');
 
-            // Application access control
-            // Note: Future enhancement will add 'is_listed' for public listing visibility
-            $table->boolean('requires_invite')->default(true)->comment('true = invite token required, false = direct URL works');
-
-            // Invite token fields
-            $table->string('invite_token', 64)->unique()->nullable();
-            $table->timestamp('invite_token_expires_at')->nullable();
+            // Visibility and access control
+            $table->enum('visibility', ['public', 'unlisted', 'private'])->default('unlisted');
+            $table->boolean('accepting_applications')->default(false);
+            $table->enum('application_access', ['open', 'link_required', 'invite_only'])->default('link_required');
 
             // Address fields - nullable for drafts
             $table->string('house_number', 20)->nullable();
@@ -110,7 +102,7 @@ return new class extends Migration
             $table->index(['type', 'subtype'], 'idx_type_subtype');
             $table->index('available_date', 'idx_available_date');
             $table->index('rent_amount', 'idx_rent_amount');
-            $table->index(['invite_token', 'invite_token_expires_at'], 'idx_invite_token');
+            $table->index(['visibility', 'accepting_applications'], 'idx_visibility_applications');
         });
     }
 

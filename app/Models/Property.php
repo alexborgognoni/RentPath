@@ -5,11 +5,36 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Property extends Model
 {
     use HasFactory;
+
+    // Status constants (lifecycle only, funnel stage is derived from applications)
+    public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_VACANT = 'vacant';
+
+    public const STATUS_LEASED = 'leased';
+
+    public const STATUS_MAINTENANCE = 'maintenance';
+
+    public const STATUS_ARCHIVED = 'archived';
+
+    // Visibility constants (who can SEE the property)
+    public const VISIBILITY_PUBLIC = 'public';
+
+    public const VISIBILITY_UNLISTED = 'unlisted';
+
+    public const VISIBILITY_PRIVATE = 'private';
+
+    // Application access constants (who can APPLY)
+    public const ACCESS_OPEN = 'open';
+
+    public const ACCESS_LINK_REQUIRED = 'link_required';
+
+    public const ACCESS_INVITE_ONLY = 'invite_only';
 
     /**
      * The attributes that are mass assignable.
@@ -69,10 +94,10 @@ class Property extends Model
         'postal_code',
         'country',
 
-        // Application access control and invite tokens
-        'requires_invite',
-        'invite_token',
-        'invite_token_expires_at',
+        // Visibility and access control
+        'visibility',
+        'accepting_applications',
+        'application_access',
     ];
 
     /**
@@ -112,8 +137,7 @@ class Property extends Model
         'has_garden' => 'boolean',
         'has_rooftop' => 'boolean',
         'extras' => 'array',
-        'requires_invite' => 'boolean',
-        'invite_token_expires_at' => 'datetime',
+        'accepting_applications' => 'boolean',
         'wizard_step' => 'integer',
     ];
 
@@ -139,6 +163,22 @@ class Property extends Model
     public function inviteTokens()
     {
         return $this->hasMany(ApplicationInviteToken::class);
+    }
+
+    /**
+     * Get the applications for the property.
+     */
+    public function applications(): HasMany
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    /**
+     * Get the leads for the property.
+     */
+    public function leads(): HasMany
+    {
+        return $this->hasMany(Lead::class);
     }
 
     /**
@@ -280,11 +320,27 @@ class Property extends Model
     }
 
     /**
-     * Scope for available properties.
+     * Scope for vacant properties.
      */
-    public function scopeAvailable($query)
+    public function scopeVacant($query)
     {
-        return $query->where('status', 'available');
+        return $query->where('status', self::STATUS_VACANT);
+    }
+
+    /**
+     * Scope for publicly visible properties.
+     */
+    public function scopePubliclyVisible($query)
+    {
+        return $query->where('visibility', self::VISIBILITY_PUBLIC);
+    }
+
+    /**
+     * Scope for properties accepting applications.
+     */
+    public function scopeAcceptingApplications($query)
+    {
+        return $query->where('accepting_applications', true);
     }
 
     /**
@@ -304,50 +360,68 @@ class Property extends Model
     }
 
     /**
-     * Generate a new invite token that expires in the given number of days.
+     * Check if the property is publicly visible.
      */
-    public function generateInviteToken(int $expirationDays = 30): string
+    public function isPubliclyVisible(): bool
     {
-        $this->invite_token = Str::random(64);
-        $this->invite_token_expires_at = now()->addDays($expirationDays);
-        $this->save();
-
-        return $this->invite_token;
+        return $this->visibility === self::VISIBILITY_PUBLIC;
     }
 
     /**
-     * Check if the invite token is valid and not expired.
+     * Check if the property is accessible via direct link (unlisted or public).
      */
-    public function hasValidInviteToken(): bool
+    public function isAccessibleViaLink(): bool
     {
-        if (! $this->invite_token) {
-            return false;
+        return in_array($this->visibility, [self::VISIBILITY_PUBLIC, self::VISIBILITY_UNLISTED]);
+    }
+
+    /**
+     * Check if the property accepts open applications (no token/invite required).
+     */
+    public function hasOpenApplicationAccess(): bool
+    {
+        return $this->accepting_applications && $this->application_access === self::ACCESS_OPEN;
+    }
+
+    /**
+     * Check if the property requires a token link to apply.
+     */
+    public function requiresTokenToApply(): bool
+    {
+        return $this->application_access === self::ACCESS_LINK_REQUIRED;
+    }
+
+    /**
+     * Check if the property is invite-only for applications.
+     */
+    public function isInviteOnly(): bool
+    {
+        return $this->application_access === self::ACCESS_INVITE_ONLY;
+    }
+
+    /**
+     * Get the funnel stage derived from applications.
+     * This replaces the old status-based funnel tracking.
+     */
+    public function getFunnelStageAttribute(): string
+    {
+        $applications = $this->applications()
+            ->whereNotIn('status', ['draft', 'withdrawn'])
+            ->get();
+
+        if ($applications->isEmpty()) {
+            return 'no_applications';
         }
 
-        if (! $this->invite_token_expires_at) {
-            return false;
+        // Return highest priority stage
+        $priorities = ['approved', 'visit_scheduled', 'under_review', 'submitted'];
+        foreach ($priorities as $status) {
+            if ($applications->contains('status', $status)) {
+                return $status;
+            }
         }
 
-        return $this->invite_token_expires_at->isFuture();
-    }
-
-    /**
-     * Invalidate the current invite token.
-     */
-    public function invalidateInviteToken(): void
-    {
-        $this->invite_token = null;
-        $this->invite_token_expires_at = null;
-        $this->save();
-    }
-
-    /**
-     * Check if the property can be accessed publicly for applications.
-     * Returns true if invite is NOT required (inverted from requires_invite).
-     */
-    public function isPubliclyAccessible(): bool
-    {
-        return $this->requires_invite === false;
+        return 'has_applications';
     }
 
     /**
@@ -376,7 +450,6 @@ class Property extends Model
             $defaultToken = $this->inviteTokens()->create([
                 'name' => 'Default',
                 'token' => ApplicationInviteToken::generateToken(),
-                'type' => 'private',
                 'max_uses' => null,
                 'expires_at' => null,
             ]);
@@ -420,10 +493,52 @@ class Property extends Model
         return $this->inviteTokens()->create([
             'name' => $data['name'] ?? null,
             'token' => ApplicationInviteToken::generateToken(),
-            'type' => $data['type'] ?? 'private',
-            'email' => $data['email'] ?? null,
             'max_uses' => $data['max_uses'] ?? null,
             'expires_at' => $data['expires_at'] ?? null,
         ]);
+    }
+
+    /**
+     * Get available status options with labels.
+     *
+     * @return array<string, string>
+     */
+    public static function getStatusOptions(): array
+    {
+        return [
+            self::STATUS_DRAFT => 'Draft',
+            self::STATUS_VACANT => 'Vacant',
+            self::STATUS_LEASED => 'Leased',
+            self::STATUS_MAINTENANCE => 'Maintenance',
+            self::STATUS_ARCHIVED => 'Archived',
+        ];
+    }
+
+    /**
+     * Get available visibility options with labels.
+     *
+     * @return array<string, string>
+     */
+    public static function getVisibilityOptions(): array
+    {
+        return [
+            self::VISIBILITY_PUBLIC => 'Public',
+            self::VISIBILITY_UNLISTED => 'Unlisted',
+            self::VISIBILITY_PRIVATE => 'Private',
+        ];
+    }
+
+    /**
+     * Get available application access options with labels.
+     *
+     * @return array<string, string>
+     */
+    public static function getApplicationAccessOptions(): array
+    {
+        return [
+            self::ACCESS_OPEN => 'Open',
+            self::ACCESS_LINK_REQUIRED => 'Link Required',
+            self::ACCESS_INVITE_ONLY => 'Invite Only',
+        ];
     }
 }

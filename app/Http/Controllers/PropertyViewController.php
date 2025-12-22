@@ -14,35 +14,57 @@ class PropertyViewController extends Controller
     /**
      * Display a property for tenant viewing.
      *
-     * Access control logic:
-     * - If requires_invite = false: Anyone can view (authenticated or not)
-     * - If requires_invite = true: Must have valid token in URL
-     * - Token type 'invite' will require authentication (to be implemented later)
+     * Access control logic based on application_access field:
+     * - 'open': Anyone can view and apply (no token needed)
+     * - 'link_required': Must have valid token in URL to view/apply
+     * - 'invite_only': Must have valid token (same as link_required for viewing)
+     *
+     * Visibility field controls discovery:
+     * - 'public': Listed in browse/search
+     * - 'unlisted': Direct link only (with token if required)
+     * - 'private': Owner only (not handled here)
      */
     public function show(Request $request, Property $property)
     {
+        // Private properties are not viewable via tenant portal
+        if ($property->visibility === Property::VISIBILITY_PRIVATE) {
+            abort(404);
+        }
+
         // Check access control
         $token = $request->query('token');
+        $inviteToken = null;
 
-        // If property doesn't require invite, allow access
-        if (! $property->requires_invite) {
+        // If application_access is 'open', allow access without token
+        if ($property->application_access === Property::ACCESS_OPEN) {
             return $this->renderPropertyView($property);
         }
 
-        // Property requires invite - check for token
+        // Property requires token (link_required or invite_only)
         if (! $token) {
-            abort(403, 'This property requires an invite token to view.');
+            abort(403, 'This property requires an invite link to view.');
         }
 
         // Find and validate the token
         $inviteToken = $property->inviteTokens()->where('token', $token)->first();
 
         if (! $inviteToken || ! $inviteToken->canBeUsed()) {
-            abort(403, 'Invalid or expired invite token.');
+            abort(403, 'Invalid or expired invite link.');
         }
 
-        // Increment token usage count
-        $inviteToken->increment('used_count');
+        // Track view count (once per session per token)
+        $sessionKey = 'token_viewed_'.$inviteToken->id;
+        if (! $request->session()->has($sessionKey)) {
+            $inviteToken->incrementViewCount();
+            $request->session()->put($sessionKey, true);
+        }
+
+        // Store token info in session for potential lead creation on signup
+        $request->session()->put('invite_token', [
+            'token_id' => $inviteToken->id,
+            'property_id' => $property->id,
+            'token' => $token,
+        ]);
 
         // Token is valid - render the view
         return $this->renderPropertyView($property, $token);
@@ -171,7 +193,7 @@ class PropertyViewController extends Controller
         }
 
         // Property must be accepting applications
-        if (! in_array($property->status, ['available', 'application_received'])) {
+        if (! $property->accepting_applications) {
             return false;
         }
 
@@ -267,11 +289,20 @@ class PropertyViewController extends Controller
      */
     public function showImage(Request $request, Property $property, $imageId)
     {
+        // Private properties are not viewable via tenant portal
+        if ($property->visibility === Property::VISIBILITY_PRIVATE) {
+            abort(404);
+        }
+
         // Check access control (same logic as show method)
         $token = $request->query('token');
 
-        if ($property->requires_invite && ! $property->canAccessWithToken($token)) {
-            abort(403, 'Invalid or expired invite token.');
+        // If not open access, require valid token
+        if ($property->application_access !== Property::ACCESS_OPEN) {
+            $inviteToken = $property->inviteTokens()->where('token', $token)->first();
+            if (! $inviteToken || ! $inviteToken->canBeUsed()) {
+                abort(403, 'Invalid or expired invite link.');
+            }
         }
 
         // Find the image
