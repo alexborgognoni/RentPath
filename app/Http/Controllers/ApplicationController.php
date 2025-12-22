@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
 use App\Models\Application;
+use App\Models\Lead;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,8 +43,8 @@ class ApplicationController extends Controller
             ->where('status', 'draft')
             ->first();
 
-        // Check if property is available for applications
-        if (! in_array($property->status, ['available', 'application_received'])) {
+        // Check if property is accepting applications
+        if (! $property->accepting_applications) {
             return redirect()->route('tenant.properties.show', ['property' => $property->id])
                 ->with('error', 'This property is not accepting applications at this time');
         }
@@ -210,12 +211,11 @@ class ApplicationController extends Controller
         // Auto-verify profile if minimum required data is present
         $this->autoVerifyProfileIfReady($tenantProfile);
 
-        // TODO: Send email notifications to property manager and tenant
+        // Update lead status to 'applied' if exists
+        $this->updateLeadOnApplicationSubmit($user, $property, $application);
 
-        // Update property status
-        if ($property->status === 'available') {
-            $property->update(['status' => 'application_received']);
-        }
+        // TODO: Send email notifications to property manager and tenant
+        // Note: Property funnel stage is now derived from applications, no need to update property status
 
         return redirect()->route('applications.show', ['application' => $application->id])
             ->with('success', 'Application submitted successfully!');
@@ -282,6 +282,9 @@ class ApplicationController extends Controller
         } else {
             $application = Application::create($data);
         }
+
+        // Update lead status to 'drafting' if exists
+        $this->updateLeadOnDraft($user, $property);
 
         // Return back with the actual max step reached
         // The frontend will read this from the updated draft application
@@ -599,6 +602,258 @@ class ApplicationController extends Controller
 
         if ($hasRequiredData) {
             $tenantProfile->update(['profile_verified_at' => now()]);
+        }
+    }
+
+    // ========================================
+    // Manager-side methods
+    // ========================================
+
+    /**
+     * List all applications for manager's properties.
+     */
+    public function indexManager(Request $request)
+    {
+        $user = Auth::user();
+        $propertyManager = $user->propertyManager;
+
+        if (! $propertyManager) {
+            abort(403, 'Property manager profile required');
+        }
+
+        // Get all property IDs owned by this manager
+        $propertyIds = $user->properties()->pluck('properties.id');
+
+        // Build query for applications
+        $query = Application::whereIn('property_id', $propertyIds)
+            ->visibleToManager()
+            ->with([
+                'property:id,title,city,street_name,house_number',
+                'tenantProfile.user:id,first_name,last_name,email',
+            ])
+            ->orderBy('submitted_at', 'desc');
+
+        // Optional property filter
+        if ($request->has('property') && $request->property) {
+            $query->where('property_id', $request->property);
+        }
+
+        $applications = $query->get();
+
+        // Get properties for filter dropdown
+        $properties = $user->properties()
+            ->select('properties.id', 'properties.title')
+            ->orderBy('properties.title')
+            ->get();
+
+        return Inertia::render('applications', [
+            'applications' => $applications,
+            'properties' => $properties,
+            'selectedPropertyId' => $request->property ? (int) $request->property : null,
+        ]);
+    }
+
+    /**
+     * Show a single application for manager.
+     */
+    public function showManager(Application $application)
+    {
+        $user = Auth::user();
+        $propertyManager = $user->propertyManager;
+
+        // Check authorization: must be property owner
+        if (! $propertyManager || $application->property->property_manager_id !== $propertyManager->id) {
+            abort(403, 'Unauthorized to view this application');
+        }
+
+        // Load relationships
+        $application->load([
+            'property.images',
+            'property.propertyManager',
+            'tenantProfile.user',
+        ]);
+
+        // Transform property images with URLs
+        $property = $application->property;
+        $imagesWithUrls = $property->images->map(function ($image) {
+            return [
+                'id' => $image->id,
+                'image_url' => StorageHelper::url($image->image_path, 'private', 1440),
+                'image_path' => $image->image_path,
+                'is_main' => $image->is_main,
+                'sort_order' => $image->sort_order,
+            ];
+        })->sortBy('sort_order')->values()->toArray();
+
+        // Transform application data with document URLs
+        $applicationData = $application->toArray();
+        $applicationData['property']['images'] = $imagesWithUrls;
+
+        // Add signed URLs for snapshot documents
+        $documentFields = [
+            'snapshot_id_document_path',
+            'snapshot_employment_contract_path',
+            'snapshot_payslip_1_path',
+            'snapshot_payslip_2_path',
+            'snapshot_payslip_3_path',
+            'snapshot_student_proof_path',
+            'snapshot_guarantor_id_path',
+            'snapshot_guarantor_proof_income_path',
+            'application_id_document_path',
+            'application_proof_of_income_path',
+            'application_reference_letter_path',
+        ];
+
+        foreach ($documentFields as $field) {
+            $urlField = str_replace('_path', '_url', $field);
+            $applicationData[$urlField] = StorageHelper::url($application->$field, 'private', 5);
+        }
+
+        // Define allowed status transitions based on current status
+        $allowedTransitions = $this->getAllowedTransitions($application->status);
+
+        return Inertia::render('application', [
+            'application' => $applicationData,
+            'allowedTransitions' => $allowedTransitions,
+        ]);
+    }
+
+    /**
+     * Update application status.
+     */
+    public function updateStatus(Request $request, Application $application)
+    {
+        $user = Auth::user();
+        $propertyManager = $user->propertyManager;
+
+        // Check authorization
+        if (! $propertyManager || $application->property->property_manager_id !== $propertyManager->id) {
+            abort(403, 'Unauthorized to update this application');
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|string',
+            'notes' => 'nullable|string|max:2000',
+        ]);
+
+        $newStatus = $validated['status'];
+        $notes = $validated['notes'] ?? null;
+
+        // Verify this is an allowed transition
+        $allowedTransitions = $this->getAllowedTransitions($application->status);
+        if (! in_array($newStatus, $allowedTransitions)) {
+            return back()->with('error', 'Invalid status transition');
+        }
+
+        // Handle specific transitions
+        switch ($newStatus) {
+            case 'under_review':
+                $application->moveToUnderReview($user);
+                break;
+
+            case 'visit_scheduled':
+                $application->status = 'visit_scheduled';
+                $application->visit_scheduled_at = now(); // Simple confirmation for now
+                $application->visit_notes = $notes;
+                $application->save();
+                break;
+
+            case 'visit_completed':
+                $application->completeVisit($notes);
+                break;
+
+            case 'approved':
+                $application->approve($user, $notes);
+                break;
+
+            case 'rejected':
+                $application->reject($notes ?? 'No reason provided');
+                break;
+
+            case 'leased':
+                // For now, mark as leased with current date
+                $application->status = 'leased';
+                $application->lease_signed_at = now();
+                if ($notes) {
+                    $application->approval_notes = ($application->approval_notes ? $application->approval_notes."\n\n" : '').$notes;
+                }
+                $application->save();
+
+                // Update property status
+                $application->property->update(['status' => 'leased']);
+                break;
+
+            case 'archived':
+                $application->archive();
+                break;
+
+            default:
+                return back()->with('error', 'Unknown status');
+        }
+
+        return back()->with('success', 'Application status updated');
+    }
+
+    /**
+     * Get allowed status transitions for manager.
+     */
+    private function getAllowedTransitions(string $currentStatus): array
+    {
+        return match ($currentStatus) {
+            'submitted' => ['under_review', 'archived'],
+            'under_review' => ['visit_scheduled', 'approved', 'rejected', 'archived'],
+            'visit_scheduled' => ['visit_completed', 'archived'],
+            'visit_completed' => ['approved', 'rejected', 'archived'],
+            'approved' => ['leased', 'archived'],
+            'rejected' => ['archived'],
+            'leased' => ['archived'],
+            default => [],
+        };
+    }
+
+    /**
+     * Update lead status to 'drafting' when user starts an application draft.
+     */
+    private function updateLeadOnDraft($user, Property $property): void
+    {
+        $lead = Lead::where('property_id', $property->id)
+            ->where('email', $user->email)
+            ->whereNotIn('status', [Lead::STATUS_APPLIED, Lead::STATUS_ARCHIVED])
+            ->first();
+
+        if ($lead && $lead->status !== Lead::STATUS_DRAFTING) {
+            $lead->update(['status' => Lead::STATUS_DRAFTING]);
+        }
+    }
+
+    /**
+     * Update lead status to 'applied' when application is submitted.
+     */
+    private function updateLeadOnApplicationSubmit($user, Property $property, Application $application): void
+    {
+        $lead = Lead::where('property_id', $property->id)
+            ->where('email', $user->email)
+            ->first();
+
+        if ($lead) {
+            $lead->update([
+                'status' => Lead::STATUS_APPLIED,
+                'application_id' => $application->id,
+                'user_id' => $user->id,
+            ]);
+        } else {
+            // Create a lead from the application if one doesn't exist
+            Lead::create([
+                'property_id' => $property->id,
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'token' => Lead::generateToken(),
+                'source' => Lead::SOURCE_APPLICATION,
+                'status' => Lead::STATUS_APPLIED,
+                'user_id' => $user->id,
+                'application_id' => $application->id,
+            ]);
         }
     }
 }

@@ -307,6 +307,14 @@ class Application extends Model
     }
 
     /**
+     * Scope to get applications visible to property managers (submitted and beyond, not drafts).
+     */
+    public function scopeVisibleToManager($query)
+    {
+        return $query->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted']);
+    }
+
+    /**
      * Scope to get applications by status.
      */
     public function scopeByStatus($query, string $status)

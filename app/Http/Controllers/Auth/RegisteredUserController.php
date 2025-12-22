@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Helpers\RedirectHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Lead;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -56,6 +57,9 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Create a lead if user came from an invite token
+        $this->createLeadFromSession($request, $user);
+
         // Check if there's a redirect URL from form data or query parameter
         $redirect = $request->input('redirect') ?? $request->query('redirect');
         $userTypePreference = $request->input('userType', 'tenant');
@@ -74,5 +78,48 @@ class RegisteredUserController extends Controller
         return ResponseFacade::make('', 302, [
             'Location' => $redirectUrl,
         ]);
+    }
+
+    /**
+     * Create a Lead from session data if user came from an invite token.
+     */
+    private function createLeadFromSession(Request $request, User $user): void
+    {
+        $inviteTokenData = $request->session()->get('invite_token');
+
+        if (! $inviteTokenData) {
+            return;
+        }
+
+        // Check if lead already exists for this email + property
+        $existingLead = Lead::where('property_id', $inviteTokenData['property_id'])
+            ->where('email', $user->email)
+            ->first();
+
+        if ($existingLead) {
+            // Link the existing lead to this user
+            $existingLead->update([
+                'user_id' => $user->id,
+                'status' => Lead::STATUS_VIEWED,
+                'viewed_at' => now(),
+            ]);
+        } else {
+            // Create a new lead
+            Lead::create([
+                'property_id' => $inviteTokenData['property_id'],
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'token' => Lead::generateToken(),
+                'source' => Lead::SOURCE_TOKEN_SIGNUP,
+                'status' => Lead::STATUS_VIEWED,
+                'user_id' => $user->id,
+                'invite_token_id' => $inviteTokenData['token_id'],
+                'viewed_at' => now(),
+            ]);
+        }
+
+        // Clear the session data
+        $request->session()->forget('invite_token');
     }
 }
