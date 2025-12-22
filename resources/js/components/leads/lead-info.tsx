@@ -137,7 +137,7 @@ export function LeadInfo({ lead }: LeadInfoProps) {
                     </h2>
 
                     <Link
-                        href={route('manager.properties.show', { property: lead.property.id })}
+                        href={route('properties.show', { property: lead.property.id })}
                         className="block rounded-lg border border-border p-4 transition-colors hover:bg-muted"
                     >
                         <p className="font-medium text-foreground">{lead.property.title}</p>
