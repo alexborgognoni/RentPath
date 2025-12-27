@@ -10,8 +10,8 @@ test('guests are redirected to the login page', function () {
     expect($response->headers->get('Location'))->toStartWith(config('app.url').'/login');
 });
 
-test('authenticated users can visit the dashboard', function () {
+test('authenticated users are redirected from dashboard to applications', function () {
     $this->actingAs($user = User::factory()->create());
 
-    $this->get('/dashboard')->assertOk();
+    $this->get('/dashboard')->assertRedirect(route('applications.index'));
 });

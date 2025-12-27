@@ -3,11 +3,12 @@ import { LanguageSelector } from '@/components/language-selector';
 import { LogoHomeButton } from '@/components/logo-home-button';
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
 import { MobileMenu } from '@/components/mobile-menu';
+import { TenantNav } from '@/components/tenant-nav';
 import { type BreadcrumbItem, type SharedData } from '@/types';
-import { route, settingsRoute } from '@/utils/route';
+import { isManagerSubdomain, route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronsUpDown, LogOut, MessageCircle, Settings } from 'lucide-react';
+import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface AppHeaderProps {
@@ -18,6 +19,7 @@ interface AppHeaderProps {
 export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth, translations, subdomain, managerSubdomain } = page.props;
+    const isTenantPortal = !isManagerSubdomain(subdomain, managerSubdomain);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -105,7 +107,7 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
             }`}
         >
             <div ref={containerRef} className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                {/* Left: Logo + Title */}
+                {/* Left: Logo + Title/Breadcrumbs */}
                 <div className="flex items-center space-x-3">
                     <LogoHomeButton />
 
@@ -132,6 +134,16 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                             )}
                         </>
                     )}
+
+                    {/* Tenant Navigation - shown on tenant portal when authenticated (desktop only) */}
+                    {isTenantPortal && auth?.user && (
+                        <>
+                            <div className="hidden h-6 w-px bg-border md:block dark:bg-border" />
+                            <div className="hidden md:block">
+                                <TenantNav />
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Right: Currency + Language + User (Desktop) / Mobile Menu */}
@@ -149,19 +161,6 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
                         {/* Auth Buttons or User Menu */}
                         {auth?.user ? (
                             <>
-                                <Link
-                                    href={route('tenant.messages.index')}
-                                    className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                                >
-                                    <MessageCircle className="h-4 w-4" />
-                                    {t(translations?.header, 'messages') || 'Messages'}
-                                </Link>
-                                <Link
-                                    href={route('dashboard')}
-                                    className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
-                                >
-                                    {t(translations?.header, 'dashboard') || 'Dashboard'}
-                                </Link>
                                 <div ref={userMenuRef} className="relative">
                                     <button
                                         onClick={() => setShowUserMenu(!showUserMenu)}

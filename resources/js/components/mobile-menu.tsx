@@ -1,12 +1,13 @@
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
+import { TenantNavMobile } from '@/components/tenant-nav';
 import { Button } from '@/components/ui/button';
 import { SharedData } from '@/types';
 import { currencies, getCurrency, getCurrencyFromStorage, setCurrencyInStorage, type Currency, type CurrencyCode } from '@/utils/currency-utils';
-import { route, settingsRoute } from '@/utils/route';
+import { isManagerSubdomain, route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { ChevronDown, LogOut, Menu, MessageCircle, Settings, X } from 'lucide-react';
+import { Building2, ChevronDown, LogOut, Menu, Settings, User, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -24,6 +25,7 @@ interface MobileMenuProps {
 export function MobileMenu({ getUserInitials }: MobileMenuProps) {
     const page = usePage<SharedData>();
     const { auth, translations, locale, subdomain, managerSubdomain } = page.props;
+    const isTenantPortal = !isManagerSubdomain(subdomain, managerSubdomain);
     const [isOpen, setIsOpen] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -257,9 +259,19 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                 </div>
                             )}
 
-                            {/* Login Button for logged out users */}
+                            {/* Guest Navigation */}
                             {!auth.user && (
                                 <>
+                                    {/* Browse Properties - always visible for guests on tenant portal */}
+                                    {isTenantPortal && (
+                                        <Button variant="outline" className="h-11 w-full justify-start text-base" asChild>
+                                            <a href={route('properties.index')} onClick={() => setIsOpen(false)}>
+                                                <Building2 size={20} />
+                                                <span>{t(translations, 'nav.properties') || 'Browse Properties'}</span>
+                                            </a>
+                                        </Button>
+                                    )}
+
                                     <a
                                         href={route('login')}
                                         className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-base font-semibold text-white shadow-xs transition-all hover:scale-105"
@@ -362,19 +374,44 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
 
                         {/* Navigation & Settings Section - Bottom (logged in) */}
                         {auth.user && (
-                            <div className="space-y-2 pt-4">
-                                <Button variant="outline" className="h-11 w-full justify-start text-base" asChild>
-                                    <a href={route('tenant.messages.index')} onClick={() => setIsOpen(false)}>
-                                        <MessageCircle size={20} />
-                                        <span>{t(translations.header, 'messages') || 'Messages'}</span>
-                                    </a>
-                                </Button>
-                                <Button variant="outline" className="h-11 w-full justify-start text-base" asChild>
-                                    <a href={settingsRoute('profile', subdomain, managerSubdomain)} onClick={() => setIsOpen(false)}>
-                                        <Settings size={20} />
-                                        <span>{t(translations.header, 'settings')}</span>
-                                    </a>
-                                </Button>
+                            <div className="space-y-4 border-t border-border pt-4">
+                                {/* Tenant Portal Navigation */}
+                                {isTenantPortal && (
+                                    <>
+                                        <div className="space-y-1">
+                                            <label className="mb-2 block text-xs font-medium text-muted-foreground">
+                                                {t(translations, 'nav.navigation') || 'Navigation'}
+                                            </label>
+                                            <TenantNavMobile onNavigate={() => setIsOpen(false)} />
+                                        </div>
+                                        <div className="border-t border-border" />
+                                    </>
+                                )}
+
+                                {/* Profile & Settings */}
+                                <div className="space-y-1">
+                                    <label className="mb-2 block text-xs font-medium text-muted-foreground">
+                                        {t(translations, 'nav.account') || 'Account'}
+                                    </label>
+                                    {isTenantPortal && (
+                                        <Button variant="ghost" className="h-11 w-full justify-start text-base" asChild>
+                                            <a href={route('tenant.profile.show')} onClick={() => setIsOpen(false)}>
+                                                <User size={20} />
+                                                <span>{t(translations, 'nav.my_profile') || 'My Profile'}</span>
+                                            </a>
+                                        </Button>
+                                    )}
+                                    <Button variant="ghost" className="h-11 w-full justify-start text-base" asChild>
+                                        <a href={settingsRoute('profile', subdomain, managerSubdomain)} onClick={() => setIsOpen(false)}>
+                                            <Settings size={20} />
+                                            <span>{t(translations.header, 'settings')}</span>
+                                        </a>
+                                    </Button>
+                                </div>
+
+                                <div className="border-t border-border" />
+
+                                {/* Logout */}
                                 <Button variant="destructive" className="h-11 w-full justify-start text-base" onClick={handleLogoutClick}>
                                     <LogOut size={20} />
                                     <span>{t(translations.header, 'sign_out')}</span>

@@ -1,5 +1,5 @@
 import { ConversationList } from '@/components/messages/conversation-list';
-import { AppLayout } from '@/layouts/app-layout';
+import { TenantLayout } from '@/layouts/tenant-layout';
 import { route } from '@/utils/route';
 import { Head } from '@inertiajs/react';
 import { MessageCircle } from 'lucide-react';
@@ -18,10 +18,10 @@ interface MessagesIndexProps {
 
 export default function MessagesIndex({ conversations }: MessagesIndexProps) {
     return (
-        <AppLayout>
+        <TenantLayout>
             <Head title="Messages" />
 
-            <div className="container mx-auto max-w-4xl px-4 py-8">
+            <div className="mx-auto max-w-4xl">
                 {/* Header */}
                 <div className="mb-6 flex items-center gap-3">
                     <MessageCircle className="h-7 w-7 text-primary" />
@@ -38,6 +38,6 @@ export default function MessagesIndex({ conversations }: MessagesIndexProps) {
                     />
                 </div>
             </div>
-        </AppLayout>
+        </TenantLayout>
     );
 }

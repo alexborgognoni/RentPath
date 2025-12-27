@@ -1,4 +1,4 @@
-import { BaseLayout } from '@/layouts/base-layout';
+import { TenantLayout } from '@/layouts/tenant-layout';
 import { type Application, type SharedData } from '@/types';
 import { route } from '@/utils/route';
 import { Head, router, usePage } from '@inertiajs/react';
@@ -98,10 +98,10 @@ export default function ApplicationView() {
     const canWithdraw = ['submitted', 'under_review', 'visit_scheduled', 'visit_completed'].includes(application.status);
 
     return (
-        <BaseLayout>
+        <TenantLayout>
             <Head title={`Application for ${application.property?.title}`} />
 
-            <div className="mx-auto max-w-4xl px-4 py-8">
+            <div className="mx-auto max-w-4xl">
                 {/* Header */}
                 <div className="mb-8 flex items-start justify-between">
                     <div>
@@ -275,8 +275,8 @@ export default function ApplicationView() {
 
                     {/* Actions */}
                     <div className="flex flex-wrap gap-4">
-                        <a href={route('dashboard')} className="rounded-lg border border-border px-6 py-3 font-medium hover:bg-muted">
-                            Back to Dashboard
+                        <a href={route('applications.index')} className="rounded-lg border border-border px-6 py-3 font-medium hover:bg-muted">
+                            Back to Applications
                         </a>
 
                         <button
@@ -299,6 +299,6 @@ export default function ApplicationView() {
                     </div>
                 </div>
             </div>
-        </BaseLayout>
+        </TenantLayout>
     );
 }

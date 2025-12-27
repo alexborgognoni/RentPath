@@ -34,6 +34,69 @@ class TenantProfileController extends Controller
     }
 
     /**
+     * Display the tenant profile.
+     */
+    public function show()
+    {
+        $tenantProfile = Auth::user()->tenantProfile;
+
+        // Calculate profile completeness
+        $completeness = 0;
+        $documents = [
+            'id_document' => false,
+            'proof_of_income' => false,
+            'reference_letter' => false,
+        ];
+
+        if ($tenantProfile) {
+            $completeness = $this->calculateCompleteness($tenantProfile);
+            $documents = [
+                'id_document' => ! empty($tenantProfile->id_document_path),
+                'proof_of_income' => ! empty($tenantProfile->payslip_1_path) || ! empty($tenantProfile->employment_contract_path),
+                'reference_letter' => ! empty($tenantProfile->reference_letter_path),
+            ];
+        }
+
+        return Inertia::render('tenant/profile', [
+            'profile' => $tenantProfile?->toArray(),
+            'hasProfile' => $tenantProfile !== null,
+            'completeness' => $completeness,
+            'documents' => $documents,
+        ]);
+    }
+
+    /**
+     * Calculate profile completeness percentage.
+     */
+    private function calculateCompleteness($profile): int
+    {
+        $fields = [
+            'date_of_birth',
+            'nationality',
+            'phone_number',
+            'current_street_name',
+            'current_city',
+            'current_postal_code',
+            'current_country',
+            'employment_status',
+            'id_document_path',
+        ];
+
+        // Add employment-specific fields
+        if (in_array($profile->employment_status, ['employed', 'self_employed'])) {
+            $fields = array_merge($fields, [
+                'employer_name',
+                'job_title',
+                'monthly_income',
+            ]);
+        }
+
+        $filled = collect($fields)->filter(fn ($f) => ! empty($profile->$f))->count();
+
+        return (int) round(($filled / count($fields)) * 100);
+    }
+
+    /**
      * Show the form for editing the tenant profile.
      */
     public function edit()

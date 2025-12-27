@@ -1,11 +1,11 @@
-import { AppLayout } from '@/layouts/app-layout';
+import { TenantLayout } from '@/layouts/tenant-layout';
 import type { SharedData } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { useReactiveCurrency } from '@/utils/currency-utils';
 import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Bath, BedDouble, Home, MapPin, Maximize } from 'lucide-react';
+import { Bath, BedDouble, Building2, Home, MapPin, Maximize } from 'lucide-react';
 
 interface PropertiesPageProps {
     properties: Property[];
@@ -17,13 +17,17 @@ export default function PropertiesPage({ properties }: PropertiesPageProps) {
     const { formatRent } = useReactiveCurrency();
 
     return (
-        <AppLayout>
+        <TenantLayout>
             <Head title={t('properties.browse.title')} />
 
-            <div className="container mx-auto max-w-7xl px-4 py-8">
-                <div className="mb-8">
-                    <h1 className="mb-2 text-3xl font-bold text-foreground">{t('properties.browse.title')}</h1>
-                    <p className="text-muted-foreground">{t('properties.browse.subtitle')}</p>
+            <div className="space-y-6">
+                {/* Header */}
+                <div className="flex items-center gap-3">
+                    <Building2 className="h-8 w-8 text-primary" />
+                    <div>
+                        <h1 className="text-2xl font-bold text-foreground">{t('properties.browse.title') || 'Browse Properties'}</h1>
+                        <p className="text-muted-foreground">{t('properties.browse.subtitle') || 'Discover available rental properties'}</p>
+                    </div>
                 </div>
 
                 {properties.length === 0 ? (
@@ -119,6 +123,6 @@ export default function PropertiesPage({ properties }: PropertiesPageProps) {
                     </div>
                 )}
             </div>
-        </AppLayout>
+        </TenantLayout>
     );
 }

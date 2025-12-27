@@ -13,6 +13,68 @@ use Inertia\Inertia;
 class ApplicationController extends Controller
 {
     /**
+     * Display a listing of the tenant's applications.
+     */
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        if (! $tenantProfile) {
+            return Inertia::render('tenant/applications', [
+                'applications' => [],
+                'filters' => ['status' => 'all', 'search' => ''],
+            ]);
+        }
+
+        $query = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->with(['property.images'])
+            ->whereNotIn('status', ['deleted']);
+
+        // Filter by status
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Search by property
+        if ($request->filled('search')) {
+            $query->whereHas('property', function ($q) use ($request) {
+                $q->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('street_name', 'like', '%'.$request->search.'%')
+                    ->orWhere('city', 'like', '%'.$request->search.'%');
+            });
+        }
+
+        $applications = $query->latest()->get()
+            ->map(function ($application) {
+                $applicationArray = $application->toArray();
+
+                // Add property image URLs
+                if ($application->property && $application->property->images) {
+                    $applicationArray['property']['images'] = $application->property->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image_url' => StorageHelper::url($image->image_path, 'private', 1440),
+                            'image_path' => $image->image_path,
+                            'is_main' => $image->is_main,
+                            'sort_order' => $image->sort_order,
+                        ];
+                    })->sortBy('sort_order')->values()->toArray();
+                }
+
+                return $applicationArray;
+            });
+
+        return Inertia::render('tenant/applications', [
+            'applications' => $applications,
+            'filters' => [
+                'status' => $request->status ?? 'all',
+                'search' => $request->search ?? '',
+            ],
+        ]);
+    }
+
+    /**
      * Show the application creation form for a specific property.
      */
     public function create(Property $property)

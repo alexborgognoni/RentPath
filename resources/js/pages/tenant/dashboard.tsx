@@ -1,146 +1,98 @@
-import { AppLayout } from '@/layouts/app-layout';
+import { QuickActions, RecentApplications, StatsBar } from '@/components/tenant-dashboard';
+import { TenantLayout } from '@/layouts/tenant-layout';
 import type { SharedData } from '@/types';
-import type { Application, PropertyImage } from '@/types/dashboard';
-import { useReactiveCurrency } from '@/utils/currency-utils';
+import type { Application } from '@/types/dashboard';
 import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Calendar, Home, MapPin } from 'lucide-react';
+import { Building2, Sparkles } from 'lucide-react';
 
-interface TenantDashboardProps {
-    applications: Application[];
+interface DashboardStats {
+    total_applications: number;
+    pending_review: number;
+    approved: number;
+    unread_messages: number;
+    profile_complete: boolean;
 }
 
-export default function TenantDashboard({ applications }: TenantDashboardProps) {
+interface TenantDashboardProps {
+    stats: DashboardStats;
+    recentApplications: Application[];
+    hasProfile: boolean;
+    userName: string;
+}
+
+export default function TenantDashboard({ stats, recentApplications, userName }: TenantDashboardProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, key);
-    const { formatRent } = useReactiveCurrency();
 
-    const getStatusColor = (status: string) => {
-        const statusColors: Record<string, string> = {
-            draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-            submitted: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-            under_review: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-            visit_scheduled: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-            visit_completed: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
-            approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-            rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-            withdrawn: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-            leased: 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300',
-            archived: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-        };
-        return statusColors[status] || 'bg-gray-100 text-gray-800';
-    };
-
-    const formatStatus = (status: string) => {
-        return (
-            t(`tenant.dashboard.status.${status}`) ||
-            status
-                .split('_')
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')
-        );
-    };
+    // Empty state for new users (no applications yet)
+    const showEmptyState = stats.total_applications === 0;
 
     return (
-        <AppLayout>
-            <Head title={t('tenant.dashboard.title')} />
+        <TenantLayout>
+            <Head title={t('tenant.dashboard.title') || 'Dashboard'} />
 
-            <div className="container mx-auto max-w-7xl px-4 py-8">
-                <div className="mb-8 flex items-start justify-between">
+            <div className="space-y-8">
+                {/* Welcome Header */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="mb-2 text-3xl font-bold text-foreground">{t('tenant.dashboard.title')}</h1>
-                        <p className="text-muted-foreground">{t('tenant.dashboard.subtitle')}</p>
+                        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+                            {t('tenant.dashboard.welcome') || 'Welcome back'}, {userName?.split(' ')[0] || 'there'}!
+                        </h1>
+                        <p className="mt-1 text-muted-foreground">
+                            {t('tenant.dashboard.subtitle') || 'Manage your rental applications and messages'}
+                        </p>
                     </div>
                     <Link
                         href={route('properties.index')}
-                        className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
+                        className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-secondary px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
                     >
-                        {t('tenant.dashboard.browse_properties')}
+                        <Building2 className="h-4 w-4" />
+                        {t('tenant.dashboard.browse_properties') || 'Browse Properties'}
                     </Link>
                 </div>
 
-                {applications.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-12 text-center">
-                        <Home className="mb-4 h-16 w-16 text-muted-foreground opacity-50" />
-                        <h2 className="mb-2 text-xl font-semibold text-foreground">{t('tenant.dashboard.empty.title')}</h2>
-                        <p className="mb-6 max-w-md text-muted-foreground">{t('tenant.dashboard.empty.description')}</p>
+                {showEmptyState ? (
+                    /* Empty State */
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-gradient-to-b from-card to-card/50 px-6 py-16 text-center">
+                        <div className="mb-6 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 p-6">
+                            <Sparkles className="h-12 w-12 text-primary" />
+                        </div>
+                        <h2 className="mb-3 text-2xl font-bold text-foreground">
+                            {t('tenant.dashboard.empty.title') || 'Start Your Rental Journey'}
+                        </h2>
+                        <p className="mb-8 max-w-md text-muted-foreground">
+                            {t('tenant.dashboard.empty.description') ||
+                                'Browse available properties and submit your first application. Your applications and messages will appear here.'}
+                        </p>
                         <Link
                             href={route('properties.index')}
-                            className="rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary/90"
+                            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
                         >
-                            {t('tenant.dashboard.browse_properties')}
+                            <Building2 className="h-5 w-5" />
+                            {t('tenant.dashboard.empty.cta') || 'Browse Properties'}
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {applications.map((application) => {
-                            const property = application.property;
-                            const mainImage = property?.images?.find((img: PropertyImage) => img.is_main) || property?.images?.[0];
+                    /* Dashboard Content */
+                    <>
+                        {/* Stats Bar */}
+                        <StatsBar
+                            totalApplications={stats.total_applications}
+                            pendingReview={stats.pending_review}
+                            approved={stats.approved}
+                            unreadMessages={stats.unread_messages}
+                        />
 
-                            return (
-                                <Link
-                                    key={application.id}
-                                    href={`/applications/${application.id}`}
-                                    className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-lg"
-                                >
-                                    {/* Property Image */}
-                                    <div className="relative aspect-video overflow-hidden bg-muted">
-                                        {mainImage ? (
-                                            <img
-                                                src={mainImage.image_url}
-                                                alt={property?.title || 'Property'}
-                                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full w-full items-center justify-center">
-                                                <Home className="h-16 w-16 text-muted-foreground opacity-30" />
-                                            </div>
-                                        )}
+                        {/* Quick Actions */}
+                        <QuickActions unreadMessages={stats.unread_messages} profileComplete={stats.profile_complete} />
 
-                                        {/* Status Badge */}
-                                        <div className="absolute top-3 right-3">
-                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(application.status)}`}>
-                                                {formatStatus(application.status)}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Property Details */}
-                                    <div className="p-5">
-                                        <h3 className="mb-2 line-clamp-1 text-lg font-semibold text-foreground">
-                                            {property?.title || 'Property Title'}
-                                        </h3>
-
-                                        <div className="mb-4 space-y-2 text-sm text-muted-foreground">
-                                            <div className="flex items-center gap-2">
-                                                <MapPin className="h-4 w-4 flex-shrink-0" />
-                                                <span className="line-clamp-1">
-                                                    {property?.house_number} {property?.street_name}, {property?.city}
-                                                </span>
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="h-4 w-4 flex-shrink-0" />
-                                                <span>
-                                                    {t('tenant.dashboard.card.applied_on')} {new Date(application.created_at).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-between border-t border-border pt-4">
-                                            <span className="text-xl font-bold text-foreground">
-                                                {formatRent(property?.rent_amount, property?.rent_currency)}
-                                            </span>
-                                            <span className="text-sm font-medium text-primary">{t('tenant.dashboard.card.view_details')}</span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            );
-                        })}
-                    </div>
+                        {/* Recent Applications */}
+                        <RecentApplications applications={recentApplications} />
+                    </>
                 )}
             </div>
-        </AppLayout>
+        </TenantLayout>
     );
 }

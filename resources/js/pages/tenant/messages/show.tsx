@@ -1,7 +1,7 @@
 import { MessageInput } from '@/components/messages/message-input';
 import { MessageThread } from '@/components/messages/message-thread';
 import { Button } from '@/components/ui/button';
-import { AppLayout } from '@/layouts/app-layout';
+import { TenantLayout } from '@/layouts/tenant-layout';
 import { route } from '@/utils/route';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Building } from 'lucide-react';
@@ -35,10 +35,10 @@ interface MessagesShowProps {
 
 export default function MessagesShow({ conversation, messages }: MessagesShowProps) {
     return (
-        <AppLayout>
+        <TenantLayout>
             <Head title={`Chat with ${conversation.manager_name}`} />
 
-            <div className="container mx-auto max-w-4xl px-4 py-8">
+            <div className="mx-auto max-w-4xl">
                 <div className="flex h-[calc(100vh-200px)] flex-col rounded-xl border border-border bg-card shadow-sm">
                     {/* Header */}
                     <div className="flex items-center gap-4 border-b border-border p-4">
@@ -65,6 +65,6 @@ export default function MessagesShow({ conversation, messages }: MessagesShowPro
                     <MessageInput storeRoute={route('tenant.messages.store', { conversation: conversation.id })} />
                 </div>
             </div>
-        </AppLayout>
+        </TenantLayout>
     );
 }

@@ -54,8 +54,8 @@ if (! function_exists('userDefaultDashboard')) {
             return $managerUrl.'/properties';
         }
 
-        // Otherwise, user is a tenant - redirect to root domain dashboard
-        return config('app.url').'/dashboard';
+        // Otherwise, user is a tenant - redirect to applications
+        return config('app.url').'/applications';
     }
 }
 
@@ -455,52 +455,16 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
 */
 
 Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
-    Route::get('dashboard', function (Request $request) {
-        $user = $request->user();
-        $tenantProfile = $user->tenantProfile;
-
-        // If no tenant profile, show empty state
-        if (! $tenantProfile) {
-            return Inertia::render('tenant/dashboard', [
-                'applications' => [],
-            ]);
-        }
-
-        // Fetch all applications for this tenant with property details
-        $applications = \App\Models\Application::where('tenant_profile_id', $tenantProfile->id)
-            ->with(['property' => function ($query) {
-                $query->with('images');
-            }])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($application) {
-                $applicationArray = $application->toArray();
-
-                // Add property image URLs
-                if ($application->property && $application->property->images) {
-                    $applicationArray['property']['images'] = $application->property->images->map(function ($image) {
-                        return [
-                            'id' => $image->id,
-                            'image_url' => \App\Helpers\StorageHelper::url($image->image_path, 'private', 1440),
-                            'image_path' => $image->image_path,
-                            'is_main' => $image->is_main,
-                            'sort_order' => $image->sort_order,
-                        ];
-                    })->sortBy('sort_order')->values()->toArray();
-                }
-
-                return $applicationArray;
-            });
-
-        return Inertia::render('tenant/dashboard', [
-            'applications' => $applications,
-        ]);
-    })->name('dashboard');
+    // Dashboard - redirect to applications (dashboard removed in favor of direct nav)
+    Route::get('dashboard', fn () => redirect()->route('applications.index'))
+        ->name('dashboard');
 
     // Tenant Profile routes
     // Note: Setup/unverified routes removed - profiles are now auto-created on first application
     // Users can edit their profile after submitting their first application
+    Route::get('profile', [\App\Http\Controllers\TenantProfileController::class, 'show'])
+        ->name('tenant.profile.show');
+
     Route::get('profile/tenant/edit', [\App\Http\Controllers\TenantProfileController::class, 'edit'])
         ->name('tenant.profile.edit');
 
@@ -509,6 +473,10 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
 
     Route::get('tenant-profile/document/{type}', [\App\Http\Controllers\TenantProfileController::class, 'serveDocument'])
         ->name('tenant.profile.document');
+
+    // Applications list route
+    Route::get('applications', [\App\Http\Controllers\ApplicationController::class, 'index'])
+        ->name('applications.index');
 
     // Application routes
     Route::get('properties/{property}/apply', [\App\Http\Controllers\ApplicationController::class, 'create'])
