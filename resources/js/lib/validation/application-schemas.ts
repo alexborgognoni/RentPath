@@ -1,10 +1,88 @@
 import { z } from 'zod';
 
-// Step IDs
-export type ApplicationStepId = 'details' | 'references' | 'emergency' | 'documents';
+// Step IDs - 6 steps (documents step removed)
+export type ApplicationStepId = 'personal' | 'employment' | 'details' | 'references' | 'emergency' | 'review';
 
 // ===== Error Messages =====
 export const APPLICATION_MESSAGES = {
+    // Personal Info Step
+    profile_date_of_birth: {
+        required: 'Date of birth is required',
+        adult: 'You must be at least 18 years old',
+    },
+    profile_nationality: {
+        required: 'Nationality is required',
+    },
+    profile_phone_number: {
+        required: 'Phone number is required',
+        invalid: 'Please enter a valid phone number',
+    },
+    profile_current_street_name: {
+        required: 'Street name is required',
+    },
+    profile_current_house_number: {
+        required: 'House number is required',
+    },
+    profile_current_city: {
+        required: 'City is required',
+    },
+    profile_current_postal_code: {
+        required: 'Postal code is required',
+    },
+    profile_current_country: {
+        required: 'Country is required',
+    },
+
+    // Employment Step
+    profile_employment_status: {
+        required: 'Please select your employment status',
+    },
+    profile_employer_name: {
+        required: 'Employer name is required',
+    },
+    profile_job_title: {
+        required: 'Job title is required',
+    },
+    profile_monthly_income: {
+        required: 'Monthly income is required',
+        min: 'Income must be a positive number',
+    },
+    profile_university_name: {
+        required: 'University name is required',
+    },
+    profile_program_of_study: {
+        required: 'Program of study is required',
+    },
+    profile_id_document: {
+        required: 'ID document is required',
+    },
+    profile_employment_contract: {
+        required: 'Employment contract is required',
+    },
+    profile_payslip: {
+        required: 'Payslip is required',
+    },
+    profile_student_proof: {
+        required: 'Proof of student status is required',
+    },
+    profile_guarantor_name: {
+        required: 'Guarantor name is required',
+    },
+    profile_guarantor_relationship: {
+        required: 'Guarantor relationship is required',
+    },
+    profile_guarantor_monthly_income: {
+        required: 'Guarantor income is required',
+        min: 'Income must be a positive number',
+    },
+    profile_guarantor_id: {
+        required: 'Guarantor ID document is required',
+    },
+    profile_guarantor_proof_income: {
+        required: 'Guarantor proof of income is required',
+    },
+
+    // Existing messages
     desired_move_in_date: {
         required: 'Move-in date is required',
         future: 'Move-in date must be in the future',
@@ -141,6 +219,7 @@ const petWithOtherSchema = petSchema.refine(
 );
 
 const referenceSchema = z.object({
+    type: z.enum(['landlord', 'personal', 'professional']),
     name: z.string(),
     phone: z.string(),
     email: z.string(),
@@ -151,7 +230,71 @@ const referenceSchema = z.object({
 
 // ===== Step Schemas =====
 
-// Step 1: Details (move-in, lease, occupants, pets)
+// Step 1: Personal Info
+export const personalInfoStepSchema = z
+    .object({
+        profile_date_of_birth: z.string().min(1, APPLICATION_MESSAGES.profile_date_of_birth.required),
+        profile_nationality: z.string().min(1, APPLICATION_MESSAGES.profile_nationality.required),
+        profile_phone_country_code: z.string(),
+        profile_phone_number: z.string().min(1, APPLICATION_MESSAGES.profile_phone_number.required),
+        profile_current_street_name: z.string().min(1, APPLICATION_MESSAGES.profile_current_street_name.required),
+        profile_current_house_number: z.string().min(1, APPLICATION_MESSAGES.profile_current_house_number.required),
+        profile_current_city: z.string().min(1, APPLICATION_MESSAGES.profile_current_city.required),
+        profile_current_postal_code: z.string().min(1, APPLICATION_MESSAGES.profile_current_postal_code.required),
+        profile_current_country: z.string().min(1, APPLICATION_MESSAGES.profile_current_country.required),
+    })
+    .refine(
+        (data) => {
+            // Validate user is at least 18 years old
+            if (data.profile_date_of_birth) {
+                const birthDate = new Date(data.profile_date_of_birth);
+                const today = new Date();
+                const age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+                return actualAge >= 18;
+            }
+            return true;
+        },
+        {
+            message: APPLICATION_MESSAGES.profile_date_of_birth.adult,
+            path: ['profile_date_of_birth'],
+        },
+    );
+
+// Step 2: Employment & Income (with conditional validation)
+export const employmentIncomeStepSchema = z.object({
+    profile_employment_status: z.string().min(1, APPLICATION_MESSAGES.profile_employment_status.required),
+    profile_employer_name: z.string(),
+    profile_job_title: z.string(),
+    profile_employment_type: z.string(),
+    profile_employment_start_date: z.string(),
+    profile_monthly_income: z.string(),
+    profile_income_currency: z.string(),
+    profile_university_name: z.string(),
+    profile_program_of_study: z.string(),
+    profile_expected_graduation_date: z.string(),
+    profile_student_income_source: z.string(),
+    profile_has_guarantor: z.boolean(),
+    profile_guarantor_name: z.string(),
+    profile_guarantor_relationship: z.string(),
+    profile_guarantor_phone: z.string(),
+    profile_guarantor_email: z.string(),
+    profile_guarantor_address: z.string(),
+    profile_guarantor_employer: z.string(),
+    profile_guarantor_monthly_income: z.string(),
+    // Documents are validated separately as Files
+    profile_id_document: z.any().nullable(),
+    profile_employment_contract: z.any().nullable(),
+    profile_payslip_1: z.any().nullable(),
+    profile_payslip_2: z.any().nullable(),
+    profile_payslip_3: z.any().nullable(),
+    profile_student_proof: z.any().nullable(),
+    profile_guarantor_id: z.any().nullable(),
+    profile_guarantor_proof_income: z.any().nullable(),
+});
+
+// Step 3: Details (move-in, lease, occupants, pets)
 export const detailsStepSchema = z
     .object({
         desired_move_in_date: z.string().min(1, APPLICATION_MESSAGES.desired_move_in_date.required),
@@ -195,27 +338,20 @@ export const detailsStepSchema = z
         },
     );
 
-// Step 2: References (previous landlord, personal references)
+// Step 4: References (unified - landlord merged with type field)
 export const referencesStepSchema = z.object({
-    previous_landlord_name: z.string(),
-    previous_landlord_phone: z.string(),
-    previous_landlord_email: z.string(),
     references: z.array(referenceSchema),
+    // Legacy fields kept for backwards compatibility
+    previous_landlord_name: z.string().optional(),
+    previous_landlord_phone: z.string().optional(),
+    previous_landlord_email: z.string().optional(),
 });
 
-// Step 3: Emergency Contact
+// Step 5: Emergency Contact
 export const emergencyStepSchema = z.object({
     emergency_contact_name: z.string(),
     emergency_contact_phone: z.string(),
     emergency_contact_relationship: z.string(),
-});
-
-// Step 4: Documents (all optional)
-export const documentsStepSchema = z.object({
-    application_id_document: z.any().nullable(),
-    application_proof_of_income: z.any().nullable(),
-    application_reference_letter: z.any().nullable(),
-    additional_documents: z.array(z.any()),
 });
 
 // ===== Validation Functions =====
@@ -232,6 +368,12 @@ export function validateApplicationStep(stepId: ApplicationStepId, data: Record<
     let schema: z.ZodSchema;
 
     switch (stepId) {
+        case 'personal':
+            schema = personalInfoStepSchema;
+            break;
+        case 'employment':
+            schema = employmentIncomeStepSchema;
+            break;
         case 'details':
             schema = detailsStepSchema;
             break;
@@ -241,9 +383,9 @@ export function validateApplicationStep(stepId: ApplicationStepId, data: Record<
         case 'emergency':
             schema = emergencyStepSchema;
             break;
-        case 'documents':
-            schema = documentsStepSchema;
-            break;
+        case 'review':
+            // Review step has no validation - just display
+            return { success: true, errors: {} };
         default:
             return { success: true, errors: {} };
     }
@@ -262,6 +404,76 @@ export function validateApplicationStep(stepId: ApplicationStepId, data: Record<
             errors[path] = issue.message;
         }
     });
+
+    // Additional validation for employment step (conditional based on status)
+    if (stepId === 'employment') {
+        const employmentStatus = data.profile_employment_status as string;
+        const isEmployed = employmentStatus === 'employed' || employmentStatus === 'self_employed';
+        const isStudent = employmentStatus === 'student';
+        const hasGuarantor = data.profile_has_guarantor as boolean;
+
+        // ID document is always required
+        if (!data.profile_id_document) {
+            errors.profile_id_document = APPLICATION_MESSAGES.profile_id_document.required;
+        }
+
+        // Employed-specific validations
+        if (isEmployed) {
+            if (!data.profile_employer_name) {
+                errors.profile_employer_name = APPLICATION_MESSAGES.profile_employer_name.required;
+            }
+            if (!data.profile_job_title) {
+                errors.profile_job_title = APPLICATION_MESSAGES.profile_job_title.required;
+            }
+            if (!data.profile_monthly_income) {
+                errors.profile_monthly_income = APPLICATION_MESSAGES.profile_monthly_income.required;
+            }
+            if (!data.profile_employment_contract) {
+                errors.profile_employment_contract = APPLICATION_MESSAGES.profile_employment_contract.required;
+            }
+            if (!data.profile_payslip_1) {
+                errors.profile_payslip_1 = APPLICATION_MESSAGES.profile_payslip.required;
+            }
+            if (!data.profile_payslip_2) {
+                errors.profile_payslip_2 = APPLICATION_MESSAGES.profile_payslip.required;
+            }
+            if (!data.profile_payslip_3) {
+                errors.profile_payslip_3 = APPLICATION_MESSAGES.profile_payslip.required;
+            }
+        }
+
+        // Student-specific validations
+        if (isStudent) {
+            if (!data.profile_university_name) {
+                errors.profile_university_name = APPLICATION_MESSAGES.profile_university_name.required;
+            }
+            if (!data.profile_program_of_study) {
+                errors.profile_program_of_study = APPLICATION_MESSAGES.profile_program_of_study.required;
+            }
+            if (!data.profile_student_proof) {
+                errors.profile_student_proof = APPLICATION_MESSAGES.profile_student_proof.required;
+            }
+        }
+
+        // Guarantor validations
+        if (hasGuarantor) {
+            if (!data.profile_guarantor_name) {
+                errors.profile_guarantor_name = APPLICATION_MESSAGES.profile_guarantor_name.required;
+            }
+            if (!data.profile_guarantor_relationship) {
+                errors.profile_guarantor_relationship = APPLICATION_MESSAGES.profile_guarantor_relationship.required;
+            }
+            if (!data.profile_guarantor_monthly_income) {
+                errors.profile_guarantor_monthly_income = APPLICATION_MESSAGES.profile_guarantor_monthly_income.required;
+            }
+            if (!data.profile_guarantor_id) {
+                errors.profile_guarantor_id = APPLICATION_MESSAGES.profile_guarantor_id.required;
+            }
+            if (!data.profile_guarantor_proof_income) {
+                errors.profile_guarantor_proof_income = APPLICATION_MESSAGES.profile_guarantor_proof_income.required;
+            }
+        }
+    }
 
     // Additional validation for occupants with "Other" relationship
     if (stepId === 'details') {
@@ -299,6 +511,7 @@ export function validateApplicationStep(stepId: ApplicationStepId, data: Record<
     // Additional validation for references
     if (stepId === 'references') {
         const references = data.references as Array<{
+            type: string;
             name: string;
             phone: string;
             email: string;
@@ -347,7 +560,8 @@ export function validateApplicationStep(stepId: ApplicationStepId, data: Record<
  * Returns steps.length if all steps are valid
  */
 export function findFirstInvalidApplicationStep(data: Record<string, unknown>): number {
-    const stepIds: ApplicationStepId[] = ['details', 'references', 'emergency', 'documents'];
+    // 6-step order: personal, employment, details, references, emergency, review
+    const stepIds: ApplicationStepId[] = ['personal', 'employment', 'details', 'references', 'emergency', 'review'];
 
     for (let i = 0; i < stepIds.length; i++) {
         const result = validateApplicationStep(stepIds[i], data);
@@ -364,7 +578,8 @@ export function findFirstInvalidApplicationStep(data: Record<string, unknown>): 
  */
 export function validateApplicationForSubmit(data: Record<string, unknown>): ValidationResult {
     const allErrors: Record<string, string> = {};
-    const stepIds: ApplicationStepId[] = ['details', 'references', 'emergency', 'documents'];
+    // Validate all steps except review (which has no validation)
+    const stepIds: ApplicationStepId[] = ['personal', 'employment', 'details', 'references', 'emergency'];
 
     for (const stepId of stepIds) {
         const result = validateApplicationStep(stepId, data);

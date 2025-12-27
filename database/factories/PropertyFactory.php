@@ -33,7 +33,7 @@ class PropertyFactory extends Factory
             'type' => $type,
             'subtype' => fake()->randomElement($subtypes[$type]),
             'status' => Property::STATUS_VACANT,
-            'visibility' => Property::VISIBILITY_UNLISTED,
+            'visibility' => Property::VISIBILITY_PUBLIC,
             'accepting_applications' => true,
             'application_access' => Property::ACCESS_OPEN,
             'house_number' => fake()->buildingNumber(),

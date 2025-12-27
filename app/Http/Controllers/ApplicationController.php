@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
+use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
 use App\Models\Lead;
 use App\Models\Property;
+use App\Models\TenantReference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -82,11 +84,10 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         // Auto-create tenant profile if it doesn't exist
-        if (! $user->tenantProfile) {
-            $user->tenantProfile()->create([]);
-        }
-
         $tenantProfile = $user->tenantProfile;
+        if (! $tenantProfile) {
+            $tenantProfile = $user->tenantProfile()->create([]);
+        }
 
         // Check if already applied (excluding drafts - those can continue)
         $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
@@ -122,16 +123,15 @@ class ApplicationController extends Controller
     /**
      * Store a new application.
      */
-    public function store(Request $request, Property $property)
+    public function store(StoreApplicationRequest $request, Property $property)
     {
         $user = Auth::user();
 
         // Auto-create tenant profile if it doesn't exist
-        if (! $user->tenantProfile) {
-            $user->tenantProfile()->create([]);
-        }
-
         $tenantProfile = $user->tenantProfile;
+        if (! $tenantProfile) {
+            $tenantProfile = $user->tenantProfile()->create([]);
+        }
 
         // Check for existing application
         $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
@@ -150,59 +150,14 @@ class ApplicationController extends Controller
             ->where('status', 'draft')
             ->first();
 
-        // Validation rules
-        $rules = [
-            'desired_move_in_date' => 'required|date|after:today',
-            'lease_duration_months' => 'required|integer|min:1|max:60',
-            'message_to_landlord' => 'nullable|string|max:2000',
+        // Validation is handled by StoreApplicationRequest with conditional rules
+        $validated = $request->validated();
 
-            // Occupants
-            'additional_occupants' => 'required|integer|min:0|max:20',
-            'occupants_details' => 'nullable|array',
-            'occupants_details.*.name' => 'required|string|max:255',
-            'occupants_details.*.age' => 'required|integer|min:0|max:120',
-            'occupants_details.*.relationship' => 'required|string|max:100',
+        // Sync profile data (save profile fields to TenantProfile for reuse)
+        $this->syncProfileDataFromWizard($request, $tenantProfile);
 
-            // Pets
-            'has_pets' => 'required|boolean',
-            'pets_details' => 'nullable|array',
-            'pets_details.*.type' => 'required|string|max:100',
-            'pets_details.*.breed' => 'nullable|string|max:100',
-            'pets_details.*.age' => 'nullable|integer|min:0|max:50',
-            'pets_details.*.weight' => 'nullable|numeric|min:0',
-
-            // Previous landlord reference (optional)
-            'previous_landlord_name' => 'nullable|string|max:255',
-            'previous_landlord_phone' => 'nullable|string|max:20',
-            'previous_landlord_email' => 'nullable|email|max:255',
-
-            // Emergency contact (can override profile)
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_phone' => 'nullable|string|max:20',
-            'emergency_contact_relationship' => 'nullable|string|max:100',
-
-            // References
-            'references' => 'nullable|array',
-            'references.*.name' => 'required|string|max:255',
-            'references.*.phone' => 'required|string|max:20',
-            'references.*.email' => 'required|email|max:255',
-            'references.*.relationship' => 'required|string|max:100',
-            'references.*.years_known' => 'required|integer|min:0|max:100',
-
-            // Optional fresh documents
-            'application_id_document' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'application_proof_of_income' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'application_reference_letter' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-
-            // Additional documents
-            'additional_documents' => 'nullable|array',
-            'additional_documents.*' => 'file|mimes:pdf,jpeg,png,jpg|max:20480',
-
-            // Token tracking
-            'invited_via_token' => 'nullable|string|max:64',
-        ];
-
-        $validated = $request->validate($rules);
+        // Refresh the tenant profile to get updated data for snapshot
+        $tenantProfile->refresh();
 
         // Handle file uploads for application-specific documents
         if ($request->hasFile('application_id_document')) {
@@ -254,6 +209,17 @@ class ApplicationController extends Controller
             $validated['application_reference_letter']
         );
 
+        // Remove profile fields from validated data (they're saved to TenantProfile, not Application)
+        $profileFieldPrefixes = ['profile_'];
+        foreach (array_keys($validated) as $key) {
+            foreach ($profileFieldPrefixes as $prefix) {
+                if (str_starts_with($key, $prefix)) {
+                    unset($validated[$key]);
+                    break;
+                }
+            }
+        }
+
         // Snapshot profile data at submission time (for audit trail)
         $validated = array_merge($validated, $this->snapshotProfileData($tenantProfile));
 
@@ -273,6 +239,9 @@ class ApplicationController extends Controller
         // Auto-verify profile if minimum required data is present
         $this->autoVerifyProfileIfReady($tenantProfile);
 
+        // Sync application data (references, emergency contact, pets, occupants) back to profile
+        $this->syncApplicationToProfile($application, $tenantProfile);
+
         // Update lead status to 'applied' if exists
         $this->updateLeadOnApplicationSubmit($user, $property, $application);
 
@@ -291,11 +260,10 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         // Auto-create tenant profile if it doesn't exist
-        if (! $user->tenantProfile) {
-            $user->tenantProfile()->create([]);
-        }
-
         $tenantProfile = $user->tenantProfile;
+        if (! $tenantProfile) {
+            $tenantProfile = $user->tenantProfile()->create([]);
+        }
 
         // Check if draft already exists for this user and property
         $application = Application::where('tenant_profile_id', $tenantProfile->id)
@@ -304,25 +272,39 @@ class ApplicationController extends Controller
             ->first();
 
         $requestedStep = $request->input('current_step', 1);
-        $previousMaxStep = $application ? $application->current_step : 0;
 
-        // ALWAYS save the data first (preserve user work)
-        $data = $request->all();
+        // Note: Profile data is synced only on final submission, not during draft saves
+        // This allows users to review all changes before committing to their profile
+        // However, we still save profile_ fields as snapshot_ fields in the Application
+
+        $allData = $request->all();
+        $data = [];
+
+        // Map profile_ fields to snapshot_ fields, pass through other fields
+        foreach ($allData as $key => $value) {
+            if (str_starts_with($key, 'profile_')) {
+                // Map profile_* → snapshot_* for Application storage
+                $snapshotKey = 'snapshot_'.substr($key, 8); // Remove 'profile_' prefix
+                $data[$snapshotKey] = $value;
+            } else {
+                $data[$key] = $value;
+            }
+        }
+
         $data['tenant_profile_id'] = $tenantProfile->id;
         $data['property_id'] = $property->id;
         $data['status'] = 'draft';
-        // Don't set current_step yet - will determine after validation
 
         // Validate to determine actual allowed max step
         $validatedMaxStep = 0;
 
         // Check all steps up to the requested step
         for ($step = 1; $step <= $requestedStep; $step++) {
-            $stepValidation = $this->getStepValidationRules($step, $data);
+            $stepValidation = $this->getStepValidationRules($step, $allData);
 
             if (! empty($stepValidation)) {
                 // Create a validator instance to check without throwing
-                $validator = \Validator::make($data, $stepValidation);
+                $validator = \Validator::make($allData, $stepValidation);
 
                 if ($validator->fails()) {
                     // This step is invalid - can't progress beyond here
@@ -336,7 +318,6 @@ class ApplicationController extends Controller
         }
 
         // The actual current_step is the max validated step
-        // If no steps are valid, current_step stays at 0
         $data['current_step'] = $validatedMaxStep;
 
         if ($application) {
@@ -345,69 +326,107 @@ class ApplicationController extends Controller
             $application = Application::create($data);
         }
 
+        // Refresh to get updated values
+        $application->refresh();
+
         // Update lead status to 'drafting' if exists
         $this->updateLeadOnDraft($user, $property);
 
-        // Return back with the actual max step reached
-        // The frontend will read this from the updated draft application
+        // Return back - Inertia will reload the page and get updated draftApplication from create()
         return back(303);
     }
 
     /**
      * Get validation rules for a specific step.
+     * 6-step structure (Documents step removed):
+     * 1: Personal Info, 2: Employment & Income, 3: Details, 4: References (opt),
+     * 5: Emergency (opt), 6: Review
      */
     private function getStepValidationRules(int $step, array $data): array
     {
         switch ($step) {
             case 1:
+                // Step 1: Personal Information
+                return [
+                    'profile_date_of_birth' => 'required|date|before:-18 years',
+                    'profile_nationality' => 'required|string|max:100',
+                    'profile_phone_country_code' => 'required|string|max:5',
+                    'profile_phone_number' => 'required|string|max:20',
+                    'profile_current_house_number' => 'required|string|max:20',
+                    'profile_current_street_name' => 'required|string|max:255',
+                    'profile_current_city' => 'required|string|max:100',
+                    'profile_current_postal_code' => 'required|string|max:20',
+                    'profile_current_country' => 'required|string|max:2',
+                ];
+
+            case 2:
+                // Step 2: Employment & Income (with conditional document validation)
+                $rules = [
+                    'profile_employment_status' => 'required|in:employed,self_employed,student,unemployed,retired',
+                    'profile_income_currency' => 'required|in:eur,usd,gbp,chf',
+                    'profile_has_guarantor' => 'required|boolean',
+                ];
+
+                $status = $data['profile_employment_status'] ?? '';
+
+                // Add conditional rules based on employment status
+                if (in_array($status, ['employed', 'self_employed'])) {
+                    $rules['profile_employer_name'] = 'required|string|max:255';
+                    $rules['profile_job_title'] = 'required|string|max:255';
+                    $rules['profile_monthly_income'] = 'required|numeric|min:0';
+                }
+
+                if ($status === 'student') {
+                    $rules['profile_university_name'] = 'required|string|max:255';
+                    $rules['profile_program_of_study'] = 'required|string|max:255';
+                }
+
+                // Guarantor validation if has_guarantor is true
+                if (isset($data['profile_has_guarantor']) && $data['profile_has_guarantor']) {
+                    $rules['profile_guarantor_name'] = 'required|string|max:255';
+                    $rules['profile_guarantor_relationship'] = 'required|string|max:100';
+                    $rules['profile_guarantor_monthly_income'] = 'required|numeric|min:0';
+                }
+
+                return $rules;
+
+            case 3:
+                // Step 3: Application Details
                 $rules = [
                     'desired_move_in_date' => 'required|date|after:today',
                     'lease_duration_months' => 'required|integer|min:1|max:60',
                     'message_to_landlord' => 'nullable|string|max:2000',
                     'additional_occupants' => 'required|integer|min:0|max:20',
-                    'occupants_details' => 'nullable|array',
-                    'occupants_details.*.name' => 'required|string|max:255',
-                    'occupants_details.*.age' => 'required|integer|min:0|max:120',
-                    'occupants_details.*.relationship' => 'required|string|max:100',
-                    'occupants_details.*.relationship_other' => 'nullable|string|max:100',
                     'has_pets' => 'required|boolean',
                 ];
 
-                // Validate relationship_other when relationship is "Other"
-                $occupants = $data['occupants_details'] ?? [];
-                foreach ($occupants as $index => $occupant) {
-                    if (isset($occupant['relationship']) && $occupant['relationship'] === 'Other') {
-                        $rules["occupants_details.{$index}.relationship_other"] = 'required|string|max:100';
-                    }
+                // Validate occupant details if additional_occupants > 0
+                $occupantCount = intval($data['additional_occupants'] ?? 0);
+                if ($occupantCount > 0) {
+                    $rules['occupants_details'] = 'required|array|min:1';
+                    $rules['occupants_details.*.name'] = 'required|string|max:255';
+                    $rules['occupants_details.*.age'] = 'required|integer|min:0|max:120';
+                    $rules['occupants_details.*.relationship'] = 'required|string|max:100';
                 }
 
                 // Add pets validation only if has_pets is true
                 if (isset($data['has_pets']) && $data['has_pets'] === true) {
                     $rules['pets_details'] = 'required|array|min:1';
                     $rules['pets_details.*.type'] = 'required|string|max:100';
-                    $rules['pets_details.*.type_other'] = 'nullable|string|max:100';
-                    $rules['pets_details.*.breed'] = 'nullable|string|max:100';
-                    $rules['pets_details.*.age'] = 'nullable|integer|min:0|max:50';
-                    $rules['pets_details.*.weight'] = 'nullable|numeric|min:0';
-
-                    // Validate type_other when type is "Other"
-                    $pets = $data['pets_details'] ?? [];
-                    foreach ($pets as $index => $pet) {
-                        if (isset($pet['type']) && $pet['type'] === 'Other') {
-                            $rules["pets_details.{$index}.type_other"] = 'required|string|max:100';
-                        }
-                    }
                 }
 
                 return $rules;
 
-            case 2:
-                // Step 2: References (all optional, but if provided must be complete)
+            case 4:
+                // Step 4: References (optional step - no required fields)
                 return [];
 
-            case 3:
-            case 4:
-                // Steps 3 and 4 have no required fields
+            case 5:
+                // Step 5: Emergency Contact (optional step - no required fields)
+                return [];
+
+            case 6:
+                // Step 6: Review (no validation needed)
                 return [];
 
             default:
@@ -422,16 +441,13 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
 
-        // Check authorization: must be the applicant or the property owner
-        $isApplicant = $application->tenantProfile->user_id === $user->id;
-        $isPropertyOwner = $application->property->property_manager_id === $user->propertyManager?->id;
-
-        if (! $isApplicant && ! $isPropertyOwner) {
+        // Check authorization: must be the applicant (tenant portal is for tenants only)
+        if ($application->tenantProfile->user_id !== $user->id) {
             abort(403, 'Unauthorized to view this application');
         }
 
-        // If applicant views a draft application, redirect to continue editing
-        if ($isApplicant && $application->status === 'draft') {
+        // If viewing a draft application, redirect to continue editing
+        if ($application->status === 'draft') {
             return redirect()->route('applications.create', ['property' => $application->property_id])
                 ->with('message', 'Continue filling out your application');
         }
@@ -443,15 +459,11 @@ class ApplicationController extends Controller
             'tenantProfile.user',
         ]);
 
-        // Determine which view to render based on user role
-        if ($isPropertyOwner) {
-            return Inertia::render('property-manager/application-view', [
-                'application' => $application,
-            ]);
-        }
+        // Transform application data with property images and document URLs
+        $applicationData = $this->transformApplicationWithUrls($application);
 
         return Inertia::render('tenant/application-view', [
-            'application' => $application,
+            'application' => $applicationData,
         ]);
     }
 
@@ -592,12 +604,95 @@ class ApplicationController extends Controller
     }
 
     /**
+     * Sync profile data from wizard form to TenantProfile.
+     * This saves the profile fields for reuse across applications.
+     */
+    private function syncProfileDataFromWizard(Request $request, $tenantProfile): void
+    {
+        $profileData = [
+            // Personal Info
+            'date_of_birth' => $request->input('profile_date_of_birth'),
+            'nationality' => $request->input('profile_nationality'),
+            'phone_country_code' => $request->input('profile_phone_country_code'),
+            'phone_number' => $request->input('profile_phone_number'),
+            'current_house_number' => $request->input('profile_current_house_number'),
+            'current_street_name' => $request->input('profile_current_street_name'),
+            'current_city' => $request->input('profile_current_city'),
+            'current_postal_code' => $request->input('profile_current_postal_code'),
+            'current_country' => $request->input('profile_current_country'),
+
+            // Employment & Income
+            'employment_status' => $request->input('profile_employment_status'),
+            'employer_name' => $request->input('profile_employer_name'),
+            'job_title' => $request->input('profile_job_title'),
+            'employment_type' => $request->input('profile_employment_type'),
+            'employment_start_date' => $request->input('profile_employment_start_date'),
+            'monthly_income' => $request->input('profile_monthly_income'),
+            'income_currency' => $request->input('profile_income_currency'),
+
+            // Student Info
+            'university_name' => $request->input('profile_university_name'),
+            'program_of_study' => $request->input('profile_program_of_study'),
+            'expected_graduation_date' => $request->input('profile_expected_graduation_date'),
+            'student_income_source' => $request->input('profile_student_income_source'),
+
+            // Guarantor
+            'has_guarantor' => $request->boolean('profile_has_guarantor'),
+            'guarantor_name' => $request->input('profile_guarantor_name'),
+            'guarantor_relationship' => $request->input('profile_guarantor_relationship'),
+            'guarantor_phone' => $request->input('profile_guarantor_phone'),
+            'guarantor_email' => $request->input('profile_guarantor_email'),
+            'guarantor_address' => $request->input('profile_guarantor_address'),
+            'guarantor_employer' => $request->input('profile_guarantor_employer'),
+            'guarantor_monthly_income' => $request->input('profile_guarantor_monthly_income'),
+        ];
+
+        // Handle profile document uploads
+        $documentFields = [
+            'profile_id_document' => ['path' => 'id_document_path', 'name' => 'id_document_original_name', 'folder' => 'profiles/id-documents'],
+            'profile_employment_contract' => ['path' => 'employment_contract_path', 'name' => 'employment_contract_original_name', 'folder' => 'profiles/employment-contracts'],
+            'profile_payslip_1' => ['path' => 'payslip_1_path', 'name' => 'payslip_1_original_name', 'folder' => 'profiles/payslips'],
+            'profile_payslip_2' => ['path' => 'payslip_2_path', 'name' => 'payslip_2_original_name', 'folder' => 'profiles/payslips'],
+            'profile_payslip_3' => ['path' => 'payslip_3_path', 'name' => 'payslip_3_original_name', 'folder' => 'profiles/payslips'],
+            'profile_student_proof' => ['path' => 'student_proof_path', 'name' => 'student_proof_original_name', 'folder' => 'profiles/student-proofs'],
+            'profile_other_income_proof' => ['path' => 'other_income_proof_path', 'name' => 'other_income_proof_original_name', 'folder' => 'profiles/other-income-proofs'],
+            'profile_guarantor_id' => ['path' => 'guarantor_id_path', 'name' => 'guarantor_id_original_name', 'folder' => 'profiles/guarantor-ids'],
+            'profile_guarantor_proof_income' => ['path' => 'guarantor_proof_income_path', 'name' => 'guarantor_proof_income_original_name', 'folder' => 'profiles/guarantor-income-proofs'],
+        ];
+
+        foreach ($documentFields as $formField => $dbFields) {
+            if ($request->hasFile($formField)) {
+                $file = $request->file($formField);
+                $path = StorageHelper::store($file, $dbFields['folder'], 'private');
+                $profileData[$dbFields['path']] = $path;
+                $profileData[$dbFields['name']] = $file->getClientOriginalName();
+            }
+        }
+
+        // Update the tenant profile with all collected data
+        $tenantProfile->update($profileData);
+    }
+
+    /**
      * Snapshot profile data into application for audit trail.
      * This preserves the profile state at submission time.
      */
     private function snapshotProfileData($tenantProfile): array
     {
         return [
+            // Personal info snapshot
+            'snapshot_date_of_birth' => $tenantProfile->date_of_birth,
+            'snapshot_nationality' => $tenantProfile->nationality,
+            'snapshot_phone_country_code' => $tenantProfile->phone_country_code,
+            'snapshot_phone_number' => $tenantProfile->phone_number,
+
+            // Current address snapshot
+            'snapshot_current_house_number' => $tenantProfile->current_house_number,
+            'snapshot_current_street_name' => $tenantProfile->current_street_name,
+            'snapshot_current_city' => $tenantProfile->current_city,
+            'snapshot_current_postal_code' => $tenantProfile->current_postal_code,
+            'snapshot_current_country' => $tenantProfile->current_country,
+
             // Employment snapshot
             'snapshot_employment_status' => $tenantProfile->employment_status,
             'snapshot_employer_name' => $tenantProfile->employer_name,
@@ -607,22 +702,20 @@ class ApplicationController extends Controller
             'snapshot_monthly_income' => $tenantProfile->monthly_income,
             'snapshot_income_currency' => $tenantProfile->income_currency,
 
-            // Current address snapshot
-            'snapshot_current_house_number' => $tenantProfile->current_house_number,
-            'snapshot_current_street_name' => $tenantProfile->current_street_name,
-            'snapshot_current_city' => $tenantProfile->current_city,
-            'snapshot_current_postal_code' => $tenantProfile->current_postal_code,
-            'snapshot_current_country' => $tenantProfile->current_country,
-
             // Student snapshot
             'snapshot_university_name' => $tenantProfile->university_name,
             'snapshot_program_of_study' => $tenantProfile->program_of_study,
             'snapshot_expected_graduation_date' => $tenantProfile->expected_graduation_date,
+            'snapshot_student_income_source' => $tenantProfile->student_income_source,
 
             // Guarantor snapshot
             'snapshot_has_guarantor' => $tenantProfile->has_guarantor,
             'snapshot_guarantor_name' => $tenantProfile->guarantor_name,
             'snapshot_guarantor_relationship' => $tenantProfile->guarantor_relationship,
+            'snapshot_guarantor_phone' => $tenantProfile->guarantor_phone,
+            'snapshot_guarantor_email' => $tenantProfile->guarantor_email,
+            'snapshot_guarantor_address' => $tenantProfile->guarantor_address,
+            'snapshot_guarantor_employer' => $tenantProfile->guarantor_employer,
             'snapshot_guarantor_monthly_income' => $tenantProfile->guarantor_monthly_income,
 
             // Document paths snapshot
@@ -664,6 +757,93 @@ class ApplicationController extends Controller
 
         if ($hasRequiredData) {
             $tenantProfile->update(['profile_verified_at' => now()]);
+        }
+    }
+
+    /**
+     * Sync application data back to TenantProfile after submission.
+     * This saves references, emergency contact, pets, and occupants for reuse.
+     */
+    private function syncApplicationToProfile(Application $application, $tenantProfile): void
+    {
+        $profileUpdates = [];
+
+        // Sync Emergency Contact
+        if ($application->emergency_contact_name) {
+            $profileUpdates['emergency_contact_name'] = $application->emergency_contact_name;
+            $profileUpdates['emergency_contact_phone'] = $application->emergency_contact_phone;
+            $profileUpdates['emergency_contact_relationship'] = $application->emergency_contact_relationship;
+        }
+
+        // Sync Pets
+        if ($application->has_pets !== null) {
+            $profileUpdates['has_pets'] = $application->has_pets;
+            $profileUpdates['pets_details'] = $application->pets_details;
+            // Generate description from details
+            if ($application->pets_details && is_array($application->pets_details)) {
+                $descriptions = array_map(function ($pet) {
+                    return trim(($pet['breed'] ?? '').' '.($pet['type'] ?? ''));
+                }, $application->pets_details);
+                $profileUpdates['pets_description'] = implode(', ', array_filter($descriptions));
+            }
+        }
+
+        // Sync Occupants
+        if ($application->additional_occupants !== null) {
+            $profileUpdates['occupants_count'] = $application->additional_occupants + 1; // +1 for applicant
+            $profileUpdates['occupants_details'] = $application->occupants_details;
+        }
+
+        // Apply profile updates
+        if (! empty($profileUpdates)) {
+            $tenantProfile->update($profileUpdates);
+        }
+
+        // Sync References to tenant_references table
+        $this->syncReferencesToProfile($application, $tenantProfile);
+    }
+
+    /**
+     * Sync references from application to tenant_references table.
+     */
+    private function syncReferencesToProfile(Application $application, $tenantProfile): void
+    {
+        $references = $application->snapshot_references ?? $application->references ?? [];
+
+        // Also include previous_landlord if it exists (legacy support)
+        if ($application->previous_landlord_name) {
+            $landlordRef = [
+                'type' => TenantReference::TYPE_LANDLORD,
+                'name' => $application->previous_landlord_name,
+                'phone' => $application->previous_landlord_phone,
+                'email' => $application->previous_landlord_email,
+                'relationship' => 'Previous Landlord',
+            ];
+            // Prepend landlord reference
+            array_unshift($references, $landlordRef);
+        }
+
+        foreach ($references as $ref) {
+            if (empty($ref['name'])) {
+                continue;
+            }
+
+            $type = $ref['type'] ?? TenantReference::TYPE_PERSONAL;
+
+            // Upsert: update if same type+email exists, otherwise create
+            TenantReference::updateOrCreate(
+                [
+                    'tenant_profile_id' => $tenantProfile->id,
+                    'type' => $type,
+                    'email' => $ref['email'] ?? null,
+                ],
+                [
+                    'name' => $ref['name'],
+                    'phone' => $ref['phone'] ?? null,
+                    'relationship' => $ref['relationship'] ?? null,
+                    'years_known' => $ref['years_known'] ?? null,
+                ]
+            );
         }
     }
 
@@ -735,41 +915,8 @@ class ApplicationController extends Controller
             'tenantProfile.user',
         ]);
 
-        // Transform property images with URLs
-        $property = $application->property;
-        $imagesWithUrls = $property->images->map(function ($image) {
-            return [
-                'id' => $image->id,
-                'image_url' => StorageHelper::url($image->image_path, 'private', 1440),
-                'image_path' => $image->image_path,
-                'is_main' => $image->is_main,
-                'sort_order' => $image->sort_order,
-            ];
-        })->sortBy('sort_order')->values()->toArray();
-
-        // Transform application data with document URLs
-        $applicationData = $application->toArray();
-        $applicationData['property']['images'] = $imagesWithUrls;
-
-        // Add signed URLs for snapshot documents
-        $documentFields = [
-            'snapshot_id_document_path',
-            'snapshot_employment_contract_path',
-            'snapshot_payslip_1_path',
-            'snapshot_payslip_2_path',
-            'snapshot_payslip_3_path',
-            'snapshot_student_proof_path',
-            'snapshot_guarantor_id_path',
-            'snapshot_guarantor_proof_income_path',
-            'application_id_document_path',
-            'application_proof_of_income_path',
-            'application_reference_letter_path',
-        ];
-
-        foreach ($documentFields as $field) {
-            $urlField = str_replace('_path', '_url', $field);
-            $applicationData[$urlField] = StorageHelper::url($application->$field, 'private', 5);
-        }
+        // Transform application data with property images and document URLs
+        $applicationData = $this->transformApplicationWithUrls($application);
 
         // Define allowed status transitions based on current status
         $allowedTransitions = $this->getAllowedTransitions($application->status);
@@ -871,6 +1018,50 @@ class ApplicationController extends Controller
             'leased' => ['archived'],
             default => [],
         };
+    }
+
+    /**
+     * Transform application with property images and document URLs.
+     */
+    private function transformApplicationWithUrls(Application $application): array
+    {
+        // Transform property images with URLs
+        $property = $application->property;
+        $imagesWithUrls = $property->images->map(function ($image) {
+            return [
+                'id' => $image->id,
+                'image_url' => StorageHelper::url($image->image_path, 'private', 1440),
+                'image_path' => $image->image_path,
+                'is_main' => $image->is_main,
+                'sort_order' => $image->sort_order,
+            ];
+        })->sortBy('sort_order')->values()->toArray();
+
+        // Transform application data with document URLs
+        $applicationData = $application->toArray();
+        $applicationData['property']['images'] = $imagesWithUrls;
+
+        // Add signed URLs for snapshot documents
+        $documentFields = [
+            'snapshot_id_document_path',
+            'snapshot_employment_contract_path',
+            'snapshot_payslip_1_path',
+            'snapshot_payslip_2_path',
+            'snapshot_payslip_3_path',
+            'snapshot_student_proof_path',
+            'snapshot_guarantor_id_path',
+            'snapshot_guarantor_proof_income_path',
+            'application_id_document_path',
+            'application_proof_of_income_path',
+            'application_reference_letter_path',
+        ];
+
+        foreach ($documentFields as $field) {
+            $urlField = str_replace('_path', '_url', $field);
+            $applicationData[$urlField] = StorageHelper::url($application->$field, 'private', 5);
+        }
+
+        return $applicationData;
     }
 
     /**

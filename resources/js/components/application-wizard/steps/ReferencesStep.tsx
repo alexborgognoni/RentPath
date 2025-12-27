@@ -1,7 +1,17 @@
 import type { ApplicationWizardData, ReferenceDetails } from '@/hooks/useApplicationWizard';
-import { Plus, Trash2 } from 'lucide-react';
+import { Briefcase, Building2, Plus, Trash2, User } from 'lucide-react';
 
-const REFERENCE_RELATIONSHIPS = ['Employer', 'Colleague', 'Professor', 'Teacher', 'Friend', 'Neighbor', 'Other'];
+const REFERENCE_TYPES = [
+    { value: 'landlord', label: 'Previous Landlord', icon: Building2, description: 'A landlord from a previous rental' },
+    { value: 'personal', label: 'Personal Reference', icon: User, description: 'A friend, neighbor, or family acquaintance' },
+    { value: 'professional', label: 'Professional Reference', icon: Briefcase, description: 'An employer, colleague, or professor' },
+] as const;
+
+const REFERENCE_RELATIONSHIPS = {
+    landlord: ['Previous Landlord', 'Property Manager', 'Other'],
+    personal: ['Friend', 'Neighbor', 'Family Friend', 'Other'],
+    professional: ['Employer', 'Manager', 'Colleague', 'Professor', 'Teacher', 'Mentor', 'Other'],
+};
 
 interface ReferencesStepProps {
     data: ApplicationWizardData;
@@ -9,204 +19,275 @@ interface ReferencesStepProps {
     touchedFields: Record<string, boolean>;
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
     markFieldTouched: (field: string) => void;
-    addReference: () => void;
+    addReference: (type?: 'landlord' | 'personal' | 'professional') => void;
     removeReference: (index: number) => void;
     updateReference: (index: number, field: keyof ReferenceDetails, value: string) => void;
     onBlur: () => void;
 }
 
-export function ReferencesStep({
-    data,
-    errors,
-    touchedFields,
-    updateField,
-    markFieldTouched,
-    addReference,
-    removeReference,
-    updateReference,
-    onBlur,
-}: ReferencesStepProps) {
-    return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold">References</h2>
+export function ReferencesStep({ data, errors, touchedFields, addReference, removeReference, updateReference, onBlur }: ReferencesStepProps) {
+    // Group references by type
+    const landlordRefs = data.references.filter((ref) => ref.type === 'landlord');
+    const personalRefs = data.references.filter((ref) => ref.type === 'personal');
+    const professionalRefs = data.references.filter((ref) => ref.type === 'professional');
 
-            {/* Previous Landlord Section */}
-            <div>
-                <h3 className="mb-4 font-semibold">Previous Landlord (Optional)</h3>
-                <p className="mb-4 text-sm text-muted-foreground">
-                    If this is your first rental or you're currently living with family, you can skip this section.
-                </p>
-                <div className="grid gap-4 md:grid-cols-3">
+    const getTypeLabel = (type: string) => {
+        return REFERENCE_TYPES.find((t) => t.value === type)?.label || type;
+    };
+
+    const getTypeIcon = (type: string) => {
+        const refType = REFERENCE_TYPES.find((t) => t.value === type);
+        if (!refType) return User;
+        return refType.icon;
+    };
+
+    const getRelationshipOptions = (type: string) => {
+        return REFERENCE_RELATIONSHIPS[type as keyof typeof REFERENCE_RELATIONSHIPS] || REFERENCE_RELATIONSHIPS.personal;
+    };
+
+    const renderReferenceCard = (ref: ReferenceDetails, index: number, actualIndex: number) => {
+        const TypeIcon = getTypeIcon(ref.type);
+        const relationshipOptions = getRelationshipOptions(ref.type);
+
+        return (
+            <div key={actualIndex} className="rounded-lg border border-border bg-card p-4">
+                <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <TypeIcon size={18} className="text-muted-foreground" />
+                        <span className="font-medium">{getTypeLabel(ref.type)}</span>
+                        {index > 0 && <span className="text-sm text-muted-foreground">#{index + 1}</span>}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => removeReference(actualIndex)}
+                        className="cursor-pointer rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                        aria-label="Remove reference"
+                    >
+                        <Trash2 size={16} />
+                    </button>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label className="mb-2 block text-sm font-medium">Name</label>
+                        <label className="mb-1 block text-sm">
+                            Name <span className="text-destructive">*</span>
+                        </label>
                         <input
                             type="text"
-                            value={data.previous_landlord_name}
-                            onChange={(e) => updateField('previous_landlord_name', e.target.value)}
+                            value={ref.name}
+                            onChange={(e) => updateReference(actualIndex, 'name', e.target.value)}
                             onBlur={onBlur}
-                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                            aria-invalid={!!(touchedFields[`ref_${actualIndex}_name`] && errors[`ref_${actualIndex}_name`])}
+                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_name`] && errors[`ref_${actualIndex}_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                         />
+                        {touchedFields[`ref_${actualIndex}_name`] && errors[`ref_${actualIndex}_name`] && (
+                            <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_name`]}</p>
+                        )}
                     </div>
 
                     <div>
-                        <label className="mb-2 block text-sm font-medium">Phone</label>
+                        <label className="mb-1 block text-sm">
+                            Relationship <span className="text-destructive">*</span>
+                        </label>
+                        <select
+                            value={ref.relationship}
+                            onChange={(e) => updateReference(actualIndex, 'relationship', e.target.value)}
+                            onBlur={onBlur}
+                            aria-invalid={!!(touchedFields[`ref_${actualIndex}_relationship`] && errors[`ref_${actualIndex}_relationship`])}
+                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_relationship`] && errors[`ref_${actualIndex}_relationship`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                        >
+                            <option value="">Select...</option>
+                            {relationshipOptions.map((rel) => (
+                                <option key={rel} value={rel}>
+                                    {rel}
+                                </option>
+                            ))}
+                        </select>
+                        {touchedFields[`ref_${actualIndex}_relationship`] && errors[`ref_${actualIndex}_relationship`] && (
+                            <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_relationship`]}</p>
+                        )}
+                    </div>
+
+                    {ref.relationship === 'Other' && (
+                        <div className="md:col-span-2">
+                            <label className="mb-1 block text-sm">
+                                Please specify <span className="text-destructive">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={ref.relationship_other}
+                                onChange={(e) => updateReference(actualIndex, 'relationship_other', e.target.value)}
+                                onBlur={onBlur}
+                                placeholder="Enter relationship..."
+                                aria-invalid={
+                                    !!(touchedFields[`ref_${actualIndex}_relationship_other`] && errors[`ref_${actualIndex}_relationship_other`])
+                                }
+                                className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_relationship_other`] && errors[`ref_${actualIndex}_relationship_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                            />
+                            {touchedFields[`ref_${actualIndex}_relationship_other`] && errors[`ref_${actualIndex}_relationship_other`] && (
+                                <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_relationship_other`]}</p>
+                            )}
+                        </div>
+                    )}
+
+                    <div>
+                        <label className="mb-1 block text-sm">
+                            Phone <span className="text-destructive">*</span>
+                        </label>
                         <input
                             type="tel"
-                            value={data.previous_landlord_phone}
-                            onChange={(e) => updateField('previous_landlord_phone', e.target.value)}
+                            value={ref.phone}
+                            onChange={(e) => updateReference(actualIndex, 'phone', e.target.value)}
                             onBlur={onBlur}
-                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                            aria-invalid={!!(touchedFields[`ref_${actualIndex}_phone`] && errors[`ref_${actualIndex}_phone`])}
+                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_phone`] && errors[`ref_${actualIndex}_phone`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                         />
+                        {touchedFields[`ref_${actualIndex}_phone`] && errors[`ref_${actualIndex}_phone`] && (
+                            <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_phone`]}</p>
+                        )}
                     </div>
 
                     <div>
-                        <label className="mb-2 block text-sm font-medium">Email</label>
+                        <label className="mb-1 block text-sm">
+                            Email <span className="text-destructive">*</span>
+                        </label>
                         <input
                             type="email"
-                            value={data.previous_landlord_email}
-                            onChange={(e) => updateField('previous_landlord_email', e.target.value)}
+                            value={ref.email}
+                            onChange={(e) => updateReference(actualIndex, 'email', e.target.value)}
                             onBlur={onBlur}
-                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                            aria-invalid={!!(touchedFields[`ref_${actualIndex}_email`] && errors[`ref_${actualIndex}_email`])}
+                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_email`] && errors[`ref_${actualIndex}_email`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                         />
+                        {touchedFields[`ref_${actualIndex}_email`] && errors[`ref_${actualIndex}_email`] && (
+                            <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_email`]}</p>
+                        )}
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="mb-1 block text-sm">
+                            Years Known <span className="text-destructive">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={ref.years_known}
+                            onChange={(e) => updateReference(actualIndex, 'years_known', e.target.value)}
+                            onBlur={onBlur}
+                            aria-invalid={!!(touchedFields[`ref_${actualIndex}_years_known`] && errors[`ref_${actualIndex}_years_known`])}
+                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_years_known`] && errors[`ref_${actualIndex}_years_known`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                        />
+                        {touchedFields[`ref_${actualIndex}_years_known`] && errors[`ref_${actualIndex}_years_known`] && (
+                            <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_years_known`]}</p>
+                        )}
                     </div>
                 </div>
             </div>
+        );
+    };
 
-            {/* Personal References Section */}
-            <div className="border-t border-border pt-6">
-                <h3 className="mb-4 font-semibold">Personal References (Optional)</h3>
-                <p className="mb-4 text-sm text-muted-foreground">Add references from employers, colleagues, or other professional contacts.</p>
+    // Get actual indices for each reference
+    const getActualIndex = (ref: ReferenceDetails) => data.references.indexOf(ref);
 
-                {data.references.map((ref, index) => (
-                    <div key={index} className="mb-4 rounded-lg border border-border p-4">
-                        <div className="mb-2 flex items-center justify-between">
-                            <h4 className="font-medium">Reference {index + 1}</h4>
-                            <button type="button" onClick={() => removeReference(index)} className="cursor-pointer text-red-500 hover:text-red-700">
-                                <Trash2 size={16} />
-                            </button>
+    return (
+        <div className="space-y-6">
+            <div>
+                <h2 className="text-xl font-bold">References</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    Add references to strengthen your application. Landlord references are especially valuable.
+                </p>
+            </div>
+
+            {/* Landlord References Section */}
+            <div>
+                <div className="mb-3 flex items-center gap-2">
+                    <Building2 size={20} className="text-primary" />
+                    <h3 className="font-semibold">Landlord References</h3>
+                    <span className="text-sm text-muted-foreground">(Recommended)</span>
+                </div>
+                <p className="mb-4 text-sm text-muted-foreground">A reference from a previous landlord helps verify your rental history.</p>
+
+                <div className="space-y-3">
+                    {landlordRefs.length === 0 ? (
+                        <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
+                            <p className="text-sm text-muted-foreground">No landlord references added yet.</p>
                         </div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="mb-1 block text-sm">
-                                    Name <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    value={ref.name}
-                                    onChange={(e) => updateReference(index, 'name', e.target.value)}
-                                    onBlur={onBlur}
-                                    aria-invalid={!!(touchedFields[`ref_${index}_name`] && errors[`ref_${index}_name`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`ref_${index}_name`] && errors[`ref_${index}_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                                    required
-                                />
-                                {touchedFields[`ref_${index}_name`] && errors[`ref_${index}_name`] && (
-                                    <p className="mt-1 text-xs text-destructive">{errors[`ref_${index}_name`]}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">
-                                    Phone <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="tel"
-                                    value={ref.phone}
-                                    onChange={(e) => updateReference(index, 'phone', e.target.value)}
-                                    onBlur={onBlur}
-                                    aria-invalid={!!(touchedFields[`ref_${index}_phone`] && errors[`ref_${index}_phone`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`ref_${index}_phone`] && errors[`ref_${index}_phone`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                                    required
-                                />
-                                {touchedFields[`ref_${index}_phone`] && errors[`ref_${index}_phone`] && (
-                                    <p className="mt-1 text-xs text-destructive">{errors[`ref_${index}_phone`]}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">
-                                    Email <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="email"
-                                    value={ref.email}
-                                    onChange={(e) => updateReference(index, 'email', e.target.value)}
-                                    onBlur={onBlur}
-                                    aria-invalid={!!(touchedFields[`ref_${index}_email`] && errors[`ref_${index}_email`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`ref_${index}_email`] && errors[`ref_${index}_email`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                                    required
-                                />
-                                {touchedFields[`ref_${index}_email`] && errors[`ref_${index}_email`] && (
-                                    <p className="mt-1 text-xs text-destructive">{errors[`ref_${index}_email`]}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">
-                                    Relationship <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    value={ref.relationship}
-                                    onChange={(e) => updateReference(index, 'relationship', e.target.value)}
-                                    onFocus={() => markFieldTouched(`ref_${index}_relationship`)}
-                                    onBlur={onBlur}
-                                    aria-invalid={!!(touchedFields[`ref_${index}_relationship`] && errors[`ref_${index}_relationship`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`ref_${index}_relationship`] && errors[`ref_${index}_relationship`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                                    required
-                                >
-                                    {!touchedFields[`ref_${index}_relationship`] && <option value="">Select...</option>}
-                                    {REFERENCE_RELATIONSHIPS.map((rel) => (
-                                        <option key={rel} value={rel}>
-                                            {rel}
-                                        </option>
-                                    ))}
-                                </select>
-                                {touchedFields[`ref_${index}_relationship`] && errors[`ref_${index}_relationship`] && (
-                                    <p className="mt-1 text-xs text-destructive">{errors[`ref_${index}_relationship`]}</p>
-                                )}
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="mb-1 block text-sm">
-                                    Years Known <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="number"
-                                    value={ref.years_known}
-                                    onChange={(e) => updateReference(index, 'years_known', e.target.value)}
-                                    onBlur={onBlur}
-                                    aria-invalid={!!(touchedFields[`ref_${index}_years_known`] && errors[`ref_${index}_years_known`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`ref_${index}_years_known`] && errors[`ref_${index}_years_known`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                                    required
-                                />
-                                {touchedFields[`ref_${index}_years_known`] && errors[`ref_${index}_years_known`] && (
-                                    <p className="mt-1 text-xs text-destructive">{errors[`ref_${index}_years_known`]}</p>
-                                )}
-                            </div>
-                        </div>
-                        {ref.relationship === 'Other' && (
-                            <div className="mt-3">
-                                <label className="mb-1 block text-sm">
-                                    Please specify relationship <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    value={ref.relationship_other}
-                                    onChange={(e) => updateReference(index, 'relationship_other', e.target.value)}
-                                    onBlur={onBlur}
-                                    placeholder="Enter relationship..."
-                                    aria-invalid={!!(touchedFields[`ref_${index}_relationship_other`] && errors[`ref_${index}_relationship_other`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`ref_${index}_relationship_other`] && errors[`ref_${index}_relationship_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                                    required
-                                />
-                                {touchedFields[`ref_${index}_relationship_other`] && errors[`ref_${index}_relationship_other`] && (
-                                    <p className="mt-1 text-xs text-destructive">{errors[`ref_${index}_relationship_other`]}</p>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                ))}
+                    ) : (
+                        landlordRefs.map((ref, index) => renderReferenceCard(ref, index, getActualIndex(ref)))
+                    )}
+                </div>
 
-                <button type="button" onClick={addReference} className="flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline">
+                <button
+                    type="button"
+                    onClick={() => addReference('landlord')}
+                    className="mt-3 flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline"
+                >
                     <Plus size={16} />
-                    Add Reference
+                    Add Landlord Reference
                 </button>
             </div>
+
+            {/* Personal & Professional References Section */}
+            <div className="border-t border-border pt-6">
+                <div className="mb-3 flex items-center gap-2">
+                    <User size={20} className="text-primary" />
+                    <h3 className="font-semibold">Other References</h3>
+                    <span className="text-sm text-muted-foreground">(Optional)</span>
+                </div>
+                <p className="mb-4 text-sm text-muted-foreground">
+                    Add personal or professional references who can vouch for your character and reliability.
+                </p>
+
+                <div className="space-y-3">
+                    {personalRefs.length === 0 && professionalRefs.length === 0 ? (
+                        <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
+                            <p className="text-sm text-muted-foreground">No other references added yet.</p>
+                        </div>
+                    ) : (
+                        <>
+                            {professionalRefs.map((ref, index) => renderReferenceCard(ref, index, getActualIndex(ref)))}
+                            {personalRefs.map((ref, index) => renderReferenceCard(ref, index, getActualIndex(ref)))}
+                        </>
+                    )}
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-3">
+                    <button
+                        type="button"
+                        onClick={() => addReference('professional')}
+                        className="flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline"
+                    >
+                        <Plus size={16} />
+                        <Briefcase size={14} />
+                        Add Professional Reference
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => addReference('personal')}
+                        className="flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline"
+                    >
+                        <Plus size={16} />
+                        <User size={14} />
+                        Add Personal Reference
+                    </button>
+                </div>
+            </div>
+
+            {/* Summary */}
+            {data.references.length > 0 && (
+                <div className="rounded-lg bg-muted/50 p-4">
+                    <p className="text-sm text-muted-foreground">
+                        <strong>{data.references.length}</strong> reference{data.references.length !== 1 ? 's' : ''} added
+                        {landlordRefs.length > 0 && (
+                            <span>
+                                {' '}
+                                ({landlordRefs.length} landlord, {professionalRefs.length + personalRefs.length} other)
+                            </span>
+                        )}
+                    </p>
+                </div>
+            )}
         </div>
     );
 }

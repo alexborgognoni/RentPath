@@ -176,11 +176,10 @@ class PropertyViewController extends Controller
         $user = Auth::user();
 
         // Auto-create tenant profile if doesn't exist (will be filled during application)
-        if (! $user->tenantProfile) {
-            $user->tenantProfile()->create([]);
-        }
-
         $tenantProfile = $user->tenantProfile;
+        if (! $tenantProfile) {
+            $tenantProfile = $user->tenantProfile()->create([]);
+        }
 
         // Check if user already has an active application for this property (excluding drafts)
         $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)

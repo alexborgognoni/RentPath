@@ -71,6 +71,8 @@ class TenantProfile extends Model
         'payslip_3_original_name',
         'student_proof_path',
         'student_proof_original_name',
+        'other_income_proof_path',
+        'other_income_proof_original_name',
         'guarantor_id_path',
         'guarantor_id_original_name',
         'guarantor_proof_income_path',
@@ -86,8 +88,10 @@ class TenantProfile extends Model
 
         // Preferences
         'occupants_count',
+        'occupants_details',
         'has_pets',
         'pets_description',
+        'pets_details',
         'is_smoker',
 
         // Verification
@@ -113,6 +117,8 @@ class TenantProfile extends Model
         'profile_verified_at' => 'datetime',
         'verification_rejected_fields' => 'array',
         'occupants_count' => 'integer',
+        'occupants_details' => 'array',
+        'pets_details' => 'array',
     ];
 
     /**
@@ -139,6 +145,33 @@ class TenantProfile extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(Application::class);
+    }
+
+    /**
+     * The references associated with this tenant profile.
+     */
+    public function references(): HasMany
+    {
+        return $this->hasMany(TenantReference::class);
+    }
+
+    /**
+     * Get landlord references only.
+     */
+    public function landlordReferences(): HasMany
+    {
+        return $this->references()->where('type', TenantReference::TYPE_LANDLORD);
+    }
+
+    /**
+     * Get personal references (non-landlord).
+     */
+    public function personalReferences(): HasMany
+    {
+        return $this->references()->whereIn('type', [
+            TenantReference::TYPE_PERSONAL,
+            TenantReference::TYPE_PROFESSIONAL,
+        ]);
     }
 
     /**
@@ -258,6 +291,15 @@ class TenantProfile extends Model
     }
 
     /**
+     * Get the URL for other income proof document (5-minute signed URL).
+     * Used for unemployed/retired tenants to prove benefits, savings, pension, etc.
+     */
+    public function getOtherIncomeProofUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->other_income_proof_path, 'private', 5);
+    }
+
+    /**
      * Get the URL for guarantor ID (5-minute signed URL).
      */
     public function getGuarantorIdUrlAttribute(): ?string
@@ -282,6 +324,14 @@ class TenantProfile extends Model
     }
 
     /**
+     * Check if the tenant is unemployed or retired.
+     */
+    public function isUnemployedOrRetired(): bool
+    {
+        return in_array($this->employment_status, ['unemployed', 'retired']);
+    }
+
+    /**
      * Get required documents based on employment status.
      */
     public function getRequiredDocuments(): array
@@ -297,6 +347,10 @@ class TenantProfile extends Model
 
         if ($this->isStudent()) {
             $required[] = 'student_proof_path';
+        }
+
+        if ($this->isUnemployedOrRetired()) {
+            $required[] = 'other_income_proof_path';
         }
 
         if ($this->has_guarantor) {

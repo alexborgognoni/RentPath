@@ -108,12 +108,13 @@ export function useWizard<TData, TStepId extends string>({
     // Track if we should skip the next step lock check (for forward navigation)
     const skipNextLockCheck = useRef(false);
 
-    // Derived values
-    const currentStep = steps[currentStepIndex].id;
-    const currentStepConfig = steps[currentStepIndex];
-    const isFirstStep = currentStepIndex === 0;
-    const isLastStep = currentStepIndex === steps.length - 1;
-    const progress = ((currentStepIndex + 1) / steps.length) * 100;
+    // Derived values (with safety bounds check)
+    const safeStepIndex = Math.max(0, Math.min(currentStepIndex, steps.length - 1));
+    const currentStep = steps[safeStepIndex].id;
+    const currentStepConfig = steps[safeStepIndex];
+    const isFirstStep = safeStepIndex === 0;
+    const isLastStep = safeStepIndex === steps.length - 1;
+    const progress = ((safeStepIndex + 1) / steps.length) * 100;
 
     // Memoize data for autosave comparison
     const dataString = useMemo(() => JSON.stringify(data), [data]);
@@ -176,14 +177,20 @@ export function useWizard<TData, TStepId extends string>({
                 setAutosaveStatus('saved');
 
                 // Backend may reduce max_valid_step if validation failed
+                // Allow user to stay on the first invalid step to fix it
                 if (result.maxValidStep !== undefined) {
-                    const backendMaxStep = result.maxValidStep - 1;
-                    if (backendMaxStep < maxStepReached) {
-                        setMaxStepReached(backendMaxStep);
-                        if (currentStepIndex > backendMaxStep) {
-                            setCurrentStepIndex(backendMaxStep);
-                            onStepChange?.(steps[backendMaxStep].id, backendMaxStep);
-                        }
+                    const lastValidStepIndex = result.maxValidStep - 1; // 0-indexed
+                    const firstInvalidStepIndex = lastValidStepIndex + 1; // User can be here to fix
+
+                    // Only reduce maxStepReached if user has progressed beyond first invalid step
+                    if (firstInvalidStepIndex < maxStepReached) {
+                        setMaxStepReached(firstInvalidStepIndex);
+                    }
+
+                    // Only navigate back if currently beyond the first invalid step
+                    if (currentStepIndex > firstInvalidStepIndex) {
+                        setCurrentStepIndex(firstInvalidStepIndex);
+                        onStepChange?.(steps[firstInvalidStepIndex].id, firstInvalidStepIndex);
                     }
                 }
             } catch (error) {

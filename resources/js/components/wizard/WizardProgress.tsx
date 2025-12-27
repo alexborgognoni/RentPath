@@ -26,21 +26,25 @@ export function WizardProgress<TStepId extends string>({
     const { translations } = usePage<SharedData>().props;
     const t = (key: string, params?: Record<string, string | number>) => translate(translations, key, params);
 
+    // Safety bounds check for step index
+    const safeStepIndex = Math.max(0, Math.min(currentStepIndex, steps.length - 1));
+    const currentStepConfig = steps[safeStepIndex];
+
     return (
         <div className="w-full">
             {/* Mobile: Simple progress bar with step counter */}
             <div className="md:hidden">
                 <div className="mb-2 flex items-center justify-between text-sm">
                     <span className="font-medium text-foreground">
-                        {t('wizard.progress.stepOf', { current: currentStepIndex + 1, total: steps.length })}
+                        {t('wizard.progress.stepOf', { current: safeStepIndex + 1, total: steps.length })}
                     </span>
-                    <span className="text-muted-foreground">{steps[currentStepIndex].shortTitle}</span>
+                    <span className="text-muted-foreground">{currentStepConfig?.shortTitle}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-muted">
                     <motion.div
                         className="h-full bg-gradient-to-r from-primary to-primary/80"
                         initial={{ width: 0 }}
-                        animate={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
+                        animate={{ width: `${((safeStepIndex + 1) / steps.length) * 100}%` }}
                         transition={{ duration: 0.3, ease: 'easeOut' }}
                     />
                 </div>

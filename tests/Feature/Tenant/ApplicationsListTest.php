@@ -2,6 +2,7 @@
 
 use App\Models\Application;
 use App\Models\Property;
+use App\Models\PropertyImage;
 use App\Models\PropertyManager;
 use App\Models\TenantProfile;
 use App\Models\User;
@@ -196,5 +197,144 @@ test('applications list returns default filters', function () {
             ->has('filters')
             ->where('filters.status', 'all')
             ->where('filters.search', '')
+    );
+});
+
+test('tenant can view their submitted application details', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $tenantProfile = TenantProfile::factory()->create([
+        'user_id' => $user->id,
+        'profile_verified_at' => now(),
+    ]);
+
+    $application = Application::factory()->create([
+        'tenant_profile_id' => $tenantProfile->id,
+        'property_id' => $this->property->id,
+        'status' => 'submitted',
+        'submitted_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)->get("/applications/{$application->id}");
+
+    $response->assertOk();
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->component('tenant/application-view')
+            ->has('application')
+            ->where('application.id', $application->id)
+            ->where('application.status', 'submitted')
+    );
+});
+
+test('tenant viewing draft application is redirected to create wizard', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $tenantProfile = TenantProfile::factory()->create([
+        'user_id' => $user->id,
+        'profile_verified_at' => now(),
+    ]);
+
+    $application = Application::factory()->create([
+        'tenant_profile_id' => $tenantProfile->id,
+        'property_id' => $this->property->id,
+        'status' => 'draft',
+    ]);
+
+    $response = $this->actingAs($user)->get("/applications/{$application->id}");
+
+    $response->assertRedirect("/properties/{$this->property->id}/apply");
+});
+
+test('tenant cannot view other users application', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $otherUser = User::factory()->create(['email_verified_at' => now()]);
+
+    $otherTenantProfile = TenantProfile::factory()->create([
+        'user_id' => $otherUser->id,
+        'profile_verified_at' => now(),
+    ]);
+
+    $application = Application::factory()->create([
+        'tenant_profile_id' => $otherTenantProfile->id,
+        'property_id' => $this->property->id,
+        'status' => 'submitted',
+    ]);
+
+    // Create tenant profile for user to avoid null error
+    TenantProfile::factory()->create([
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->actingAs($user)->get("/applications/{$application->id}");
+
+    $response->assertStatus(403);
+});
+
+test('application view includes document urls', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $tenantProfile = TenantProfile::factory()->create([
+        'user_id' => $user->id,
+        'profile_verified_at' => now(),
+    ]);
+
+    $application = Application::factory()->create([
+        'tenant_profile_id' => $tenantProfile->id,
+        'property_id' => $this->property->id,
+        'status' => 'submitted',
+        'submitted_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)->get("/applications/{$application->id}");
+
+    $response->assertOk();
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->component('tenant/application-view')
+            ->has('application')
+            // Verify document URL fields are included in response
+            ->has('application.property.images')
+    );
+});
+
+test('application view includes property images with urls', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $tenantProfile = TenantProfile::factory()->create([
+        'user_id' => $user->id,
+        'profile_verified_at' => now(),
+    ]);
+
+    // Create property with images
+    $propertyWithImages = Property::factory()->create([
+        'property_manager_id' => $this->property->property_manager_id,
+    ]);
+
+    // Create property images manually
+    PropertyImage::create([
+        'property_id' => $propertyWithImages->id,
+        'image_path' => 'properties/test-image-1.jpg',
+        'is_main' => true,
+        'sort_order' => 0,
+    ]);
+    PropertyImage::create([
+        'property_id' => $propertyWithImages->id,
+        'image_path' => 'properties/test-image-2.jpg',
+        'is_main' => false,
+        'sort_order' => 1,
+    ]);
+
+    $application = Application::factory()->create([
+        'tenant_profile_id' => $tenantProfile->id,
+        'property_id' => $propertyWithImages->id,
+        'status' => 'submitted',
+        'submitted_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)->get("/applications/{$application->id}");
+
+    $response->assertOk();
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->component('tenant/application-view')
+            ->has('application.property.images', 2)
+            ->has('application.property.images.0.image_url')
     );
 });

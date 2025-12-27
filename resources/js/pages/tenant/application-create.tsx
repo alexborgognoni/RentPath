@@ -1,4 +1,11 @@
-import { DetailsStep, DocumentsStep, EmergencyStep, ReferencesStep } from '@/components/application-wizard/steps';
+import {
+    DetailsStep,
+    EmergencyStep,
+    EmploymentIncomeStep,
+    PersonalInfoStep,
+    ReferencesStep,
+    ReviewStep,
+} from '@/components/application-wizard/steps';
 import { WizardNavigation, WizardProgress } from '@/components/wizard';
 import { useApplicationWizard, type ApplicationStep, type DraftApplication } from '@/hooks/useApplicationWizard';
 import { TenantLayout } from '@/layouts/tenant-layout';
@@ -30,9 +37,52 @@ export default function ApplicationCreate() {
         wizard.saveNow();
     }, [wizard]);
 
+    // Existing document file names for display
+    const existingDocuments = {
+        id_document: tenantProfile?.id_document_original_name,
+        employment_contract: tenantProfile?.employment_contract_original_name,
+        payslip_1: tenantProfile?.payslip_1_original_name,
+        payslip_2: tenantProfile?.payslip_2_original_name,
+        payslip_3: tenantProfile?.payslip_3_original_name,
+        student_proof: tenantProfile?.student_proof_original_name,
+        guarantor_id: tenantProfile?.guarantor_id_original_name,
+        guarantor_proof_income: tenantProfile?.guarantor_proof_income_original_name,
+    };
+
+    // Handle edit from review step
+    const handleEditStep = useCallback(
+        (step: string) => {
+            wizard.goToStep(step as ApplicationStep);
+        },
+        [wizard],
+    );
+
     // Render current step content
     const renderStep = () => {
         switch (wizard.currentStep) {
+            case 'personal':
+                return (
+                    <PersonalInfoStep
+                        data={wizard.data}
+                        errors={wizard.errors}
+                        touchedFields={wizard.touchedFields}
+                        updateField={wizard.updateField}
+                        markFieldTouched={wizard.markFieldTouched}
+                        onBlur={handleBlur}
+                    />
+                );
+            case 'employment':
+                return (
+                    <EmploymentIncomeStep
+                        data={wizard.data}
+                        errors={wizard.errors}
+                        touchedFields={wizard.touchedFields}
+                        updateField={wizard.updateField}
+                        markFieldTouched={wizard.markFieldTouched}
+                        onBlur={handleBlur}
+                        existingDocuments={existingDocuments}
+                    />
+                );
             case 'details':
                 return (
                     <DetailsStep
@@ -70,11 +120,11 @@ export default function ApplicationCreate() {
                         data={wizard.data}
                         updateField={wizard.updateField}
                         onBlur={handleBlur}
-                        hasProfileEmergencyContact={!!tenantProfile.emergency_contact_name}
+                        hasProfileEmergencyContact={!!tenantProfile?.emergency_contact_name}
                     />
                 );
-            case 'documents':
-                return <DocumentsStep data={wizard.data} updateField={wizard.updateField} uploadProgress={wizard.uploadProgress} />;
+            case 'review':
+                return <ReviewStep data={wizard.data} onEditStep={handleEditStep} />;
             default:
                 return null;
         }
