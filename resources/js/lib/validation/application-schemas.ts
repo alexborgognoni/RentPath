@@ -1,3 +1,4 @@
+import { validatePhoneNumber } from '@/utils/phone-validation';
 import { z } from 'zod';
 
 // Step IDs - 6 steps (documents step removed)
@@ -259,6 +260,19 @@ export const personalInfoStepSchema = z
         {
             message: APPLICATION_MESSAGES.profile_date_of_birth.adult,
             path: ['profile_date_of_birth'],
+        },
+    )
+    .refine(
+        (data) => {
+            // Validate phone number format for selected country
+            if (data.profile_phone_number && data.profile_phone_country_code) {
+                return validatePhoneNumber(data.profile_phone_number, data.profile_phone_country_code);
+            }
+            return true;
+        },
+        {
+            message: APPLICATION_MESSAGES.profile_phone_number.invalid,
+            path: ['profile_phone_number'],
         },
     );
 

@@ -32,10 +32,21 @@ export default function ApplicationCreate() {
         token,
     });
 
-    // Handle blur to trigger autosave
+    // Handle blur to trigger validation and autosave
     const handleBlur = useCallback(() => {
+        wizard.validateCurrentStep();
         wizard.saveNow();
     }, [wizard]);
+
+    // Handle blur for a specific field - marks as touched and validates
+    const handleFieldBlur = useCallback(
+        (field: string) => {
+            wizard.markFieldTouched(field);
+            wizard.validateCurrentStep();
+            wizard.saveNow();
+        },
+        [wizard],
+    );
 
     // Existing document file names for display
     const existingDocuments = {
@@ -69,6 +80,7 @@ export default function ApplicationCreate() {
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
                         onBlur={handleBlur}
+                        onFieldBlur={handleFieldBlur}
                     />
                 );
             case 'employment':

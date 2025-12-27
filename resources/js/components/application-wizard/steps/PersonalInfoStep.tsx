@@ -1,57 +1,10 @@
+import { CountrySelect } from '@/components/ui/country-select';
+import { NationalitySelect } from '@/components/ui/nationality-select';
+import { PhoneInput } from '@/components/ui/phone-input';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
-import { COUNTRIES } from '@/lib/validation/property-validation';
-
-// Common phone country codes for EU focus
-const PHONE_COUNTRY_CODES = [
-    { code: '+31', country: 'NL' },
-    { code: '+32', country: 'BE' },
-    { code: '+33', country: 'FR' },
-    { code: '+34', country: 'ES' },
-    { code: '+39', country: 'IT' },
-    { code: '+41', country: 'CH' },
-    { code: '+43', country: 'AT' },
-    { code: '+44', country: 'GB' },
-    { code: '+49', country: 'DE' },
-    { code: '+351', country: 'PT' },
-    { code: '+352', country: 'LU' },
-    { code: '+353', country: 'IE' },
-    { code: '+1', country: 'US' },
-];
-
-// Nationalities using ISO 3166-1 alpha-2 codes (industry standard)
-// Store code, display demonym
-const NATIONALITIES = [
-    { code: 'NL', name: 'Dutch' },
-    { code: 'BE', name: 'Belgian' },
-    { code: 'DE', name: 'German' },
-    { code: 'FR', name: 'French' },
-    { code: 'GB', name: 'British' },
-    { code: 'IE', name: 'Irish' },
-    { code: 'IT', name: 'Italian' },
-    { code: 'ES', name: 'Spanish' },
-    { code: 'PT', name: 'Portuguese' },
-    { code: 'AT', name: 'Austrian' },
-    { code: 'CH', name: 'Swiss' },
-    { code: 'US', name: 'American' },
-    { code: 'OTHER', name: 'Other' },
-];
-
-// Country code to name mapping
-const COUNTRY_NAMES: Record<string, string> = {
-    AT: 'Austria',
-    BE: 'Belgium',
-    CH: 'Switzerland',
-    DE: 'Germany',
-    ES: 'Spain',
-    FR: 'France',
-    GB: 'United Kingdom',
-    IE: 'Ireland',
-    IT: 'Italy',
-    LU: 'Luxembourg',
-    NL: 'Netherlands',
-    PT: 'Portugal',
-    US: 'United States',
-};
+import { useGeoLocation } from '@/hooks/useGeoLocation';
+import { getCountryByIso2 } from '@/utils/country-data';
+import { useEffect, useRef } from 'react';
 
 interface PersonalInfoStepProps {
     data: ApplicationWizardData;
@@ -60,12 +13,60 @@ interface PersonalInfoStepProps {
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
     markFieldTouched: (field: string) => void;
     onBlur: () => void;
+    onFieldBlur?: (field: string) => void;
 }
 
-export function PersonalInfoStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur }: PersonalInfoStepProps) {
+export function PersonalInfoStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur, onFieldBlur }: PersonalInfoStepProps) {
+    const { countryCode: detectedCountry } = useGeoLocation();
+    const hasSetDefaults = useRef(false);
+
+    // Create field-specific blur handler
+    const handleFieldBlur = (field: string) => () => {
+        if (onFieldBlur) {
+            onFieldBlur(field);
+        } else {
+            markFieldTouched(field);
+            onBlur();
+        }
+    };
+
+    // Set default country-related fields based on IP detection (only once, if empty)
+    useEffect(
+        () => {
+            if (detectedCountry && !hasSetDefaults.current) {
+                hasSetDefaults.current = true;
+
+                // Set default phone country code if not set
+                if (!data.profile_phone_country_code) {
+                    const country = getCountryByIso2(detectedCountry);
+                    if (country) {
+                        updateField('profile_phone_country_code', `+${country.dialCode}`);
+                    }
+                }
+                // Set default current country if not set
+                if (!data.profile_current_country) {
+                    updateField('profile_current_country', detectedCountry);
+                }
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally run only when detectedCountry changes, using ref guard to prevent loops
+        [detectedCountry],
+    );
+
     const handleFieldChange = (field: keyof ApplicationWizardData, value: unknown) => {
         updateField(field, value as ApplicationWizardData[typeof field]);
         markFieldTouched(field);
+    };
+
+    const handlePhoneChange = (phoneNumber: string, countryCode: string) => {
+        updateField('profile_phone_number', phoneNumber);
+        updateField('profile_phone_country_code', countryCode);
+        markFieldTouched('profile_phone_number');
+    };
+
+    const handleNationalityChange = (value: string) => {
+        updateField('profile_nationality', value);
+        markFieldTouched('profile_nationality');
     };
 
     const getFieldClass = (field: string) => {
@@ -105,21 +106,14 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
                     <label className="mb-2 block text-sm font-medium">
                         Nationality <span className="text-red-500">*</span>
                     </label>
-                    <select
+                    <NationalitySelect
                         value={data.profile_nationality}
-                        onChange={(e) => handleFieldChange('profile_nationality', e.target.value)}
+                        onChange={handleNationalityChange}
                         onBlur={onBlur}
+                        defaultCountry={detectedCountry}
                         aria-invalid={!!(touchedFields.profile_nationality && errors.profile_nationality)}
-                        className={getFieldClass('profile_nationality')}
-                        required
-                    >
-                        <option value="">Select nationality...</option>
-                        {NATIONALITIES.map((nat) => (
-                            <option key={nat.code} value={nat.code}>
-                                {nat.name}
-                            </option>
-                        ))}
-                    </select>
+                        error={touchedFields.profile_nationality ? errors.profile_nationality : undefined}
+                    />
                     {touchedFields.profile_nationality && errors.profile_nationality && (
                         <p className="mt-1 text-sm text-destructive">{errors.profile_nationality}</p>
                     )}
@@ -131,30 +125,16 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
                 <label className="mb-2 block text-sm font-medium">
                     Phone Number <span className="text-red-500">*</span>
                 </label>
-                <div className="flex gap-2">
-                    <select
-                        value={data.profile_phone_country_code}
-                        onChange={(e) => handleFieldChange('profile_phone_country_code', e.target.value)}
-                        onBlur={onBlur}
-                        className="w-32 rounded-lg border border-border bg-background px-3 py-2"
-                    >
-                        {PHONE_COUNTRY_CODES.map((item) => (
-                            <option key={item.code} value={item.code}>
-                                {item.code} ({item.country})
-                            </option>
-                        ))}
-                    </select>
-                    <input
-                        type="tel"
-                        value={data.profile_phone_number}
-                        onChange={(e) => handleFieldChange('profile_phone_number', e.target.value)}
-                        onBlur={onBlur}
-                        placeholder="612345678"
-                        aria-invalid={!!(touchedFields.profile_phone_number && errors.profile_phone_number)}
-                        className={`flex-1 ${getFieldClass('profile_phone_number')}`}
-                        required
-                    />
-                </div>
+                <PhoneInput
+                    value={data.profile_phone_number}
+                    countryCode={data.profile_phone_country_code}
+                    onChange={handlePhoneChange}
+                    onBlur={handleFieldBlur('profile_phone_number')}
+                    defaultCountry={detectedCountry}
+                    aria-invalid={!!(touchedFields.profile_phone_number && errors.profile_phone_number)}
+                    error={touchedFields.profile_phone_number ? errors.profile_phone_number : undefined}
+                    placeholder="612345678"
+                />
                 {touchedFields.profile_phone_number && errors.profile_phone_number && (
                     <p className="mt-1 text-sm text-destructive">{errors.profile_phone_number}</p>
                 )}
@@ -247,21 +227,15 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
                         <label className="mb-2 block text-sm font-medium">
                             Country <span className="text-red-500">*</span>
                         </label>
-                        <select
+                        <CountrySelect
                             value={data.profile_current_country}
-                            onChange={(e) => handleFieldChange('profile_current_country', e.target.value)}
+                            onChange={(value) => handleFieldChange('profile_current_country', value)}
                             onBlur={onBlur}
+                            defaultCountry={detectedCountry}
+                            placeholder="Select country..."
                             aria-invalid={!!(touchedFields.profile_current_country && errors.profile_current_country)}
-                            className={getFieldClass('profile_current_country')}
-                            required
-                        >
-                            <option value="">Select country...</option>
-                            {COUNTRIES.map((code) => (
-                                <option key={code} value={code}>
-                                    {COUNTRY_NAMES[code] || code}
-                                </option>
-                            ))}
-                        </select>
+                            error={touchedFields.profile_current_country ? errors.profile_current_country : undefined}
+                        />
                         {touchedFields.profile_current_country && errors.profile_current_country && (
                             <p className="mt-1 text-sm text-destructive">{errors.profile_current_country}</p>
                         )}
