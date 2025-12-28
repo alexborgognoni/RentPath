@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { AlertCircle, CheckCircle2, Eye, FileText, Image, Loader2, RefreshCw, Upload, X } from 'lucide-react';
-import { useCallback, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { useDropzone, type Accept } from 'react-dropzone';
 
 export type FileUploadStatus = 'idle' | 'uploading' | 'success' | 'error';
@@ -75,6 +75,15 @@ export function FileUpload({
     const [progress, setProgress] = useState(0);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
+
+    // Reset uploadedFile state when existingFile changes (e.g., after page reload)
+    // This ensures we show the "existing file" UI with preview URL instead of "just uploaded" UI
+    useEffect(() => {
+        if (existingFile) {
+            setUploadedFile(null);
+            setStatus('idle');
+        }
+    }, [existingFile?.originalName, existingFile?.previewUrl]);
 
     const uploadFile = useCallback(
         async (file: File) => {
@@ -197,11 +206,7 @@ export function FileUpload({
 
     return (
         <div className={cn('space-y-2', className)}>
-            {label && (
-                <label className="block text-sm font-medium">
-                    {label} {required && <span className="text-red-500">*</span>}
-                </label>
-            )}
+            {label && <label className="block text-sm font-medium">{label}</label>}
 
             {/* Existing file display */}
             {hasExistingFile && (

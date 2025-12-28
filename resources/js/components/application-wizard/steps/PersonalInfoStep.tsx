@@ -127,9 +127,7 @@ export function PersonalInfoStep({
             {/* Date of Birth & Nationality */}
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                    <label className="mb-2 block text-sm font-medium">
-                        Date of Birth <span className="text-red-500">*</span>
-                    </label>
+                    <label className="mb-2 block text-sm font-medium">Date of Birth</label>
                     <input
                         type="date"
                         value={data.profile_date_of_birth}
@@ -146,9 +144,7 @@ export function PersonalInfoStep({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium">
-                        Nationality <span className="text-red-500">*</span>
-                    </label>
+                    <label className="mb-2 block text-sm font-medium">Nationality</label>
                     <NationalitySelect
                         value={data.profile_nationality}
                         onChange={handleNationalityChange}
@@ -165,9 +161,7 @@ export function PersonalInfoStep({
 
             {/* Phone Number */}
             <div>
-                <label className="mb-2 block text-sm font-medium">
-                    Phone Number <span className="text-red-500">*</span>
-                </label>
+                <label className="mb-2 block text-sm font-medium">Phone Number</label>
                 <PhoneInput
                     value={data.profile_phone_number}
                     countryCode={data.profile_phone_country_code}
@@ -190,9 +184,7 @@ export function PersonalInfoStep({
                 {/* Street Name & House Number */}
                 <div className="grid gap-4 md:grid-cols-3">
                     <div className="md:col-span-2">
-                        <label className="mb-2 block text-sm font-medium">
-                            Street Name <span className="text-red-500">*</span>
-                        </label>
+                        <label className="mb-2 block text-sm font-medium">Street Name</label>
                         <input
                             type="text"
                             value={data.profile_current_street_name}
@@ -209,9 +201,7 @@ export function PersonalInfoStep({
                     </div>
 
                     <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            House Number <span className="text-red-500">*</span>
-                        </label>
+                        <label className="mb-2 block text-sm font-medium">House Number</label>
                         <input
                             type="text"
                             value={data.profile_current_house_number}
@@ -248,9 +238,7 @@ export function PersonalInfoStep({
                 {/* City & State/Province */}
                 <div className={`mt-4 grid gap-4 ${showStateProvince ? 'md:grid-cols-2' : ''}`}>
                     <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            City <span className="text-red-500">*</span>
-                        </label>
+                        <label className="mb-2 block text-sm font-medium">City</label>
                         <input
                             type="text"
                             value={data.profile_current_city}
@@ -269,7 +257,8 @@ export function PersonalInfoStep({
                     {showStateProvince && (
                         <div>
                             <label className="mb-2 block text-sm font-medium">
-                                {stateProvinceLabel} {stateProvinceRequired && <span className="text-red-500">*</span>}
+                                {stateProvinceLabel}
+                                {!stateProvinceRequired && <span className="text-muted-foreground"> (optional)</span>}
                             </label>
                             <StateProvinceSelect
                                 value={data.profile_current_state_province}
@@ -289,9 +278,7 @@ export function PersonalInfoStep({
                 {/* Postal Code & Country */}
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            {postalCodeLabel} <span className="text-red-500">*</span>
-                        </label>
+                        <label className="mb-2 block text-sm font-medium">{postalCodeLabel}</label>
                         <input
                             type="text"
                             value={data.profile_current_postal_code}
@@ -308,9 +295,7 @@ export function PersonalInfoStep({
                     </div>
 
                     <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            Country <span className="text-red-500">*</span>
-                        </label>
+                        <label className="mb-2 block text-sm font-medium">Country</label>
                         <CountrySelect
                             value={data.profile_current_country}
                             onChange={(value) => handleFieldChange('profile_current_country', value)}

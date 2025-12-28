@@ -69,9 +69,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label className="mb-1 block text-sm">
-                            Name <span className="text-destructive">*</span>
-                        </label>
+                        <label className="mb-1 block text-sm">Name </label>
                         <input
                             type="text"
                             value={ref.name}
@@ -86,9 +84,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm">
-                            Relationship <span className="text-destructive">*</span>
-                        </label>
+                        <label className="mb-1 block text-sm">Relationship </label>
                         <select
                             value={ref.relationship}
                             onChange={(e) => updateReference(actualIndex, 'relationship', e.target.value)}
@@ -110,9 +106,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
 
                     {ref.relationship === 'Other' && (
                         <div className="md:col-span-2">
-                            <label className="mb-1 block text-sm">
-                                Please specify <span className="text-destructive">*</span>
-                            </label>
+                            <label className="mb-1 block text-sm">Please specify </label>
                             <input
                                 type="text"
                                 value={ref.relationship_other}
@@ -131,9 +125,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     )}
 
                     <div>
-                        <label className="mb-1 block text-sm">
-                            Phone <span className="text-destructive">*</span>
-                        </label>
+                        <label className="mb-1 block text-sm">Phone </label>
                         <input
                             type="tel"
                             value={ref.phone}
@@ -148,9 +140,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm">
-                            Email <span className="text-destructive">*</span>
-                        </label>
+                        <label className="mb-1 block text-sm">Email </label>
                         <input
                             type="email"
                             value={ref.email}
@@ -165,9 +155,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className="mb-1 block text-sm">
-                            Years Known <span className="text-destructive">*</span>
-                        </label>
+                        <label className="mb-1 block text-sm">Years Known </label>
                         <input
                             type="number"
                             min="0"

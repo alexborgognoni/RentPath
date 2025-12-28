@@ -105,9 +105,7 @@ export function EmploymentIncomeStep({
 
             {/* Employment Status Selection */}
             <div>
-                <label className="mb-3 block text-sm font-medium">
-                    Employment Status <span className="text-red-500">*</span>
-                </label>
+                <label className="mb-3 block text-sm font-medium">Employment Status </label>
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
                     {EMPLOYMENT_STATUSES.map((status) => {
                         const Icon = status.icon;
@@ -139,9 +137,7 @@ export function EmploymentIncomeStep({
                 <div className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                Employer Name <span className="text-red-500">*</span>
-                            </label>
+                            <label className="mb-2 block text-sm font-medium">Employer Name </label>
                             <input
                                 type="text"
                                 value={data.profile_employer_name}
@@ -157,9 +153,7 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                Job Title <span className="text-red-500">*</span>
-                            </label>
+                            <label className="mb-2 block text-sm font-medium">Job Title </label>
                             <input
                                 type="text"
                                 value={data.profile_job_title}
@@ -175,9 +169,7 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                Employment Type <span className="text-red-500">*</span>
-                            </label>
+                            <label className="mb-2 block text-sm font-medium">Employment Type </label>
                             <select
                                 value={data.profile_employment_type}
                                 onChange={(e) => handleFieldChange('profile_employment_type', e.target.value)}
@@ -198,9 +190,7 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                Employment Start Date <span className="text-red-500">*</span>
-                            </label>
+                            <label className="mb-2 block text-sm font-medium">Employment Start Date </label>
                             <input
                                 type="date"
                                 value={data.profile_employment_start_date}
@@ -219,9 +209,7 @@ export function EmploymentIncomeStep({
                     {/* Income */}
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                Monthly Income (Gross) <span className="text-red-500">*</span>
-                            </label>
+                            <label className="mb-2 block text-sm font-medium">Monthly Income (Gross) </label>
                             <div className="flex gap-2">
                                 <select
                                     value={data.profile_income_currency}
@@ -339,9 +327,7 @@ export function EmploymentIncomeStep({
                 <div className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                University / Institution <span className="text-red-500">*</span>
-                            </label>
+                            <label className="mb-2 block text-sm font-medium">University / Institution </label>
                             <input
                                 type="text"
                                 value={data.profile_university_name}
@@ -357,9 +343,7 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                Program of Study <span className="text-red-500">*</span>
-                            </label>
+                            <label className="mb-2 block text-sm font-medium">Program of Study </label>
                             <input
                                 type="text"
                                 value={data.profile_program_of_study}
@@ -375,7 +359,9 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Expected Graduation Date</label>
+                            <label className="mb-2 block text-sm font-medium">
+                                Expected Graduation Date <span className="text-muted-foreground">(optional)</span>
+                            </label>
                             <input
                                 type="date"
                                 value={data.profile_expected_graduation_date}
@@ -387,7 +373,9 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Income Source</label>
+                            <label className="mb-2 block text-sm font-medium">
+                                Income Source <span className="text-muted-foreground">(optional)</span>
+                            </label>
                             <input
                                 type="text"
                                 value={data.profile_student_income_source}
@@ -402,7 +390,9 @@ export function EmploymentIncomeStep({
                     {/* Monthly Income for Students */}
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Monthly Income (if any)</label>
+                            <label className="mb-2 block text-sm font-medium">
+                                Monthly Income <span className="text-muted-foreground">(optional)</span>
+                            </label>
                             <div className="flex gap-2">
                                 <select
                                     value={data.profile_income_currency}
@@ -458,7 +448,9 @@ export function EmploymentIncomeStep({
                     {/* Optional: Monthly Income field */}
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Monthly Income (if any)</label>
+                            <label className="mb-2 block text-sm font-medium">
+                                Monthly Income <span className="text-muted-foreground">(optional)</span>
+                            </label>
                             <div className="flex gap-2">
                                 <select
                                     value={data.profile_income_currency}
@@ -534,9 +526,7 @@ export function EmploymentIncomeStep({
                     <div className="space-y-4">
                         <div className="grid gap-4 md:grid-cols-2">
                             <div>
-                                <label className="mb-2 block text-sm font-medium">
-                                    Guarantor Name <span className="text-red-500">*</span>
-                                </label>
+                                <label className="mb-2 block text-sm font-medium">Guarantor Name </label>
                                 <input
                                     type="text"
                                     value={data.profile_guarantor_name}
@@ -552,9 +542,7 @@ export function EmploymentIncomeStep({
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium">
-                                    Relationship <span className="text-red-500">*</span>
-                                </label>
+                                <label className="mb-2 block text-sm font-medium">Relationship </label>
                                 <select
                                     value={data.profile_guarantor_relationship}
                                     onChange={(e) => handleFieldChange('profile_guarantor_relationship', e.target.value)}
@@ -575,7 +563,9 @@ export function EmploymentIncomeStep({
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium">Guarantor Phone</label>
+                                <label className="mb-2 block text-sm font-medium">
+                                    Guarantor Phone <span className="text-muted-foreground">(optional)</span>
+                                </label>
                                 <input
                                     type="tel"
                                     value={data.profile_guarantor_phone}
@@ -587,7 +577,9 @@ export function EmploymentIncomeStep({
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium">Guarantor Email</label>
+                                <label className="mb-2 block text-sm font-medium">
+                                    Guarantor Email <span className="text-muted-foreground">(optional)</span>
+                                </label>
                                 <input
                                     type="email"
                                     value={data.profile_guarantor_email}
@@ -599,7 +591,9 @@ export function EmploymentIncomeStep({
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="mb-2 block text-sm font-medium">Guarantor Address</label>
+                                <label className="mb-2 block text-sm font-medium">
+                                    Guarantor Address <span className="text-muted-foreground">(optional)</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={data.profile_guarantor_address}
@@ -611,7 +605,9 @@ export function EmploymentIncomeStep({
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium">Guarantor Employer</label>
+                                <label className="mb-2 block text-sm font-medium">
+                                    Guarantor Employer <span className="text-muted-foreground">(optional)</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={data.profile_guarantor_employer}
@@ -623,9 +619,7 @@ export function EmploymentIncomeStep({
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium">
-                                    Guarantor Monthly Income <span className="text-red-500">*</span>
-                                </label>
+                                <label className="mb-2 block text-sm font-medium">Guarantor Monthly Income </label>
                                 <div className="flex gap-2">
                                     <span className="flex items-center rounded-lg border border-border bg-muted px-3 text-sm">
                                         {CURRENCY_SYMBOLS[data.profile_income_currency] || '€'}

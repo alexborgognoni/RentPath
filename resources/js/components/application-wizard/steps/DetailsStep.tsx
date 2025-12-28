@@ -44,9 +44,7 @@ export function DetailsStep({
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                    <label className="mb-2 block text-sm font-medium">
-                        Desired Move-In Date <span className="text-red-500">*</span>
-                    </label>
+                    <label className="mb-2 block text-sm font-medium">Desired Move-In Date </label>
                     <input
                         type="date"
                         value={data.desired_move_in_date}
@@ -63,9 +61,7 @@ export function DetailsStep({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium">
-                        Desired Lease Duration (months) <span className="text-red-500">*</span>
-                    </label>
+                    <label className="mb-2 block text-sm font-medium">Desired Lease Duration (months) </label>
                     <input
                         type="number"
                         value={data.lease_duration_months}
@@ -84,7 +80,9 @@ export function DetailsStep({
             </div>
 
             <div>
-                <label className="mb-2 block text-sm font-medium">Message to Landlord (Optional)</label>
+                <label className="mb-2 block text-sm font-medium">
+                    Message to Landlord <span className="text-muted-foreground">(optional)</span>
+                </label>
                 <textarea
                     value={data.message_to_landlord}
                     onChange={(e) => updateField('message_to_landlord', e.target.value)}
@@ -114,9 +112,7 @@ export function DetailsStep({
                         </div>
                         <div className="grid gap-4 md:grid-cols-3">
                             <div>
-                                <label className="mb-1 block text-sm">
-                                    Name <span className="text-red-500">*</span>
-                                </label>
+                                <label className="mb-1 block text-sm">Name </label>
                                 <input
                                     type="text"
                                     value={occupant.name}
@@ -131,9 +127,7 @@ export function DetailsStep({
                                 )}
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm">
-                                    Age <span className="text-red-500">*</span>
-                                </label>
+                                <label className="mb-1 block text-sm">Age </label>
                                 <input
                                     type="number"
                                     value={occupant.age}
@@ -148,9 +142,7 @@ export function DetailsStep({
                                 )}
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm">
-                                    Relationship <span className="text-red-500">*</span>
-                                </label>
+                                <label className="mb-1 block text-sm">Relationship </label>
                                 <select
                                     value={occupant.relationship}
                                     onChange={(e) => updateOccupant(index, 'relationship', e.target.value)}
@@ -174,9 +166,7 @@ export function DetailsStep({
                         </div>
                         {occupant.relationship === 'Other' && (
                             <div className="mt-3">
-                                <label className="mb-1 block text-sm">
-                                    Please specify relationship <span className="text-red-500">*</span>
-                                </label>
+                                <label className="mb-1 block text-sm">Please specify relationship </label>
                                 <input
                                     type="text"
                                     value={occupant.relationship_other}
@@ -230,9 +220,7 @@ export function DetailsStep({
                                 </div>
                                 <div className="grid gap-4 md:grid-cols-4">
                                     <div>
-                                        <label className="mb-1 block text-sm">
-                                            Type <span className="text-red-500">*</span>
-                                        </label>
+                                        <label className="mb-1 block text-sm">Type </label>
                                         <select
                                             value={pet.type}
                                             onChange={(e) => updatePet(index, 'type', e.target.value)}
@@ -254,7 +242,9 @@ export function DetailsStep({
                                         )}
                                     </div>
                                     <div>
-                                        <label className="mb-1 block text-sm">Breed</label>
+                                        <label className="mb-1 block text-sm">
+                                            Breed <span className="text-muted-foreground">(optional)</span>
+                                        </label>
                                         <input
                                             type="text"
                                             value={pet.breed}
@@ -264,7 +254,9 @@ export function DetailsStep({
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-1 block text-sm">Age</label>
+                                        <label className="mb-1 block text-sm">
+                                            Age <span className="text-muted-foreground">(optional)</span>
+                                        </label>
                                         <input
                                             type="number"
                                             value={pet.age}
@@ -274,7 +266,9 @@ export function DetailsStep({
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-1 block text-sm">Weight (kg)</label>
+                                        <label className="mb-1 block text-sm">
+                                            Weight (kg) <span className="text-muted-foreground">(optional)</span>
+                                        </label>
                                         <input
                                             type="number"
                                             value={pet.weight}
@@ -286,9 +280,7 @@ export function DetailsStep({
                                 </div>
                                 {pet.type === 'Other' && (
                                     <div className="mt-3">
-                                        <label className="mb-1 block text-sm">
-                                            Please specify pet type <span className="text-red-500">*</span>
-                                        </label>
+                                        <label className="mb-1 block text-sm">Please specify pet type </label>
                                         <input
                                             type="text"
                                             value={pet.type_other}
