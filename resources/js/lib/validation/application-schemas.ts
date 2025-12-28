@@ -49,6 +49,12 @@ export const APPLICATION_MESSAGES = {
     profile_job_title: {
         required: 'Job title is required',
     },
+    profile_employment_type: {
+        required: 'Employment type is required',
+    },
+    profile_employment_start_date: {
+        required: 'Employment start date is required',
+    },
     profile_monthly_income: {
         required: 'Monthly income is required',
         min: 'Income must be a positive number',
@@ -59,8 +65,11 @@ export const APPLICATION_MESSAGES = {
     profile_program_of_study: {
         required: 'Program of study is required',
     },
-    profile_id_document: {
-        required: 'ID document is required',
+    profile_id_document_front: {
+        required: 'Front side of ID document is required',
+    },
+    profile_id_document_back: {
+        required: 'Back side of ID document is required',
     },
     profile_employment_contract: {
         required: 'Employment contract is required',
@@ -86,6 +95,9 @@ export const APPLICATION_MESSAGES = {
     },
     profile_guarantor_proof_income: {
         required: 'Guarantor proof of income is required',
+    },
+    profile_other_income_proof: {
+        required: 'Proof of income source is required',
     },
 
     // Existing messages
@@ -163,6 +175,21 @@ export const APPLICATION_MESSAGES = {
     },
 };
 
+// ===== Existing Documents Context =====
+// Used to check if documents already exist in tenant profile
+export interface ExistingDocumentsContext {
+    id_document_front?: boolean;
+    id_document_back?: boolean;
+    employment_contract?: boolean;
+    payslip_1?: boolean;
+    payslip_2?: boolean;
+    payslip_3?: boolean;
+    student_proof?: boolean;
+    other_income_proof?: boolean;
+    guarantor_id?: boolean;
+    guarantor_proof_income?: boolean;
+}
+
 // ===== Shared Sub-Schemas =====
 const occupantSchema = z.object({
     name: z.string().min(1, APPLICATION_MESSAGES.occupant.name.required).max(255, APPLICATION_MESSAGES.occupant.name.maxLength),
@@ -236,82 +263,101 @@ const referenceSchema = z.object({
 
 // ===== Step Schemas =====
 
-// Step 1: Personal Info
-export const personalInfoStepSchema = z
-    .object({
-        profile_date_of_birth: z.string().min(1, APPLICATION_MESSAGES.profile_date_of_birth.required),
-        profile_nationality: z.string().min(1, APPLICATION_MESSAGES.profile_nationality.required),
-        profile_phone_country_code: z.string(),
-        profile_phone_number: z.string().min(1, APPLICATION_MESSAGES.profile_phone_number.required),
-        profile_current_street_name: z.string().min(1, APPLICATION_MESSAGES.profile_current_street_name.required),
-        profile_current_house_number: z.string().min(1, APPLICATION_MESSAGES.profile_current_house_number.required),
-        profile_current_address_line_2: z.string().optional(),
-        profile_current_city: z.string().min(1, APPLICATION_MESSAGES.profile_current_city.required),
-        profile_current_state_province: z.string().optional(),
-        profile_current_postal_code: z.string().min(1, APPLICATION_MESSAGES.profile_current_postal_code.required),
-        profile_current_country: z.string().min(1, APPLICATION_MESSAGES.profile_current_country.required),
-    })
-    .refine(
-        (data) => {
-            // Validate user is at least 18 years old
-            if (data.profile_date_of_birth) {
-                const birthDate = new Date(data.profile_date_of_birth);
-                const today = new Date();
-                const age = today.getFullYear() - birthDate.getFullYear();
-                const monthDiff = today.getMonth() - birthDate.getMonth();
-                const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
-                return actualAge >= 18;
-            }
-            return true;
-        },
-        {
-            message: APPLICATION_MESSAGES.profile_date_of_birth.adult,
-            path: ['profile_date_of_birth'],
-        },
-    )
-    .refine(
-        (data) => {
-            // Validate phone number format for selected country
-            if (data.profile_phone_number && data.profile_phone_country_code) {
-                return validatePhoneNumber(data.profile_phone_number, data.profile_phone_country_code);
-            }
-            return true;
-        },
-        {
-            message: APPLICATION_MESSAGES.profile_phone_number.invalid,
-            path: ['profile_phone_number'],
-        },
-    )
-    .refine(
-        (data) => {
-            // Validate postal code format for selected country
-            if (data.profile_current_postal_code && data.profile_current_country) {
-                return validatePostalCode(data.profile_current_postal_code, data.profile_current_country);
-            }
-            return true;
-        },
-        {
-            message: APPLICATION_MESSAGES.profile_current_postal_code.invalid,
-            path: ['profile_current_postal_code'],
-        },
-    )
-    .refine(
-        (data) => {
-            // Validate state/province is provided for countries that require it
-            if (data.profile_current_country && requiresStateProvince(data.profile_current_country)) {
-                return !!data.profile_current_state_province?.trim();
-            }
-            return true;
-        },
-        {
-            message: APPLICATION_MESSAGES.profile_current_state_province.required,
-            path: ['profile_current_state_province'],
-        },
-    );
+// Step 1: Personal Info - Base schema
+const personalInfoBaseSchema = z.object({
+    profile_date_of_birth: z.string().min(1, APPLICATION_MESSAGES.profile_date_of_birth.required),
+    profile_nationality: z.string().min(1, APPLICATION_MESSAGES.profile_nationality.required),
+    profile_phone_country_code: z.string(),
+    profile_phone_number: z.string().min(1, APPLICATION_MESSAGES.profile_phone_number.required),
+    profile_current_street_name: z.string().min(1, APPLICATION_MESSAGES.profile_current_street_name.required),
+    profile_current_house_number: z.string().min(1, APPLICATION_MESSAGES.profile_current_house_number.required),
+    profile_current_address_line_2: z.string().optional(),
+    profile_current_city: z.string().min(1, APPLICATION_MESSAGES.profile_current_city.required),
+    profile_current_state_province: z.string().optional(),
+    profile_current_postal_code: z.string().min(1, APPLICATION_MESSAGES.profile_current_postal_code.required),
+    profile_current_country: z.string().min(1, APPLICATION_MESSAGES.profile_current_country.required),
+    profile_id_document_front: z.any().nullable(),
+    profile_id_document_back: z.any().nullable(),
+});
 
-// Step 2: Employment & Income (with conditional validation)
-export const employmentIncomeStepSchema = z.object({
-    profile_employment_status: z.string().min(1, APPLICATION_MESSAGES.profile_employment_status.required),
+// Factory function that creates personal info schema with existing docs context
+export function createPersonalInfoStepSchema(existingDocs: ExistingDocumentsContext = {}) {
+    return personalInfoBaseSchema.superRefine((data, ctx) => {
+        // Validate user is at least 18 years old
+        if (data.profile_date_of_birth) {
+            const birthDate = new Date(data.profile_date_of_birth);
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+            if (actualAge < 18) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_date_of_birth.adult,
+                    path: ['profile_date_of_birth'],
+                });
+            }
+        }
+
+        // Validate phone number format for selected country
+        if (data.profile_phone_number && data.profile_phone_country_code) {
+            if (!validatePhoneNumber(data.profile_phone_number, data.profile_phone_country_code)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_phone_number.invalid,
+                    path: ['profile_phone_number'],
+                });
+            }
+        }
+
+        // Validate postal code format for selected country
+        if (data.profile_current_postal_code && data.profile_current_country) {
+            if (!validatePostalCode(data.profile_current_postal_code, data.profile_current_country)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_current_postal_code.invalid,
+                    path: ['profile_current_postal_code'],
+                });
+            }
+        }
+
+        // Validate state/province is provided for countries that require it
+        if (data.profile_current_country && requiresStateProvince(data.profile_current_country)) {
+            if (!data.profile_current_state_province?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_current_state_province.required,
+                    path: ['profile_current_state_province'],
+                });
+            }
+        }
+
+        // ID document front always required (unless existing)
+        if (!data.profile_id_document_front && !existingDocs.id_document_front) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.profile_id_document_front.required,
+                path: ['profile_id_document_front'],
+            });
+        }
+
+        // ID document back always required (unless existing)
+        if (!data.profile_id_document_back && !existingDocs.id_document_back) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.profile_id_document_back.required,
+                path: ['profile_id_document_back'],
+            });
+        }
+    });
+}
+
+// Default export for backwards compatibility (no existing docs context)
+export const personalInfoStepSchema = createPersonalInfoStepSchema();
+
+// Step 2: Employment & Income - Base schema with all fields
+const employmentBaseSchema = z.object({
+    profile_employment_status: z.string(),
     profile_employer_name: z.string(),
     profile_job_title: z.string(),
     profile_employment_type: z.string(),
@@ -330,16 +376,183 @@ export const employmentIncomeStepSchema = z.object({
     profile_guarantor_address: z.string(),
     profile_guarantor_employer: z.string(),
     profile_guarantor_monthly_income: z.string(),
-    // Documents are validated separately as Files
-    profile_id_document: z.any().nullable(),
+    // Documents are validated as Files
+    profile_id_document_front: z.any().nullable(),
+    profile_id_document_back: z.any().nullable(),
     profile_employment_contract: z.any().nullable(),
     profile_payslip_1: z.any().nullable(),
     profile_payslip_2: z.any().nullable(),
     profile_payslip_3: z.any().nullable(),
     profile_student_proof: z.any().nullable(),
+    profile_other_income_proof: z.any().nullable(),
     profile_guarantor_id: z.any().nullable(),
     profile_guarantor_proof_income: z.any().nullable(),
 });
+
+// Factory function that creates employment schema with existing docs context
+export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContext = {}) {
+    return employmentBaseSchema.superRefine((data, ctx) => {
+        const status = data.profile_employment_status;
+        const isEmployed = status === 'employed' || status === 'self_employed';
+        const isStudent = status === 'student';
+        const isUnemployedOrRetired = status === 'unemployed' || status === 'retired';
+        const hasGuarantor = data.profile_has_guarantor;
+
+        // Employment status is always required
+        if (!status) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.profile_employment_status.required,
+                path: ['profile_employment_status'],
+            });
+        }
+
+        // Employed/Self-employed validations
+        if (isEmployed) {
+            if (!data.profile_employer_name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_employer_name.required,
+                    path: ['profile_employer_name'],
+                });
+            }
+            if (!data.profile_job_title?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_job_title.required,
+                    path: ['profile_job_title'],
+                });
+            }
+            if (!data.profile_employment_type?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_employment_type.required,
+                    path: ['profile_employment_type'],
+                });
+            }
+            if (!data.profile_employment_start_date?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_employment_start_date.required,
+                    path: ['profile_employment_start_date'],
+                });
+            }
+            if (!data.profile_monthly_income) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_monthly_income.required,
+                    path: ['profile_monthly_income'],
+                });
+            }
+            if (!data.profile_employment_contract && !existingDocs.employment_contract) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_employment_contract.required,
+                    path: ['profile_employment_contract'],
+                });
+            }
+            if (!data.profile_payslip_1 && !existingDocs.payslip_1) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_payslip.required,
+                    path: ['profile_payslip_1'],
+                });
+            }
+            if (!data.profile_payslip_2 && !existingDocs.payslip_2) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_payslip.required,
+                    path: ['profile_payslip_2'],
+                });
+            }
+            if (!data.profile_payslip_3 && !existingDocs.payslip_3) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_payslip.required,
+                    path: ['profile_payslip_3'],
+                });
+            }
+        }
+
+        // Student validations
+        if (isStudent) {
+            if (!data.profile_university_name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_university_name.required,
+                    path: ['profile_university_name'],
+                });
+            }
+            if (!data.profile_program_of_study?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_program_of_study.required,
+                    path: ['profile_program_of_study'],
+                });
+            }
+            if (!data.profile_student_proof && !existingDocs.student_proof) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_student_proof.required,
+                    path: ['profile_student_proof'],
+                });
+            }
+        }
+
+        // Unemployed/Retired validations
+        if (isUnemployedOrRetired) {
+            if (!data.profile_other_income_proof && !existingDocs.other_income_proof) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_other_income_proof.required,
+                    path: ['profile_other_income_proof'],
+                });
+            }
+        }
+
+        // Guarantor validations
+        if (hasGuarantor) {
+            if (!data.profile_guarantor_name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_name.required,
+                    path: ['profile_guarantor_name'],
+                });
+            }
+            if (!data.profile_guarantor_relationship?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_relationship.required,
+                    path: ['profile_guarantor_relationship'],
+                });
+            }
+            if (!data.profile_guarantor_monthly_income) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_monthly_income.required,
+                    path: ['profile_guarantor_monthly_income'],
+                });
+            }
+            if (!data.profile_guarantor_id && !existingDocs.guarantor_id) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_id.required,
+                    path: ['profile_guarantor_id'],
+                });
+            }
+            if (!data.profile_guarantor_proof_income && !existingDocs.guarantor_proof_income) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_proof_income.required,
+                    path: ['profile_guarantor_proof_income'],
+                });
+            }
+        }
+    });
+}
+
+// Default export for backwards compatibility (no existing docs context)
+export const employmentIncomeStepSchema = createEmploymentStepSchema();
 
 // Step 3: Details (move-in, lease, occupants, pets)
 export const detailsStepSchema = z
@@ -411,15 +624,21 @@ export interface ValidationResult {
 /**
  * Validate a specific step
  */
-export function validateApplicationStep(stepId: ApplicationStepId, data: Record<string, unknown>): ValidationResult {
+export function validateApplicationStep(
+    stepId: ApplicationStepId,
+    data: Record<string, unknown>,
+    existingDocs?: ExistingDocumentsContext,
+): ValidationResult {
     let schema: z.ZodSchema;
 
     switch (stepId) {
         case 'personal':
-            schema = personalInfoStepSchema;
+            // Use factory function with existing docs context for personal step
+            schema = createPersonalInfoStepSchema(existingDocs);
             break;
         case 'employment':
-            schema = employmentIncomeStepSchema;
+            // Use factory function with existing docs context for employment step
+            schema = createEmploymentStepSchema(existingDocs);
             break;
         case 'details':
             schema = detailsStepSchema;
@@ -439,87 +658,16 @@ export function validateApplicationStep(stepId: ApplicationStepId, data: Record<
 
     const result = schema.safeParse(data);
 
-    if (result.success) {
-        return { success: true, errors: {} };
-    }
-
     const errors: Record<string, string> = {};
-    result.error.issues.forEach((issue) => {
-        const path = issue.path.map(String).join('.');
-        // Only set the first error for each path
-        if (!errors[path]) {
-            errors[path] = issue.message;
-        }
-    });
 
-    // Additional validation for employment step (conditional based on status)
-    if (stepId === 'employment') {
-        const employmentStatus = data.profile_employment_status as string;
-        const isEmployed = employmentStatus === 'employed' || employmentStatus === 'self_employed';
-        const isStudent = employmentStatus === 'student';
-        const hasGuarantor = data.profile_has_guarantor as boolean;
-
-        // ID document is always required
-        if (!data.profile_id_document) {
-            errors.profile_id_document = APPLICATION_MESSAGES.profile_id_document.required;
-        }
-
-        // Employed-specific validations
-        if (isEmployed) {
-            if (!data.profile_employer_name) {
-                errors.profile_employer_name = APPLICATION_MESSAGES.profile_employer_name.required;
+    if (!result.success) {
+        result.error.issues.forEach((issue) => {
+            const path = issue.path.map(String).join('.');
+            // Only set the first error for each path
+            if (!errors[path]) {
+                errors[path] = issue.message;
             }
-            if (!data.profile_job_title) {
-                errors.profile_job_title = APPLICATION_MESSAGES.profile_job_title.required;
-            }
-            if (!data.profile_monthly_income) {
-                errors.profile_monthly_income = APPLICATION_MESSAGES.profile_monthly_income.required;
-            }
-            if (!data.profile_employment_contract) {
-                errors.profile_employment_contract = APPLICATION_MESSAGES.profile_employment_contract.required;
-            }
-            if (!data.profile_payslip_1) {
-                errors.profile_payslip_1 = APPLICATION_MESSAGES.profile_payslip.required;
-            }
-            if (!data.profile_payslip_2) {
-                errors.profile_payslip_2 = APPLICATION_MESSAGES.profile_payslip.required;
-            }
-            if (!data.profile_payslip_3) {
-                errors.profile_payslip_3 = APPLICATION_MESSAGES.profile_payslip.required;
-            }
-        }
-
-        // Student-specific validations
-        if (isStudent) {
-            if (!data.profile_university_name) {
-                errors.profile_university_name = APPLICATION_MESSAGES.profile_university_name.required;
-            }
-            if (!data.profile_program_of_study) {
-                errors.profile_program_of_study = APPLICATION_MESSAGES.profile_program_of_study.required;
-            }
-            if (!data.profile_student_proof) {
-                errors.profile_student_proof = APPLICATION_MESSAGES.profile_student_proof.required;
-            }
-        }
-
-        // Guarantor validations
-        if (hasGuarantor) {
-            if (!data.profile_guarantor_name) {
-                errors.profile_guarantor_name = APPLICATION_MESSAGES.profile_guarantor_name.required;
-            }
-            if (!data.profile_guarantor_relationship) {
-                errors.profile_guarantor_relationship = APPLICATION_MESSAGES.profile_guarantor_relationship.required;
-            }
-            if (!data.profile_guarantor_monthly_income) {
-                errors.profile_guarantor_monthly_income = APPLICATION_MESSAGES.profile_guarantor_monthly_income.required;
-            }
-            if (!data.profile_guarantor_id) {
-                errors.profile_guarantor_id = APPLICATION_MESSAGES.profile_guarantor_id.required;
-            }
-            if (!data.profile_guarantor_proof_income) {
-                errors.profile_guarantor_proof_income = APPLICATION_MESSAGES.profile_guarantor_proof_income.required;
-            }
-        }
+        });
     }
 
     // Additional validation for occupants with "Other" relationship
@@ -606,12 +754,12 @@ export function validateApplicationStep(stepId: ApplicationStepId, data: Record<
  * Find the first invalid step (returns the index)
  * Returns steps.length if all steps are valid
  */
-export function findFirstInvalidApplicationStep(data: Record<string, unknown>): number {
+export function findFirstInvalidApplicationStep(data: Record<string, unknown>, existingDocs?: ExistingDocumentsContext): number {
     // 6-step order: personal, employment, details, references, emergency, review
     const stepIds: ApplicationStepId[] = ['personal', 'employment', 'details', 'references', 'emergency', 'review'];
 
     for (let i = 0; i < stepIds.length; i++) {
-        const result = validateApplicationStep(stepIds[i], data);
+        const result = validateApplicationStep(stepIds[i], data, existingDocs);
         if (!result.success) {
             return i;
         }
@@ -623,13 +771,13 @@ export function findFirstInvalidApplicationStep(data: Record<string, unknown>): 
 /**
  * Validate all data for submission
  */
-export function validateApplicationForSubmit(data: Record<string, unknown>): ValidationResult {
+export function validateApplicationForSubmit(data: Record<string, unknown>, existingDocs?: ExistingDocumentsContext): ValidationResult {
     const allErrors: Record<string, string> = {};
     // Validate all steps except review (which has no validation)
     const stepIds: ApplicationStepId[] = ['personal', 'employment', 'details', 'references', 'emergency'];
 
     for (const stepId of stepIds) {
-        const result = validateApplicationStep(stepId, data);
+        const result = validateApplicationStep(stepId, data, existingDocs);
         Object.assign(allErrors, result.errors);
     }
 

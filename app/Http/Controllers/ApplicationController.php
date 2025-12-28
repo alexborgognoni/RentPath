@@ -106,6 +106,13 @@ class ApplicationController extends Controller
             ->where('status', 'draft')
             ->first();
 
+        // Re-validate max step based on current profile data
+        // This handles the edge case where profile changes in another application
+        // might invalidate steps that were previously valid
+        if ($draftApplication) {
+            $draftApplication = $this->revalidateDraftMaxStep($draftApplication, $tenantProfile);
+        }
+
         // Check if property is accepting applications
         if (! $property->accepting_applications) {
             return redirect()->route('tenant.properties.show', ['property' => $property->id])
@@ -118,6 +125,64 @@ class ApplicationController extends Controller
             'draftApplication' => $draftApplication,
             'token' => request()->query('token'), // Pass token if accessing via invite
         ]);
+    }
+
+    /**
+     * Re-validate draft application max step based on current profile data.
+     *
+     * This handles the edge case where profile data changed in another application,
+     * potentially invalidating steps that were previously valid.
+     *
+     * Sets current_step to the first invalid step (so user can fix it),
+     * or to the review step (6) if all content steps are valid.
+     */
+    private function revalidateDraftMaxStep(Application $draft, $tenantProfile): Application
+    {
+        // Build validation data from current profile + draft
+        $validationData = array_merge(
+            $this->mapProfileToValidationData($tenantProfile),
+            $draft->only([
+                'desired_move_in_date',
+                'lease_duration_months',
+                'message_to_landlord',
+                'additional_occupants',
+                'occupants_details',
+                'has_pets',
+                'pets_details',
+                'references',
+                'previous_landlord_name',
+                'previous_landlord_phone',
+                'previous_landlord_email',
+                'emergency_contact_name',
+                'emergency_contact_phone',
+                'emergency_contact_relationship',
+            ])
+        );
+
+        // Find the first invalid step (steps 1-5 are content, step 6 is review)
+        $firstInvalidStep = null;
+        for ($step = 1; $step <= 5; $step++) {
+            $stepValidation = $this->getStepValidationRules($step, $validationData);
+
+            if (! empty($stepValidation)) {
+                $validator = \Validator::make($validationData, $stepValidation);
+                if ($validator->fails()) {
+                    $firstInvalidStep = $step;
+                    break;
+                }
+            }
+        }
+
+        // If all steps valid, go to review (step 6); otherwise go to first invalid step
+        $targetStep = $firstInvalidStep ?? 6;
+
+        // Update if changed
+        if ($targetStep !== $draft->current_step) {
+            $draft->update(['current_step' => $targetStep]);
+            $draft->refresh();
+        }
+
+        return $draft;
     }
 
     /**
@@ -254,6 +319,10 @@ class ApplicationController extends Controller
 
     /**
      * Save application as draft (for step-by-step form).
+     *
+     * Note: Profile fields are autosaved directly to TenantProfile via /tenant-profile/autosave.
+     * Draft only stores application-specific fields (move-in date, occupants, pets, references, etc.).
+     * On final submission, profile data is snapshotted from the current TenantProfile.
      */
     public function saveDraft(Request $request, Property $property)
     {
@@ -273,21 +342,32 @@ class ApplicationController extends Controller
 
         $requestedStep = $request->input('current_step', 1);
 
-        // Note: Profile data is synced only on final submission, not during draft saves
-        // This allows users to review all changes before committing to their profile
-        // However, we still save profile_ fields as snapshot_ fields in the Application
-
         $allData = $request->all();
-        $data = [];
 
-        // Map profile_ fields to snapshot_ fields, pass through other fields
-        foreach ($allData as $key => $value) {
-            if (str_starts_with($key, 'profile_')) {
-                // Map profile_* → snapshot_* for Application storage
-                $snapshotKey = 'snapshot_'.substr($key, 8); // Remove 'profile_' prefix
-                $data[$snapshotKey] = $value;
-            } else {
-                $data[$key] = $value;
+        // Only save application-specific fields to draft (not profile fields)
+        // Profile fields are autosaved directly to TenantProfile
+        $applicationFields = [
+            'desired_move_in_date',
+            'lease_duration_months',
+            'message_to_landlord',
+            'additional_occupants',
+            'occupants_details',
+            'has_pets',
+            'pets_details',
+            'references',
+            'previous_landlord_name',
+            'previous_landlord_phone',
+            'previous_landlord_email',
+            'emergency_contact_name',
+            'emergency_contact_phone',
+            'emergency_contact_relationship',
+            'invited_via_token',
+        ];
+
+        $data = [];
+        foreach ($applicationFields as $field) {
+            if (array_key_exists($field, $allData)) {
+                $data[$field] = $allData[$field];
             }
         }
 
@@ -296,15 +376,20 @@ class ApplicationController extends Controller
         $data['status'] = 'draft';
 
         // Validate to determine actual allowed max step
+        // Note: Validation still uses profile fields from the request to check step validity,
+        // but profile data comes from TenantProfile (already autosaved) for actual validation
         $validatedMaxStep = 0;
+
+        // Merge current profile data with request for validation
+        $validationData = array_merge($this->mapProfileToValidationData($tenantProfile), $allData);
 
         // Check all steps up to the requested step
         for ($step = 1; $step <= $requestedStep; $step++) {
-            $stepValidation = $this->getStepValidationRules($step, $allData);
+            $stepValidation = $this->getStepValidationRules($step, $validationData);
 
             if (! empty($stepValidation)) {
                 // Create a validator instance to check without throwing
-                $validator = \Validator::make($allData, $stepValidation);
+                $validator = \Validator::make($validationData, $stepValidation);
 
                 if ($validator->fails()) {
                     // This step is invalid - can't progress beyond here
@@ -334,6 +419,45 @@ class ApplicationController extends Controller
 
         // Return back - Inertia will reload the page and get updated draftApplication from create()
         return back(303);
+    }
+
+    /**
+     * Map TenantProfile data to profile_* fields for validation.
+     */
+    private function mapProfileToValidationData($tenantProfile): array
+    {
+        return [
+            'profile_date_of_birth' => $tenantProfile->date_of_birth,
+            'profile_nationality' => $tenantProfile->nationality,
+            'profile_phone_country_code' => $tenantProfile->phone_country_code,
+            'profile_phone_number' => $tenantProfile->phone_number,
+            'profile_current_house_number' => $tenantProfile->current_house_number,
+            'profile_current_address_line_2' => $tenantProfile->current_address_line_2,
+            'profile_current_street_name' => $tenantProfile->current_street_name,
+            'profile_current_city' => $tenantProfile->current_city,
+            'profile_current_state_province' => $tenantProfile->current_state_province,
+            'profile_current_postal_code' => $tenantProfile->current_postal_code,
+            'profile_current_country' => $tenantProfile->current_country,
+            'profile_employment_status' => $tenantProfile->employment_status,
+            'profile_employer_name' => $tenantProfile->employer_name,
+            'profile_job_title' => $tenantProfile->job_title,
+            'profile_employment_type' => $tenantProfile->employment_type,
+            'profile_employment_start_date' => $tenantProfile->employment_start_date,
+            'profile_monthly_income' => $tenantProfile->monthly_income,
+            'profile_income_currency' => $tenantProfile->income_currency,
+            'profile_university_name' => $tenantProfile->university_name,
+            'profile_program_of_study' => $tenantProfile->program_of_study,
+            'profile_expected_graduation_date' => $tenantProfile->expected_graduation_date,
+            'profile_student_income_source' => $tenantProfile->student_income_source,
+            'profile_has_guarantor' => $tenantProfile->has_guarantor,
+            'profile_guarantor_name' => $tenantProfile->guarantor_name,
+            'profile_guarantor_relationship' => $tenantProfile->guarantor_relationship,
+            'profile_guarantor_phone' => $tenantProfile->guarantor_phone,
+            'profile_guarantor_email' => $tenantProfile->guarantor_email,
+            'profile_guarantor_address' => $tenantProfile->guarantor_address,
+            'profile_guarantor_employer' => $tenantProfile->guarantor_employer,
+            'profile_guarantor_monthly_income' => $tenantProfile->guarantor_monthly_income,
+        ];
     }
 
     /**
@@ -652,8 +776,11 @@ class ApplicationController extends Controller
         ];
 
         // Handle profile document uploads
+        // Note: With immediate uploads, documents are already uploaded to tenant profile
+        // This fallback handles any files still sent on form submission (backwards compatibility)
         $documentFields = [
-            'profile_id_document' => ['path' => 'id_document_path', 'name' => 'id_document_original_name', 'folder' => 'profiles/id-documents'],
+            'profile_id_document_front' => ['path' => 'id_document_front_path', 'name' => 'id_document_front_original_name', 'folder' => 'profiles/id-documents'],
+            'profile_id_document_back' => ['path' => 'id_document_back_path', 'name' => 'id_document_back_original_name', 'folder' => 'profiles/id-documents'],
             'profile_employment_contract' => ['path' => 'employment_contract_path', 'name' => 'employment_contract_original_name', 'folder' => 'profiles/employment-contracts'],
             'profile_payslip_1' => ['path' => 'payslip_1_path', 'name' => 'payslip_1_original_name', 'folder' => 'profiles/payslips'],
             'profile_payslip_2' => ['path' => 'payslip_2_path', 'name' => 'payslip_2_original_name', 'folder' => 'profiles/payslips'],
@@ -725,12 +852,14 @@ class ApplicationController extends Controller
             'snapshot_guarantor_monthly_income' => $tenantProfile->guarantor_monthly_income,
 
             // Document paths snapshot
-            'snapshot_id_document_path' => $tenantProfile->id_document_path,
+            'snapshot_id_document_front_path' => $tenantProfile->id_document_front_path,
+            'snapshot_id_document_back_path' => $tenantProfile->id_document_back_path,
             'snapshot_employment_contract_path' => $tenantProfile->employment_contract_path,
             'snapshot_payslip_1_path' => $tenantProfile->payslip_1_path,
             'snapshot_payslip_2_path' => $tenantProfile->payslip_2_path,
             'snapshot_payslip_3_path' => $tenantProfile->payslip_3_path,
             'snapshot_student_proof_path' => $tenantProfile->student_proof_path,
+            'snapshot_other_income_proof_path' => $tenantProfile->other_income_proof_path,
             'snapshot_guarantor_id_path' => $tenantProfile->guarantor_id_path,
             'snapshot_guarantor_proof_income_path' => $tenantProfile->guarantor_proof_income_path,
         ];

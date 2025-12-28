@@ -48,16 +48,28 @@ export default function ApplicationCreate() {
         [wizard],
     );
 
-    // Existing document file names for display
+    // Existing document file names and URLs for display
     const existingDocuments = {
-        id_document: tenantProfile?.id_document_original_name,
+        id_document_front: tenantProfile?.id_document_front_original_name,
+        id_document_front_url: tenantProfile?.id_document_front_url,
+        id_document_back: tenantProfile?.id_document_back_original_name,
+        id_document_back_url: tenantProfile?.id_document_back_url,
         employment_contract: tenantProfile?.employment_contract_original_name,
+        employment_contract_url: tenantProfile?.employment_contract_url,
         payslip_1: tenantProfile?.payslip_1_original_name,
+        payslip_1_url: tenantProfile?.payslip_1_url,
         payslip_2: tenantProfile?.payslip_2_original_name,
+        payslip_2_url: tenantProfile?.payslip_2_url,
         payslip_3: tenantProfile?.payslip_3_original_name,
+        payslip_3_url: tenantProfile?.payslip_3_url,
         student_proof: tenantProfile?.student_proof_original_name,
+        student_proof_url: tenantProfile?.student_proof_url,
+        other_income_proof: tenantProfile?.other_income_proof_original_name,
+        other_income_proof_url: tenantProfile?.other_income_proof_url,
         guarantor_id: tenantProfile?.guarantor_id_original_name,
+        guarantor_id_url: tenantProfile?.guarantor_id_url,
         guarantor_proof_income: tenantProfile?.guarantor_proof_income_original_name,
+        guarantor_proof_income_url: tenantProfile?.guarantor_proof_income_url,
     };
 
     // Handle edit from review step
@@ -81,6 +93,7 @@ export default function ApplicationCreate() {
                         markFieldTouched={wizard.markFieldTouched}
                         onBlur={handleBlur}
                         onFieldBlur={handleFieldBlur}
+                        existingDocuments={existingDocuments}
                     />
                 );
             case 'employment':

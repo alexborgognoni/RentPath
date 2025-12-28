@@ -470,6 +470,15 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
     Route::get('tenant-profile/document/{type}', [\App\Http\Controllers\TenantProfileController::class, 'serveDocument'])
         ->name('tenant.profile.document');
 
+    Route::post('tenant-profile/document/upload', [\App\Http\Controllers\TenantProfileController::class, 'uploadDocument'])
+        ->name('tenant.profile.document.upload');
+
+    Route::delete('tenant-profile/document', [\App\Http\Controllers\TenantProfileController::class, 'deleteDocument'])
+        ->name('tenant.profile.document.delete');
+
+    Route::post('tenant-profile/autosave', [\App\Http\Controllers\TenantProfileController::class, 'autosave'])
+        ->name('tenant.profile.autosave');
+
     // Applications list route
     Route::get('applications', [\App\Http\Controllers\ApplicationController::class, 'index'])
         ->name('applications.index');

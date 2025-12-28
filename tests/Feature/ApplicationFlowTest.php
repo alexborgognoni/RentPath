@@ -289,7 +289,8 @@ test('it prevents direct api calls from bypassing validation', function () {
 test('final submission requires all steps valid', function () {
     // Ensure tenant profile has required documents so they're not required in request
     $this->tenantProfile->update([
-        'id_document_path' => 'test/id.pdf',
+        'id_document_front_path' => 'test/id-front.pdf',
+        'id_document_back_path' => 'test/id-back.pdf',
         'other_income_proof_path' => 'test/income.pdf',
     ]);
 

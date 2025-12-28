@@ -97,7 +97,7 @@ class TenantProfileFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'profile_verified_at' => null,
             'verification_rejection_reason' => $reason,
-            'verification_rejected_fields' => ['id_document_path'],
+            'verification_rejected_fields' => ['id_document_front_path', 'id_document_back_path'],
         ]);
     }
 

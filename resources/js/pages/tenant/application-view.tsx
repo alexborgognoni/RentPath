@@ -530,8 +530,12 @@ export default function ApplicationView() {
                             <CardContent>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <DocumentLink
-                                        url={application.snapshot_id_document_url}
-                                        label={t('tenant.application.id_document') || 'ID Document'}
+                                        url={application.snapshot_id_document_front_url}
+                                        label={(t('tenant.application.id_document') || 'ID Document') + ' (Front)'}
+                                    />
+                                    <DocumentLink
+                                        url={application.snapshot_id_document_back_url}
+                                        label={(t('tenant.application.id_document') || 'ID Document') + ' (Back)'}
                                     />
                                     <DocumentLink
                                         url={application.snapshot_employment_contract_url}

@@ -56,6 +56,24 @@ class StorageHelper
     }
 
     /**
+     * Delete a file from storage.
+     *
+     * @param  string|null  $path  The file path to delete
+     * @param  string  $visibility  'public' or 'private'
+     * @return bool Whether the file was deleted
+     */
+    public static function delete(?string $path, string $visibility): bool
+    {
+        if (! $path) {
+            return false;
+        }
+
+        $disk = self::getDisk($visibility);
+
+        return Storage::disk($disk)->delete($path);
+    }
+
+    /**
      * Get a URL for a stored file based on its visibility.
      *
      * @param  string  $visibility  'public' or 'private'

@@ -372,4 +372,195 @@ class TenantProfileController extends Controller
 
         return Storage::disk($disk)->response($path);
     }
+
+    /**
+     * Upload a single document to the tenant profile immediately.
+     * Used by the application wizard for per-file uploads with progress.
+     */
+    public function uploadDocument(Request $request)
+    {
+        $user = Auth::user();
+
+        // Auto-create tenant profile if it doesn't exist
+        $tenantProfile = $user->tenantProfile;
+        if (! $tenantProfile) {
+            $tenantProfile = $user->tenantProfile()->create([]);
+        }
+
+        // Define allowed document types and their storage config
+        $documentTypes = [
+            'id_document_front' => ['folder' => 'profiles/id-documents', 'disk' => 'private'],
+            'id_document_back' => ['folder' => 'profiles/id-documents', 'disk' => 'private'],
+            'employment_contract' => ['folder' => 'profiles/employment-contracts', 'disk' => 'private'],
+            'payslip_1' => ['folder' => 'profiles/payslips', 'disk' => 'private'],
+            'payslip_2' => ['folder' => 'profiles/payslips', 'disk' => 'private'],
+            'payslip_3' => ['folder' => 'profiles/payslips', 'disk' => 'private'],
+            'student_proof' => ['folder' => 'profiles/student-proofs', 'disk' => 'private'],
+            'other_income_proof' => ['folder' => 'profiles/other-income-proofs', 'disk' => 'private'],
+            'guarantor_id' => ['folder' => 'profiles/guarantor-ids', 'disk' => 'private'],
+            'guarantor_proof_income' => ['folder' => 'profiles/guarantor-income-proofs', 'disk' => 'private'],
+        ];
+
+        $validated = $request->validate([
+            'document_type' => ['required', 'string', 'in:'.implode(',', array_keys($documentTypes))],
+            'file' => ['required', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:20480'], // 20MB max
+        ]);
+
+        $documentType = $validated['document_type'];
+        $file = $request->file('file');
+        $config = $documentTypes[$documentType];
+
+        // Build field names
+        $pathField = $documentType.'_path';
+        $nameField = $documentType.'_original_name';
+
+        // Delete old file if exists
+        $oldPath = $tenantProfile->$pathField;
+        if ($oldPath) {
+            StorageHelper::delete($oldPath, $config['disk']);
+        }
+
+        // Store new file
+        $newPath = StorageHelper::store($file, $config['folder'], $config['disk']);
+
+        // Update tenant profile
+        $tenantProfile->update([
+            $pathField => $newPath,
+            $nameField => $file->getClientOriginalName(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'document_type' => $documentType,
+            'original_name' => $file->getClientOriginalName(),
+            'path' => $newPath,
+        ]);
+    }
+
+    /**
+     * Delete a document from the tenant profile.
+     */
+    public function deleteDocument(Request $request)
+    {
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        if (! $tenantProfile) {
+            return response()->json(['success' => false, 'error' => 'Profile not found'], 404);
+        }
+
+        $documentTypes = [
+            'id_document_front', 'id_document_back', 'employment_contract',
+            'payslip_1', 'payslip_2', 'payslip_3', 'student_proof',
+            'other_income_proof', 'guarantor_id', 'guarantor_proof_income',
+        ];
+
+        $validated = $request->validate([
+            'document_type' => ['required', 'string', 'in:'.implode(',', $documentTypes)],
+        ]);
+
+        $documentType = $validated['document_type'];
+        $pathField = $documentType.'_path';
+        $nameField = $documentType.'_original_name';
+
+        // Delete file if exists
+        $oldPath = $tenantProfile->$pathField;
+        if ($oldPath) {
+            StorageHelper::delete($oldPath, 'private');
+        }
+
+        // Clear fields
+        $tenantProfile->update([
+            $pathField => null,
+            $nameField => null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'document_type' => $documentType,
+        ]);
+    }
+
+    /**
+     * Autosave profile fields immediately.
+     * Used by the application wizard for real-time profile updates.
+     */
+    public function autosave(Request $request)
+    {
+        $user = Auth::user();
+
+        // Auto-create tenant profile if it doesn't exist
+        $tenantProfile = $user->tenantProfile;
+        if (! $tenantProfile) {
+            $tenantProfile = $user->tenantProfile()->create([]);
+        }
+
+        // Define allowed fields that can be autosaved
+        // These are profile fields, not application-specific fields
+        $allowedFields = [
+            // Personal Info
+            'date_of_birth',
+            'nationality',
+            'phone_country_code',
+            'phone_number',
+            // Current Address
+            'current_house_number',
+            'current_address_line_2',
+            'current_street_name',
+            'current_city',
+            'current_state_province',
+            'current_postal_code',
+            'current_country',
+            // Employment
+            'employment_status',
+            'employer_name',
+            'job_title',
+            'employment_type',
+            'employment_start_date',
+            'monthly_income',
+            'income_currency',
+            // Student
+            'university_name',
+            'program_of_study',
+            'expected_graduation_date',
+            'student_income_source',
+            // Guarantor
+            'has_guarantor',
+            'guarantor_name',
+            'guarantor_relationship',
+            'guarantor_phone',
+            'guarantor_email',
+            'guarantor_address',
+            'guarantor_employer',
+            'guarantor_monthly_income',
+        ];
+
+        // Only accept allowed fields from the request
+        $data = [];
+        foreach ($request->all() as $key => $value) {
+            // Handle profile_ prefix (from wizard form fields)
+            $fieldName = str_starts_with($key, 'profile_') ? substr($key, 8) : $key;
+
+            if (in_array($fieldName, $allowedFields)) {
+                // Handle boolean conversion for has_guarantor
+                if ($fieldName === 'has_guarantor') {
+                    $data[$fieldName] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                } else {
+                    $data[$fieldName] = $value === '' ? null : $value;
+                }
+            }
+        }
+
+        if (empty($data)) {
+            return response()->json(['success' => false, 'error' => 'No valid fields provided'], 400);
+        }
+
+        // Update the tenant profile
+        $tenantProfile->update($data);
+
+        return response()->json([
+            'success' => true,
+            'updated_fields' => array_keys($data),
+        ]);
+    }
 }

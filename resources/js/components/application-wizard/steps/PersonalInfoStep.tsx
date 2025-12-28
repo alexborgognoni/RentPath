@@ -1,4 +1,5 @@
 import { CountrySelect } from '@/components/ui/country-select';
+import { FileUpload } from '@/components/ui/file-upload';
 import { NationalitySelect } from '@/components/ui/nationality-select';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { StateProvinceSelect } from '@/components/ui/state-province-select';
@@ -12,7 +13,8 @@ import {
     requiresStateProvince,
 } from '@/utils/address-validation';
 import { getCountryByIso2 } from '@/utils/country-data';
-import { useEffect, useMemo, useRef } from 'react';
+import { router } from '@inertiajs/react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 interface PersonalInfoStepProps {
     data: ApplicationWizardData;
@@ -22,9 +24,24 @@ interface PersonalInfoStepProps {
     markFieldTouched: (field: string) => void;
     onBlur: () => void;
     onFieldBlur?: (field: string) => void;
+    existingDocuments?: {
+        id_document_front?: string;
+        id_document_front_url?: string;
+        id_document_back?: string;
+        id_document_back_url?: string;
+    };
 }
 
-export function PersonalInfoStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur, onFieldBlur }: PersonalInfoStepProps) {
+export function PersonalInfoStep({
+    data,
+    errors,
+    touchedFields,
+    updateField,
+    markFieldTouched,
+    onBlur,
+    onFieldBlur,
+    existingDocuments,
+}: PersonalInfoStepProps) {
     const { countryCode: detectedCountry } = useGeoLocation();
     const hasSetDefaults = useRef(false);
 
@@ -94,6 +111,11 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
         const hasError = touchedFields[field] && errors[field];
         return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
+
+    // Reload tenant profile data after successful upload
+    const handleUploadSuccess = useCallback(() => {
+        router.reload({ only: ['tenantProfile'] });
+    }, []);
 
     return (
         <div className="space-y-6">
@@ -302,6 +324,64 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
                             <p className="mt-1 text-sm text-destructive">{errors.profile_current_country}</p>
                         )}
                     </div>
+                </div>
+            </div>
+
+            {/* ID Document */}
+            <div className="border-t border-border pt-6">
+                <h3 className="mb-4 font-semibold">ID Document (Passport, ID Card, Drivers License)</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                    <FileUpload
+                        label="Front Side"
+                        required
+                        documentType="id_document_front"
+                        uploadUrl="/tenant-profile/document/upload"
+                        accept={{
+                            'image/*': ['.png', '.jpg', '.jpeg'],
+                            'application/pdf': ['.pdf'],
+                        }}
+                        maxSize={20 * 1024 * 1024}
+                        description={{
+                            fileTypes: 'PDF, PNG, JPG',
+                            maxFileSize: '20MB',
+                        }}
+                        existingFile={
+                            existingDocuments?.id_document_front
+                                ? {
+                                      originalName: existingDocuments.id_document_front,
+                                      previewUrl: existingDocuments.id_document_front_url,
+                                  }
+                                : null
+                        }
+                        onUploadSuccess={handleUploadSuccess}
+                        error={touchedFields.profile_id_document_front ? errors.profile_id_document_front : undefined}
+                    />
+
+                    <FileUpload
+                        label="Back Side"
+                        required
+                        documentType="id_document_back"
+                        uploadUrl="/tenant-profile/document/upload"
+                        accept={{
+                            'image/*': ['.png', '.jpg', '.jpeg'],
+                            'application/pdf': ['.pdf'],
+                        }}
+                        maxSize={20 * 1024 * 1024}
+                        description={{
+                            fileTypes: 'PDF, PNG, JPG',
+                            maxFileSize: '20MB',
+                        }}
+                        existingFile={
+                            existingDocuments?.id_document_back
+                                ? {
+                                      originalName: existingDocuments.id_document_back,
+                                      previewUrl: existingDocuments.id_document_back_url,
+                                  }
+                                : null
+                        }
+                        onUploadSuccess={handleUploadSuccess}
+                        error={touchedFields.profile_id_document_back ? errors.profile_id_document_back : undefined}
+                    />
                 </div>
             </div>
         </div>

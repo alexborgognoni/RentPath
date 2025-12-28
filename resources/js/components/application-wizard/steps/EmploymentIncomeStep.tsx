@@ -1,6 +1,9 @@
+import { FileUpload } from '@/components/ui/file-upload';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import { CURRENCIES } from '@/lib/validation/property-validation';
-import { Briefcase, FileText, GraduationCap, Upload, UserCheck, X } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { Briefcase, GraduationCap, UserCheck } from 'lucide-react';
+import { useCallback } from 'react';
 
 const EMPLOYMENT_STATUSES = [
     { value: 'employed', label: 'Employed', icon: Briefcase },
@@ -34,14 +37,22 @@ interface EmploymentIncomeStepProps {
     markFieldTouched: (field: string) => void;
     onBlur: () => void;
     existingDocuments?: {
-        id_document?: string;
         employment_contract?: string;
+        employment_contract_url?: string;
         payslip_1?: string;
+        payslip_1_url?: string;
         payslip_2?: string;
+        payslip_2_url?: string;
         payslip_3?: string;
+        payslip_3_url?: string;
         student_proof?: string;
+        student_proof_url?: string;
+        other_income_proof?: string;
+        other_income_proof_url?: string;
         guarantor_id?: string;
+        guarantor_id_url?: string;
         guarantor_proof_income?: string;
+        guarantor_proof_income_url?: string;
     };
 }
 
@@ -66,58 +77,21 @@ export function EmploymentIncomeStep({
 
     const isEmployed = data.profile_employment_status === 'employed' || data.profile_employment_status === 'self_employed';
     const isStudent = data.profile_employment_status === 'student';
+    const isUnemployedOrRetired = data.profile_employment_status === 'unemployed' || data.profile_employment_status === 'retired';
 
-    const handleFileChange = (field: keyof ApplicationWizardData, file: File | null) => {
-        updateField(field, file);
-        markFieldTouched(field);
+    // Reload tenant profile data after successful upload
+    const handleUploadSuccess = useCallback(() => {
+        router.reload({ only: ['tenantProfile'] });
+    }, []);
+
+    const fileUploadAccept = {
+        'image/*': ['.png', '.jpg', '.jpeg'],
+        'application/pdf': ['.pdf'],
     };
 
-    const renderFileInput = (field: keyof ApplicationWizardData, label: string, required: boolean = false, existingFileName?: string) => {
-        const file = data[field] as File | null;
-        const hasExisting = existingFileName && !file;
-
-        return (
-            <div>
-                <label className="mb-2 block text-sm font-medium">
-                    {label} {required && <span className="text-red-500">*</span>}
-                </label>
-                {hasExisting ? (
-                    <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2 dark:border-green-800 dark:bg-green-950">
-                        <FileText className="h-4 w-4 text-green-600" />
-                        <span className="flex-1 truncate text-sm text-green-700 dark:text-green-300">{existingFileName}</span>
-                        <button
-                            type="button"
-                            onClick={() => handleFileChange(field, null)}
-                            className="text-xs text-muted-foreground hover:text-foreground"
-                        >
-                            Replace
-                        </button>
-                    </div>
-                ) : file ? (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-4 py-2">
-                        <FileText className="h-4 w-4 text-primary" />
-                        <span className="flex-1 truncate text-sm">{file.name}</span>
-                        <button type="button" onClick={() => handleFileChange(field, null)} className="text-muted-foreground hover:text-destructive">
-                            <X className="h-4 w-4" />
-                        </button>
-                    </div>
-                ) : (
-                    <label
-                        className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed px-4 py-3 transition-colors hover:border-primary hover:bg-muted/50 ${touchedFields[field] && errors[field] ? 'border-destructive' : 'border-border'}`}
-                    >
-                        <Upload className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">Click to upload</span>
-                        <input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange(field, e.target.files?.[0] || null)}
-                            className="hidden"
-                        />
-                    </label>
-                )}
-                {touchedFields[field] && errors[field] && <p className="mt-1 text-sm text-destructive">{errors[field]}</p>}
-            </div>
-        );
+    const fileUploadDescription = {
+        fileTypes: 'PDF, PNG, JPG',
+        maxFileSize: '20MB',
     };
 
     return (
@@ -162,9 +136,7 @@ export function EmploymentIncomeStep({
 
             {/* Employed / Self-Employed Fields */}
             {isEmployed && (
-                <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-4">
-                    <h3 className="font-semibold">Employment Details</h3>
-
+                <div className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
                             <label className="mb-2 block text-sm font-medium">
@@ -203,12 +175,15 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Employment Type</label>
+                            <label className="mb-2 block text-sm font-medium">
+                                Employment Type <span className="text-red-500">*</span>
+                            </label>
                             <select
                                 value={data.profile_employment_type}
                                 onChange={(e) => handleFieldChange('profile_employment_type', e.target.value)}
                                 onBlur={onBlur}
                                 className={getFieldClass('profile_employment_type')}
+                                required
                             >
                                 <option value="">Select type...</option>
                                 {EMPLOYMENT_TYPES.map((type) => (
@@ -217,10 +192,15 @@ export function EmploymentIncomeStep({
                                     </option>
                                 ))}
                             </select>
+                            {touchedFields.profile_employment_type && errors.profile_employment_type && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_employment_type}</p>
+                            )}
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Employment Start Date</label>
+                            <label className="mb-2 block text-sm font-medium">
+                                Employment Start Date <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 type="date"
                                 value={data.profile_employment_start_date}
@@ -228,7 +208,11 @@ export function EmploymentIncomeStep({
                                 onBlur={onBlur}
                                 max={new Date().toISOString().split('T')[0]}
                                 className={getFieldClass('profile_employment_start_date')}
+                                required
                             />
+                            {touchedFields.profile_employment_start_date && errors.profile_employment_start_date && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_employment_start_date}</p>
+                            )}
                         </div>
                     </div>
 
@@ -269,23 +253,90 @@ export function EmploymentIncomeStep({
                     </div>
 
                     {/* Employment Documents */}
-                    <div className="mt-4 border-t border-border pt-4">
-                        <h4 className="mb-3 text-sm font-medium">Employment Documents</h4>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            {renderFileInput('profile_employment_contract', 'Employment Contract', true, existingDocuments?.employment_contract)}
-                            {renderFileInput('profile_payslip_1', 'Recent Payslip (1)', true, existingDocuments?.payslip_1)}
-                            {renderFileInput('profile_payslip_2', 'Recent Payslip (2)', true, existingDocuments?.payslip_2)}
-                            {renderFileInput('profile_payslip_3', 'Recent Payslip (3)', true, existingDocuments?.payslip_3)}
-                        </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <FileUpload
+                            label="Employment Contract"
+                            required
+                            documentType="employment_contract"
+                            uploadUrl="/tenant-profile/document/upload"
+                            accept={fileUploadAccept}
+                            maxSize={20 * 1024 * 1024}
+                            description={fileUploadDescription}
+                            existingFile={
+                                existingDocuments?.employment_contract
+                                    ? {
+                                          originalName: existingDocuments.employment_contract,
+                                          previewUrl: existingDocuments.employment_contract_url,
+                                      }
+                                    : null
+                            }
+                            onUploadSuccess={handleUploadSuccess}
+                            error={touchedFields.profile_employment_contract ? errors.profile_employment_contract : undefined}
+                        />
+                        <FileUpload
+                            label="Recent Payslip (1)"
+                            required
+                            documentType="payslip_1"
+                            uploadUrl="/tenant-profile/document/upload"
+                            accept={fileUploadAccept}
+                            maxSize={20 * 1024 * 1024}
+                            description={fileUploadDescription}
+                            existingFile={
+                                existingDocuments?.payslip_1
+                                    ? {
+                                          originalName: existingDocuments.payslip_1,
+                                          previewUrl: existingDocuments.payslip_1_url,
+                                      }
+                                    : null
+                            }
+                            onUploadSuccess={handleUploadSuccess}
+                            error={touchedFields.profile_payslip_1 ? errors.profile_payslip_1 : undefined}
+                        />
+                        <FileUpload
+                            label="Recent Payslip (2)"
+                            required
+                            documentType="payslip_2"
+                            uploadUrl="/tenant-profile/document/upload"
+                            accept={fileUploadAccept}
+                            maxSize={20 * 1024 * 1024}
+                            description={fileUploadDescription}
+                            existingFile={
+                                existingDocuments?.payslip_2
+                                    ? {
+                                          originalName: existingDocuments.payslip_2,
+                                          previewUrl: existingDocuments.payslip_2_url,
+                                      }
+                                    : null
+                            }
+                            onUploadSuccess={handleUploadSuccess}
+                            error={touchedFields.profile_payslip_2 ? errors.profile_payslip_2 : undefined}
+                        />
+                        <FileUpload
+                            label="Recent Payslip (3)"
+                            required
+                            documentType="payslip_3"
+                            uploadUrl="/tenant-profile/document/upload"
+                            accept={fileUploadAccept}
+                            maxSize={20 * 1024 * 1024}
+                            description={fileUploadDescription}
+                            existingFile={
+                                existingDocuments?.payslip_3
+                                    ? {
+                                          originalName: existingDocuments.payslip_3,
+                                          previewUrl: existingDocuments.payslip_3_url,
+                                      }
+                                    : null
+                            }
+                            onUploadSuccess={handleUploadSuccess}
+                            error={touchedFields.profile_payslip_3 ? errors.profile_payslip_3 : undefined}
+                        />
                     </div>
                 </div>
             )}
 
             {/* Student Fields */}
             {isStudent && (
-                <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-4">
-                    <h3 className="font-semibold">Student Information</h3>
-
+                <div className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
                             <label className="mb-2 block text-sm font-medium">
@@ -379,24 +430,87 @@ export function EmploymentIncomeStep({
                     </div>
 
                     {/* Student Document */}
-                    <div className="mt-4 border-t border-border pt-4">
-                        <h4 className="mb-3 text-sm font-medium">Student Documents</h4>
-                        {renderFileInput(
-                            'profile_student_proof',
-                            'Proof of Student Status (enrollment letter, student ID)',
-                            true,
-                            existingDocuments?.student_proof,
-                        )}
-                    </div>
+                    <FileUpload
+                        label="Proof of Student Status (enrollment letter, student ID)"
+                        required
+                        documentType="student_proof"
+                        uploadUrl="/tenant-profile/document/upload"
+                        accept={fileUploadAccept}
+                        maxSize={20 * 1024 * 1024}
+                        description={fileUploadDescription}
+                        existingFile={
+                            existingDocuments?.student_proof
+                                ? {
+                                      originalName: existingDocuments.student_proof,
+                                      previewUrl: existingDocuments.student_proof_url,
+                                  }
+                                : null
+                        }
+                        onUploadSuccess={handleUploadSuccess}
+                        error={touchedFields.profile_student_proof ? errors.profile_student_proof : undefined}
+                    />
                 </div>
             )}
 
-            {/* ID Document - Required for all */}
-            <div className="border-t border-border pt-6">
-                <h3 className="mb-3 font-semibold">Identity Document</h3>
-                <p className="mb-4 text-sm text-muted-foreground">A valid ID is required for all applications.</p>
-                {renderFileInput('profile_id_document', 'ID Document (Passport, ID Card, Drivers License)', true, existingDocuments?.id_document)}
-            </div>
+            {/* Unemployed / Retired Fields */}
+            {isUnemployedOrRetired && (
+                <div className="space-y-4">
+                    {/* Optional: Monthly Income field */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">Monthly Income (if any)</label>
+                            <div className="flex gap-2">
+                                <select
+                                    value={data.profile_income_currency}
+                                    onChange={(e) => handleFieldChange('profile_income_currency', e.target.value)}
+                                    className="w-24 rounded-lg border border-border bg-background px-3 py-2"
+                                >
+                                    {CURRENCIES.map((currency) => (
+                                        <option key={currency} value={currency}>
+                                            {CURRENCY_SYMBOLS[currency]} ({currency.toUpperCase()})
+                                        </option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="number"
+                                    value={data.profile_monthly_income}
+                                    onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder="0"
+                                    min="0"
+                                    step="100"
+                                    className={`flex-1 ${getFieldClass('profile_monthly_income')}`}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Income Proof Document */}
+                    <FileUpload
+                        label={
+                            data.profile_employment_status === 'retired'
+                                ? 'Proof of Pension/Retirement Income'
+                                : 'Proof of Income Source (benefits statement, bank statements, etc.)'
+                        }
+                        required
+                        documentType="other_income_proof"
+                        uploadUrl="/tenant-profile/document/upload"
+                        accept={fileUploadAccept}
+                        maxSize={20 * 1024 * 1024}
+                        description={fileUploadDescription}
+                        existingFile={
+                            existingDocuments?.other_income_proof
+                                ? {
+                                      originalName: existingDocuments.other_income_proof,
+                                      previewUrl: existingDocuments.other_income_proof_url,
+                                  }
+                                : null
+                        }
+                        onUploadSuccess={handleUploadSuccess}
+                        error={touchedFields.profile_other_income_proof ? errors.profile_other_income_proof : undefined}
+                    />
+                </div>
+            )}
 
             {/* Guarantor Section */}
             <div className="border-t border-border pt-6">
@@ -417,9 +531,7 @@ export function EmploymentIncomeStep({
                 </p>
 
                 {data.profile_has_guarantor && (
-                    <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-4">
-                        <h4 className="font-semibold">Guarantor Information</h4>
-
+                    <div className="space-y-4">
                         <div className="grid gap-4 md:grid-cols-2">
                             <div>
                                 <label className="mb-2 block text-sm font-medium">
@@ -537,17 +649,45 @@ export function EmploymentIncomeStep({
                         </div>
 
                         {/* Guarantor Documents */}
-                        <div className="mt-4 border-t border-border pt-4">
-                            <h4 className="mb-3 text-sm font-medium">Guarantor Documents</h4>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                {renderFileInput('profile_guarantor_id', 'Guarantor ID Document', true, existingDocuments?.guarantor_id)}
-                                {renderFileInput(
-                                    'profile_guarantor_proof_income',
-                                    'Guarantor Proof of Income',
-                                    true,
-                                    existingDocuments?.guarantor_proof_income,
-                                )}
-                            </div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <FileUpload
+                                label="Guarantor ID Document"
+                                required
+                                documentType="guarantor_id"
+                                uploadUrl="/tenant-profile/document/upload"
+                                accept={fileUploadAccept}
+                                maxSize={20 * 1024 * 1024}
+                                description={fileUploadDescription}
+                                existingFile={
+                                    existingDocuments?.guarantor_id
+                                        ? {
+                                              originalName: existingDocuments.guarantor_id,
+                                              previewUrl: existingDocuments.guarantor_id_url,
+                                          }
+                                        : null
+                                }
+                                onUploadSuccess={handleUploadSuccess}
+                                error={touchedFields.profile_guarantor_id ? errors.profile_guarantor_id : undefined}
+                            />
+                            <FileUpload
+                                label="Guarantor Proof of Income"
+                                required
+                                documentType="guarantor_proof_income"
+                                uploadUrl="/tenant-profile/document/upload"
+                                accept={fileUploadAccept}
+                                maxSize={20 * 1024 * 1024}
+                                description={fileUploadDescription}
+                                existingFile={
+                                    existingDocuments?.guarantor_proof_income
+                                        ? {
+                                              originalName: existingDocuments.guarantor_proof_income,
+                                              previewUrl: existingDocuments.guarantor_proof_income_url,
+                                          }
+                                        : null
+                                }
+                                onUploadSuccess={handleUploadSuccess}
+                                error={touchedFields.profile_guarantor_proof_income ? errors.profile_guarantor_proof_income : undefined}
+                            />
                         </div>
                     </div>
                 )}

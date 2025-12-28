@@ -277,7 +277,12 @@ export function ApplicationInfo({ application }: ApplicationInfoProps) {
                     <h2 className="text-lg font-semibold text-foreground">{t('documents')}</h2>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <DocumentLink url={application.snapshot_id_document_url} label={t('idDocument')} noDocLabel={t('noDocument')} />
+                    <DocumentLink
+                        url={application.snapshot_id_document_front_url}
+                        label={t('idDocument') + ' (Front)'}
+                        noDocLabel={t('noDocument')}
+                    />
+                    <DocumentLink url={application.snapshot_id_document_back_url} label={t('idDocument') + ' (Back)'} noDocLabel={t('noDocument')} />
                     <DocumentLink url={application.snapshot_employment_contract_url} label={t('employmentContract')} noDocLabel={t('noDocument')} />
                     <DocumentLink
                         url={application.snapshot_payslip_1_url || application.snapshot_payslip_2_url || application.snapshot_payslip_3_url}

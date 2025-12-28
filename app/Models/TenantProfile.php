@@ -61,8 +61,10 @@ class TenantProfile extends Model
         'guarantor_monthly_income',
 
         // Documents
-        'id_document_path',
-        'id_document_original_name',
+        'id_document_front_path',
+        'id_document_front_original_name',
+        'id_document_back_path',
+        'id_document_back_original_name',
         'employment_contract_path',
         'employment_contract_original_name',
         'payslip_1_path',
@@ -131,6 +133,16 @@ class TenantProfile extends Model
     protected $appends = [
         'profile_picture_url',
         'age',
+        'id_document_front_url',
+        'id_document_back_url',
+        'employment_contract_url',
+        'payslip_1_url',
+        'payslip_2_url',
+        'payslip_3_url',
+        'student_proof_url',
+        'other_income_proof_url',
+        'guarantor_id_url',
+        'guarantor_proof_income_url',
     ];
 
     /**
@@ -247,11 +259,19 @@ class TenantProfile extends Model
     }
 
     /**
-     * Get the URL for the ID document (5-minute signed URL).
+     * Get the URL for the ID document front (5-minute signed URL).
      */
-    public function getIdDocumentUrlAttribute(): ?string
+    public function getIdDocumentFrontUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->id_document_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->id_document_front_path, 'private', 5);
+    }
+
+    /**
+     * Get the URL for the ID document back (5-minute signed URL).
+     */
+    public function getIdDocumentBackUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->id_document_back_path, 'private', 5);
     }
 
     /**
@@ -340,7 +360,7 @@ class TenantProfile extends Model
      */
     public function getRequiredDocuments(): array
     {
-        $required = ['id_document_path'];
+        $required = ['id_document_front_path', 'id_document_back_path'];
 
         if ($this->isEmployed()) {
             $required[] = 'employment_contract_path';

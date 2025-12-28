@@ -71,7 +71,10 @@ class StoreApplicationRequest extends FormRequest
             'profile_guarantor_monthly_income' => 'nullable|numeric|min:0',
 
             // Document base rules (nullable by default, will be overridden conditionally)
-            'profile_id_document' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
+            // Note: With immediate uploads, documents are already in tenant profile
+            // These rules handle fallback upload on form submission
+            'profile_id_document_front' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
+            'profile_id_document_back' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
             'profile_employment_contract' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
             'profile_payslip_1' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
             'profile_payslip_2' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
@@ -140,8 +143,11 @@ class StoreApplicationRequest extends FormRequest
         // =====================================
 
         // ID Document: Always required if not already in profile
-        if (! $tenantProfile?->id_document_path) {
-            $rules['profile_id_document'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
+        if (! $tenantProfile?->id_document_front_path) {
+            $rules['profile_id_document_front'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
+        }
+        if (! $tenantProfile?->id_document_back_path) {
+            $rules['profile_id_document_back'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
 
         // Employed/Self-Employed: Require employment fields and documents
@@ -248,7 +254,8 @@ class StoreApplicationRequest extends FormRequest
             'profile_guarantor_monthly_income.min' => 'Income must be a positive number',
 
             // Documents - must match APPLICATION_MESSAGES
-            'profile_id_document.required' => 'ID document is required',
+            'profile_id_document_front.required' => 'Front side of ID document is required',
+            'profile_id_document_back.required' => 'Back side of ID document is required',
             'profile_employment_contract.required' => 'Employment contract is required',
             'profile_payslip_1.required' => 'Payslip is required',
             'profile_payslip_2.required' => 'Payslip is required',

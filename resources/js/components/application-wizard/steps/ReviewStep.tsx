@@ -163,7 +163,8 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                 <div className="mt-4 border-t border-border pt-4">
                     <h4 className="mb-3 text-sm font-medium text-muted-foreground">Documents</h4>
                     <div className="flex flex-wrap gap-2">
-                        <DocumentBadge name="ID Document" exists={!!data.profile_id_document} />
+                        <DocumentBadge name="ID Front" exists={!!data.profile_id_document_front} />
+                        <DocumentBadge name="ID Back" exists={!!data.profile_id_document_back} />
                         {isEmployed && (
                             <>
                                 <DocumentBadge name="Employment Contract" exists={!!data.profile_employment_contract} />
