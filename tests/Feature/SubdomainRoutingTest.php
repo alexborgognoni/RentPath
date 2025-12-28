@@ -31,7 +31,7 @@ class SubdomainRoutingTest extends TestCase
     {
         $domain = config('app.domain');
 
-        $response = $this->get('http://'.$domain.'/dashboard');
+        $response = $this->get('http://'.$domain.'/applications');
         $response->assertRedirect();
         $this->assertTrue(str_contains($response->headers->get('Location'), '/login'));
     }
@@ -89,7 +89,7 @@ class SubdomainRoutingTest extends TestCase
         $user = User::factory()->create();
         $domain = config('app.domain');
 
-        $response = $this->actingAs($user)->get('http://'.$domain.'/dashboard');
+        $response = $this->actingAs($user)->get('http://'.$domain.'/applications');
         $response->assertStatus(200);
     }
 

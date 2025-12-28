@@ -19,8 +19,8 @@ class RedirectHelper
     {
         // If no redirect URL, return default based on user type
         if (! $redirectPath) {
-            // Property managers go to /properties, tenants go to /dashboard
-            $defaultPath = $fallbackPath ?? ($userType === 'property-manager' ? '/properties' : '/dashboard');
+            // Property managers go to /properties, tenants go to /applications
+            $defaultPath = $fallbackPath ?? ($userType === 'property-manager' ? '/properties' : '/applications');
 
             return self::buildUrl($defaultPath, $userType);
         }

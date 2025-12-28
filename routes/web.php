@@ -455,10 +455,6 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
 */
 
 Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(function () {
-    // Dashboard - redirect to applications (dashboard removed in favor of direct nav)
-    Route::get('dashboard', fn () => redirect()->route('applications.index'))
-        ->name('dashboard');
-
     // Tenant Profile routes
     // Note: Setup/unverified routes removed - profiles are now auto-created on first application
     // Users can edit their profile after submitting their first application

@@ -488,7 +488,7 @@ class ApplicationController extends Controller
 
         $application->withdraw();
 
-        return redirect()->route('dashboard')
+        return redirect()->route('applications.index')
             ->with('success', 'Application withdrawn successfully');
     }
 
@@ -601,7 +601,7 @@ class ApplicationController extends Controller
 
         $application->delete();
 
-        return redirect()->route('dashboard')
+        return redirect()->route('applications.index')
             ->with('success', 'Draft application deleted');
     }
 

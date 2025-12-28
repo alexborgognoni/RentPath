@@ -109,7 +109,7 @@ class TenantProfileController extends Controller
         }
 
         if ($tenantProfile->isVerified()) {
-            return redirect()->route('dashboard')
+            return redirect()->route('applications.index')
                 ->with('info', 'Your profile is already verified. Contact support to make changes.');
         }
 
@@ -135,7 +135,7 @@ class TenantProfileController extends Controller
         }
 
         if ($tenantProfile->isVerified()) {
-            return redirect()->route('dashboard')
+            return redirect()->route('applications.index')
                 ->with('error', 'Cannot edit a verified profile.');
         }
 
@@ -342,7 +342,7 @@ class TenantProfileController extends Controller
 
         $tenantProfile->update($validated);
 
-        return redirect()->route('dashboard')
+        return redirect()->route('applications.index')
             ->with('success', 'Profile updated and resubmitted for review!');
     }
 
