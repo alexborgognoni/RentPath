@@ -1,35 +1,10 @@
 import { SimpleSelect, type SelectOption } from '@/components/ui/simple-select';
 import type { ApplicationWizardData, ReferenceDetails } from '@/hooks/useApplicationWizard';
+import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { Briefcase, Building2, Plus, Trash2, User } from 'lucide-react';
-
-const REFERENCE_TYPES = [
-    { value: 'landlord', label: 'Previous Landlord', icon: Building2, description: 'A landlord from a previous rental' },
-    { value: 'personal', label: 'Personal Reference', icon: User, description: 'A friend, neighbor, or family acquaintance' },
-    { value: 'professional', label: 'Professional Reference', icon: Briefcase, description: 'An employer, colleague, or professor' },
-] as const;
-
-const REFERENCE_RELATIONSHIPS: Record<string, SelectOption[]> = {
-    landlord: [
-        { value: 'Previous Landlord', label: 'Previous Landlord' },
-        { value: 'Property Manager', label: 'Property Manager' },
-        { value: 'Other', label: 'Other' },
-    ],
-    personal: [
-        { value: 'Friend', label: 'Friend' },
-        { value: 'Neighbor', label: 'Neighbor' },
-        { value: 'Family Friend', label: 'Family Friend' },
-        { value: 'Other', label: 'Other' },
-    ],
-    professional: [
-        { value: 'Employer', label: 'Employer' },
-        { value: 'Manager', label: 'Manager' },
-        { value: 'Colleague', label: 'Colleague' },
-        { value: 'Professor', label: 'Professor' },
-        { value: 'Teacher', label: 'Teacher' },
-        { value: 'Mentor', label: 'Mentor' },
-        { value: 'Other', label: 'Other' },
-    ],
-};
+import { useMemo } from 'react';
 
 interface ReferencesStepProps {
     data: ApplicationWizardData;
@@ -43,20 +18,68 @@ interface ReferencesStepProps {
     onBlur: () => void;
 }
 
+const REFERENCE_TYPE_ICONS = {
+    landlord: Building2,
+    personal: User,
+    professional: Briefcase,
+} as const;
+
 export function ReferencesStep({ data, errors, touchedFields, addReference, removeReference, updateReference, onBlur }: ReferencesStepProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, `wizard.application.referencesStep.${key}`);
+
+    const LANDLORD_RELATIONSHIPS = useMemo(
+        () => [
+            { value: 'Previous Landlord', label: t('landlord.relationships.previous_landlord') },
+            { value: 'Property Manager', label: t('landlord.relationships.property_manager') },
+            { value: 'Other', label: t('landlord.relationships.other') },
+        ],
+        [translations],
+    );
+
+    const PERSONAL_RELATIONSHIPS = useMemo(
+        () => [
+            { value: 'Friend', label: t('personal.relationships.friend') },
+            { value: 'Neighbor', label: t('personal.relationships.neighbor') },
+            { value: 'Family Friend', label: t('personal.relationships.family_friend') },
+            { value: 'Other', label: t('personal.relationships.other') },
+        ],
+        [translations],
+    );
+
+    const PROFESSIONAL_RELATIONSHIPS = useMemo(
+        () => [
+            { value: 'Employer', label: t('professional.relationships.employer') },
+            { value: 'Manager', label: t('professional.relationships.manager') },
+            { value: 'Colleague', label: t('professional.relationships.colleague') },
+            { value: 'Professor', label: t('professional.relationships.professor') },
+            { value: 'Teacher', label: t('professional.relationships.teacher') },
+            { value: 'Mentor', label: t('professional.relationships.mentor') },
+            { value: 'Other', label: t('professional.relationships.other') },
+        ],
+        [translations],
+    );
+
+    const REFERENCE_RELATIONSHIPS: Record<string, SelectOption[]> = {
+        landlord: LANDLORD_RELATIONSHIPS,
+        personal: PERSONAL_RELATIONSHIPS,
+        professional: PROFESSIONAL_RELATIONSHIPS,
+    };
+
     // Group references by type
     const landlordRefs = data.references.filter((ref) => ref.type === 'landlord');
     const personalRefs = data.references.filter((ref) => ref.type === 'personal');
     const professionalRefs = data.references.filter((ref) => ref.type === 'professional');
 
     const getTypeLabel = (type: string) => {
-        return REFERENCE_TYPES.find((t) => t.value === type)?.label || type;
+        if (type === 'landlord') return t('landlord.title');
+        if (type === 'personal') return t('other.title');
+        if (type === 'professional') return t('other.title');
+        return type;
     };
 
     const getTypeIcon = (type: string) => {
-        const refType = REFERENCE_TYPES.find((t) => t.value === type);
-        if (!refType) return User;
-        return refType.icon;
+        return REFERENCE_TYPE_ICONS[type as keyof typeof REFERENCE_TYPE_ICONS] || User;
     };
 
     const getRelationshipOptions = (type: string) => {
@@ -87,7 +110,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label className="mb-1 block text-sm">Name </label>
+                        <label className="mb-1 block text-sm">{t('fields.name')}</label>
                         <input
                             type="text"
                             value={ref.name}
@@ -102,7 +125,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm">Relationship</label>
+                        <label className="mb-1 block text-sm">{t('fields.relationship')}</label>
                         <SimpleSelect
                             value={ref.relationship}
                             onChange={(value) => updateReference(actualIndex, 'relationship', value)}
@@ -118,13 +141,13 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
 
                     {ref.relationship === 'Other' && (
                         <div className="md:col-span-2">
-                            <label className="mb-1 block text-sm">Please specify </label>
+                            <label className="mb-1 block text-sm">{t('fields.specify')}</label>
                             <input
                                 type="text"
                                 value={ref.relationship_other}
                                 onChange={(e) => updateReference(actualIndex, 'relationship_other', e.target.value)}
                                 onBlur={onBlur}
-                                placeholder="Enter relationship..."
+                                placeholder={t('placeholder')}
                                 aria-invalid={
                                     !!(touchedFields[`ref_${actualIndex}_relationship_other`] && errors[`ref_${actualIndex}_relationship_other`])
                                 }
@@ -137,7 +160,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     )}
 
                     <div>
-                        <label className="mb-1 block text-sm">Phone </label>
+                        <label className="mb-1 block text-sm">{t('fields.phone')}</label>
                         <input
                             type="tel"
                             value={ref.phone}
@@ -152,7 +175,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm">Email </label>
+                        <label className="mb-1 block text-sm">{t('fields.email')}</label>
                         <input
                             type="email"
                             value={ref.email}
@@ -167,7 +190,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className="mb-1 block text-sm">Years Known </label>
+                        <label className="mb-1 block text-sm">{t('fields.yearsKnown')}</label>
                         <input
                             type="number"
                             min="0"
@@ -193,25 +216,23 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-xl font-bold">References</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    Add references to strengthen your application. Landlord references are especially valuable.
-                </p>
+                <h2 className="text-xl font-bold">{t('title')}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
             </div>
 
             {/* Landlord References Section */}
             <div>
                 <div className="mb-3 flex items-center gap-2">
                     <Building2 size={20} className="text-primary" />
-                    <h3 className="font-semibold">Landlord References</h3>
-                    <span className="text-sm text-muted-foreground">(Recommended)</span>
+                    <h3 className="font-semibold">{t('landlord.title')}</h3>
+                    <span className="text-sm text-muted-foreground">({t('landlord.recommended')})</span>
                 </div>
-                <p className="mb-4 text-sm text-muted-foreground">A reference from a previous landlord helps verify your rental history.</p>
+                <p className="mb-4 text-sm text-muted-foreground">{t('landlord.description')}</p>
 
                 <div className="space-y-3">
                     {landlordRefs.length === 0 ? (
                         <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
-                            <p className="text-sm text-muted-foreground">No landlord references added yet.</p>
+                            <p className="text-sm text-muted-foreground">{t('landlord.empty')}</p>
                         </div>
                     ) : (
                         landlordRefs.map((ref, index) => renderReferenceCard(ref, index, getActualIndex(ref)))
@@ -224,7 +245,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     className="mt-3 flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline"
                 >
                     <Plus size={16} />
-                    Add Landlord Reference
+                    {t('landlord.add')}
                 </button>
             </div>
 
@@ -232,17 +253,15 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
             <div className="border-t border-border pt-6">
                 <div className="mb-3 flex items-center gap-2">
                     <User size={20} className="text-primary" />
-                    <h3 className="font-semibold">Other References</h3>
-                    <span className="text-sm text-muted-foreground">(Optional)</span>
+                    <h3 className="font-semibold">{t('other.title')}</h3>
+                    <span className="text-sm text-muted-foreground">({t('other.optional')})</span>
                 </div>
-                <p className="mb-4 text-sm text-muted-foreground">
-                    Add personal or professional references who can vouch for your character and reliability.
-                </p>
+                <p className="mb-4 text-sm text-muted-foreground">{t('other.description')}</p>
 
                 <div className="space-y-3">
                     {personalRefs.length === 0 && professionalRefs.length === 0 ? (
                         <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
-                            <p className="text-sm text-muted-foreground">No other references added yet.</p>
+                            <p className="text-sm text-muted-foreground">{t('other.empty')}</p>
                         </div>
                     ) : (
                         <>
@@ -260,7 +279,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     >
                         <Plus size={16} />
                         <Briefcase size={14} />
-                        Add Professional Reference
+                        {t('other.addProfessional')}
                     </button>
                     <button
                         type="button"
@@ -269,7 +288,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     >
                         <Plus size={16} />
                         <User size={14} />
-                        Add Personal Reference
+                        {t('other.addPersonal')}
                     </button>
                 </div>
             </div>
@@ -278,11 +297,17 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
             {data.references.length > 0 && (
                 <div className="rounded-lg bg-muted/50 p-4">
                     <p className="text-sm text-muted-foreground">
-                        <strong>{data.references.length}</strong> reference{data.references.length !== 1 ? 's' : ''} added
+                        <strong>{data.references.length}</strong>{' '}
+                        {data.references.length === 1
+                            ? t('summary').replace(':count', '1').split('|')[0]
+                            : t('summary').replace(':count', data.references.length.toString()).split('|')[1] ||
+                              t('summary').replace(':count', data.references.length.toString())}
                         {landlordRefs.length > 0 && (
                             <span>
                                 {' '}
-                                ({landlordRefs.length} landlord, {professionalRefs.length + personalRefs.length} other)
+                                {t('summaryDetail')
+                                    .replace(':landlord', landlordRefs.length.toString())
+                                    .replace(':other', (professionalRefs.length + personalRefs.length).toString())}
                             </span>
                         )}
                     </p>

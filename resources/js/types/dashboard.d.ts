@@ -97,7 +97,6 @@ export interface Property {
     available_from?: string; // alias for available_date
     rent_amount: number;
     rent_currency: 'eur' | 'usd' | 'gbp' | 'chf';
-    utilities_included?: boolean;
     pets_allowed?: boolean;
     smoking_allowed?: boolean;
     // Property status (lifecycle only, funnel stage is derived from applications)

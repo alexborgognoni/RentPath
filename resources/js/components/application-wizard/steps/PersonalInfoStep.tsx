@@ -6,6 +6,7 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import { StateProvinceSelect } from '@/components/ui/state-province-select';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import { useGeoLocation } from '@/hooks/useGeoLocation';
+import type { SharedData } from '@/types';
 import {
     getPostalCodeLabel,
     getPostalCodePlaceholder,
@@ -14,7 +15,8 @@ import {
     requiresStateProvince,
 } from '@/utils/address-validation';
 import { getCountryByIso2 } from '@/utils/country-data';
-import { router } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
+import { router, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 interface PersonalInfoStepProps {
@@ -47,6 +49,9 @@ export function PersonalInfoStep({
     onFieldBlur,
     existingDocuments,
 }: PersonalInfoStepProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, `wizard.application.personalStep.${key}`);
+
     const { countryCode: detectedCountry } = useGeoLocation();
     const hasSetDefaults = useRef(false);
 
@@ -125,14 +130,14 @@ export function PersonalInfoStep({
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-xl font-bold">Personal Information</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Your profile will be updated when you submit this application.</p>
+                <h2 className="text-xl font-bold">{t('title')}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
             </div>
 
             {/* Date of Birth & Nationality */}
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                    <label className="mb-2 block text-sm font-medium">Date of Birth</label>
+                    <label className="mb-2 block text-sm font-medium">{t('fields.dateOfBirth')}</label>
                     <DatePicker
                         value={data.profile_date_of_birth}
                         onChange={(value) => handleFieldChange('profile_date_of_birth', value)}
@@ -147,7 +152,7 @@ export function PersonalInfoStep({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium">Nationality</label>
+                    <label className="mb-2 block text-sm font-medium">{t('fields.nationality')}</label>
                     <NationalitySelect
                         value={data.profile_nationality}
                         onChange={handleNationalityChange}
@@ -164,7 +169,7 @@ export function PersonalInfoStep({
 
             {/* Phone Number */}
             <div>
-                <label className="mb-2 block text-sm font-medium">Phone Number</label>
+                <label className="mb-2 block text-sm font-medium">{t('fields.phoneNumber')}</label>
                 <PhoneInput
                     value={data.profile_phone_number}
                     countryCode={data.profile_phone_country_code}
@@ -173,7 +178,7 @@ export function PersonalInfoStep({
                     defaultCountry={detectedCountry}
                     aria-invalid={!!(touchedFields.profile_phone_number && errors.profile_phone_number)}
                     error={touchedFields.profile_phone_number ? errors.profile_phone_number : undefined}
-                    placeholder="612345678"
+                    placeholder={t('placeholders.phone')}
                 />
                 {touchedFields.profile_phone_number && errors.profile_phone_number && (
                     <p className="mt-1 text-sm text-destructive">{errors.profile_phone_number}</p>
@@ -182,18 +187,18 @@ export function PersonalInfoStep({
 
             {/* Current Address */}
             <div className="border-t border-border pt-6">
-                <h3 className="mb-4 font-semibold">Current Address</h3>
+                <h3 className="mb-4 font-semibold">{t('sections.currentAddress')}</h3>
 
                 {/* Street Name & House Number */}
                 <div className="grid gap-4 md:grid-cols-3">
                     <div className="md:col-span-2">
-                        <label className="mb-2 block text-sm font-medium">Street Name</label>
+                        <label className="mb-2 block text-sm font-medium">{t('fields.streetName')}</label>
                         <input
                             type="text"
                             value={data.profile_current_street_name}
                             onChange={(e) => handleFieldChange('profile_current_street_name', e.target.value)}
                             onBlur={onBlur}
-                            placeholder="Kalverstraat"
+                            placeholder={t('placeholders.streetName')}
                             aria-invalid={!!(touchedFields.profile_current_street_name && errors.profile_current_street_name)}
                             className={getFieldClass('profile_current_street_name')}
                             required
@@ -204,13 +209,13 @@ export function PersonalInfoStep({
                     </div>
 
                     <div>
-                        <label className="mb-2 block text-sm font-medium">House Number</label>
+                        <label className="mb-2 block text-sm font-medium">{t('fields.houseNumber')}</label>
                         <input
                             type="text"
                             value={data.profile_current_house_number}
                             onChange={(e) => handleFieldChange('profile_current_house_number', e.target.value)}
                             onBlur={onBlur}
-                            placeholder="123A"
+                            placeholder={t('placeholders.houseNumber')}
                             aria-invalid={!!(touchedFields.profile_current_house_number && errors.profile_current_house_number)}
                             className={getFieldClass('profile_current_house_number')}
                             required
@@ -223,13 +228,15 @@ export function PersonalInfoStep({
 
                 {/* Address Line 2 (optional) */}
                 <div className="mt-4">
-                    <label className="mb-2 block text-sm font-medium">Apartment, Suite, Unit (optional)</label>
+                    <label className="mb-2 block text-sm font-medium">
+                        {t('fields.apartment')} <span className="text-muted-foreground">({t('optional')})</span>
+                    </label>
                     <input
                         type="text"
                         value={data.profile_current_address_line_2}
                         onChange={(e) => handleFieldChange('profile_current_address_line_2', e.target.value)}
                         onBlur={onBlur}
-                        placeholder="Apt 4B, Floor 2"
+                        placeholder={t('placeholders.apartment')}
                         aria-invalid={!!(touchedFields.profile_current_address_line_2 && errors.profile_current_address_line_2)}
                         className={getFieldClass('profile_current_address_line_2')}
                     />
@@ -241,13 +248,13 @@ export function PersonalInfoStep({
                 {/* City & State/Province */}
                 <div className={`mt-4 grid gap-4 ${showStateProvince ? 'md:grid-cols-2' : ''}`}>
                     <div>
-                        <label className="mb-2 block text-sm font-medium">City</label>
+                        <label className="mb-2 block text-sm font-medium">{t('fields.city')}</label>
                         <input
                             type="text"
                             value={data.profile_current_city}
                             onChange={(e) => handleFieldChange('profile_current_city', e.target.value)}
                             onBlur={onBlur}
-                            placeholder="Amsterdam"
+                            placeholder={t('placeholders.city')}
                             aria-invalid={!!(touchedFields.profile_current_city && errors.profile_current_city)}
                             className={getFieldClass('profile_current_city')}
                             required
@@ -261,7 +268,7 @@ export function PersonalInfoStep({
                         <div>
                             <label className="mb-2 block text-sm font-medium">
                                 {stateProvinceLabel}
-                                {!stateProvinceRequired && <span className="text-muted-foreground"> (optional)</span>}
+                                {!stateProvinceRequired && <span className="text-muted-foreground"> ({t('optional')})</span>}
                             </label>
                             <StateProvinceSelect
                                 value={data.profile_current_state_province}
@@ -298,7 +305,7 @@ export function PersonalInfoStep({
                     </div>
 
                     <div>
-                        <label className="mb-2 block text-sm font-medium">Country</label>
+                        <label className="mb-2 block text-sm font-medium">{t('fields.country')}</label>
                         <CountrySelect
                             value={data.profile_current_country}
                             onChange={(value) => handleFieldChange('profile_current_country', value)}
@@ -317,10 +324,10 @@ export function PersonalInfoStep({
 
             {/* ID Document */}
             <div className="border-t border-border pt-6">
-                <h3 className="mb-4 font-semibold">ID Document (Passport, ID Card, Drivers License)</h3>
+                <h3 className="mb-4 font-semibold">{t('sections.idDocument')}</h3>
                 <div className="grid gap-4 md:grid-cols-2">
                     <FileUpload
-                        label="Front Side"
+                        label={t('fileLabels.frontSide')}
                         required
                         documentType="id_document_front"
                         uploadUrl="/tenant-profile/document/upload"
@@ -348,7 +355,7 @@ export function PersonalInfoStep({
                     />
 
                     <FileUpload
-                        label="Back Side"
+                        label={t('fileLabels.backSide')}
                         required
                         documentType="id_document_back"
                         uploadUrl="/tenant-profile/document/upload"

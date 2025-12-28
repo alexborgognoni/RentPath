@@ -52,6 +52,7 @@ test('profile page shows profile data for user with profile', function () {
             ->has('profile')
             ->has('completeness')
             ->has('documents')
+            ->has('profileDocuments')
     );
 });
 

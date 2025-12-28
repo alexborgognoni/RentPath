@@ -380,7 +380,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                     <>
                                         <div className="space-y-1">
                                             <label className="mb-2 block text-xs font-medium text-muted-foreground">
-                                                {t(translations, 'nav.navigation') || 'Navigation'}
+                                                {t(translations.header, 'nav.navigation') || 'Navigation'}
                                             </label>
                                             <TenantNavMobile onNavigate={() => setIsOpen(false)} />
                                         </div>
@@ -391,13 +391,13 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                 {/* Profile & Settings */}
                                 <div className="space-y-1">
                                     <label className="mb-2 block text-xs font-medium text-muted-foreground">
-                                        {t(translations, 'nav.account') || 'Account'}
+                                        {t(translations.header, 'nav.account') || 'Account'}
                                     </label>
                                     {isTenantPortal && (
                                         <Button variant="ghost" className="h-11 w-full justify-start text-base" asChild>
                                             <a href={route('tenant.profile.show')} onClick={() => setIsOpen(false)}>
                                                 <User size={20} />
-                                                <span>{t(translations, 'nav.my_profile') || 'My Profile'}</span>
+                                                <span>{t(translations.header, 'nav.my_profile') || 'My Profile'}</span>
                                             </a>
                                         </Button>
                                     )}

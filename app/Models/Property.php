@@ -271,6 +271,7 @@ class Property extends Model
 
     /**
      * Get formatted rent amount with currency.
+     * Removes unnecessary decimals: .00 removed, .50 becomes .5
      */
     public function getFormattedRentAttribute(): string
     {
@@ -282,8 +283,16 @@ class Property extends Model
         ];
 
         $symbol = $symbols[$this->rent_currency] ?? $this->rent_currency;
+        $amount = (float) $this->rent_amount;
 
-        return $symbol.number_format($this->rent_amount, 2);
+        // Format with smart decimals: no decimals if whole number, otherwise remove trailing zeros
+        if ($amount == floor($amount)) {
+            $formatted = number_format($amount, 0);
+        } else {
+            $formatted = rtrim(rtrim(number_format($amount, 2), '0'), '.');
+        }
+
+        return $symbol.$formatted;
     }
 
     /**

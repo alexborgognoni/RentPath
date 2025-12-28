@@ -1,4 +1,7 @@
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
+import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 
 interface EmergencyStepProps {
     data: ApplicationWizardData;
@@ -19,6 +22,9 @@ export function EmergencyStep({
     onBlur,
     hasProfileEmergencyContact,
 }: EmergencyStepProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, `wizard.application.emergencyStep.${key}`);
+
     const handleFieldChange = (field: keyof ApplicationWizardData, value: string) => {
         updateField(field, value);
         markFieldTouched(field);
@@ -31,16 +37,12 @@ export function EmergencyStep({
 
     return (
         <div className="space-y-6">
-            <h2 className="text-xl font-bold">Emergency Contact</h2>
-            <p className="text-sm text-muted-foreground">
-                {hasProfileEmergencyContact
-                    ? 'You can use your profile emergency contact or provide a different one for this application.'
-                    : 'Provide an emergency contact for this application.'}
-            </p>
+            <h2 className="text-xl font-bold">{t('title')}</h2>
+            <p className="text-sm text-muted-foreground">{hasProfileEmergencyContact ? t('descriptionWithProfile') : t('descriptionNoProfile')}</p>
 
             <div className="grid gap-4 md:grid-cols-3">
                 <div>
-                    <label className="mb-2 block text-sm font-medium">Name</label>
+                    <label className="mb-2 block text-sm font-medium">{t('fields.name')}</label>
                     <input
                         type="text"
                         value={data.emergency_contact_name}
@@ -55,7 +57,7 @@ export function EmergencyStep({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium">Phone</label>
+                    <label className="mb-2 block text-sm font-medium">{t('fields.phone')}</label>
                     <input
                         type="tel"
                         value={data.emergency_contact_phone}
@@ -70,13 +72,13 @@ export function EmergencyStep({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium">Relationship</label>
+                    <label className="mb-2 block text-sm font-medium">{t('fields.relationship')}</label>
                     <input
                         type="text"
                         value={data.emergency_contact_relationship}
                         onChange={(e) => handleFieldChange('emergency_contact_relationship', e.target.value)}
                         onBlur={onBlur}
-                        placeholder="Parent, Sibling..."
+                        placeholder={t('placeholder')}
                         aria-invalid={!!(touchedFields.emergency_contact_relationship && errors.emergency_contact_relationship)}
                         className={getFieldClass('emergency_contact_relationship')}
                     />

@@ -48,12 +48,22 @@ export const translate = (translations: Translations, key: string, params?: Reco
         return key;
     }
 
-    // Replace Laravel-style :param placeholders
-    if (params) {
-        return Object.entries(params).reduce((result, [paramKey, paramValue]) => {
-            return result.replace(new RegExp(`:${paramKey}`, 'g'), String(paramValue));
-        }, current);
+    let result = current;
+
+    // Handle Laravel-style pluralization: "singular|plural"
+    // e.g., ":count spot|:count spots" with count=2 becomes "2 spots"
+    if (result.includes('|') && params && 'count' in params) {
+        const count = Number(params.count);
+        const [singular, plural] = result.split('|');
+        result = count === 1 ? singular : plural;
     }
 
-    return current;
+    // Replace Laravel-style :param placeholders
+    if (params) {
+        return Object.entries(params).reduce((str, [paramKey, paramValue]) => {
+            return str.replace(new RegExp(`:${paramKey}`, 'g'), String(paramValue));
+        }, result);
+    }
+
+    return result;
 };

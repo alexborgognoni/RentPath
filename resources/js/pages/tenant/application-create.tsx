@@ -11,9 +11,22 @@ import { useApplicationWizard, type ApplicationStep, type DraftApplication } fro
 import { TenantLayout } from '@/layouts/tenant-layout';
 import { type SharedData, type TenantProfile } from '@/types';
 import type { Property } from '@/types/dashboard';
+import { translate } from '@/utils/translate-utils';
 import { Head, usePage } from '@inertiajs/react';
-import { MapPin, User } from 'lucide-react';
-import { useCallback } from 'react';
+import { Bath, Bed, Car, MapPin, Ruler, User } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
+
+/**
+ * Format a number by removing unnecessary trailing zeros.
+ * e.g., 1.0 -> 1, 1.50 -> 1.5, 1.25 -> 1.25
+ */
+function formatNumber(value: number | string | null | undefined): string {
+    if (value === null || value === undefined) return '';
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(num)) return '';
+    // Convert to string, which removes trailing zeros after decimal point
+    return num.toString();
+}
 
 interface ApplicationCreateProps extends SharedData {
     property: Property;
@@ -23,13 +36,30 @@ interface ApplicationCreateProps extends SharedData {
 }
 
 export default function ApplicationCreate() {
-    const { property, tenantProfile, draftApplication, token } = usePage<ApplicationCreateProps>().props;
+    const { property, tenantProfile, draftApplication, token, translations } = usePage<ApplicationCreateProps>().props;
+    const t = useCallback(
+        (key: string, params?: Record<string, string | number>) => translate(translations, `wizard.application.${key}`, params),
+        [translations],
+    );
+
+    // Build translated step configs
+    const translatedSteps = useMemo(() => {
+        const stepIds: ApplicationStep[] = ['personal', 'employment', 'details', 'references', 'emergency', 'review'];
+        return stepIds.map((id) => ({
+            id,
+            title: translate(translations, `wizard.application.steps.${id}.title`),
+            shortTitle: translate(translations, `wizard.application.steps.${id}.shortTitle`),
+            description: translate(translations, `wizard.application.steps.${id}.description`),
+            optional: id === 'references' || id === 'emergency',
+        }));
+    }, [translations]);
 
     const wizard = useApplicationWizard({
         propertyId: property.id,
         tenantProfile,
         draftApplication,
         token,
+        steps: translatedSteps,
     });
 
     // Handle blur to trigger validation and autosave
@@ -190,10 +220,10 @@ export default function ApplicationCreate() {
 
     return (
         <TenantLayout>
-            <Head title={`Apply for ${property.title}`} />
+            <Head title={t('page.metaTitle', { property: property.title })} />
             {/* Title */}
             <div className="mb-6 text-center">
-                <h1 className="mb-2 text-3xl font-bold">Application for {property.title}</h1>
+                <h1 className="mb-2 text-3xl font-bold">{t('page.title', { property: property.title })}</h1>
                 <p className="text-sm text-muted-foreground">{wizard.currentStepConfig.description}</p>
             </div>
 
@@ -225,8 +255,8 @@ export default function ApplicationCreate() {
                             isFirstStep={wizard.isFirstStep}
                             isLastStep={wizard.isLastStep}
                             isSubmitting={wizard.isSubmitting}
-                            submitLabel="Submit Application"
-                            submittingLabel="Submitting..."
+                            submitLabel={t('nav.submitApplication')}
+                            submittingLabel={t('nav.submitting')}
                         />
                     </div>
                 </div>
@@ -240,7 +270,7 @@ export default function ApplicationCreate() {
                                 {property.property_manager.profile_picture_url ? (
                                     <img
                                         src={property.property_manager.profile_picture_url}
-                                        alt={property.property_manager.user?.full_name || 'Property Manager'}
+                                        alt={property.property_manager.user?.full_name || t('sidebar.propertyManager')}
                                         className="h-12 w-12 rounded-full object-cover"
                                     />
                                 ) : (
@@ -249,11 +279,13 @@ export default function ApplicationCreate() {
                                     </div>
                                 )}
                                 <div className="min-w-0 flex-1">
-                                    <p className="truncate font-medium">{property.property_manager.user?.full_name || 'Property Manager'}</p>
+                                    <p className="truncate font-medium">
+                                        {property.property_manager.user?.full_name || t('sidebar.propertyManager')}
+                                    </p>
                                     <p className="truncate text-sm text-muted-foreground">
                                         {property.property_manager.type === 'professional' && property.property_manager.company_name
                                             ? property.property_manager.company_name
-                                            : 'Private Landlord'}
+                                            : t('sidebar.privateLandlord')}
                                     </p>
                                 </div>
                             </div>
@@ -282,40 +314,56 @@ export default function ApplicationCreate() {
                             </div>
 
                             <div className="border-t border-border pt-3">
-                                <div className="mb-2 flex items-baseline justify-between">
-                                    <span className="text-sm text-muted-foreground">Monthly Rent</span>
-                                    <span className="text-xl font-bold text-primary">{property.formatted_rent}</span>
+                                <div className="flex items-baseline justify-between">
+                                    <span className="text-sm text-muted-foreground">{t('sidebar.monthlyRent')}</span>
+                                    <span className="text-xl font-bold text-foreground">{property.formatted_rent}</span>
                                 </div>
-
-                                {property.utilities_included !== null && (
-                                    <p className="text-xs text-muted-foreground">
-                                        {property.utilities_included ? 'Utilities included' : 'Utilities not included'}
-                                    </p>
-                                )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-2 border-t border-border pt-3 text-sm">
                                 {property.bedrooms !== null && property.bedrooms !== undefined && (
-                                    <div>
-                                        <p className="text-muted-foreground">Bedrooms</p>
-                                        <p className="font-medium">{property.bedrooms}</p>
+                                    <div className="flex items-center gap-2">
+                                        <Bed className="h-4 w-4 text-muted-foreground" />
+                                        <div>
+                                            <p className="text-muted-foreground">{t('sidebar.bedrooms')}</p>
+                                            <p className="font-medium">{formatNumber(property.bedrooms)}</p>
+                                        </div>
                                     </div>
                                 )}
                                 {property.bathrooms !== null && property.bathrooms !== undefined && (
-                                    <div>
-                                        <p className="text-muted-foreground">Bathrooms</p>
-                                        <p className="font-medium">{property.bathrooms}</p>
+                                    <div className="flex items-center gap-2">
+                                        <Bath className="h-4 w-4 text-muted-foreground" />
+                                        <div>
+                                            <p className="text-muted-foreground">{t('sidebar.bathrooms')}</p>
+                                            <p className="font-medium">{formatNumber(property.bathrooms)}</p>
+                                        </div>
                                     </div>
                                 )}
                                 {property.size !== null && property.size !== undefined && (
-                                    <div>
-                                        <p className="text-muted-foreground">Size</p>
-                                        <p className="font-medium">{property.size} m²</p>
+                                    <div className="flex items-center gap-2">
+                                        <Ruler className="h-4 w-4 text-muted-foreground" />
+                                        <div>
+                                            <p className="text-muted-foreground">{t('sidebar.size')}</p>
+                                            <p className="font-medium">{formatNumber(property.size)} m²</p>
+                                        </div>
+                                    </div>
+                                )}
+                                {((property.parking_spots_interior ?? 0) > 0 || (property.parking_spots_exterior ?? 0) > 0) && (
+                                    <div className="flex items-center gap-2">
+                                        <Car className="h-4 w-4 text-muted-foreground" />
+                                        <div>
+                                            <p className="text-muted-foreground">{t('sidebar.parking')}</p>
+                                            <p className="font-medium">
+                                                {t('sidebar.spots', {
+                                                    count: (property.parking_spots_interior ?? 0) + (property.parking_spots_exterior ?? 0),
+                                                })}
+                                            </p>
+                                        </div>
                                     </div>
                                 )}
                                 {property.available_from && (
                                     <div>
-                                        <p className="text-muted-foreground">Available</p>
+                                        <p className="text-muted-foreground">{t('sidebar.available')}</p>
                                         <p className="font-medium">
                                             {new Date(property.available_from).toLocaleDateString('en-US', {
                                                 month: 'short',
@@ -328,10 +376,12 @@ export default function ApplicationCreate() {
 
                             {(property.pets_allowed || property.smoking_allowed) && (
                                 <div className="border-t border-border pt-3 text-sm">
-                                    <p className="mb-1 font-medium">Allowed</p>
+                                    <p className="mb-1 font-medium">{t('sidebar.allowed')}</p>
                                     <div className="space-y-1">
-                                        {property.pets_allowed && <p className="text-green-600 dark:text-green-400">Pets allowed</p>}
-                                        {property.smoking_allowed && <p className="text-green-600 dark:text-green-400">Smoking allowed</p>}
+                                        {property.pets_allowed && <p className="text-green-600 dark:text-green-400">{t('sidebar.petsAllowed')}</p>}
+                                        {property.smoking_allowed && (
+                                            <p className="text-green-600 dark:text-green-400">{t('sidebar.smokingAllowed')}</p>
+                                        )}
                                     </div>
                                 </div>
                             )}

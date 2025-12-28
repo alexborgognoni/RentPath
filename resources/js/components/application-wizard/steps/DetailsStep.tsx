@@ -2,29 +2,11 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import { WeightUnitSelect } from '@/components/ui/weight-unit-select';
 import type { ApplicationWizardData, OccupantDetails, PetDetails } from '@/hooks/useApplicationWizard';
+import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
+import { usePage } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
-
-const OCCUPANT_RELATIONSHIPS = [
-    { value: 'Spouse', label: 'Spouse' },
-    { value: 'Partner', label: 'Partner' },
-    { value: 'Child', label: 'Child' },
-    { value: 'Parent', label: 'Parent' },
-    { value: 'Sibling', label: 'Sibling' },
-    { value: 'Roommate', label: 'Roommate' },
-    { value: 'Other', label: 'Other' },
-] as const;
-
-const PET_TYPES = [
-    { value: 'Dog', label: 'Dog' },
-    { value: 'Cat', label: 'Cat' },
-    { value: 'Bird', label: 'Bird' },
-    { value: 'Fish', label: 'Fish' },
-    { value: 'Rabbit', label: 'Rabbit' },
-    { value: 'Hamster', label: 'Hamster' },
-    { value: 'Guinea Pig', label: 'Guinea Pig' },
-    { value: 'Reptile', label: 'Reptile' },
-    { value: 'Other', label: 'Other' },
-] as const;
+import { useMemo } from 'react';
 
 interface DetailsStepProps {
     data: ApplicationWizardData;
@@ -55,6 +37,37 @@ export function DetailsStep({
     updatePet,
     onBlur,
 }: DetailsStepProps) {
+    const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, `wizard.application.detailsStep.${key}`);
+
+    const OCCUPANT_RELATIONSHIPS = useMemo(
+        () => [
+            { value: 'Spouse', label: t('occupants.relationships.spouse') },
+            { value: 'Partner', label: t('occupants.relationships.partner') },
+            { value: 'Child', label: t('occupants.relationships.child') },
+            { value: 'Parent', label: t('occupants.relationships.parent') },
+            { value: 'Sibling', label: t('occupants.relationships.sibling') },
+            { value: 'Roommate', label: t('occupants.relationships.roommate') },
+            { value: 'Other', label: t('occupants.relationships.other') },
+        ],
+        [translations],
+    );
+
+    const PET_TYPES = useMemo(
+        () => [
+            { value: 'Dog', label: t('pets.types.dog') },
+            { value: 'Cat', label: t('pets.types.cat') },
+            { value: 'Bird', label: t('pets.types.bird') },
+            { value: 'Fish', label: t('pets.types.fish') },
+            { value: 'Rabbit', label: t('pets.types.rabbit') },
+            { value: 'Hamster', label: t('pets.types.hamster') },
+            { value: 'Guinea Pig', label: t('pets.types.guinea_pig') },
+            { value: 'Reptile', label: t('pets.types.reptile') },
+            { value: 'Other', label: t('pets.types.other') },
+        ],
+        [translations],
+    );
+
     const handleFieldChange = (field: keyof ApplicationWizardData, value: unknown) => {
         updateField(field, value as ApplicationWizardData[typeof field]);
         markFieldTouched(field);
@@ -62,11 +75,11 @@ export function DetailsStep({
 
     return (
         <div className="space-y-6">
-            <h2 className="text-xl font-bold">Application Details</h2>
+            <h2 className="text-xl font-bold">{t('title')}</h2>
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                    <label className="mb-2 block text-sm font-medium">Desired Move-In Date </label>
+                    <label className="mb-2 block text-sm font-medium">{t('fields.moveInDate')}</label>
                     <DatePicker
                         value={data.desired_move_in_date}
                         onChange={(value) => handleFieldChange('desired_move_in_date', value)}
@@ -80,7 +93,7 @@ export function DetailsStep({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium">Desired Lease Duration (months) </label>
+                    <label className="mb-2 block text-sm font-medium">{t('fields.leaseDuration')}</label>
                     <input
                         type="number"
                         value={data.lease_duration_months}
@@ -100,7 +113,7 @@ export function DetailsStep({
 
             <div>
                 <label className="mb-2 block text-sm font-medium">
-                    Message to Landlord <span className="text-muted-foreground">(optional)</span>
+                    {t('fields.messageToLandlord')} <span className="text-muted-foreground">({t('optional')})</span>
                 </label>
                 <textarea
                     value={data.message_to_landlord}
@@ -108,30 +121,30 @@ export function DetailsStep({
                     onBlur={onBlur}
                     rows={4}
                     maxLength={2000}
-                    placeholder="Introduce yourself and explain why you're interested in this property..."
+                    placeholder={t('placeholders.message')}
                     className="w-full rounded-lg border border-border bg-background px-4 py-2"
                 />
-                <p className="mt-1 text-xs text-muted-foreground">{data.message_to_landlord.length}/2000 characters</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                    {t('characters').replace(':count', data.message_to_landlord.length.toString()).replace(':max', '2000')}
+                </p>
             </div>
 
             {/* Occupants Section */}
             <div className="border-t border-border pt-6">
-                <h3 className="mb-4 font-semibold">Occupants</h3>
-                <p className="mb-4 text-sm text-muted-foreground">
-                    You (the applicant) are automatically included. Add any additional occupants below.
-                </p>
+                <h3 className="mb-4 font-semibold">{t('occupants.title')}</h3>
+                <p className="mb-4 text-sm text-muted-foreground">{t('occupants.description')}</p>
 
                 {data.occupants_details.map((occupant, index) => (
                     <div key={index} className="mb-4 rounded-lg border border-border p-4">
                         <div className="mb-2 flex items-center justify-between">
-                            <h4 className="font-medium">Occupant {index + 1}</h4>
+                            <h4 className="font-medium">{t('occupants.occupant').replace(':index', (index + 1).toString())}</h4>
                             <button type="button" onClick={() => removeOccupant(index)} className="cursor-pointer text-red-500 hover:text-red-700">
                                 <Trash2 size={16} />
                             </button>
                         </div>
                         <div className="grid gap-4 md:grid-cols-3">
                             <div>
-                                <label className="mb-1 block text-sm">Name </label>
+                                <label className="mb-1 block text-sm">{t('occupants.name')}</label>
                                 <input
                                     type="text"
                                     value={occupant.name}
@@ -146,7 +159,7 @@ export function DetailsStep({
                                 )}
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm">Age </label>
+                                <label className="mb-1 block text-sm">{t('occupants.age')}</label>
                                 <input
                                     type="number"
                                     value={occupant.age}
@@ -161,7 +174,7 @@ export function DetailsStep({
                                 )}
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm">Relationship</label>
+                                <label className="mb-1 block text-sm">{t('occupants.relationship')}</label>
                                 <SimpleSelect
                                     value={occupant.relationship}
                                     onChange={(value) => updateOccupant(index, 'relationship', value)}
@@ -177,13 +190,13 @@ export function DetailsStep({
                         </div>
                         {occupant.relationship === 'Other' && (
                             <div className="mt-3">
-                                <label className="mb-1 block text-sm">Please specify relationship </label>
+                                <label className="mb-1 block text-sm">{t('occupants.specifyRelationship')}</label>
                                 <input
                                     type="text"
                                     value={occupant.relationship_other}
                                     onChange={(e) => updateOccupant(index, 'relationship_other', e.target.value)}
                                     onBlur={onBlur}
-                                    placeholder="Enter relationship..."
+                                    placeholder={t('occupants.placeholder')}
                                     aria-invalid={
                                         !!(touchedFields[`occupant_${index}_relationship_other`] && errors[`occupant_${index}_relationship_other`])
                                     }
@@ -200,7 +213,7 @@ export function DetailsStep({
 
                 <button type="button" onClick={addOccupant} className="flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline">
                     <Plus size={16} />
-                    Add Occupant
+                    {t('occupants.addOccupant')}
                 </button>
             </div>
 
@@ -208,7 +221,7 @@ export function DetailsStep({
             <div className="border-t border-border pt-6">
                 <div className="mb-4 flex items-center gap-2">
                     <input type="checkbox" checked={data.has_pets} onChange={(e) => updateField('has_pets', e.target.checked)} className="h-4 w-4" />
-                    <label className="text-sm font-medium">I have pets</label>
+                    <label className="text-sm font-medium">{t('pets.hasPets')}</label>
                 </div>
 
                 {data.has_pets && (
@@ -218,20 +231,20 @@ export function DetailsStep({
                         {data.pets_details.map((pet, index) => (
                             <div key={index} className="rounded-lg border border-border p-4">
                                 <div className="mb-2 flex items-center justify-between">
-                                    <h4 className="font-medium">Pet {index + 1}</h4>
+                                    <h4 className="font-medium">{t('pets.pet').replace(':index', (index + 1).toString())}</h4>
                                     <button
                                         type="button"
                                         onClick={() => removePet(index)}
                                         className={`text-red-500 hover:text-red-700 ${data.has_pets && data.pets_details.length === 1 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                                         disabled={data.has_pets && data.pets_details.length === 1}
-                                        title={data.has_pets && data.pets_details.length === 1 ? 'At least one pet is required' : ''}
+                                        title={data.has_pets && data.pets_details.length === 1 ? t('pets.atLeastOneRequired') : ''}
                                     >
                                         <Trash2 size={16} />
                                     </button>
                                 </div>
                                 <div className="grid gap-4 md:grid-cols-4">
                                     <div>
-                                        <label className="mb-1 block text-sm">Type</label>
+                                        <label className="mb-1 block text-sm">{t('pets.type')}</label>
                                         <SimpleSelect
                                             value={pet.type}
                                             onChange={(value) => updatePet(index, 'type', value)}
@@ -246,7 +259,7 @@ export function DetailsStep({
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm">
-                                            Breed <span className="text-muted-foreground">(optional)</span>
+                                            {t('pets.breed')} <span className="text-muted-foreground">({t('optional')})</span>
                                         </label>
                                         <input
                                             type="text"
@@ -258,7 +271,7 @@ export function DetailsStep({
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm">
-                                            Age <span className="text-muted-foreground">(optional)</span>
+                                            {t('pets.age')} <span className="text-muted-foreground">({t('optional')})</span>
                                         </label>
                                         <input
                                             type="number"
@@ -270,7 +283,7 @@ export function DetailsStep({
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm">
-                                            Weight <span className="text-muted-foreground">(optional)</span>
+                                            {t('pets.weight')} <span className="text-muted-foreground">({t('optional')})</span>
                                         </label>
                                         <div className="flex">
                                             <WeightUnitSelect
@@ -290,13 +303,13 @@ export function DetailsStep({
                                 </div>
                                 {pet.type === 'Other' && (
                                     <div className="mt-3">
-                                        <label className="mb-1 block text-sm">Please specify pet type </label>
+                                        <label className="mb-1 block text-sm">{t('pets.specifyType')}</label>
                                         <input
                                             type="text"
                                             value={pet.type_other}
                                             onChange={(e) => updatePet(index, 'type_other', e.target.value)}
                                             onBlur={onBlur}
-                                            placeholder="Enter pet type..."
+                                            placeholder={t('pets.placeholder')}
                                             aria-invalid={!!(touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`])}
                                             className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                             required
@@ -315,7 +328,7 @@ export function DetailsStep({
                             className="flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline"
                         >
                             <Plus size={16} />
-                            Add Pet
+                            {t('pets.addPet')}
                         </button>
                     </div>
                 )}

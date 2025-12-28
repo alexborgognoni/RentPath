@@ -47,14 +47,18 @@ class TenantProfileController extends Controller
             'proof_of_income' => false,
             'reference_letter' => false,
         ];
+        $profileDocuments = [];
 
         if ($tenantProfile) {
             $completeness = $this->calculateCompleteness($tenantProfile);
             $documents = [
-                'id_document' => ! empty($tenantProfile->id_document_path),
+                'id_document' => ! empty($tenantProfile->id_document_front_path),
                 'proof_of_income' => ! empty($tenantProfile->payslip_1_path) || ! empty($tenantProfile->employment_contract_path),
                 'reference_letter' => ! empty($tenantProfile->reference_letter_path),
             ];
+
+            // Build document metadata for FileUpload components
+            $profileDocuments = $this->buildDocumentMetadata($tenantProfile);
         }
 
         return Inertia::render('tenant/profile', [
@@ -62,7 +66,47 @@ class TenantProfileController extends Controller
             'hasProfile' => $tenantProfile !== null,
             'completeness' => $completeness,
             'documents' => $documents,
+            'profileDocuments' => $profileDocuments,
         ]);
+    }
+
+    /**
+     * Build document metadata for FileUpload components.
+     */
+    private function buildDocumentMetadata($tenantProfile): array
+    {
+        $documentTypes = [
+            'id_document_front',
+            'id_document_back',
+            'employment_contract',
+            'payslip_1',
+            'payslip_2',
+            'payslip_3',
+            'student_proof',
+            'other_income_proof',
+            'guarantor_id',
+            'guarantor_proof_income',
+        ];
+
+        $documents = [];
+
+        foreach ($documentTypes as $type) {
+            $pathField = $type.'_path';
+            $nameField = $type.'_original_name';
+
+            if (! empty($tenantProfile->$pathField)) {
+                $metadata = $tenantProfile->documents_metadata[$type] ?? null;
+
+                $documents[$type] = [
+                    'originalName' => $tenantProfile->$nameField ?? basename($tenantProfile->$pathField),
+                    'url' => StorageHelper::url($tenantProfile->$pathField, 'private'),
+                    'size' => $metadata['size'] ?? null,
+                    'uploadedAt' => $metadata['lastModified'] ?? null,
+                ];
+            }
+        }
+
+        return $documents;
     }
 
     /**
@@ -71,15 +115,20 @@ class TenantProfileController extends Controller
     private function calculateCompleteness($profile): int
     {
         $fields = [
+            // Personal info
             'date_of_birth',
             'nationality',
             'phone_number',
+            // Address
             'current_street_name',
             'current_city',
             'current_postal_code',
             'current_country',
+            // Identity documents
+            'id_document_front_path',
+            'id_document_back_path',
+            // Employment
             'employment_status',
-            'id_document_path',
         ];
 
         // Add employment-specific fields
@@ -88,6 +137,25 @@ class TenantProfileController extends Controller
                 'employer_name',
                 'job_title',
                 'monthly_income',
+                'employment_contract_path',
+                'payslip_1_path',
+            ]);
+        }
+
+        // Add student-specific fields
+        if ($profile->employment_status === 'student') {
+            $fields = array_merge($fields, [
+                'university_name',
+                'program_of_study',
+                'student_proof_path',
+            ]);
+        }
+
+        // Add guarantor fields if has_guarantor is true
+        if ($profile->has_guarantor) {
+            $fields = array_merge($fields, [
+                'guarantor_name',
+                'guarantor_relationship',
             ]);
         }
 
@@ -533,6 +601,11 @@ class TenantProfileController extends Controller
             'guarantor_address',
             'guarantor_employer',
             'guarantor_monthly_income',
+            'guarantor_income_currency',
+            // Emergency Contact
+            'emergency_contact_name',
+            'emergency_contact_phone',
+            'emergency_contact_relationship',
         ];
 
         // Only accept allowed fields from the request

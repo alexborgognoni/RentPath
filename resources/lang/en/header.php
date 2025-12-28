@@ -11,4 +11,9 @@ return [
         'cancel' => 'Cancel',
         'confirm' => 'Log Out',
     ],
+    'nav' => [
+        'navigation' => 'Navigation',
+        'account' => 'Account',
+        'my_profile' => 'My Profile',
+    ],
 ];

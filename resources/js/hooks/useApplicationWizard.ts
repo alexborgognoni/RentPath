@@ -281,6 +281,7 @@ export interface UseApplicationWizardOptions {
     draftApplication?: DraftApplication | null;
     token?: string | null;
     onDraftUpdated?: (draft: DraftApplication) => void;
+    steps?: WizardStepConfig<ApplicationStep>[];
 }
 
 export interface UseApplicationWizardReturn {
@@ -354,7 +355,10 @@ export function useApplicationWizard({
     draftApplication,
     token,
     onDraftUpdated,
+    steps: providedSteps,
 }: UseApplicationWizardOptions): UseApplicationWizardReturn {
+    // Use provided steps or fall back to default (untranslated)
+    const steps = providedSteps ?? APPLICATION_STEPS;
     // Application-specific state
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -362,7 +366,7 @@ export function useApplicationWizard({
     const [pendingSave, setPendingSave] = useState(false);
 
     // Calculate initial step from draft's current_step
-    const initialStepIndex = draftApplication?.current_step ? Math.min(draftApplication.current_step - 1, APPLICATION_STEPS.length - 1) : 0;
+    const initialStepIndex = draftApplication?.current_step ? Math.min(draftApplication.current_step - 1, steps.length - 1) : 0;
     const initialMaxStepReached = draftApplication?.current_step ? draftApplication.current_step - 1 : 0;
 
     // Build existing documents context from tenant profile
@@ -442,7 +446,7 @@ export function useApplicationWizard({
 
     // Use the generic wizard hook
     const wizard = useWizard<ApplicationWizardData, ApplicationStep>({
-        steps: APPLICATION_STEPS,
+        steps,
         initialData: getInitialData(draftApplication, tenantProfile, token),
         initialStepIndex: Math.max(0, initialStepIndex),
         initialMaxStepReached: Math.max(0, initialMaxStepReached),

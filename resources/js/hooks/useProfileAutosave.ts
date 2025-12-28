@@ -35,6 +35,10 @@ const PROFILE_FIELDS = new Set([
     'profile_guarantor_address',
     'profile_guarantor_employer',
     'profile_guarantor_monthly_income',
+    'profile_guarantor_income_currency',
+    'profile_emergency_contact_name',
+    'profile_emergency_contact_phone',
+    'profile_emergency_contact_relationship',
 ]);
 
 export function isProfileField(fieldName: string): boolean {
