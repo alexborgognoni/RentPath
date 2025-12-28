@@ -12,7 +12,7 @@ import { TenantLayout } from '@/layouts/tenant-layout';
 import { type SharedData, type TenantProfile } from '@/types';
 import type { Property } from '@/types/dashboard';
 import { Head, usePage } from '@inertiajs/react';
-import { MapPin } from 'lucide-react';
+import { MapPin, User } from 'lucide-react';
 import { useCallback } from 'react';
 
 interface ApplicationCreateProps extends SharedData {
@@ -232,8 +232,36 @@ export default function ApplicationCreate() {
                 </div>
 
                 {/* Property Summary Sidebar - Fixed width */}
-                <div className="order-1 lg:order-2">
-                    <div className="sticky top-8 rounded-lg border border-border bg-card">
+                <div className="order-1 space-y-4 lg:order-2">
+                    {/* Property Manager Card */}
+                    {property.property_manager && (
+                        <div className="rounded-lg border border-border bg-card p-4">
+                            <div className="flex items-center gap-3">
+                                {property.property_manager.profile_picture_url ? (
+                                    <img
+                                        src={property.property_manager.profile_picture_url}
+                                        alt={property.property_manager.user?.full_name || 'Property Manager'}
+                                        className="h-12 w-12 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                        <User className="h-6 w-6 text-muted-foreground" />
+                                    </div>
+                                )}
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate font-medium">{property.property_manager.user?.full_name || 'Property Manager'}</p>
+                                    <p className="truncate text-sm text-muted-foreground">
+                                        {property.property_manager.type === 'professional' && property.property_manager.company_name
+                                            ? property.property_manager.company_name
+                                            : 'Private Landlord'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Property Details Card */}
+                    <div className="rounded-lg border border-border bg-card">
                         {property.main_image_url && (
                             <div className="overflow-hidden rounded-t-lg">
                                 <img src={property.main_image_url} alt={property.title} className="h-56 w-full object-cover" />
