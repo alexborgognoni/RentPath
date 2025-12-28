@@ -164,7 +164,10 @@ export default function ApplicationCreate() {
                 return (
                     <EmergencyStep
                         data={wizard.data}
+                        errors={wizard.errors}
+                        touchedFields={wizard.touchedFields}
                         updateField={wizard.updateField}
+                        markFieldTouched={wizard.markFieldTouched}
                         onBlur={handleBlur}
                         hasProfileEmergencyContact={!!tenantProfile?.emergency_contact_name}
                     />

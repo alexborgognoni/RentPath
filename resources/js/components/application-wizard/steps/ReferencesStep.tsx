@@ -94,7 +94,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                             onChange={(e) => updateReference(actualIndex, 'name', e.target.value)}
                             onBlur={onBlur}
                             aria-invalid={!!(touchedFields[`ref_${actualIndex}_name`] && errors[`ref_${actualIndex}_name`])}
-                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_name`] && errors[`ref_${actualIndex}_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`ref_${actualIndex}_name`] && errors[`ref_${actualIndex}_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                         />
                         {touchedFields[`ref_${actualIndex}_name`] && errors[`ref_${actualIndex}_name`] && (
                             <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_name`]}</p>
@@ -128,7 +128,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                                 aria-invalid={
                                     !!(touchedFields[`ref_${actualIndex}_relationship_other`] && errors[`ref_${actualIndex}_relationship_other`])
                                 }
-                                className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_relationship_other`] && errors[`ref_${actualIndex}_relationship_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`ref_${actualIndex}_relationship_other`] && errors[`ref_${actualIndex}_relationship_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                             />
                             {touchedFields[`ref_${actualIndex}_relationship_other`] && errors[`ref_${actualIndex}_relationship_other`] && (
                                 <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_relationship_other`]}</p>
@@ -144,7 +144,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                             onChange={(e) => updateReference(actualIndex, 'phone', e.target.value)}
                             onBlur={onBlur}
                             aria-invalid={!!(touchedFields[`ref_${actualIndex}_phone`] && errors[`ref_${actualIndex}_phone`])}
-                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_phone`] && errors[`ref_${actualIndex}_phone`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`ref_${actualIndex}_phone`] && errors[`ref_${actualIndex}_phone`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                         />
                         {touchedFields[`ref_${actualIndex}_phone`] && errors[`ref_${actualIndex}_phone`] && (
                             <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_phone`]}</p>
@@ -159,7 +159,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                             onChange={(e) => updateReference(actualIndex, 'email', e.target.value)}
                             onBlur={onBlur}
                             aria-invalid={!!(touchedFields[`ref_${actualIndex}_email`] && errors[`ref_${actualIndex}_email`])}
-                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_email`] && errors[`ref_${actualIndex}_email`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`ref_${actualIndex}_email`] && errors[`ref_${actualIndex}_email`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                         />
                         {touchedFields[`ref_${actualIndex}_email`] && errors[`ref_${actualIndex}_email`] && (
                             <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_email`]}</p>
@@ -176,7 +176,7 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                             onChange={(e) => updateReference(actualIndex, 'years_known', e.target.value)}
                             onBlur={onBlur}
                             aria-invalid={!!(touchedFields[`ref_${actualIndex}_years_known`] && errors[`ref_${actualIndex}_years_known`])}
-                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_years_known`] && errors[`ref_${actualIndex}_years_known`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`ref_${actualIndex}_years_known`] && errors[`ref_${actualIndex}_years_known`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                         />
                         {touchedFields[`ref_${actualIndex}_years_known`] && errors[`ref_${actualIndex}_years_known`] && (
                             <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_years_known`]}</p>

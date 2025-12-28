@@ -139,7 +139,7 @@ export function DetailsStep({
                                     onChange={(e) => updateOccupant(index, 'name', e.target.value)}
                                     onBlur={onBlur}
                                     aria-invalid={!!(touchedFields[`occupant_${index}_name`] && errors[`occupant_${index}_name`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`occupant_${index}_name`] && errors[`occupant_${index}_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupant_${index}_name`] && errors[`occupant_${index}_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                     required
                                 />
                                 {touchedFields[`occupant_${index}_name`] && errors[`occupant_${index}_name`] && (
@@ -154,7 +154,7 @@ export function DetailsStep({
                                     onChange={(e) => updateOccupant(index, 'age', e.target.value)}
                                     onBlur={onBlur}
                                     aria-invalid={!!(touchedFields[`occupant_${index}_age`] && errors[`occupant_${index}_age`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`occupant_${index}_age`] && errors[`occupant_${index}_age`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupant_${index}_age`] && errors[`occupant_${index}_age`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                     required
                                 />
                                 {touchedFields[`occupant_${index}_age`] && errors[`occupant_${index}_age`] && (
@@ -188,7 +188,7 @@ export function DetailsStep({
                                     aria-invalid={
                                         !!(touchedFields[`occupant_${index}_relationship_other`] && errors[`occupant_${index}_relationship_other`])
                                     }
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`occupant_${index}_relationship_other`] && errors[`occupant_${index}_relationship_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupant_${index}_relationship_other`] && errors[`occupant_${index}_relationship_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                     required
                                 />
                                 {touchedFields[`occupant_${index}_relationship_other`] && errors[`occupant_${index}_relationship_other`] && (
@@ -254,7 +254,7 @@ export function DetailsStep({
                                             value={pet.breed}
                                             onChange={(e) => updatePet(index, 'breed', e.target.value)}
                                             onBlur={onBlur}
-                                            className="w-full rounded border border-border bg-background px-3 py-1.5"
+                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
                                     <div>
@@ -266,7 +266,7 @@ export function DetailsStep({
                                             value={pet.age}
                                             onChange={(e) => updatePet(index, 'age', e.target.value)}
                                             onBlur={onBlur}
-                                            className="w-full rounded border border-border bg-background px-3 py-1.5"
+                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
                                     <div>
@@ -278,7 +278,7 @@ export function DetailsStep({
                                             value={pet.weight}
                                             onChange={(e) => updatePet(index, 'weight', e.target.value)}
                                             onBlur={onBlur}
-                                            className="w-full rounded border border-border bg-background px-3 py-1.5"
+                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
                                 </div>
@@ -292,7 +292,7 @@ export function DetailsStep({
                                             onBlur={onBlur}
                                             placeholder="Enter pet type..."
                                             aria-invalid={!!(touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`])}
-                                            className={`w-full rounded border px-3 py-1.5 ${touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                             required
                                         />
                                         {touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`] && (

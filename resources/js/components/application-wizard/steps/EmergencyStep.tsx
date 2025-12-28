@@ -2,12 +2,33 @@ import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 
 interface EmergencyStepProps {
     data: ApplicationWizardData;
+    errors: Record<string, string>;
+    touchedFields: Record<string, boolean>;
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
+    markFieldTouched: (field: string) => void;
     onBlur: () => void;
     hasProfileEmergencyContact: boolean;
 }
 
-export function EmergencyStep({ data, updateField, onBlur, hasProfileEmergencyContact }: EmergencyStepProps) {
+export function EmergencyStep({
+    data,
+    errors,
+    touchedFields,
+    updateField,
+    markFieldTouched,
+    onBlur,
+    hasProfileEmergencyContact,
+}: EmergencyStepProps) {
+    const handleFieldChange = (field: keyof ApplicationWizardData, value: string) => {
+        updateField(field, value);
+        markFieldTouched(field);
+    };
+
+    const getFieldClass = (field: string) => {
+        const hasError = touchedFields[field] && errors[field];
+        return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
+    };
+
     return (
         <div className="space-y-6">
             <h2 className="text-xl font-bold">Emergency Contact</h2>
@@ -23,10 +44,14 @@ export function EmergencyStep({ data, updateField, onBlur, hasProfileEmergencyCo
                     <input
                         type="text"
                         value={data.emergency_contact_name}
-                        onChange={(e) => updateField('emergency_contact_name', e.target.value)}
+                        onChange={(e) => handleFieldChange('emergency_contact_name', e.target.value)}
                         onBlur={onBlur}
-                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                        aria-invalid={!!(touchedFields.emergency_contact_name && errors.emergency_contact_name)}
+                        className={getFieldClass('emergency_contact_name')}
                     />
+                    {touchedFields.emergency_contact_name && errors.emergency_contact_name && (
+                        <p className="mt-1 text-sm text-destructive">{errors.emergency_contact_name}</p>
+                    )}
                 </div>
 
                 <div>
@@ -34,10 +59,14 @@ export function EmergencyStep({ data, updateField, onBlur, hasProfileEmergencyCo
                     <input
                         type="tel"
                         value={data.emergency_contact_phone}
-                        onChange={(e) => updateField('emergency_contact_phone', e.target.value)}
+                        onChange={(e) => handleFieldChange('emergency_contact_phone', e.target.value)}
                         onBlur={onBlur}
-                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                        aria-invalid={!!(touchedFields.emergency_contact_phone && errors.emergency_contact_phone)}
+                        className={getFieldClass('emergency_contact_phone')}
                     />
+                    {touchedFields.emergency_contact_phone && errors.emergency_contact_phone && (
+                        <p className="mt-1 text-sm text-destructive">{errors.emergency_contact_phone}</p>
+                    )}
                 </div>
 
                 <div>
@@ -45,11 +74,15 @@ export function EmergencyStep({ data, updateField, onBlur, hasProfileEmergencyCo
                     <input
                         type="text"
                         value={data.emergency_contact_relationship}
-                        onChange={(e) => updateField('emergency_contact_relationship', e.target.value)}
+                        onChange={(e) => handleFieldChange('emergency_contact_relationship', e.target.value)}
                         onBlur={onBlur}
                         placeholder="Parent, Sibling..."
-                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                        aria-invalid={!!(touchedFields.emergency_contact_relationship && errors.emergency_contact_relationship)}
+                        className={getFieldClass('emergency_contact_relationship')}
                     />
+                    {touchedFields.emergency_contact_relationship && errors.emergency_contact_relationship && (
+                        <p className="mt-1 text-sm text-destructive">{errors.emergency_contact_relationship}</p>
+                    )}
                 </div>
             </div>
         </div>
