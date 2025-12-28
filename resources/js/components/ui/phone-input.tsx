@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { COUNTRIES, formatDialCode, getCountryByDialCode, getCountryByIso2, iso2ToFlagEmoji, searchCountries } from '@/utils/country-data';
+import { COUNTRIES_WITH_DIAL_CODES, formatDialCode, getCountryByDialCode, getCountryByIso2, iso2ToFlagEmoji, searchCountries } from '@/utils/country-data';
 import * as Popover from '@radix-ui/react-popover';
 import { ChevronDown, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -41,8 +41,11 @@ export function PhoneInput({
 }: PhoneInputProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
+    const [highlightedIndex, setHighlightedIndex] = useState(0);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const phoneInputRef = useRef<HTMLInputElement>(null);
+    const listRef = useRef<HTMLDivElement>(null);
+    const itemRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
     // Determine current country from countryCode prop or defaultCountry
     const currentCountry = useMemo(() => {
@@ -51,13 +54,26 @@ export function PhoneInput({
             const country = getCountryByDialCode(dialCode);
             if (country) return country;
         }
-        return getCountryByIso2(defaultCountry) || COUNTRIES[0];
+        return getCountryByIso2(defaultCountry) || COUNTRIES_WITH_DIAL_CODES[0];
     }, [countryCode, defaultCountry]);
 
-    // Filter countries based on search
+    // Filter countries based on search (only show countries with dial codes)
     const filteredCountries = useMemo(() => {
-        return searchCountries(search);
+        return searchCountries(search, true);
     }, [search]);
+
+    // Reset highlighted index when search changes or popover opens
+    useEffect(() => {
+        setHighlightedIndex(0);
+    }, [search, isOpen]);
+
+    // Scroll highlighted item into view
+    useEffect(() => {
+        if (isOpen && filteredCountries.length > 0) {
+            const item = itemRefs.current.get(highlightedIndex);
+            item?.scrollIntoView({ block: 'nearest' });
+        }
+    }, [highlightedIndex, isOpen, filteredCountries.length]);
 
     // Handle country selection
     const handleCountrySelect = useCallback(
@@ -89,8 +105,8 @@ export function PhoneInput({
         }
     }, [isOpen]);
 
-    // Keyboard navigation
-    const handleKeyDown = useCallback(
+    // Keyboard navigation for trigger button
+    const handleTriggerKeyDown = useCallback(
         (e: React.KeyboardEvent) => {
             if (e.key === 'Escape') {
                 setIsOpen(false);
@@ -100,6 +116,34 @@ export function PhoneInput({
             }
         },
         [isOpen],
+    );
+
+    // Keyboard navigation for search input
+    const handleSearchKeyDown = useCallback(
+        (e: React.KeyboardEvent) => {
+            if (filteredCountries.length === 0) return;
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    setHighlightedIndex((prev) => (prev < filteredCountries.length - 1 ? prev + 1 : prev));
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (filteredCountries[highlightedIndex]) {
+                        handleCountrySelect(filteredCountries[highlightedIndex].iso2);
+                    }
+                    break;
+                case 'Escape':
+                    setIsOpen(false);
+                    break;
+            }
+        },
+        [filteredCountries, highlightedIndex, handleCountrySelect],
     );
 
     const hasError = ariaInvalid || !!error;
@@ -112,9 +156,9 @@ export function PhoneInput({
                     <button
                         type="button"
                         disabled={disabled}
-                        onKeyDown={handleKeyDown}
+                        onKeyDown={handleTriggerKeyDown}
                         className={cn(
-                            'flex w-32 shrink-0 items-center justify-between gap-1 rounded-lg border bg-background px-4 py-2',
+                            'flex w-32 shrink-0 cursor-pointer items-center justify-between gap-1 rounded-lg border bg-background px-4 py-2',
                             'border-border focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                             'disabled:cursor-not-allowed disabled:opacity-50',
                             hasError && 'border-destructive bg-destructive/5',
@@ -149,26 +193,33 @@ export function PhoneInput({
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
+                                onKeyDown={handleSearchKeyDown}
                                 placeholder="Search countries..."
                                 className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                             />
                         </div>
 
                         {/* Country List */}
-                        <div className="max-h-64 overflow-y-auto p-1">
+                        <div ref={listRef} className="max-h-64 overflow-y-auto p-1">
                             {filteredCountries.length === 0 ? (
                                 <div className="px-2 py-4 text-center text-sm text-muted-foreground">No countries found</div>
                             ) : (
-                                filteredCountries.map((c) => (
+                                filteredCountries.map((c, index) => (
                                     <button
                                         key={c.iso2}
+                                        ref={(el) => {
+                                            if (el) itemRefs.current.set(index, el);
+                                            else itemRefs.current.delete(index);
+                                        }}
                                         type="button"
                                         onClick={() => handleCountrySelect(c.iso2)}
+                                        onMouseEnter={() => setHighlightedIndex(index)}
                                         className={cn(
-                                            'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none',
+                                            'flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none',
                                             'hover:bg-muted',
                                             'focus:bg-muted',
-                                            c.iso2 === currentCountry.iso2 && 'bg-muted',
+                                            index === highlightedIndex && 'bg-muted',
+                                            c.iso2 === currentCountry.iso2 && 'font-medium',
                                         )}
                                     >
                                         <span className="text-base">{iso2ToFlagEmoji(c.iso2)}</span>

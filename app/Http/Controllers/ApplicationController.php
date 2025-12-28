@@ -353,8 +353,10 @@ class ApplicationController extends Controller
                     'profile_phone_country_code' => 'required|string|max:5',
                     'profile_phone_number' => 'required|string|max:20',
                     'profile_current_house_number' => 'required|string|max:20',
+                    'profile_current_address_line_2' => 'nullable|string|max:100',
                     'profile_current_street_name' => 'required|string|max:255',
                     'profile_current_city' => 'required|string|max:100',
+                    'profile_current_state_province' => 'nullable|string|max:100',
                     'profile_current_postal_code' => 'required|string|max:20',
                     'profile_current_country' => 'required|string|max:2',
                 ];
@@ -616,8 +618,10 @@ class ApplicationController extends Controller
             'phone_country_code' => $request->input('profile_phone_country_code'),
             'phone_number' => $request->input('profile_phone_number'),
             'current_house_number' => $request->input('profile_current_house_number'),
+            'current_address_line_2' => $request->input('profile_current_address_line_2'),
             'current_street_name' => $request->input('profile_current_street_name'),
             'current_city' => $request->input('profile_current_city'),
+            'current_state_province' => $request->input('profile_current_state_province'),
             'current_postal_code' => $request->input('profile_current_postal_code'),
             'current_country' => $request->input('profile_current_country'),
 
@@ -688,8 +692,10 @@ class ApplicationController extends Controller
 
             // Current address snapshot
             'snapshot_current_house_number' => $tenantProfile->current_house_number,
+            'snapshot_current_address_line_2' => $tenantProfile->current_address_line_2,
             'snapshot_current_street_name' => $tenantProfile->current_street_name,
             'snapshot_current_city' => $tenantProfile->current_city,
+            'snapshot_current_state_province' => $tenantProfile->current_state_province,
             'snapshot_current_postal_code' => $tenantProfile->current_postal_code,
             'snapshot_current_country' => $tenantProfile->current_country,
 

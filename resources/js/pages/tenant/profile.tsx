@@ -222,8 +222,15 @@ export default function ProfilePage({ profile, hasProfile, completeness, documen
                             </h2>
                             <p className="text-foreground">
                                 {profile.current_house_number} {profile.current_street_name}
+                                {profile.current_address_line_2 && (
+                                    <>
+                                        <br />
+                                        {profile.current_address_line_2}
+                                    </>
+                                )}
                                 <br />
-                                {profile.current_postal_code} {profile.current_city}
+                                {profile.current_city}
+                                {profile.current_state_province && `, ${profile.current_state_province}`} {profile.current_postal_code}
                                 <br />
                                 {profile.current_country}
                             </p>

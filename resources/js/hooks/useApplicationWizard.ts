@@ -89,8 +89,10 @@ export interface ApplicationWizardData {
     profile_phone_country_code: string;
     profile_phone_number: string;
     profile_current_house_number: string;
+    profile_current_address_line_2: string;
     profile_current_street_name: string;
     profile_current_city: string;
+    profile_current_state_province: string;
     profile_current_postal_code: string;
     profile_current_country: string;
 
@@ -173,8 +175,10 @@ export interface DraftApplication {
     snapshot_phone_country_code?: string;
     snapshot_phone_number?: string;
     snapshot_current_house_number?: string;
+    snapshot_current_address_line_2?: string;
     snapshot_current_street_name?: string;
     snapshot_current_city?: string;
+    snapshot_current_state_province?: string;
     snapshot_current_postal_code?: string;
     snapshot_current_country?: string;
     snapshot_employment_status?: string;
@@ -216,8 +220,10 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_phone_country_code: draft?.snapshot_phone_country_code || tenantProfile?.phone_country_code || '+31',
         profile_phone_number: draft?.snapshot_phone_number || tenantProfile?.phone_number || '',
         profile_current_house_number: draft?.snapshot_current_house_number || tenantProfile?.current_house_number || '',
+        profile_current_address_line_2: draft?.snapshot_current_address_line_2 || tenantProfile?.current_address_line_2 || '',
         profile_current_street_name: draft?.snapshot_current_street_name || tenantProfile?.current_street_name || '',
         profile_current_city: draft?.snapshot_current_city || tenantProfile?.current_city || '',
+        profile_current_state_province: draft?.snapshot_current_state_province || tenantProfile?.current_state_province || '',
         profile_current_postal_code: draft?.snapshot_current_postal_code || tenantProfile?.current_postal_code || '',
         profile_current_country: draft?.snapshot_current_country || tenantProfile?.current_country || '',
 
@@ -545,7 +551,9 @@ export function useApplicationWizard({
             newTouched.profile_phone_number = true;
             newTouched.profile_current_street_name = true;
             newTouched.profile_current_house_number = true;
+            newTouched.profile_current_address_line_2 = true;
             newTouched.profile_current_city = true;
+            newTouched.profile_current_state_province = true;
             newTouched.profile_current_postal_code = true;
             newTouched.profile_current_country = true;
         }

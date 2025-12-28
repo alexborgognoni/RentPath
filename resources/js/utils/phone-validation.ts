@@ -1,6 +1,19 @@
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
 
 /**
+ * Phone number validation utilities using libphonenumber-js.
+ *
+ * IMPORTANT: This validation logic MUST match the backend validation in:
+ * app/Rules/ValidPhoneNumber.php
+ *
+ * Both use libphonenumber (JS: libphonenumber-js, PHP: giggsey/libphonenumber-for-php)
+ * to ensure consistent validation results.
+ *
+ * Per DESIGN.md validation strategy, frontend and backend must have identical
+ * validation logic.
+ */
+
+/**
  * Validate a phone number for a specific country
  * @param phoneNumber - The national phone number (without country code)
  * @param countryCode - The dial code (e.g., "+31") or ISO country code (e.g., "NL")
@@ -49,12 +62,15 @@ export function formatPhoneNumber(phoneNumber: string, countryCode: string): str
  * @param phoneNumber - The national phone number
  * @param countryCode - The dial code (e.g., "+31")
  * @returns Error message or null if valid
+ *
+ * NOTE: Error message must match APPLICATION_MESSAGES.profile_phone_number.invalid
+ * and backend ValidPhoneNumber.php error message.
  */
 export function getPhoneValidationError(phoneNumber: string, countryCode: string): string | null {
     if (!phoneNumber) return null; // Let required validation handle empty
 
     if (!validatePhoneNumber(phoneNumber, countryCode)) {
-        return 'Please enter a valid phone number for the selected country';
+        return 'Please enter a valid phone number';
     }
 
     return null;

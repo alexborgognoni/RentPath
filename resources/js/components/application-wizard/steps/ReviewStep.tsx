@@ -102,8 +102,15 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                     </h4>
                     <p className="font-medium">
                         {data.profile_current_house_number} {data.profile_current_street_name}
+                        {data.profile_current_address_line_2 && (
+                            <>
+                                <br />
+                                {data.profile_current_address_line_2}
+                            </>
+                        )}
                         <br />
-                        {data.profile_current_city}, {data.profile_current_postal_code}
+                        {data.profile_current_city}
+                        {data.profile_current_state_province && `, ${data.profile_current_state_province}`} {data.profile_current_postal_code}
                         <br />
                         {COUNTRY_NAMES[data.profile_current_country] || data.profile_current_country}
                     </p>

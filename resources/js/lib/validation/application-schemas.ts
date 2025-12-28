@@ -1,3 +1,4 @@
+import { requiresStateProvince, validatePostalCode } from '@/utils/address-validation';
 import { validatePhoneNumber } from '@/utils/phone-validation';
 import { z } from 'zod';
 
@@ -29,9 +30,13 @@ export const APPLICATION_MESSAGES = {
     },
     profile_current_postal_code: {
         required: 'Postal code is required',
+        invalid: 'Invalid postal code format for selected country',
     },
     profile_current_country: {
         required: 'Country is required',
+    },
+    profile_current_state_province: {
+        required: 'State/Province is required for this country',
     },
 
     // Employment Step
@@ -240,7 +245,9 @@ export const personalInfoStepSchema = z
         profile_phone_number: z.string().min(1, APPLICATION_MESSAGES.profile_phone_number.required),
         profile_current_street_name: z.string().min(1, APPLICATION_MESSAGES.profile_current_street_name.required),
         profile_current_house_number: z.string().min(1, APPLICATION_MESSAGES.profile_current_house_number.required),
+        profile_current_address_line_2: z.string().optional(),
         profile_current_city: z.string().min(1, APPLICATION_MESSAGES.profile_current_city.required),
+        profile_current_state_province: z.string().optional(),
         profile_current_postal_code: z.string().min(1, APPLICATION_MESSAGES.profile_current_postal_code.required),
         profile_current_country: z.string().min(1, APPLICATION_MESSAGES.profile_current_country.required),
     })
@@ -273,6 +280,32 @@ export const personalInfoStepSchema = z
         {
             message: APPLICATION_MESSAGES.profile_phone_number.invalid,
             path: ['profile_phone_number'],
+        },
+    )
+    .refine(
+        (data) => {
+            // Validate postal code format for selected country
+            if (data.profile_current_postal_code && data.profile_current_country) {
+                return validatePostalCode(data.profile_current_postal_code, data.profile_current_country);
+            }
+            return true;
+        },
+        {
+            message: APPLICATION_MESSAGES.profile_current_postal_code.invalid,
+            path: ['profile_current_postal_code'],
+        },
+    )
+    .refine(
+        (data) => {
+            // Validate state/province is provided for countries that require it
+            if (data.profile_current_country && requiresStateProvince(data.profile_current_country)) {
+                return !!data.profile_current_state_province?.trim();
+            }
+            return true;
+        },
+        {
+            message: APPLICATION_MESSAGES.profile_current_state_province.required,
+            path: ['profile_current_state_province'],
         },
     );
 

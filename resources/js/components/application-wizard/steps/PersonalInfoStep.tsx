@@ -1,10 +1,18 @@
 import { CountrySelect } from '@/components/ui/country-select';
 import { NationalitySelect } from '@/components/ui/nationality-select';
 import { PhoneInput } from '@/components/ui/phone-input';
+import { StateProvinceSelect } from '@/components/ui/state-province-select';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import { useGeoLocation } from '@/hooks/useGeoLocation';
+import {
+    getPostalCodeLabel,
+    getPostalCodePlaceholder,
+    getStateProvinceLabel,
+    hasStateProvinceOptions,
+    requiresStateProvince,
+} from '@/utils/address-validation';
 import { getCountryByIso2 } from '@/utils/country-data';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 interface PersonalInfoStepProps {
     data: ApplicationWizardData;
@@ -19,6 +27,14 @@ interface PersonalInfoStepProps {
 export function PersonalInfoStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur, onFieldBlur }: PersonalInfoStepProps) {
     const { countryCode: detectedCountry } = useGeoLocation();
     const hasSetDefaults = useRef(false);
+
+    // Country-specific address field info
+    const currentCountry = data.profile_current_country || detectedCountry || 'NL';
+    const postalCodeLabel = useMemo(() => getPostalCodeLabel(currentCountry), [currentCountry]);
+    const postalCodePlaceholder = useMemo(() => getPostalCodePlaceholder(currentCountry), [currentCountry]);
+    const stateProvinceLabel = useMemo(() => getStateProvinceLabel(currentCountry), [currentCountry]);
+    const showStateProvince = useMemo(() => hasStateProvinceOptions(currentCountry), [currentCountry]);
+    const stateProvinceRequired = useMemo(() => requiresStateProvince(currentCountry), [currentCountry]);
 
     // Create field-specific blur handler
     const handleFieldBlur = (field: string) => () => {
@@ -67,6 +83,11 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
     const handleNationalityChange = (value: string) => {
         updateField('profile_nationality', value);
         markFieldTouched('profile_nationality');
+    };
+
+    const handleStateProvinceChange = (value: string) => {
+        updateField('profile_current_state_province', value);
+        markFieldTouched('profile_current_state_province');
     };
 
     const getFieldClass = (field: string) => {
@@ -144,6 +165,7 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
             <div className="border-t border-border pt-6">
                 <h3 className="mb-4 font-semibold">Current Address</h3>
 
+                {/* Street Name & House Number */}
                 <div className="grid gap-4 md:grid-cols-3">
                     <div className="md:col-span-2">
                         <label className="mb-2 block text-sm font-medium">
@@ -184,7 +206,25 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
                     </div>
                 </div>
 
-                <div className="mt-4 grid gap-4 md:grid-cols-3">
+                {/* Address Line 2 (optional) */}
+                <div className="mt-4">
+                    <label className="mb-2 block text-sm font-medium">Apartment, Suite, Unit (optional)</label>
+                    <input
+                        type="text"
+                        value={data.profile_current_address_line_2}
+                        onChange={(e) => handleFieldChange('profile_current_address_line_2', e.target.value)}
+                        onBlur={onBlur}
+                        placeholder="Apt 4B, Floor 2"
+                        aria-invalid={!!(touchedFields.profile_current_address_line_2 && errors.profile_current_address_line_2)}
+                        className={getFieldClass('profile_current_address_line_2')}
+                    />
+                    {touchedFields.profile_current_address_line_2 && errors.profile_current_address_line_2 && (
+                        <p className="mt-1 text-sm text-destructive">{errors.profile_current_address_line_2}</p>
+                    )}
+                </div>
+
+                {/* City & State/Province */}
+                <div className={`mt-4 grid gap-4 ${showStateProvince ? 'md:grid-cols-2' : ''}`}>
                     <div>
                         <label className="mb-2 block text-sm font-medium">
                             City <span className="text-red-500">*</span>
@@ -204,16 +244,38 @@ export function PersonalInfoStep({ data, errors, touchedFields, updateField, mar
                         )}
                     </div>
 
+                    {showStateProvince && (
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                {stateProvinceLabel} {stateProvinceRequired && <span className="text-red-500">*</span>}
+                            </label>
+                            <StateProvinceSelect
+                                value={data.profile_current_state_province}
+                                onChange={handleStateProvinceChange}
+                                onBlur={onBlur}
+                                countryCode={currentCountry}
+                                aria-invalid={!!(touchedFields.profile_current_state_province && errors.profile_current_state_province)}
+                                error={touchedFields.profile_current_state_province ? errors.profile_current_state_province : undefined}
+                            />
+                            {touchedFields.profile_current_state_province && errors.profile_current_state_province && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_current_state_province}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Postal Code & Country */}
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <div>
                         <label className="mb-2 block text-sm font-medium">
-                            Postal Code <span className="text-red-500">*</span>
+                            {postalCodeLabel} <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
                             value={data.profile_current_postal_code}
                             onChange={(e) => handleFieldChange('profile_current_postal_code', e.target.value)}
                             onBlur={onBlur}
-                            placeholder="1012 AB"
+                            placeholder={postalCodePlaceholder}
                             aria-invalid={!!(touchedFields.profile_current_postal_code && errors.profile_current_postal_code)}
                             className={getFieldClass('profile_current_postal_code')}
                             required

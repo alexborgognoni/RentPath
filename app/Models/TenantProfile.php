@@ -25,8 +25,10 @@ class TenantProfile extends Model
 
         // Current address
         'current_house_number',
+        'current_address_line_2',
         'current_street_name',
         'current_city',
+        'current_state_province',
         'current_postal_code',
         'current_country',
 
@@ -226,7 +228,9 @@ class TenantProfile extends Model
         $parts = array_filter([
             $this->current_house_number,
             $this->current_street_name,
+            $this->current_address_line_2,
             $this->current_city,
+            $this->current_state_province,
             $this->current_postal_code,
             $this->current_country,
         ]);

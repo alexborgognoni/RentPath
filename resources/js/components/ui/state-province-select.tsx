@@ -1,16 +1,21 @@
 import { cn } from '@/lib/utils';
-import { type CountryInfo, getCountryByIso2, iso2ToFlagEmoji, searchCountries } from '@/utils/country-data';
+import {
+    getStateProvinceLabel,
+    getStateProvinceOptions,
+    hasStateProvinceOptions,
+    type StateProvinceOption,
+} from '@/utils/address-validation';
 import * as Popover from '@radix-ui/react-popover';
 import { ChevronDown, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-export interface NationalitySelectProps {
-    /** Current value (ISO 3166-1 alpha-2 code, e.g., "NL") */
+export interface StateProvinceSelectProps {
+    /** Current value (state/province code or name) */
     value: string;
-    /** Called when nationality changes */
+    /** Called when state/province changes */
     onChange: (value: string) => void;
-    /** Default country ISO code for initial selection if value is empty */
-    defaultCountry?: string;
+    /** Country code to determine options (ISO 3166-1 alpha-2) */
+    countryCode: string;
     /** Error message to display */
     error?: string;
     /** Called when input loses focus */
@@ -25,36 +30,51 @@ export interface NationalitySelectProps {
     'aria-invalid'?: boolean;
 }
 
-export function NationalitySelect({
+export function StateProvinceSelect({
     value,
     onChange,
-    // defaultCountry - reserved for future use
+    countryCode,
     error,
     onBlur,
     disabled = false,
-    placeholder = 'Select nationality...',
+    placeholder,
     className,
     'aria-invalid': ariaInvalid,
-}: NationalitySelectProps) {
+}: StateProvinceSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [highlightedIndex, setHighlightedIndex] = useState(0);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const wasOpenRef = useRef(false);
+    const previousCountryRef = useRef(countryCode);
     const listRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
-    // Get current country info
-    const currentCountry = useMemo((): CountryInfo | null => {
-        if (!value) return null;
-        return getCountryByIso2(value) || null;
-    }, [value]);
+    // Get label for the field
+    const label = getStateProvinceLabel(countryCode);
+    const defaultPlaceholder = placeholder || `Select ${label.toLowerCase()}...`;
 
-    // Filter countries based on search (searches both name and demonym)
-    const filteredCountries = useMemo(() => {
-        return searchCountries(search);
-    }, [search]);
+    // Check if country has predefined options
+    const hasOptions = hasStateProvinceOptions(countryCode);
+
+    // Get options for the country
+    const options = useMemo(() => {
+        return getStateProvinceOptions(countryCode);
+    }, [countryCode]);
+
+    // Find current option
+    const currentOption = useMemo((): StateProvinceOption | null => {
+        if (!value || !hasOptions) return null;
+        return options.find((o) => o.code === value || o.name === value) || null;
+    }, [value, options, hasOptions]);
+
+    // Filter options based on search
+    const filteredOptions = useMemo(() => {
+        if (!search) return options;
+        const searchLower = search.toLowerCase();
+        return options.filter((o) => o.name.toLowerCase().includes(searchLower) || o.code.toLowerCase().includes(searchLower));
+    }, [options, search]);
 
     // Reset highlighted index when search changes or popover opens
     useEffect(() => {
@@ -63,19 +83,30 @@ export function NationalitySelect({
 
     // Scroll highlighted item into view
     useEffect(() => {
-        if (isOpen && filteredCountries.length > 0) {
+        if (isOpen && filteredOptions.length > 0) {
             const item = itemRefs.current.get(highlightedIndex);
             item?.scrollIntoView({ block: 'nearest' });
         }
-    }, [highlightedIndex, isOpen, filteredCountries.length]);
+    }, [highlightedIndex, isOpen, filteredOptions.length]);
 
-    // Handle country selection
-    const handleCountrySelect = useCallback(
-        (iso2: string) => {
-            onChange(iso2);
+    // Clear value when country changes (if it's not valid for the new country)
+    useEffect(() => {
+        if (previousCountryRef.current !== countryCode && value) {
+            const newOptions = getStateProvinceOptions(countryCode);
+            const isValid = newOptions.some((o) => o.code === value || o.name === value);
+            if (!isValid) {
+                onChange('');
+            }
+        }
+        previousCountryRef.current = countryCode;
+    }, [countryCode, value, onChange]);
+
+    // Handle option selection
+    const handleOptionSelect = useCallback(
+        (option: StateProvinceOption) => {
+            onChange(option.code);
             setIsOpen(false);
             setSearch('');
-            // Return focus to trigger
             triggerRef.current?.focus();
         },
         [onChange],
@@ -86,7 +117,6 @@ export function NationalitySelect({
         if (isOpen) {
             setTimeout(() => searchInputRef.current?.focus(), 0);
         } else if (wasOpenRef.current && onBlur) {
-            // Only call onBlur when transitioning from open to closed
             onBlur();
         }
         wasOpenRef.current = isOpen;
@@ -108,12 +138,12 @@ export function NationalitySelect({
     // Keyboard navigation for search input
     const handleSearchKeyDown = useCallback(
         (e: React.KeyboardEvent) => {
-            if (filteredCountries.length === 0) return;
+            if (filteredOptions.length === 0) return;
 
             switch (e.key) {
                 case 'ArrowDown':
                     e.preventDefault();
-                    setHighlightedIndex((prev) => (prev < filteredCountries.length - 1 ? prev + 1 : prev));
+                    setHighlightedIndex((prev) => (prev < filteredOptions.length - 1 ? prev + 1 : prev));
                     break;
                 case 'ArrowUp':
                     e.preventDefault();
@@ -121,8 +151,8 @@ export function NationalitySelect({
                     break;
                 case 'Enter':
                     e.preventDefault();
-                    if (filteredCountries[highlightedIndex]) {
-                        handleCountrySelect(filteredCountries[highlightedIndex].iso2);
+                    if (filteredOptions[highlightedIndex]) {
+                        handleOptionSelect(filteredOptions[highlightedIndex]);
                     }
                     break;
                 case 'Escape':
@@ -130,10 +160,31 @@ export function NationalitySelect({
                     break;
             }
         },
-        [filteredCountries, highlightedIndex, handleCountrySelect],
+        [filteredOptions, highlightedIndex, handleOptionSelect],
     );
 
     const hasError = ariaInvalid || !!error;
+
+    // For countries without predefined options, show a text input
+    if (!hasOptions) {
+        return (
+            <input
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                onBlur={onBlur}
+                placeholder={defaultPlaceholder}
+                disabled={disabled}
+                className={cn(
+                    'w-full rounded-lg border bg-background px-4 py-2',
+                    'border-border focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none',
+                    'disabled:cursor-not-allowed disabled:opacity-50',
+                    hasError && 'border-destructive bg-destructive/5',
+                    className,
+                )}
+            />
+        );
+    }
 
     return (
         <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -147,18 +198,15 @@ export function NationalitySelect({
                         'flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border bg-background px-4 py-2',
                         'border-border focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                         'disabled:cursor-not-allowed disabled:opacity-50',
-                        !currentCountry && 'text-muted-foreground',
+                        !currentOption && 'text-muted-foreground',
                         hasError && 'border-destructive bg-destructive/5',
                         className,
                     )}
                 >
-                    {currentCountry ? (
-                        <span className="flex items-center gap-2 truncate">
-                            <span className="text-base">{iso2ToFlagEmoji(currentCountry.iso2)}</span>
-                            <span>{currentCountry.demonym}</span>
-                        </span>
+                    {currentOption ? (
+                        <span className="truncate">{currentOption.name}</span>
                     ) : (
-                        <span>{placeholder}</span>
+                        <span>{defaultPlaceholder}</span>
                     )}
                     <ChevronDown className="size-4 shrink-0 opacity-50" />
                 </button>
@@ -186,37 +234,36 @@ export function NationalitySelect({
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             onKeyDown={handleSearchKeyDown}
-                            placeholder="Search by country or nationality..."
+                            placeholder={`Search ${label.toLowerCase()}...`}
                             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                         />
                     </div>
 
-                    {/* Country List */}
+                    {/* Options List */}
                     <div ref={listRef} className="max-h-64 overflow-y-auto p-1">
-                        {filteredCountries.length === 0 ? (
-                            <div className="px-2 py-4 text-center text-sm text-muted-foreground">No nationalities found</div>
+                        {filteredOptions.length === 0 ? (
+                            <div className="px-2 py-4 text-center text-sm text-muted-foreground">No options found</div>
                         ) : (
-                            filteredCountries.map((c, index) => (
+                            filteredOptions.map((option, index) => (
                                 <button
-                                    key={c.iso2}
+                                    key={option.code}
                                     ref={(el) => {
                                         if (el) itemRefs.current.set(index, el);
                                         else itemRefs.current.delete(index);
                                     }}
                                     type="button"
-                                    onClick={() => handleCountrySelect(c.iso2)}
+                                    onClick={() => handleOptionSelect(option)}
                                     onMouseEnter={() => setHighlightedIndex(index)}
                                     className={cn(
                                         'flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none',
                                         'hover:bg-muted',
                                         'focus:bg-muted',
                                         index === highlightedIndex && 'bg-muted',
-                                        c.iso2 === value && 'font-medium',
+                                        (option.code === value || option.name === value) && 'font-medium',
                                     )}
                                 >
-                                    <span className="text-base">{iso2ToFlagEmoji(c.iso2)}</span>
-                                    <span className="flex-1 truncate text-left">{c.demonym}</span>
-                                    <span className="text-xs text-muted-foreground">{c.name}</span>
+                                    <span className="w-10 text-xs text-muted-foreground">{option.code}</span>
+                                    <span className="flex-1 truncate text-left">{option.name}</span>
                                 </button>
                             ))
                         )}

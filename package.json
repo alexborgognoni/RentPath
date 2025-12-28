@@ -58,6 +58,7 @@
         "date-fns": "^4.1.0",
         "framer-motion": "^12.23.12",
         "globals": "^15.14.0",
+        "i18n-iso-countries": "^7.14.0",
         "laravel-vite-plugin": "^2.0",
         "libphonenumber-js": "^1.12.33",
         "lucide-react": "^0.475.0",

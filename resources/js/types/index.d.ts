@@ -76,8 +76,10 @@ export interface TenantProfile {
 
     // Current address
     current_house_number: string;
+    current_address_line_2?: string;
     current_street_name: string;
     current_city: string;
+    current_state_province?: string;
     current_postal_code: string;
     current_country: string;
 
@@ -276,8 +278,10 @@ export interface Application {
     snapshot_monthly_income?: number;
     snapshot_income_currency?: string;
     snapshot_current_house_number?: string;
+    snapshot_current_address_line_2?: string;
     snapshot_current_street_name?: string;
     snapshot_current_city?: string;
+    snapshot_current_state_province?: string;
     snapshot_current_postal_code?: string;
     snapshot_current_country?: string;
     snapshot_university_name?: string;

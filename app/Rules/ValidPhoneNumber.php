@@ -7,6 +7,18 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
 
+/**
+ * Validates phone numbers using libphonenumber.
+ *
+ * IMPORTANT: This validation logic MUST match the frontend validation in:
+ * resources/js/utils/phone-validation.ts (validatePhoneNumber function)
+ *
+ * Both use libphonenumber (PHP: giggsey/libphonenumber-for-php, JS: libphonenumber-js)
+ * to ensure consistent validation results.
+ *
+ * Per DESIGN.md validation strategy, frontend and backend must have identical
+ * validation logic.
+ */
 class ValidPhoneNumber implements ValidationRule
 {
     /**

@@ -32,7 +32,7 @@ test('it saves draft with valid step 1 data', function () {
     $response = $this->actingAs($this->tenant)
         ->post("/properties/{$this->property->id}/apply/draft", [
             'profile_date_of_birth' => '1990-01-01',
-            'profile_nationality' => 'Dutch',
+            'profile_nationality' => 'NL',
             'profile_phone_country_code' => '+31',
             'profile_phone_number' => '612345678',
             'profile_current_house_number' => '123',
@@ -88,7 +88,7 @@ test('it allows progression to step 2 with valid step 1', function () {
     $this->actingAs($this->tenant)
         ->post("/properties/{$this->property->id}/apply/draft", [
             'profile_date_of_birth' => '1990-01-01',
-            'profile_nationality' => 'Dutch',
+            'profile_nationality' => 'NL',
             'profile_phone_country_code' => '+31',
             'profile_phone_number' => '612345678',
             'profile_current_house_number' => '123',
@@ -103,7 +103,7 @@ test('it allows progression to step 2 with valid step 1', function () {
     $response = $this->actingAs($this->tenant)
         ->post("/properties/{$this->property->id}/apply/draft", [
             'profile_date_of_birth' => '1990-01-01',
-            'profile_nationality' => 'Dutch',
+            'profile_nationality' => 'NL',
             'profile_phone_country_code' => '+31',
             'profile_phone_number' => '612345678',
             'profile_current_house_number' => '123',
@@ -165,7 +165,7 @@ test('it validates occupants when additional_occupants gt 0', function () {
         ->post("/properties/{$this->property->id}/apply/draft", [
             // Step 1: Personal Info
             'profile_date_of_birth' => '1990-01-01',
-            'profile_nationality' => 'Dutch',
+            'profile_nationality' => 'NL',
             'profile_phone_country_code' => '+31',
             'profile_phone_number' => '612345678',
             'profile_current_house_number' => '123',
@@ -201,7 +201,7 @@ test('it requires at least one pet when has_pets is true', function () {
         ->post("/properties/{$this->property->id}/apply/draft", [
             // Step 1: Personal Info
             'profile_date_of_birth' => '1990-01-01',
-            'profile_nationality' => 'Dutch',
+            'profile_nationality' => 'NL',
             'profile_phone_country_code' => '+31',
             'profile_phone_number' => '612345678',
             'profile_current_house_number' => '123',
@@ -236,7 +236,7 @@ test('it validates pets data when provided', function () {
         ->post("/properties/{$this->property->id}/apply/draft", [
             // Step 1: Personal Info
             'profile_date_of_birth' => '1990-01-01',
-            'profile_nationality' => 'Dutch',
+            'profile_nationality' => 'NL',
             'profile_phone_country_code' => '+31',
             'profile_phone_number' => '612345678',
             'profile_current_house_number' => '123',
@@ -298,7 +298,7 @@ test('final submission requires all steps valid', function () {
         ->post("/properties/{$this->property->id}/apply", [
             // Step 1: Personal Info
             'profile_date_of_birth' => '1990-01-01',
-            'profile_nationality' => 'Dutch',
+            'profile_nationality' => 'NL',
             'profile_phone_country_code' => '+31',
             'profile_phone_number' => '612345678',
             'profile_current_house_number' => '123',

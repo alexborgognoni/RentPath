@@ -76,7 +76,11 @@
 - [ ] [feature] Admin dashboard (user management, property approval, system stats)
 - [ ] [feature] Admin profile verification workflow UI
 - [ ] [feature] Property status transitions UI (manager-side)
-- [ ] [feature] Address validation with country-specific rules (postal code format, state/canton/province fields)
+- [ ] [feature] Address validation with country-specific rules (postal code format, state/canton/province fields) - see PLAN.md
+- [ ] [feature] Address autocomplete API integration (Google Places or Loqate) - improves UX, reduces errors by ~47%
+    - Evaluate: Google Places ($200 free/month) vs Loqate (better apartment data) vs Smarty (fastest)
+    - Single input with autocomplete, auto-populate fields
+    - Keep manual entry as fallback
 - [ ] [feature] Revise property type-specific logic across wizard steps
     - [ ] Make amenities/features type-specific (e.g., commercial: reception, meeting rooms; industrial: loading dock, 3-phase power)
     - [ ] Add more amenities per type (currently same 12 amenities for all types)
