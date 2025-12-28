@@ -122,6 +122,35 @@ class StorageHelper
     }
 
     /**
+     * Get file metadata (size and last modified).
+     *
+     * @param  string|null  $path  The file path
+     * @param  string  $visibility  'public' or 'private'
+     * @return array{size: int|null, lastModified: int|null}|null
+     */
+    public static function getMetadata(?string $path, string $visibility): ?array
+    {
+        if (! $path) {
+            return null;
+        }
+
+        $disk = self::getDisk($visibility);
+
+        try {
+            if (! Storage::disk($disk)->exists($path)) {
+                return null;
+            }
+
+            return [
+                'size' => Storage::disk($disk)->size($path),
+                'lastModified' => Storage::disk($disk)->lastModified($path),
+            ];
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
      * Generate a CloudFront signed URL for private content.
      */
     protected static function getCloudFrontSignedUrl(string $path, int $expiresInMinutes): string

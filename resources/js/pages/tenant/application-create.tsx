@@ -48,28 +48,49 @@ export default function ApplicationCreate() {
         [wizard],
     );
 
-    // Existing document file names and URLs for display
+    // Existing document file names, URLs, and metadata for display
+    const metadata = tenantProfile?.documents_metadata || {};
     const existingDocuments = {
         id_document_front: tenantProfile?.id_document_front_original_name,
         id_document_front_url: tenantProfile?.id_document_front_url,
+        id_document_front_size: metadata.id_document_front?.size,
+        id_document_front_uploaded_at: metadata.id_document_front?.lastModified,
         id_document_back: tenantProfile?.id_document_back_original_name,
         id_document_back_url: tenantProfile?.id_document_back_url,
+        id_document_back_size: metadata.id_document_back?.size,
+        id_document_back_uploaded_at: metadata.id_document_back?.lastModified,
         employment_contract: tenantProfile?.employment_contract_original_name,
         employment_contract_url: tenantProfile?.employment_contract_url,
+        employment_contract_size: metadata.employment_contract?.size,
+        employment_contract_uploaded_at: metadata.employment_contract?.lastModified,
         payslip_1: tenantProfile?.payslip_1_original_name,
         payslip_1_url: tenantProfile?.payslip_1_url,
+        payslip_1_size: metadata.payslip_1?.size,
+        payslip_1_uploaded_at: metadata.payslip_1?.lastModified,
         payslip_2: tenantProfile?.payslip_2_original_name,
         payslip_2_url: tenantProfile?.payslip_2_url,
+        payslip_2_size: metadata.payslip_2?.size,
+        payslip_2_uploaded_at: metadata.payslip_2?.lastModified,
         payslip_3: tenantProfile?.payslip_3_original_name,
         payslip_3_url: tenantProfile?.payslip_3_url,
+        payslip_3_size: metadata.payslip_3?.size,
+        payslip_3_uploaded_at: metadata.payslip_3?.lastModified,
         student_proof: tenantProfile?.student_proof_original_name,
         student_proof_url: tenantProfile?.student_proof_url,
+        student_proof_size: metadata.student_proof?.size,
+        student_proof_uploaded_at: metadata.student_proof?.lastModified,
         other_income_proof: tenantProfile?.other_income_proof_original_name,
         other_income_proof_url: tenantProfile?.other_income_proof_url,
+        other_income_proof_size: metadata.other_income_proof?.size,
+        other_income_proof_uploaded_at: metadata.other_income_proof?.lastModified,
         guarantor_id: tenantProfile?.guarantor_id_original_name,
         guarantor_id_url: tenantProfile?.guarantor_id_url,
+        guarantor_id_size: metadata.guarantor_id?.size,
+        guarantor_id_uploaded_at: metadata.guarantor_id?.lastModified,
         guarantor_proof_income: tenantProfile?.guarantor_proof_income_original_name,
         guarantor_proof_income_url: tenantProfile?.guarantor_proof_income_url,
+        guarantor_proof_income_size: metadata.guarantor_proof_income?.size,
+        guarantor_proof_income_uploaded_at: metadata.guarantor_proof_income?.lastModified,
     };
 
     // Handle edit from review step

@@ -143,6 +143,7 @@ class TenantProfile extends Model
         'other_income_proof_url',
         'guarantor_id_url',
         'guarantor_proof_income_url',
+        'documents_metadata',
     ];
 
     /**
@@ -345,6 +346,38 @@ class TenantProfile extends Model
     public function getReferenceLetterUrlAttribute(): ?string
     {
         return \App\Helpers\StorageHelper::url($this->reference_letter_path, 'private', 5);
+    }
+
+    /**
+     * Get metadata for all documents (size, lastModified).
+     * Returns an associative array keyed by document type.
+     *
+     * @return array<string, array{size: int|null, lastModified: int|null}|null>
+     */
+    public function getDocumentsMetadataAttribute(): array
+    {
+        $documents = [
+            'id_document_front' => $this->id_document_front_path,
+            'id_document_back' => $this->id_document_back_path,
+            'employment_contract' => $this->employment_contract_path,
+            'payslip_1' => $this->payslip_1_path,
+            'payslip_2' => $this->payslip_2_path,
+            'payslip_3' => $this->payslip_3_path,
+            'student_proof' => $this->student_proof_path,
+            'other_income_proof' => $this->other_income_proof_path,
+            'guarantor_id' => $this->guarantor_id_path,
+            'guarantor_proof_income' => $this->guarantor_proof_income_path,
+            'reference_letter' => $this->reference_letter_path,
+        ];
+
+        $metadata = [];
+        foreach ($documents as $key => $path) {
+            if ($path) {
+                $metadata[$key] = \App\Helpers\StorageHelper::getMetadata($path, 'private');
+            }
+        }
+
+        return $metadata;
     }
 
     /**

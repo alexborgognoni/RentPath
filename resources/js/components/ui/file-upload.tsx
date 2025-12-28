@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
-import { AlertCircle, CheckCircle2, Eye, FileText, Image, Loader2, RefreshCw, Upload, X } from 'lucide-react';
+import { FileIcon } from '@untitledui/file-icons';
+import { AlertCircle, CheckCircle2, Eye, Loader2, RefreshCw, Trash2, Upload } from 'lucide-react';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { useDropzone, type Accept } from 'react-dropzone';
 
@@ -9,6 +10,42 @@ export interface UploadedFile {
     originalName: string;
     path?: string;
     previewUrl?: string;
+    /** File size in bytes */
+    size?: number;
+    /** Upload timestamp (Unix timestamp in seconds) */
+    uploadedAt?: number;
+}
+
+/** Get file extension from filename */
+function getFileExtension(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase() || '';
+    return ext;
+}
+
+/** Format file size for display */
+function formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+}
+
+/** Format upload date for display */
+function formatUploadDate(timestamp: number): string {
+    const date = new Date(timestamp * 1000);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 export interface FileUploadProps {
@@ -50,6 +87,8 @@ export interface FileUploadProps {
     label?: string;
     /** Whether the field is required */
     required?: boolean;
+    /** Whether to show delete button (default: true for non-required, false for required) */
+    allowDelete?: boolean;
 }
 
 export function FileUpload({
@@ -69,7 +108,10 @@ export function FileUpload({
     error,
     label,
     required = false,
+    allowDelete,
 }: FileUploadProps) {
+    // Default allowDelete based on required prop if not explicitly set
+    const showDeleteButton = allowDelete ?? !required;
     const id = useId();
     const [status, setStatus] = useState<FileUploadStatus>('idle');
     const [progress, setProgress] = useState(0);
@@ -98,6 +140,7 @@ export function FileUpload({
             try {
                 const xhr = new XMLHttpRequest();
 
+                const fileSize = file.size;
                 const uploadPromise = new Promise<UploadedFile>((resolve, reject) => {
                     xhr.upload.addEventListener('progress', (event) => {
                         if (event.lengthComputable) {
@@ -114,6 +157,8 @@ export function FileUpload({
                                     resolve({
                                         originalName: response.original_name,
                                         path: response.path,
+                                        size: fileSize,
+                                        uploadedAt: Math.floor(Date.now() / 1000),
                                     });
                                 } else {
                                     reject(new Error(response.message || 'Upload failed'));
@@ -213,20 +258,27 @@ export function FileUpload({
                 <div className="overflow-hidden rounded-lg border border-border bg-card">
                     <div className="flex items-center gap-3 p-3">
                         {/* File icon */}
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                            {existingFile.originalName?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                                <Image className="h-5 w-5 text-primary" />
-                            ) : (
-                                <FileText className="h-5 w-5 text-primary" />
-                            )}
+                        <div className="shrink-0">
+                            <FileIcon type={getFileExtension(existingFile.originalName)} size={40} />
                         </div>
 
                         {/* File info */}
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-medium">{existingFile.originalName}</p>
-                            <div className="flex items-center gap-1 text-xs text-green-600">
-                                <CheckCircle2 className="h-3 w-3" />
-                                <span>Uploaded</span>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                {existingFile.size && <span>{formatFileSize(existingFile.size)}</span>}
+                                {(existingFile.size || existingFile.uploadedAt) && <span>•</span>}
+                                {existingFile.uploadedAt ? (
+                                    <span className="flex items-center gap-1 text-green-600">
+                                        <CheckCircle2 className="h-3 w-3" />
+                                        {formatUploadDate(existingFile.uploadedAt)}
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-1 text-green-600">
+                                        <CheckCircle2 className="h-3 w-3" />
+                                        Uploaded
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -260,6 +312,16 @@ export function FileUpload({
                                     disabled={disabled}
                                 />
                             </label>
+                            {showDeleteButton && (
+                                <button
+                                    type="button"
+                                    onClick={handleRemove}
+                                    className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                    title="Delete"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -270,20 +332,20 @@ export function FileUpload({
                 <div className="overflow-hidden rounded-lg border border-border bg-card">
                     <div className="flex items-center gap-3 p-3">
                         {/* File icon */}
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                            {uploadedFile.originalName?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                                <Image className="h-5 w-5 text-primary" />
-                            ) : (
-                                <FileText className="h-5 w-5 text-primary" />
-                            )}
+                        <div className="shrink-0">
+                            <FileIcon type={getFileExtension(uploadedFile.originalName)} size={40} />
                         </div>
 
                         {/* File info */}
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-medium">{uploadedFile.originalName}</p>
-                            <div className="flex items-center gap-1 text-xs text-green-600">
-                                <CheckCircle2 className="h-3 w-3" />
-                                <span>Just uploaded</span>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                {uploadedFile.size && <span>{formatFileSize(uploadedFile.size)}</span>}
+                                {uploadedFile.size && <span>•</span>}
+                                <span className="flex items-center gap-1 text-green-600">
+                                    <CheckCircle2 className="h-3 w-3" />
+                                    {uploadedFile.uploadedAt ? formatUploadDate(uploadedFile.uploadedAt) : 'Just now'}
+                                </span>
                             </div>
                         </div>
 
@@ -306,15 +368,14 @@ export function FileUpload({
                                     disabled={disabled}
                                 />
                             </label>
-                            {/* Only show delete button for optional documents */}
-                            {!required && (
+                            {showDeleteButton && (
                                 <button
                                     type="button"
                                     onClick={handleRemove}
                                     className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                    title="Remove"
+                                    title="Delete"
                                 >
-                                    <X className="h-4 w-4" />
+                                    <Trash2 className="h-4 w-4" />
                                 </button>
                             )}
                         </div>

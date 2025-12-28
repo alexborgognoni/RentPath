@@ -170,6 +170,7 @@ export interface TenantProfile {
     other_income_proof_url?: string;
     guarantor_id_url?: string;
     guarantor_proof_income_url?: string;
+    documents_metadata?: Record<string, { size?: number; lastModified?: number } | null>;
 }
 
 export interface Application {

@@ -43,20 +43,36 @@ interface EmploymentIncomeStepProps {
     existingDocuments?: {
         employment_contract?: string;
         employment_contract_url?: string;
+        employment_contract_size?: number;
+        employment_contract_uploaded_at?: number;
         payslip_1?: string;
         payslip_1_url?: string;
+        payslip_1_size?: number;
+        payslip_1_uploaded_at?: number;
         payslip_2?: string;
         payslip_2_url?: string;
+        payslip_2_size?: number;
+        payslip_2_uploaded_at?: number;
         payslip_3?: string;
         payslip_3_url?: string;
+        payslip_3_size?: number;
+        payslip_3_uploaded_at?: number;
         student_proof?: string;
         student_proof_url?: string;
+        student_proof_size?: number;
+        student_proof_uploaded_at?: number;
         other_income_proof?: string;
         other_income_proof_url?: string;
+        other_income_proof_size?: number;
+        other_income_proof_uploaded_at?: number;
         guarantor_id?: string;
         guarantor_id_url?: string;
+        guarantor_id_size?: number;
+        guarantor_id_uploaded_at?: number;
         guarantor_proof_income?: string;
         guarantor_proof_income_url?: string;
+        guarantor_proof_income_size?: number;
+        guarantor_proof_income_uploaded_at?: number;
     };
 }
 
@@ -246,6 +262,8 @@ export function EmploymentIncomeStep({
                                     ? {
                                           originalName: existingDocuments.employment_contract,
                                           previewUrl: existingDocuments.employment_contract_url,
+                                          size: existingDocuments.employment_contract_size,
+                                          uploadedAt: existingDocuments.employment_contract_uploaded_at,
                                       }
                                     : null
                             }
@@ -265,6 +283,8 @@ export function EmploymentIncomeStep({
                                     ? {
                                           originalName: existingDocuments.payslip_1,
                                           previewUrl: existingDocuments.payslip_1_url,
+                                          size: existingDocuments.payslip_1_size,
+                                          uploadedAt: existingDocuments.payslip_1_uploaded_at,
                                       }
                                     : null
                             }
@@ -284,6 +304,8 @@ export function EmploymentIncomeStep({
                                     ? {
                                           originalName: existingDocuments.payslip_2,
                                           previewUrl: existingDocuments.payslip_2_url,
+                                          size: existingDocuments.payslip_2_size,
+                                          uploadedAt: existingDocuments.payslip_2_uploaded_at,
                                       }
                                     : null
                             }
@@ -303,6 +325,8 @@ export function EmploymentIncomeStep({
                                     ? {
                                           originalName: existingDocuments.payslip_3,
                                           previewUrl: existingDocuments.payslip_3_url,
+                                          size: existingDocuments.payslip_3_size,
+                                          uploadedAt: existingDocuments.payslip_3_uploaded_at,
                                       }
                                     : null
                             }
@@ -417,6 +441,8 @@ export function EmploymentIncomeStep({
                                 ? {
                                       originalName: existingDocuments.student_proof,
                                       previewUrl: existingDocuments.student_proof_url,
+                                      size: existingDocuments.student_proof_size,
+                                      uploadedAt: existingDocuments.student_proof_uploaded_at,
                                   }
                                 : null
                         }
@@ -472,6 +498,8 @@ export function EmploymentIncomeStep({
                                 ? {
                                       originalName: existingDocuments.other_income_proof,
                                       previewUrl: existingDocuments.other_income_proof_url,
+                                      size: existingDocuments.other_income_proof_size,
+                                      uploadedAt: existingDocuments.other_income_proof_uploaded_at,
                                   }
                                 : null
                         }
@@ -631,6 +659,8 @@ export function EmploymentIncomeStep({
                                         ? {
                                               originalName: existingDocuments.guarantor_id,
                                               previewUrl: existingDocuments.guarantor_id_url,
+                                              size: existingDocuments.guarantor_id_size,
+                                              uploadedAt: existingDocuments.guarantor_id_uploaded_at,
                                           }
                                         : null
                                 }
@@ -650,6 +680,8 @@ export function EmploymentIncomeStep({
                                         ? {
                                               originalName: existingDocuments.guarantor_proof_income,
                                               previewUrl: existingDocuments.guarantor_proof_income_url,
+                                              size: existingDocuments.guarantor_proof_income_size,
+                                              uploadedAt: existingDocuments.guarantor_proof_income_uploaded_at,
                                           }
                                         : null
                                 }

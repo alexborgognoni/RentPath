@@ -27,8 +27,12 @@ interface PersonalInfoStepProps {
     existingDocuments?: {
         id_document_front?: string;
         id_document_front_url?: string;
+        id_document_front_size?: number;
+        id_document_front_uploaded_at?: number;
         id_document_back?: string;
         id_document_back_url?: string;
+        id_document_back_size?: number;
+        id_document_back_uploaded_at?: number;
     };
 }
 
@@ -335,6 +339,8 @@ export function PersonalInfoStep({
                                 ? {
                                       originalName: existingDocuments.id_document_front,
                                       previewUrl: existingDocuments.id_document_front_url,
+                                      size: existingDocuments.id_document_front_size,
+                                      uploadedAt: existingDocuments.id_document_front_uploaded_at,
                                   }
                                 : null
                         }
@@ -361,6 +367,8 @@ export function PersonalInfoStep({
                                 ? {
                                       originalName: existingDocuments.id_document_back,
                                       previewUrl: existingDocuments.id_document_back_url,
+                                      size: existingDocuments.id_document_back_size,
+                                      uploadedAt: existingDocuments.id_document_back_uploaded_at,
                                   }
                                 : null
                         }

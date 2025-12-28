@@ -155,6 +155,16 @@
 - [ ] [feature] Property wizard draft image persistence (upload images immediately, store in DB, re-fetch on resume) - ~8h
 - [ ] [backend] Soft deletes for properties and applications - ~3h
 - [ ] [feature] Document management UI (view thumbnails, download, delete) - ~12h
+- [ ] [backend] Dedicated Document database entity - ~8h
+    - Currently documents are stored as columns on TenantProfile (id_document_front_path, etc.)
+    - Create `documents` table with: id, documentable (polymorphic), type (enum: id_front, id_back, payslip, etc.), path, original_name, mime_type, size, uploaded_at
+    - Enables: better querying, document history, shared documents across entities, cleaner models
+    - File metadata fetched from S3 on each request → store in DB for performance
+- [ ] [backend] Direct S3 uploads with pre-signed URLs - ~12h
+    - Currently files go through Laravel server (upload to server → forward to S3)
+    - Direct S3 uploads reduce server load and enable larger file uploads
+    - Use AWS SDK to generate pre-signed PUT URLs
+    - Client uploads directly to S3, then notifies backend with file path
 - [ ] [feature] Property status transitions UI beyond active/inactive - ~10h
 - [ ] [frontend] Custom 404/500 error page designs (beyond basic) - ~3h
 - [ ] [feature] Property image bulk management (reorder, set main, delete) - ~8h
