@@ -1,8 +1,28 @@
+import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData, OccupantDetails, PetDetails } from '@/hooks/useApplicationWizard';
 import { Plus, Trash2 } from 'lucide-react';
 
-const OCCUPANT_RELATIONSHIPS = ['Spouse', 'Partner', 'Child', 'Parent', 'Sibling', 'Roommate', 'Other'];
-const PET_TYPES = ['Dog', 'Cat', 'Bird', 'Fish', 'Rabbit', 'Hamster', 'Guinea Pig', 'Reptile', 'Other'];
+const OCCUPANT_RELATIONSHIPS = [
+    { value: 'Spouse', label: 'Spouse' },
+    { value: 'Partner', label: 'Partner' },
+    { value: 'Child', label: 'Child' },
+    { value: 'Parent', label: 'Parent' },
+    { value: 'Sibling', label: 'Sibling' },
+    { value: 'Roommate', label: 'Roommate' },
+    { value: 'Other', label: 'Other' },
+] as const;
+
+const PET_TYPES = [
+    { value: 'Dog', label: 'Dog' },
+    { value: 'Cat', label: 'Cat' },
+    { value: 'Bird', label: 'Bird' },
+    { value: 'Fish', label: 'Fish' },
+    { value: 'Rabbit', label: 'Rabbit' },
+    { value: 'Hamster', label: 'Hamster' },
+    { value: 'Guinea Pig', label: 'Guinea Pig' },
+    { value: 'Reptile', label: 'Reptile' },
+    { value: 'Other', label: 'Other' },
+] as const;
 
 interface DetailsStepProps {
     data: ApplicationWizardData;
@@ -142,23 +162,15 @@ export function DetailsStep({
                                 )}
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm">Relationship </label>
-                                <select
+                                <label className="mb-1 block text-sm">Relationship</label>
+                                <SimpleSelect
                                     value={occupant.relationship}
-                                    onChange={(e) => updateOccupant(index, 'relationship', e.target.value)}
-                                    onFocus={() => markFieldTouched(`occupant_${index}_relationship`)}
+                                    onChange={(value) => updateOccupant(index, 'relationship', value)}
+                                    options={OCCUPANT_RELATIONSHIPS}
+                                    placeholder="Select..."
                                     onBlur={onBlur}
                                     aria-invalid={!!(touchedFields[`occupant_${index}_relationship`] && errors[`occupant_${index}_relationship`])}
-                                    className={`w-full rounded border px-3 py-1.5 ${touchedFields[`occupant_${index}_relationship`] && errors[`occupant_${index}_relationship`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                                    required
-                                >
-                                    {!touchedFields[`occupant_${index}_relationship`] && <option value="">Select...</option>}
-                                    {OCCUPANT_RELATIONSHIPS.map((rel) => (
-                                        <option key={rel} value={rel}>
-                                            {rel}
-                                        </option>
-                                    ))}
-                                </select>
+                                />
                                 {touchedFields[`occupant_${index}_relationship`] && errors[`occupant_${index}_relationship`] && (
                                     <p className="mt-1 text-xs text-destructive">{errors[`occupant_${index}_relationship`]}</p>
                                 )}
@@ -220,23 +232,15 @@ export function DetailsStep({
                                 </div>
                                 <div className="grid gap-4 md:grid-cols-4">
                                     <div>
-                                        <label className="mb-1 block text-sm">Type </label>
-                                        <select
+                                        <label className="mb-1 block text-sm">Type</label>
+                                        <SimpleSelect
                                             value={pet.type}
-                                            onChange={(e) => updatePet(index, 'type', e.target.value)}
-                                            onFocus={() => markFieldTouched(`pet_${index}_type`)}
+                                            onChange={(value) => updatePet(index, 'type', value)}
+                                            options={PET_TYPES}
+                                            placeholder="Select..."
                                             onBlur={onBlur}
                                             aria-invalid={!!(touchedFields[`pet_${index}_type`] && errors[`pet_${index}_type`])}
-                                            className={`w-full rounded border px-3 py-1.5 ${touchedFields[`pet_${index}_type`] && errors[`pet_${index}_type`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                                            required={data.has_pets}
-                                        >
-                                            {!touchedFields[`pet_${index}_type`] && <option value="">Select...</option>}
-                                            {PET_TYPES.map((type) => (
-                                                <option key={type} value={type}>
-                                                    {type}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        />
                                         {touchedFields[`pet_${index}_type`] && errors[`pet_${index}_type`] && (
                                             <p className="mt-1 text-xs text-destructive">{errors[`pet_${index}_type`]}</p>
                                         )}

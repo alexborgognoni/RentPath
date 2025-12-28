@@ -1,3 +1,4 @@
+import { SimpleSelect, type SelectOption } from '@/components/ui/simple-select';
 import type { ApplicationWizardData, ReferenceDetails } from '@/hooks/useApplicationWizard';
 import { Briefcase, Building2, Plus, Trash2, User } from 'lucide-react';
 
@@ -7,10 +8,27 @@ const REFERENCE_TYPES = [
     { value: 'professional', label: 'Professional Reference', icon: Briefcase, description: 'An employer, colleague, or professor' },
 ] as const;
 
-const REFERENCE_RELATIONSHIPS = {
-    landlord: ['Previous Landlord', 'Property Manager', 'Other'],
-    personal: ['Friend', 'Neighbor', 'Family Friend', 'Other'],
-    professional: ['Employer', 'Manager', 'Colleague', 'Professor', 'Teacher', 'Mentor', 'Other'],
+const REFERENCE_RELATIONSHIPS: Record<string, SelectOption[]> = {
+    landlord: [
+        { value: 'Previous Landlord', label: 'Previous Landlord' },
+        { value: 'Property Manager', label: 'Property Manager' },
+        { value: 'Other', label: 'Other' },
+    ],
+    personal: [
+        { value: 'Friend', label: 'Friend' },
+        { value: 'Neighbor', label: 'Neighbor' },
+        { value: 'Family Friend', label: 'Family Friend' },
+        { value: 'Other', label: 'Other' },
+    ],
+    professional: [
+        { value: 'Employer', label: 'Employer' },
+        { value: 'Manager', label: 'Manager' },
+        { value: 'Colleague', label: 'Colleague' },
+        { value: 'Professor', label: 'Professor' },
+        { value: 'Teacher', label: 'Teacher' },
+        { value: 'Mentor', label: 'Mentor' },
+        { value: 'Other', label: 'Other' },
+    ],
 };
 
 interface ReferencesStepProps {
@@ -84,21 +102,15 @@ export function ReferencesStep({ data, errors, touchedFields, addReference, remo
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm">Relationship </label>
-                        <select
+                        <label className="mb-1 block text-sm">Relationship</label>
+                        <SimpleSelect
                             value={ref.relationship}
-                            onChange={(e) => updateReference(actualIndex, 'relationship', e.target.value)}
+                            onChange={(value) => updateReference(actualIndex, 'relationship', value)}
+                            options={relationshipOptions}
+                            placeholder="Select..."
                             onBlur={onBlur}
                             aria-invalid={!!(touchedFields[`ref_${actualIndex}_relationship`] && errors[`ref_${actualIndex}_relationship`])}
-                            className={`w-full rounded border px-3 py-2 ${touchedFields[`ref_${actualIndex}_relationship`] && errors[`ref_${actualIndex}_relationship`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                        >
-                            <option value="">Select...</option>
-                            {relationshipOptions.map((rel) => (
-                                <option key={rel} value={rel}>
-                                    {rel}
-                                </option>
-                            ))}
-                        </select>
+                        />
                         {touchedFields[`ref_${actualIndex}_relationship`] && errors[`ref_${actualIndex}_relationship`] && (
                             <p className="mt-1 text-xs text-destructive">{errors[`ref_${actualIndex}_relationship`]}</p>
                         )}

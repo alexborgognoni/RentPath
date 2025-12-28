@@ -1,6 +1,7 @@
+import { CurrencySelect } from '@/components/ui/currency-select';
 import { FileUpload } from '@/components/ui/file-upload';
+import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
-import { CURRENCIES } from '@/lib/validation/property-validation';
 import { router } from '@inertiajs/react';
 import { Briefcase, GraduationCap, UserCheck } from 'lucide-react';
 import { useCallback } from 'react';
@@ -20,14 +21,17 @@ const EMPLOYMENT_TYPES = [
     { value: 'temporary', label: 'Temporary' },
 ] as const;
 
-const GUARANTOR_RELATIONSHIPS = ['Parent', 'Grandparent', 'Sibling', 'Spouse', 'Partner', 'Other Family', 'Friend', 'Employer', 'Other'];
-
-const CURRENCY_SYMBOLS: Record<string, string> = {
-    eur: '€',
-    usd: '$',
-    gbp: '£',
-    chf: 'CHF',
-};
+const GUARANTOR_RELATIONSHIPS = [
+    { value: 'Parent', label: 'Parent' },
+    { value: 'Grandparent', label: 'Grandparent' },
+    { value: 'Sibling', label: 'Sibling' },
+    { value: 'Spouse', label: 'Spouse' },
+    { value: 'Partner', label: 'Partner' },
+    { value: 'Other Family', label: 'Other Family' },
+    { value: 'Friend', label: 'Friend' },
+    { value: 'Employer', label: 'Employer' },
+    { value: 'Other', label: 'Other' },
+] as const;
 
 interface EmploymentIncomeStepProps {
     data: ApplicationWizardData;
@@ -169,21 +173,15 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Employment Type </label>
-                            <select
+                            <label className="mb-2 block text-sm font-medium">Employment Type</label>
+                            <SimpleSelect
                                 value={data.profile_employment_type}
-                                onChange={(e) => handleFieldChange('profile_employment_type', e.target.value)}
+                                onChange={(value) => handleFieldChange('profile_employment_type', value)}
+                                options={EMPLOYMENT_TYPES}
+                                placeholder="Select type..."
                                 onBlur={onBlur}
-                                className={getFieldClass('profile_employment_type')}
-                                required
-                            >
-                                <option value="">Select type...</option>
-                                {EMPLOYMENT_TYPES.map((type) => (
-                                    <option key={type.value} value={type.value}>
-                                        {type.label}
-                                    </option>
-                                ))}
-                            </select>
+                                aria-invalid={!!(touchedFields.profile_employment_type && errors.profile_employment_type)}
+                            />
                             {touchedFields.profile_employment_type && errors.profile_employment_type && (
                                 <p className="mt-1 text-sm text-destructive">{errors.profile_employment_type}</p>
                             )}
@@ -207,37 +205,30 @@ export function EmploymentIncomeStep({
                     </div>
 
                     {/* Income */}
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                            <label className="mb-2 block text-sm font-medium">Monthly Income (Gross) </label>
-                            <div className="flex gap-2">
-                                <select
-                                    value={data.profile_income_currency}
-                                    onChange={(e) => handleFieldChange('profile_income_currency', e.target.value)}
-                                    className="w-24 rounded-lg border border-border bg-background px-3 py-2"
-                                >
-                                    {CURRENCIES.map((currency) => (
-                                        <option key={currency} value={currency}>
-                                            {CURRENCY_SYMBOLS[currency]} ({currency.toUpperCase()})
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="number"
-                                    value={data.profile_monthly_income}
-                                    onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
-                                    onBlur={onBlur}
-                                    placeholder="3500"
-                                    min="0"
-                                    step="100"
-                                    className={`flex-1 ${getFieldClass('profile_monthly_income')}`}
-                                    required
-                                />
-                            </div>
-                            {touchedFields.profile_monthly_income && errors.profile_monthly_income && (
-                                <p className="mt-1 text-sm text-destructive">{errors.profile_monthly_income}</p>
-                            )}
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">Monthly Income (Gross)</label>
+                        <div className="flex">
+                            <CurrencySelect
+                                value={data.profile_income_currency}
+                                onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                onBlur={onBlur}
+                                compact
+                            />
+                            <input
+                                type="number"
+                                value={data.profile_monthly_income}
+                                onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
+                                onBlur={onBlur}
+                                placeholder="3500"
+                                min="0"
+                                step="100"
+                                className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_monthly_income')}`}
+                                required
+                            />
                         </div>
+                        {touchedFields.profile_monthly_income && errors.profile_monthly_income && (
+                            <p className="mt-1 text-sm text-destructive">{errors.profile_monthly_income}</p>
+                        )}
                     </div>
 
                     {/* Employment Documents */}
@@ -388,34 +379,27 @@ export function EmploymentIncomeStep({
                     </div>
 
                     {/* Monthly Income for Students */}
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                Monthly Income <span className="text-muted-foreground">(optional)</span>
-                            </label>
-                            <div className="flex gap-2">
-                                <select
-                                    value={data.profile_income_currency}
-                                    onChange={(e) => handleFieldChange('profile_income_currency', e.target.value)}
-                                    className="w-24 rounded-lg border border-border bg-background px-3 py-2"
-                                >
-                                    {CURRENCIES.map((currency) => (
-                                        <option key={currency} value={currency}>
-                                            {CURRENCY_SYMBOLS[currency]} ({currency.toUpperCase()})
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="number"
-                                    value={data.profile_monthly_income}
-                                    onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
-                                    onBlur={onBlur}
-                                    placeholder="0"
-                                    min="0"
-                                    step="100"
-                                    className={`flex-1 ${getFieldClass('profile_monthly_income')}`}
-                                />
-                            </div>
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">
+                            Monthly Income <span className="text-muted-foreground">(optional)</span>
+                        </label>
+                        <div className="flex">
+                            <CurrencySelect
+                                value={data.profile_income_currency}
+                                onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                onBlur={onBlur}
+                                compact
+                            />
+                            <input
+                                type="number"
+                                value={data.profile_monthly_income}
+                                onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
+                                onBlur={onBlur}
+                                placeholder="0"
+                                min="0"
+                                step="100"
+                                className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_monthly_income')}`}
+                            />
                         </div>
                     </div>
 
@@ -446,34 +430,27 @@ export function EmploymentIncomeStep({
             {isUnemployedOrRetired && (
                 <div className="space-y-4">
                     {/* Optional: Monthly Income field */}
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                Monthly Income <span className="text-muted-foreground">(optional)</span>
-                            </label>
-                            <div className="flex gap-2">
-                                <select
-                                    value={data.profile_income_currency}
-                                    onChange={(e) => handleFieldChange('profile_income_currency', e.target.value)}
-                                    className="w-24 rounded-lg border border-border bg-background px-3 py-2"
-                                >
-                                    {CURRENCIES.map((currency) => (
-                                        <option key={currency} value={currency}>
-                                            {CURRENCY_SYMBOLS[currency]} ({currency.toUpperCase()})
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="number"
-                                    value={data.profile_monthly_income}
-                                    onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
-                                    onBlur={onBlur}
-                                    placeholder="0"
-                                    min="0"
-                                    step="100"
-                                    className={`flex-1 ${getFieldClass('profile_monthly_income')}`}
-                                />
-                            </div>
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">
+                            Monthly Income <span className="text-muted-foreground">(optional)</span>
+                        </label>
+                        <div className="flex">
+                            <CurrencySelect
+                                value={data.profile_income_currency}
+                                onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                onBlur={onBlur}
+                                compact
+                            />
+                            <input
+                                type="number"
+                                value={data.profile_monthly_income}
+                                onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
+                                onBlur={onBlur}
+                                placeholder="0"
+                                min="0"
+                                step="100"
+                                className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_monthly_income')}`}
+                            />
                         </div>
                     </div>
 
@@ -542,21 +519,15 @@ export function EmploymentIncomeStep({
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium">Relationship </label>
-                                <select
+                                <label className="mb-2 block text-sm font-medium">Relationship</label>
+                                <SimpleSelect
                                     value={data.profile_guarantor_relationship}
-                                    onChange={(e) => handleFieldChange('profile_guarantor_relationship', e.target.value)}
+                                    onChange={(value) => handleFieldChange('profile_guarantor_relationship', value)}
+                                    options={GUARANTOR_RELATIONSHIPS}
+                                    placeholder="Select relationship..."
                                     onBlur={onBlur}
-                                    className={getFieldClass('profile_guarantor_relationship')}
-                                    required
-                                >
-                                    <option value="">Select relationship...</option>
-                                    {GUARANTOR_RELATIONSHIPS.map((rel) => (
-                                        <option key={rel} value={rel}>
-                                            {rel}
-                                        </option>
-                                    ))}
-                                </select>
+                                    aria-invalid={!!(touchedFields.profile_guarantor_relationship && errors.profile_guarantor_relationship)}
+                                />
                                 {touchedFields.profile_guarantor_relationship && errors.profile_guarantor_relationship && (
                                     <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_relationship}</p>
                                 )}
@@ -619,11 +590,14 @@ export function EmploymentIncomeStep({
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium">Guarantor Monthly Income </label>
-                                <div className="flex gap-2">
-                                    <span className="flex items-center rounded-lg border border-border bg-muted px-3 text-sm">
-                                        {CURRENCY_SYMBOLS[data.profile_income_currency] || '€'}
-                                    </span>
+                                <label className="mb-2 block text-sm font-medium">Guarantor Monthly Income</label>
+                                <div className="flex">
+                                    <CurrencySelect
+                                        value={data.profile_income_currency}
+                                        onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                        onBlur={onBlur}
+                                        compact
+                                    />
                                     <input
                                         type="number"
                                         value={data.profile_guarantor_monthly_income}
@@ -632,7 +606,7 @@ export function EmploymentIncomeStep({
                                         placeholder="5000"
                                         min="0"
                                         step="100"
-                                        className={`flex-1 ${getFieldClass('profile_guarantor_monthly_income')}`}
+                                        className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_guarantor_monthly_income')}`}
                                         required
                                     />
                                 </div>

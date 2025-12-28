@@ -1,12 +1,6 @@
+import { getCurrencySymbol } from '@/components/ui/currency-select';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import { Briefcase, CheckCircle2, FileText, GraduationCap, Home, MapPin, PawPrint, Phone, User, Users } from 'lucide-react';
-
-const CURRENCY_SYMBOLS: Record<string, string> = {
-    eur: '€',
-    usd: '$',
-    gbp: '£',
-    chf: 'CHF',
-};
 
 const COUNTRY_NAMES: Record<string, string> = {
     AT: 'Austria',
@@ -41,7 +35,7 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
 
     const formatCurrency = (amount: string | number, currency: string) => {
         if (!amount) return 'Not provided';
-        const symbol = CURRENCY_SYMBOLS[currency] || '€';
+        const symbol = getCurrencySymbol(currency);
         return `${symbol}${Number(amount).toLocaleString()}`;
     };
 
