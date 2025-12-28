@@ -59,6 +59,7 @@ class TenantProfile extends Model
         'guarantor_address',
         'guarantor_employer',
         'guarantor_monthly_income',
+        'guarantor_income_currency',
 
         // Documents
         'id_document_front_path',

@@ -69,8 +69,9 @@ export interface Property {
     bathrooms: number;
     parking_spots_interior: number;
     parking_spots_exterior: number;
-    size?: number; // in square meters
+    size?: number; // in square meters or feet depending on size_unit
     size_sqm?: number; // alias for size
+    size_unit?: 'sqm' | 'sqft';
     balcony_size?: number;
     land_size?: number; // only for houses
     floor_level?: number;
@@ -168,7 +169,8 @@ export interface PropertyFormData {
     bathrooms: number;
     parking_spots_interior: number;
     parking_spots_exterior: number;
-    size?: number; // in square meters
+    size?: number; // in square meters or feet depending on size_unit
+    size_unit?: 'sqm' | 'sqft';
     balcony_size?: number;
     land_size?: number;
     floor_level?: number;

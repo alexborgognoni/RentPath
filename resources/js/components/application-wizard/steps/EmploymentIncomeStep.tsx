@@ -618,8 +618,8 @@ export function EmploymentIncomeStep({
                                 <label className="mb-2 block text-sm font-medium">Guarantor Monthly Income</label>
                                 <div className="flex">
                                     <CurrencySelect
-                                        value={data.profile_income_currency}
-                                        onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                        value={data.profile_guarantor_income_currency}
+                                        onChange={(value) => handleFieldChange('profile_guarantor_income_currency', value)}
                                         onBlur={onBlur}
                                         compact
                                     />

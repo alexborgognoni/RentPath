@@ -56,6 +56,7 @@ class Property extends Model
         'size',
         'balcony_size',
         'land_size',
+        'size_unit',
         'floor_level',
         'has_elevator',
         'year_built',

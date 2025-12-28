@@ -113,6 +113,7 @@ const getInitialData = (property?: Property): PropertyWizardData => ({
     parking_spots_interior: toInt(property?.parking_spots_interior) ?? 0,
     parking_spots_exterior: toInt(property?.parking_spots_exterior) ?? 0,
     size: toNumber(property?.size),
+    size_unit: property?.size_unit || 'sqm',
     balcony_size: toNumber(property?.balcony_size),
     land_size: toNumber(property?.land_size),
     floor_level: toInt(property?.floor_level),

@@ -122,6 +122,7 @@ class Application extends Model
         'snapshot_guarantor_address',
         'snapshot_guarantor_employer',
         'snapshot_guarantor_monthly_income',
+        'snapshot_guarantor_income_currency',
         'snapshot_id_document_path',
         'snapshot_employment_contract_path',
         'snapshot_payslip_1_path',

@@ -110,6 +110,7 @@ export interface TenantProfile {
     guarantor_address?: string;
     guarantor_employer?: string;
     guarantor_monthly_income?: number;
+    guarantor_income_currency?: string;
 
     // Documents
     id_document_front_path?: string;

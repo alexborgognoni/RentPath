@@ -1,5 +1,6 @@
 import { NumberStepper } from '@/components/property-wizard/components/NumberStepper';
 import { StepContainer } from '@/components/property-wizard/components/StepContainer';
+import { AreaUnitSelect, getAreaUnitSymbol } from '@/components/ui/area-unit-select';
 import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
 import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
@@ -196,7 +197,12 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                         <Expand className="h-4 w-4 text-muted-foreground" />
                                         {t('wizard.specificationsStep.fields.livingSpace')}
                                     </label>
-                                    <div className="relative">
+                                    <div className="flex">
+                                        <AreaUnitSelect
+                                            value={data.size_unit || 'sqm'}
+                                            onChange={(value) => updateData('size_unit', value as 'sqm' | 'sqft')}
+                                            compact
+                                        />
                                         <input
                                             type="number"
                                             id="size"
@@ -204,16 +210,13 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                             onChange={(e) => handleSizeInputChange(e, 'size', getSizeDisplaySetter('size'))}
                                             onKeyDown={handleSizeKeyDown}
                                             onBlur={() => handleSizeBlur('size', getSizeDisplaySetter('size'))}
-                                            className={inputClassName(!!errors.size)}
+                                            className={cn(inputClassName(!!errors.size), 'rounded-l-none')}
                                             placeholder="0.00"
                                             min={0}
                                             max={PROPERTY_CONSTRAINTS.size.max}
                                             step="0.01"
                                             aria-invalid={!!errors.size}
                                         />
-                                        <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
-                                            m²
-                                        </span>
                                     </div>
                                     {errors.size && <p className="mt-1.5 text-sm text-destructive">{errors.size}</p>}
                                 </div>
@@ -241,7 +244,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                             aria-invalid={!!errors.balcony_size}
                                         />
                                         <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
-                                            m²
+                                            {getAreaUnitSymbol(data.size_unit || 'sqm')}
                                         </span>
                                     </div>
                                     {errors.balcony_size && <p className="mt-1.5 text-sm text-destructive">{errors.balcony_size}</p>}
@@ -270,7 +273,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                             aria-invalid={!!errors.land_size}
                                         />
                                         <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
-                                            m²
+                                            {getAreaUnitSymbol(data.size_unit || 'sqm')}
                                         </span>
                                     </div>
                                     {errors.land_size && <p className="mt-1.5 text-sm text-destructive">{errors.land_size}</p>}
@@ -406,7 +409,12 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 <Expand className="h-4 w-4 text-muted-foreground" />
                                 {t('wizard.specificationsStep.fields.parkingSpaceSize')}
                             </label>
-                            <div className="relative">
+                            <div className="flex">
+                                <AreaUnitSelect
+                                    value={data.size_unit || 'sqm'}
+                                    onChange={(value) => updateData('size_unit', value as 'sqm' | 'sqft')}
+                                    compact
+                                />
                                 <input
                                     type="number"
                                     id="parking_size"
@@ -414,14 +422,11 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                     onChange={(e) => handleSizeInputChange(e, 'size', getSizeDisplaySetter('size'))}
                                     onKeyDown={handleSizeKeyDown}
                                     onBlur={() => handleSizeBlur('size', getSizeDisplaySetter('size'))}
-                                    className={inputClassName()}
+                                    className={cn(inputClassName(), 'rounded-l-none')}
                                     placeholder="0.00"
                                     min={0}
                                     step="0.01"
                                 />
-                                <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted-foreground">
-                                    m²
-                                </span>
                             </div>
                         </div>
                     </motion.div>

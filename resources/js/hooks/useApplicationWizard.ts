@@ -72,6 +72,7 @@ export interface PetDetails {
     breed: string;
     age: string;
     weight: string;
+    weight_unit: string;
 }
 
 export interface ReferenceDetails {
@@ -118,6 +119,7 @@ export interface ApplicationWizardData {
     profile_guarantor_address: string;
     profile_guarantor_employer: string;
     profile_guarantor_monthly_income: string;
+    profile_guarantor_income_currency: string;
     // Profile documents
     profile_id_document_front: File | null;
     profile_id_document_back: File | null;
@@ -231,6 +233,7 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_guarantor_address: tenantProfile?.guarantor_address || '',
         profile_guarantor_employer: tenantProfile?.guarantor_employer || '',
         profile_guarantor_monthly_income: tenantProfile?.guarantor_monthly_income?.toString() || '',
+        profile_guarantor_income_currency: tenantProfile?.guarantor_income_currency || 'eur',
         // Profile documents (always start null - existing docs shown from tenantProfile)
         profile_id_document_front: null,
         profile_id_document_back: null,
@@ -485,7 +488,10 @@ export function useApplicationWizard({
 
     // ===== Pet Helpers =====
     const addPet = useCallback(() => {
-        wizard.updateField('pets_details', [...wizard.data.pets_details, { type: '', type_other: '', breed: '', age: '', weight: '' }]);
+        wizard.updateField('pets_details', [
+            ...wizard.data.pets_details,
+            { type: '', type_other: '', breed: '', age: '', weight: '', weight_unit: 'kg' },
+        ]);
     }, [wizard]);
 
     const removePet = useCallback(
@@ -703,7 +709,7 @@ export function useApplicationWizard({
                     // Add mandatory first pet when checking "I have pets"
                     wizard.updateFields({
                         [key]: value,
-                        pets_details: [{ type: '', type_other: '', breed: '', age: '', weight: '' }],
+                        pets_details: [{ type: '', type_other: '', breed: '', age: '', weight: '', weight_unit: 'kg' }],
                     } as Partial<ApplicationWizardData>);
                     return;
                 } else if (!value) {

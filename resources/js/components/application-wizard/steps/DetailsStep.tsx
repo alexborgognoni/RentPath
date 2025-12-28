@@ -1,5 +1,6 @@
 import { DatePicker } from '@/components/ui/date-picker';
 import { SimpleSelect } from '@/components/ui/simple-select';
+import { WeightUnitSelect } from '@/components/ui/weight-unit-select';
 import type { ApplicationWizardData, OccupantDetails, PetDetails } from '@/hooks/useApplicationWizard';
 import { Plus, Trash2 } from 'lucide-react';
 
@@ -269,15 +270,22 @@ export function DetailsStep({
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm">
-                                            Weight (kg) <span className="text-muted-foreground">(optional)</span>
+                                            Weight <span className="text-muted-foreground">(optional)</span>
                                         </label>
-                                        <input
-                                            type="number"
-                                            value={pet.weight}
-                                            onChange={(e) => updatePet(index, 'weight', e.target.value)}
-                                            onBlur={onBlur}
-                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                        />
+                                        <div className="flex">
+                                            <WeightUnitSelect
+                                                value={pet.weight_unit || 'kg'}
+                                                onChange={(value) => updatePet(index, 'weight_unit', value)}
+                                                compact
+                                            />
+                                            <input
+                                                type="number"
+                                                value={pet.weight}
+                                                onChange={(e) => updatePet(index, 'weight', e.target.value)}
+                                                onBlur={onBlur}
+                                                className="w-full rounded-l-none rounded-r-lg border border-border bg-background px-4 py-2"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                                 {pet.type === 'Other' && (
