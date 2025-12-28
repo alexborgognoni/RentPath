@@ -96,7 +96,7 @@ export function PhoneInput({
     const hasError = ariaInvalid || !!error;
 
     return (
-        <div className={cn('flex gap-2', className)}>
+        <div className={cn('flex', className)}>
             {/* Country Selector */}
             <SearchableSelect
                 value={internalCountryIso}
@@ -121,9 +121,10 @@ export function PhoneInput({
                 searchPlaceholder="Search countries..."
                 emptyText="No countries found"
                 disabled={disabled}
-                className={cn('w-32 shrink-0', hasError && 'border-destructive bg-destructive/5')}
+                aria-invalid={hasError}
                 closeOnScroll={closeOnScroll}
                 minWidth="288px"
+                compact
             />
 
             {/* Phone Number Input */}
@@ -137,7 +138,7 @@ export function PhoneInput({
                 placeholder={placeholder}
                 aria-invalid={hasError}
                 className={cn(
-                    'w-full min-w-0 flex-1 rounded-lg border bg-background px-4 py-2',
+                    'w-full min-w-0 flex-1 rounded-l-none rounded-r-lg border bg-background px-4 py-2',
                     'border-border placeholder:text-muted-foreground',
                     'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                     'disabled:cursor-not-allowed disabled:opacity-50',

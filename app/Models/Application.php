@@ -285,7 +285,7 @@ class Application extends Model
      */
     public function getApplicationIdDocumentUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->application_id_document_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->application_id_document_path, 'private', 5, $this->application_id_document_original_name);
     }
 
     /**
@@ -293,7 +293,7 @@ class Application extends Model
      */
     public function getApplicationProofOfIncomeUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->application_proof_of_income_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->application_proof_of_income_path, 'private', 5, $this->application_proof_of_income_original_name);
     }
 
     /**
@@ -301,7 +301,7 @@ class Application extends Model
      */
     public function getApplicationReferenceLetterUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->application_reference_letter_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->application_reference_letter_path, 'private', 5, $this->application_reference_letter_original_name);
     }
 
     /**
@@ -309,7 +309,7 @@ class Application extends Model
      */
     public function getLeaseDocumentUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->lease_document_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->lease_document_path, 'private', 5, $this->lease_document_original_name);
     }
 
     /**

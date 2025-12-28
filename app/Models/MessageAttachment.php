@@ -55,7 +55,7 @@ class MessageAttachment extends Model
      */
     public function getUrlAttribute(): ?string
     {
-        return StorageHelper::url($this->file_path, 'private', 5);
+        return StorageHelper::url($this->file_path, 'private', 5, $this->original_name);
     }
 
     /**

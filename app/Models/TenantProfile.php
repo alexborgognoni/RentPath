@@ -264,7 +264,7 @@ class TenantProfile extends Model
      */
     public function getIdDocumentFrontUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->id_document_front_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->id_document_front_path, 'private', 5, $this->id_document_front_original_name);
     }
 
     /**
@@ -272,7 +272,7 @@ class TenantProfile extends Model
      */
     public function getIdDocumentBackUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->id_document_back_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->id_document_back_path, 'private', 5, $this->id_document_back_original_name);
     }
 
     /**
@@ -280,7 +280,7 @@ class TenantProfile extends Model
      */
     public function getEmploymentContractUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->employment_contract_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->employment_contract_path, 'private', 5, $this->employment_contract_original_name);
     }
 
     /**
@@ -288,7 +288,7 @@ class TenantProfile extends Model
      */
     public function getPayslip1UrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->payslip_1_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->payslip_1_path, 'private', 5, $this->payslip_1_original_name);
     }
 
     /**
@@ -296,7 +296,7 @@ class TenantProfile extends Model
      */
     public function getPayslip2UrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->payslip_2_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->payslip_2_path, 'private', 5, $this->payslip_2_original_name);
     }
 
     /**
@@ -304,7 +304,7 @@ class TenantProfile extends Model
      */
     public function getPayslip3UrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->payslip_3_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->payslip_3_path, 'private', 5, $this->payslip_3_original_name);
     }
 
     /**
@@ -312,7 +312,7 @@ class TenantProfile extends Model
      */
     public function getStudentProofUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->student_proof_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->student_proof_path, 'private', 5, $this->student_proof_original_name);
     }
 
     /**
@@ -321,7 +321,7 @@ class TenantProfile extends Model
      */
     public function getOtherIncomeProofUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->other_income_proof_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->other_income_proof_path, 'private', 5, $this->other_income_proof_original_name);
     }
 
     /**
@@ -329,7 +329,7 @@ class TenantProfile extends Model
      */
     public function getGuarantorIdUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->guarantor_id_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->guarantor_id_path, 'private', 5, $this->guarantor_id_original_name);
     }
 
     /**
@@ -337,7 +337,7 @@ class TenantProfile extends Model
      */
     public function getGuarantorProofIncomeUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->guarantor_proof_income_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->guarantor_proof_income_path, 'private', 5, $this->guarantor_proof_income_original_name);
     }
 
     /**
@@ -345,7 +345,7 @@ class TenantProfile extends Model
      */
     public function getReferenceLetterUrlAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->reference_letter_path, 'private', 5);
+        return \App\Helpers\StorageHelper::url($this->reference_letter_path, 'private', 5, $this->reference_letter_original_name);
     }
 
     /**

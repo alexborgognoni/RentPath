@@ -78,8 +78,9 @@ class StorageHelper
      *
      * @param  string  $visibility  'public' or 'private'
      * @param  int  $expiresInMinutes  Only used for private files
+     * @param  string|null  $filename  Optional filename for Content-Disposition header (download filename)
      */
-    public static function url(?string $path, string $visibility, int $expiresInMinutes = 5): ?string
+    public static function url(?string $path, string $visibility, int $expiresInMinutes = 5, ?string $filename = null): ?string
     {
         if (! $path) {
             return null;
@@ -91,7 +92,7 @@ class StorageHelper
         if ($visibility === 'private') {
             // Production: CloudFront signed URLs
             if (env('AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID')) {
-                return self::getCloudFrontSignedUrl($path, $expiresInMinutes);
+                return self::getCloudFrontSignedUrl($path, $expiresInMinutes, $filename);
             }
 
             // Local: Laravel signed URLs (mimics CloudFront behavior)
@@ -103,11 +104,17 @@ class StorageHelper
                 ? 'private.storage'
                 : 'tenant.private.storage';
 
+            // Build route parameters
+            $routeParams = ['path' => $path];
+            if ($filename) {
+                $routeParams['filename'] = $filename;
+            }
+
             // Force URL generation to use current request scheme/host/port
             $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
                 $routeName,
                 now()->addMinutes($expiresInMinutes),
-                ['path' => $path]
+                $routeParams
             );
 
             // Replace the base URL with the current request URL to ensure subdomain is correct
@@ -152,8 +159,10 @@ class StorageHelper
 
     /**
      * Generate a CloudFront signed URL for private content.
+     *
+     * @param  string|null  $filename  Optional filename for Content-Disposition header
      */
-    protected static function getCloudFrontSignedUrl(string $path, int $expiresInMinutes): string
+    protected static function getCloudFrontSignedUrl(string $path, int $expiresInMinutes, ?string $filename = null): string
     {
         $cloudFrontUrl = config('filesystems.disks.s3_private.url');
         $keyPairId = env('AWS_PRIVATE_CLOUDFRONT_KEY_PAIR_ID');
@@ -190,6 +199,14 @@ class StorageHelper
 
         // Generate signed URL
         $resourceKey = rtrim($cloudFrontUrl, '/').'/'.ltrim($path, '/');
+
+        // Add Content-Disposition header via query parameter if filename provided
+        // This tells S3/CloudFront to suggest this filename when downloading
+        if ($filename) {
+            $disposition = 'inline; filename="'.rawurlencode($filename).'"';
+            $resourceKey .= '?response-content-disposition='.rawurlencode($disposition);
+        }
+
         $expires = time() + ($expiresInMinutes * 60);
 
         return $cloudFront->getSignedUrl([

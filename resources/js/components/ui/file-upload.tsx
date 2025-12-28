@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { FileIcon } from '@untitledui/file-icons';
-import { AlertCircle, CheckCircle2, Eye, Loader2, RefreshCw, Trash2, Upload } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Download, Eye, Loader2, RefreshCw, Trash2, Upload } from 'lucide-react';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { useDropzone, type Accept } from 'react-dropzone';
 
@@ -125,6 +125,8 @@ export function FileUpload({
             setUploadedFile(null);
             setStatus('idle');
         }
+        // Only react to specific property changes, not the whole object reference
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [existingFile?.originalName, existingFile?.previewUrl]);
 
     const uploadFile = useCallback(
@@ -293,6 +295,16 @@ export function FileUpload({
                                     title="Preview"
                                 >
                                     <Eye className="h-4 w-4" />
+                                </a>
+                            )}
+                            {existingFile.previewUrl && (
+                                <a
+                                    href={existingFile.previewUrl}
+                                    download={existingFile.originalName}
+                                    className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                    title="Download"
+                                >
+                                    <Download className="h-4 w-4" />
                                 </a>
                             )}
                             <label

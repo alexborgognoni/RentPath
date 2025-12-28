@@ -124,13 +124,20 @@ Route::domain(config('app.domain'))->group(function () {
         ->name('tenant.properties.images.show');
 
     // Private storage route for serving signed URLs (tenant side)
-    Route::get('/private-storage/{path}', function ($path) {
+    Route::get('/private-storage/{path}', function ($path, Request $request) {
         $disk = \App\Helpers\StorageHelper::getDisk('private');
         if (! Storage::disk($disk)->exists($path)) {
             abort(404);
         }
 
-        return Storage::disk($disk)->response($path);
+        $response = Storage::disk($disk)->response($path);
+
+        // Set Content-Disposition header if filename is provided
+        if ($filename = $request->query('filename')) {
+            $response->headers->set('Content-Disposition', 'inline; filename="'.rawurlencode($filename).'"');
+        }
+
+        return $response;
     })->where('path', '.*')->middleware('signed')->name('tenant.private.storage');
 
     // Locale switching
@@ -384,13 +391,20 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
         Route::delete('api/images/delete', [ImageUploadController::class, 'delete'])
             ->name('images.delete');
 
-        Route::get('/private-storage/{path}', function ($path) {
+        Route::get('/private-storage/{path}', function ($path, Request $request) {
             $disk = \App\Helpers\StorageHelper::getDisk('private');
             if (! Storage::disk($disk)->exists($path)) {
                 abort(404);
             }
 
-            return Storage::disk($disk)->response($path);
+            $response = Storage::disk($disk)->response($path);
+
+            // Set Content-Disposition header if filename is provided
+            if ($filename = $request->query('filename')) {
+                $response->headers->set('Content-Disposition', 'inline; filename="'.rawurlencode($filename).'"');
+            }
+
+            return $response;
         })->where('path', '.*')->middleware('signed')->name('private.storage');
 
         // Application management routes

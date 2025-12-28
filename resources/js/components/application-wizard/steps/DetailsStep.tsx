@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/ui/date-picker';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData, OccupantDetails, PetDetails } from '@/hooks/useApplicationWizard';
 import { Plus, Trash2 } from 'lucide-react';
@@ -65,15 +66,12 @@ export function DetailsStep({
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
                     <label className="mb-2 block text-sm font-medium">Desired Move-In Date </label>
-                    <input
-                        type="date"
+                    <DatePicker
                         value={data.desired_move_in_date}
-                        onChange={(e) => handleFieldChange('desired_move_in_date', e.target.value)}
+                        onChange={(value) => handleFieldChange('desired_move_in_date', value)}
                         onBlur={onBlur}
-                        min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+                        min={new Date(Date.now() + 86400000)}
                         aria-invalid={!!(touchedFields.desired_move_in_date && errors.desired_move_in_date)}
-                        className={`w-full rounded-lg border px-4 py-2 ${touchedFields.desired_move_in_date && errors.desired_move_in_date ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
-                        required
                     />
                     {touchedFields.desired_move_in_date && errors.desired_move_in_date && (
                         <p className="mt-1 text-sm text-destructive">{errors.desired_move_in_date}</p>

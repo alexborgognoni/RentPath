@@ -1,4 +1,5 @@
 import { CountrySelect } from '@/components/ui/country-select';
+import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
 import { NationalitySelect } from '@/components/ui/nationality-select';
 import { PhoneInput } from '@/components/ui/phone-input';
@@ -132,15 +133,13 @@ export function PersonalInfoStep({
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
                     <label className="mb-2 block text-sm font-medium">Date of Birth</label>
-                    <input
-                        type="date"
+                    <DatePicker
                         value={data.profile_date_of_birth}
-                        onChange={(e) => handleFieldChange('profile_date_of_birth', e.target.value)}
+                        onChange={(value) => handleFieldChange('profile_date_of_birth', value)}
                         onBlur={onBlur}
-                        max={new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                        restriction="past"
+                        max={new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000)}
                         aria-invalid={!!(touchedFields.profile_date_of_birth && errors.profile_date_of_birth)}
-                        className={getFieldClass('profile_date_of_birth')}
-                        required
                     />
                     {touchedFields.profile_date_of_birth && errors.profile_date_of_birth && (
                         <p className="mt-1 text-sm text-destructive">{errors.profile_date_of_birth}</p>

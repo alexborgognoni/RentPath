@@ -1,4 +1,5 @@
 import { CurrencySelect } from '@/components/ui/currency-select';
+import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
@@ -205,14 +206,12 @@ export function EmploymentIncomeStep({
 
                         <div>
                             <label className="mb-2 block text-sm font-medium">Employment Start Date </label>
-                            <input
-                                type="date"
+                            <DatePicker
                                 value={data.profile_employment_start_date}
-                                onChange={(e) => handleFieldChange('profile_employment_start_date', e.target.value)}
+                                onChange={(value) => handleFieldChange('profile_employment_start_date', value)}
                                 onBlur={onBlur}
-                                max={new Date().toISOString().split('T')[0]}
-                                className={getFieldClass('profile_employment_start_date')}
-                                required
+                                max={new Date()}
+                                aria-invalid={!!(touchedFields.profile_employment_start_date && errors.profile_employment_start_date)}
                             />
                             {touchedFields.profile_employment_start_date && errors.profile_employment_start_date && (
                                 <p className="mt-1 text-sm text-destructive">{errors.profile_employment_start_date}</p>
@@ -377,13 +376,11 @@ export function EmploymentIncomeStep({
                             <label className="mb-2 block text-sm font-medium">
                                 Expected Graduation Date <span className="text-muted-foreground">(optional)</span>
                             </label>
-                            <input
-                                type="date"
+                            <DatePicker
                                 value={data.profile_expected_graduation_date}
-                                onChange={(e) => handleFieldChange('profile_expected_graduation_date', e.target.value)}
+                                onChange={(value) => handleFieldChange('profile_expected_graduation_date', value)}
                                 onBlur={onBlur}
-                                min={new Date().toISOString().split('T')[0]}
-                                className={getFieldClass('profile_expected_graduation_date')}
+                                min={new Date()}
                             />
                         </div>
 
