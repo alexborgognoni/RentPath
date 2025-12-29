@@ -2,15 +2,26 @@ import { requiresStateProvince, validatePostalCode } from '@/utils/address-valid
 import { validatePhoneNumber } from '@/utils/phone-validation';
 import { z } from 'zod';
 
-// Step IDs - 6 steps (documents step removed)
-export type ApplicationStepId = 'personal' | 'employment' | 'details' | 'references' | 'emergency' | 'review';
+// Step IDs - 8 steps (restructured)
+export type ApplicationStepId =
+    | 'identity' // Step 1: Identity & Legal Eligibility
+    | 'household' // Step 2: Household Composition
+    | 'financial' // Step 3: Financial Capability (Tenant)
+    | 'risk' // Step 4: Risk Mitigation (Co-signers & Guarantors)
+    | 'history' // Step 5: Credit & Rental History
+    | 'additional' // Step 6: Additional Information & Documents
+    | 'consent' // Step 7: Declarations & Consent
+    | 'review'; // Step 8: Review
 
 // ===== Error Messages =====
 export const APPLICATION_MESSAGES = {
-    // Personal Info Step
+    // Step 1: Identity & Legal Eligibility
     profile_date_of_birth: {
         required: 'Date of birth is required',
         adult: 'You must be at least 18 years old',
+    },
+    profile_middle_name: {
+        maxLength: 'Middle name cannot exceed 100 characters',
     },
     profile_nationality: {
         required: 'Nationality is required',
@@ -18,6 +29,32 @@ export const APPLICATION_MESSAGES = {
     profile_phone_number: {
         required: 'Phone number is required',
         invalid: 'Please enter a valid phone number',
+    },
+    profile_id_document_type: {
+        required: 'Please select an ID document type',
+    },
+    profile_id_number: {
+        required: 'ID number is required',
+    },
+    profile_id_issuing_country: {
+        required: 'Issuing country is required',
+    },
+    profile_id_expiry_date: {
+        required: 'ID expiry date is required',
+        future: 'ID document must not be expired',
+    },
+    profile_immigration_status: {
+        required: 'Immigration status is required',
+    },
+    profile_immigration_status_other: {
+        required: 'Please specify your immigration status',
+    },
+    profile_visa_type: {
+        required: 'Visa type is required',
+    },
+    profile_visa_expiry_date: {
+        required: 'Visa expiry date is required',
+        future: 'Visa must not be expired',
     },
     profile_current_street_name: {
         required: 'Street name is required',
@@ -187,13 +224,17 @@ export const APPLICATION_MESSAGES = {
         max: 'Cannot have more than 20 additional occupants',
     },
     occupant: {
-        name: {
-            required: 'Name is required',
-            maxLength: 'Name cannot exceed 255 characters',
+        first_name: {
+            required: 'First name is required',
+            maxLength: 'First name cannot exceed 100 characters',
         },
-        age: {
-            required: 'Age is required',
-            invalid: 'Valid age is required (0-120)',
+        last_name: {
+            required: 'Last name is required',
+            maxLength: 'Last name cannot exceed 100 characters',
+        },
+        date_of_birth: {
+            required: 'Date of birth is required',
+            invalid: 'Please enter a valid date of birth',
         },
         relationship: {
             required: 'Relationship is required',
@@ -242,6 +283,84 @@ export const APPLICATION_MESSAGES = {
             required: 'Years known is required',
             invalid: 'Valid years known is required (0-100)',
         },
+        consent_to_contact: {
+            required: 'You must consent to contact this reference',
+        },
+    },
+
+    // Step 5: Credit & Rental History
+    authorize_credit_check: {
+        required: 'You must authorize a credit check',
+    },
+    current_living_situation: {
+        required: 'Please select your current living situation',
+    },
+    reason_for_moving: {
+        required: 'Please select your reason for moving',
+    },
+    reason_for_moving_other: {
+        required: 'Please specify your reason for moving',
+    },
+    ccj_bankruptcy_details: {
+        required: 'Please provide details about CCJs or bankruptcies',
+    },
+    eviction_details: {
+        required: 'Please provide details about eviction history',
+    },
+
+    // Step 7: Declarations & Consent
+    declaration_accuracy: {
+        required: 'You must confirm the accuracy of your information',
+    },
+    consent_screening: {
+        required: 'You must consent to screening checks',
+    },
+    consent_data_processing: {
+        required: 'You must consent to data processing',
+    },
+    consent_reference_contact: {
+        required: 'You must consent to reference contact',
+    },
+    digital_signature: {
+        required: 'Please provide your digital signature',
+    },
+
+    // Co-signers (Step 4)
+    co_signer: {
+        first_name: { required: 'First name is required' },
+        last_name: { required: 'Last name is required' },
+        email: { required: 'Email is required', invalid: 'Valid email is required' },
+        phone_number: { required: 'Phone number is required', invalid: 'Valid phone number is required' },
+        date_of_birth: { required: 'Date of birth is required', adult: 'Co-signer must be at least 18' },
+        nationality: { required: 'Nationality is required' },
+        id_document_type: { required: 'ID document type is required' },
+        id_number: { required: 'ID number is required' },
+        id_issuing_country: { required: 'ID issuing country is required' },
+        id_expiry_date: { required: 'ID expiry date is required', future: 'ID must not be expired' },
+        employment_status: { required: 'Employment status is required' },
+        net_monthly_income: { required: 'Monthly income is required' },
+    },
+
+    // Guarantors (Step 4)
+    guarantor: {
+        first_name: { required: 'Guarantor first name is required' },
+        last_name: { required: 'Guarantor last name is required' },
+        relationship: { required: 'Relationship is required' },
+        relationship_other: { required: 'Please specify the relationship' },
+        email: { required: 'Email is required', invalid: 'Valid email is required' },
+        phone_number: { required: 'Phone number is required' },
+        date_of_birth: { required: 'Date of birth is required', adult: 'Guarantor must be at least 18' },
+        nationality: { required: 'Nationality is required' },
+        id_document_type: { required: 'ID document type is required' },
+        street_address: { required: 'Street address is required' },
+        city: { required: 'City is required' },
+        postal_code: { required: 'Postal code is required' },
+        country: { required: 'Country is required' },
+        employment_status: { required: 'Employment status is required' },
+        net_monthly_income: { required: 'Monthly income is required' },
+        consent_to_credit_check: { required: 'Guarantor must consent to credit check' },
+        consent_to_contact: { required: 'Guarantor must consent to be contacted' },
+        guarantee_consent_signed: { required: 'Guarantor must sign the guarantee consent' },
     },
 };
 
@@ -270,23 +389,33 @@ export interface ExistingDocumentsContext {
 }
 
 // ===== Shared Sub-Schemas =====
+// Helper to coerce null/undefined to empty string for form fields
+const stringField = () => z.preprocess((val) => val ?? '', z.string());
+
 const occupantSchema = z.object({
-    name: z.string().min(1, APPLICATION_MESSAGES.occupant.name.required).max(255, APPLICATION_MESSAGES.occupant.name.maxLength),
-    age: z
-        .string()
-        .min(1, APPLICATION_MESSAGES.occupant.age.required)
-        .refine(
-            (val) => {
-                const num = parseInt(val);
-                return !isNaN(num) && num >= 0 && num <= 120;
-            },
-            { message: APPLICATION_MESSAGES.occupant.age.invalid },
-        ),
-    relationship: z
-        .string()
-        .min(1, APPLICATION_MESSAGES.occupant.relationship.required)
-        .max(100, APPLICATION_MESSAGES.occupant.relationship.maxLength),
-    relationship_other: z.string().max(100, APPLICATION_MESSAGES.occupant.relationship_other.maxLength),
+    first_name: stringField().pipe(
+        z.string().min(1, APPLICATION_MESSAGES.occupant.first_name.required).max(100, APPLICATION_MESSAGES.occupant.first_name.maxLength),
+    ),
+    last_name: stringField().pipe(
+        z.string().min(1, APPLICATION_MESSAGES.occupant.last_name.required).max(100, APPLICATION_MESSAGES.occupant.last_name.maxLength),
+    ),
+    date_of_birth: stringField().pipe(
+        z
+            .string()
+            .min(1, APPLICATION_MESSAGES.occupant.date_of_birth.required)
+            .refine(
+                (val) => {
+                    if (!val) return false;
+                    const date = new Date(val);
+                    return !isNaN(date.getTime()) && date < new Date();
+                },
+                { message: APPLICATION_MESSAGES.occupant.date_of_birth.invalid },
+            ),
+    ),
+    relationship: stringField().pipe(
+        z.string().min(1, APPLICATION_MESSAGES.occupant.relationship.required).max(100, APPLICATION_MESSAGES.occupant.relationship.maxLength),
+    ),
+    relationship_other: stringField().pipe(z.string().max(100, APPLICATION_MESSAGES.occupant.relationship_other.maxLength)),
 });
 
 const occupantWithOtherSchema = occupantSchema.refine(
@@ -924,16 +1053,149 @@ export const detailsStepSchema = z
         },
     );
 
-// Step 4: References (unified - landlord merged with type field)
+// ===== NEW STEP SCHEMAS (8-step structure) =====
+
+// Step 4: Risk Mitigation - Support (all optional since co-signers/guarantors are "coming soon")
+export const riskMitigationStepSchema = z.object({
+    interested_in_rent_insurance: z.enum(['yes', 'no', 'already_have', '']).optional(),
+    existing_insurance_provider: z.string().max(200).optional(),
+    existing_insurance_policy_number: z.string().max(100).optional(),
+});
+
+// Step 5: Credit & Rental History (per PLAN.md)
+export const historyStepSchema = z
+    .object({
+        // Credit Check Authorization (Core Requirement per PLAN.md)
+        authorize_credit_check: z.boolean(),
+        credit_check_provider_preference: z.string().optional(),
+        // Background & History (Optional - Suggested for US)
+        authorize_background_check: z.boolean().optional(),
+        has_ccjs_or_bankruptcies: z.boolean().optional(),
+        ccj_bankruptcy_details: z.string().max(2000).optional(),
+        has_eviction_history: z.boolean().optional(),
+        eviction_details: z.string().max(2000).optional(),
+        self_reported_credit_score: z.string().optional(),
+        credit_report_upload: z.any().nullable().optional(),
+        // Current Address
+        current_living_situation: z.string().optional(),
+        current_address_street: z.string().optional(),
+        current_address_unit: z.string().optional(),
+        current_address_city: z.string().optional(),
+        current_address_state_province: z.string().optional(),
+        current_address_postal_code: z.string().optional(),
+        current_address_country: z.string().optional(),
+        current_address_move_in_date: z.string().optional(),
+        current_monthly_rent: z.string().optional(),
+        current_rent_currency: z.string().optional(),
+        current_landlord_name: z.string().optional(),
+        current_landlord_contact: z.string().optional(),
+        reason_for_moving: z.string().optional(),
+        reason_for_moving_other: z.string().max(500).optional(),
+        // Previous Addresses
+        previous_addresses: z.array(z.any()).optional(),
+        // Landlord References
+        landlord_references: z.array(z.any()).optional(),
+        // Employer Reference
+        employer_reference_name: z.string().optional(),
+        employer_reference_email: z.string().optional(),
+        employer_reference_phone: z.string().optional(),
+        employer_reference_job_title: z.string().optional(),
+        consent_to_contact_employer: z.boolean().optional(),
+        // Other References
+        other_references: z.array(z.any()).optional(),
+        // Legacy fields
+        references: z.array(referenceSchema).optional(),
+        previous_landlord_name: z.string().optional(),
+        previous_landlord_phone: z.string().optional(),
+        previous_landlord_email: z.string().optional(),
+        emergency_contact_name: z.string().optional(),
+        emergency_contact_phone: z.string().optional(),
+        emergency_contact_relationship: z.string().optional(),
+    })
+    .superRefine((data, ctx) => {
+        // Credit check authorization is required
+        if (!data.authorize_credit_check) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.authorize_credit_check.required,
+                path: ['authorize_credit_check'],
+            });
+        }
+        // If CCJs/bankruptcies, require details
+        if (data.has_ccjs_or_bankruptcies && !data.ccj_bankruptcy_details?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.ccj_bankruptcy_details.required,
+                path: ['ccj_bankruptcy_details'],
+            });
+        }
+        // If eviction history, require details
+        if (data.has_eviction_history && !data.eviction_details?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.eviction_details.required,
+                path: ['eviction_details'],
+            });
+        }
+        // If reason for moving is "other", require details
+        if (data.reason_for_moving === 'other' && !data.reason_for_moving_other?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.reason_for_moving_other.required,
+                path: ['reason_for_moving_other'],
+            });
+        }
+    });
+
+// Step 6: Additional Information & Documents (per PLAN.md)
+export const additionalInfoStepSchema = z.object({
+    // Main fields per PLAN.md
+    additional_information: z.string().max(2000).optional(),
+    additional_documents: z.array(z.any()).optional(), // Array of {file, description}
+    // Legacy fields for backwards compatibility
+    additional_bank_statements: z.array(z.any()).nullable().optional(),
+    additional_tax_returns: z.array(z.any()).nullable().optional(),
+    additional_other_documents: z.array(z.any()).nullable().optional(),
+    additional_notes: z.string().max(2000).optional(),
+});
+
+// Step 7: Declarations & Consent (per PLAN.md)
+export const consentStepSchema = z.object({
+    // Required declarations
+    declaration_accuracy: z.boolean().refine((val) => val === true, {
+        message: APPLICATION_MESSAGES.declaration_accuracy.required,
+    }),
+    consent_screening: z.boolean().refine((val) => val === true, {
+        message: APPLICATION_MESSAGES.consent_screening.required,
+    }),
+    consent_data_processing: z.boolean().refine((val) => val === true, {
+        message: APPLICATION_MESSAGES.consent_data_processing.required,
+    }),
+    consent_reference_contact: z.boolean().refine((val) => val === true, {
+        message: APPLICATION_MESSAGES.consent_reference_contact.required,
+    }),
+    // Optional consents
+    consent_data_sharing: z.boolean().optional(),
+    consent_marketing: z.boolean().optional(),
+    // Signature
+    digital_signature: z.string().min(1, APPLICATION_MESSAGES.digital_signature.required),
+    signature_date: z.string().optional(), // Auto-filled
+    signature_ip_address: z.string().optional(), // Auto-captured
+    // Legacy fields for backwards compatibility
+    consent_accurate_info: z.boolean().optional(),
+    consent_background_check: z.boolean().optional(),
+    consent_terms: z.boolean().optional(),
+    signature_full_name: z.string().optional(),
+});
+
+// Legacy schemas (kept for backwards compatibility during migration)
 export const referencesStepSchema = z.object({
     references: z.array(referenceSchema),
-    // Legacy fields kept for backwards compatibility
     previous_landlord_name: z.string().optional(),
     previous_landlord_phone: z.string().optional(),
     previous_landlord_email: z.string().optional(),
 });
 
-// Step 5: Emergency Contact
 export const emergencyStepSchema = z.object({
     emergency_contact_name: z.string(),
     emergency_contact_phone: z.string(),
@@ -958,25 +1220,37 @@ export function validateApplicationStep(
     let schema: z.ZodSchema;
 
     switch (stepId) {
-        case 'personal':
-            // Use factory function with existing docs context for personal step
+        // New 8-step structure
+        case 'identity':
+            // Step 1: Identity & Legal Eligibility
             schema = createPersonalInfoStepSchema(existingDocs);
             break;
-        case 'employment':
-            // Use factory function with existing docs context for employment step
-            schema = createEmploymentStepSchema(existingDocs);
-            break;
-        case 'details':
+        case 'household':
+            // Step 2: Household Composition (move-in, occupants, pets, emergency contact)
             schema = detailsStepSchema;
             break;
-        case 'references':
-            schema = referencesStepSchema;
+        case 'financial':
+            // Step 3: Financial Capability (employment, income)
+            schema = createEmploymentStepSchema(existingDocs);
             break;
-        case 'emergency':
-            schema = emergencyStepSchema;
+        case 'risk':
+            // Step 4: Risk Mitigation (co-signers, guarantors, insurance)
+            schema = riskMitigationStepSchema;
+            break;
+        case 'history':
+            // Step 5: Credit & Rental History
+            schema = historyStepSchema;
+            break;
+        case 'additional':
+            // Step 6: Additional Information
+            schema = additionalInfoStepSchema;
+            break;
+        case 'consent':
+            // Step 7: Declarations & Consent
+            schema = consentStepSchema;
             break;
         case 'review':
-            // Review step has no validation - just display
+            // Step 8: Review - no validation, just display
             return { success: true, errors: {} };
         default:
             return { success: true, errors: {} };
@@ -997,7 +1271,7 @@ export function validateApplicationStep(
     }
 
     // Additional validation for occupants with "Other" relationship
-    if (stepId === 'details') {
+    if (stepId === 'household') {
         const occupants = data.occupants_details as Array<{ name: string; age: string; relationship: string; relationship_other: string }>;
         occupants?.forEach((occupant, index) => {
             const validationResult = occupantWithOtherSchema.safeParse(occupant);
@@ -1030,7 +1304,7 @@ export function validateApplicationStep(
     }
 
     // Additional validation for references
-    if (stepId === 'references') {
+    if (stepId === 'history') {
         const references = data.references as Array<{
             type: string;
             name: string;
@@ -1081,8 +1355,8 @@ export function validateApplicationStep(
  * Returns steps.length if all steps are valid
  */
 export function findFirstInvalidApplicationStep(data: Record<string, unknown>, existingDocs?: ExistingDocumentsContext): number {
-    // 6-step order: personal, employment, details, references, emergency, review
-    const stepIds: ApplicationStepId[] = ['personal', 'employment', 'details', 'references', 'emergency', 'review'];
+    // 8-step order: identity, household, financial, risk, history, additional, consent, review
+    const stepIds: ApplicationStepId[] = ['identity', 'household', 'financial', 'risk', 'history', 'additional', 'consent', 'review'];
 
     for (let i = 0; i < stepIds.length; i++) {
         const result = validateApplicationStep(stepIds[i], data, existingDocs);
@@ -1100,7 +1374,7 @@ export function findFirstInvalidApplicationStep(data: Record<string, unknown>, e
 export function validateApplicationForSubmit(data: Record<string, unknown>, existingDocs?: ExistingDocumentsContext): ValidationResult {
     const allErrors: Record<string, string> = {};
     // Validate all steps except review (which has no validation)
-    const stepIds: ApplicationStepId[] = ['personal', 'employment', 'details', 'references', 'emergency'];
+    const stepIds: ApplicationStepId[] = ['identity', 'household', 'financial', 'risk', 'history', 'additional', 'consent'];
 
     for (const stepId of stepIds) {
         const result = validateApplicationStep(stepId, data, existingDocs);

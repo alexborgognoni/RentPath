@@ -1,6 +1,10 @@
+export { AdditionalStep } from './AdditionalStep';
+export { ConsentStep } from './ConsentStep';
 export { DetailsStep } from './DetailsStep';
 export { EmergencyStep } from './EmergencyStep';
 export { EmploymentIncomeStep } from './EmploymentIncomeStep';
+export { HistoryStep } from './HistoryStep';
 export { PersonalInfoStep } from './PersonalInfoStep';
 export { ReferencesStep } from './ReferencesStep';
 export { ReviewStep } from './ReviewStep';
+export { SupportStep } from './SupportStep';

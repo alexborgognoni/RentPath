@@ -19,9 +19,31 @@ class TenantProfile extends Model
     protected $fillable = [
         'user_id',
         'date_of_birth',
+        'middle_name',
         'nationality',
         'phone_country_code',
         'phone_number',
+
+        // Identity - ID Document
+        'id_document_type',
+        'id_number',
+        'id_issuing_country',
+        'id_expiry_date',
+
+        // Identity - Immigration
+        'immigration_status',
+        'immigration_status_other',
+        'visa_type',
+        'visa_expiry_date',
+        'work_permit_number',
+
+        // Identity - Regional Enhancements
+        'right_to_rent_document_path',
+        'right_to_rent_document_original_name',
+        'right_to_rent_share_code',
+        'identity_verification_method',
+        'identity_points_documents',
+        'identity_points_total',
 
         // Current address
         'current_house_number',
@@ -35,14 +57,34 @@ class TenantProfile extends Model
         // Employment
         'employment_status',
         'employer_name',
+        'business_name',
+        'business_type',
+        'business_registration_number',
         'job_title',
         'employment_start_date',
+        'employment_end_date',
+        'probation_end_date',
         'employment_type',
+        'employment_contract_type',
         'monthly_income',
+        'gross_annual_income',
+        'gross_annual_revenue',
         'income_currency',
+        'pay_frequency',
         'employer_contact_name',
         'employer_contact_phone',
         'employer_contact_email',
+        'employer_address',
+        'employer_phone',
+
+        // Additional Income
+        'has_additional_income',
+        'additional_income_sources',
+
+        // Additional Documents
+        'tax_returns_paths',
+        'bank_statements_paths',
+        'business_bank_statements_paths',
 
         // Student info
         'university_name',
@@ -149,13 +191,20 @@ class TenantProfile extends Model
      */
     protected $casts = [
         'date_of_birth' => 'date',
+        'id_expiry_date' => 'date',
+        'visa_expiry_date' => 'date',
         'employment_start_date' => 'date',
+        'employment_end_date' => 'date',
+        'probation_end_date' => 'date',
         'expected_graduation_date' => 'date',
         'monthly_income' => 'decimal:2',
+        'gross_annual_income' => 'decimal:2',
+        'gross_annual_revenue' => 'decimal:2',
         'guarantor_monthly_income' => 'decimal:2',
         'guarantor_employment_start_date' => 'date',
         'guarantor_expected_graduation_date' => 'date',
         'has_guarantor' => 'boolean',
+        'has_additional_income' => 'boolean',
         'has_pets' => 'boolean',
         'is_smoker' => 'boolean',
         'profile_verified_at' => 'datetime',
@@ -163,6 +212,12 @@ class TenantProfile extends Model
         'occupants_count' => 'integer',
         'occupants_details' => 'array',
         'pets_details' => 'array',
+        'identity_points_documents' => 'array',
+        'identity_points_total' => 'integer',
+        'additional_income_sources' => 'array',
+        'tax_returns_paths' => 'array',
+        'bank_statements_paths' => 'array',
+        'business_bank_statements_paths' => 'array',
     ];
 
     /**

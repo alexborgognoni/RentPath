@@ -288,15 +288,24 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                             <Users className="h-3 w-3" /> {t('labels.additionalOccupants')}
                         </h4>
                         <div className="space-y-2">
-                            {data.occupants_details.map((occupant, index) => (
-                                <div key={index} className="flex items-center gap-4 text-sm">
-                                    <span className="font-medium">{occupant.name}</span>
-                                    <span className="text-muted-foreground">{t('labels.age').replace(':age', String(occupant.age))}</span>
-                                    <span className="text-muted-foreground">
-                                        {occupant.relationship === 'Other' ? occupant.relationship_other : occupant.relationship}
-                                    </span>
-                                </div>
-                            ))}
+                            {data.occupants_details.map((occupant, index) => {
+                                const age = occupant.date_of_birth
+                                    ? Math.floor((Date.now() - new Date(occupant.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+                                    : null;
+                                return (
+                                    <div key={index} className="flex items-center gap-4 text-sm">
+                                        <span className="font-medium">
+                                            {occupant.first_name} {occupant.last_name}
+                                        </span>
+                                        {age !== null && (
+                                            <span className="text-muted-foreground">{t('labels.age').replace(':age', String(age))}</span>
+                                        )}
+                                        <span className="text-muted-foreground">
+                                            {occupant.relationship === 'other' ? occupant.relationship_other : occupant.relationship}
+                                        </span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

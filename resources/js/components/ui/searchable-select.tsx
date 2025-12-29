@@ -181,8 +181,8 @@ export function SearchableSelect<T>({
                         'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                         'disabled:cursor-not-allowed disabled:opacity-50',
                         !currentOption && 'text-muted-foreground',
-                        hasError && 'border-destructive bg-destructive/5',
-                        compact ? 'rounded-l-lg rounded-r-none border-r-0 px-3 py-2' : 'w-full rounded-lg border-border px-4 py-2 gap-2',
+                        hasError ? 'border-destructive bg-destructive/5' : 'border-border',
+                        compact ? 'rounded-l-lg rounded-r-none border-r-0 px-3 py-2' : 'w-full rounded-lg px-4 py-2 gap-2',
                         className,
                     )}
                 >

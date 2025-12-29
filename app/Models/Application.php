@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Application extends Model
 {
@@ -24,7 +25,54 @@ class Application extends Model
         // Application-specific details
         'desired_move_in_date',
         'lease_duration_months',
+        'is_flexible_on_move_in',
+        'is_flexible_on_duration',
         'message_to_landlord',
+
+        // Credit & Background Authorization
+        'authorize_credit_check',
+        'authorize_background_check',
+        'credit_check_provider_preference',
+        'has_ccjs_or_bankruptcies',
+        'ccj_bankruptcy_details',
+        'has_eviction_history',
+        'eviction_details',
+        'self_reported_credit_score',
+        'credit_report_path',
+        'credit_report_original_name',
+
+        // Current Address - Living Situation
+        'current_living_situation',
+        'current_address_unit',
+        'current_address_state_province',
+        'current_address_move_in_date',
+        'current_monthly_rent',
+        'current_rent_currency',
+        'current_landlord_name',
+        'current_landlord_contact',
+        'reason_for_moving',
+        'reason_for_moving_other',
+
+        // Previous Addresses
+        'previous_addresses',
+
+        // Rent Guarantee Insurance
+        'interested_in_rent_insurance',
+        'existing_insurance_provider',
+        'existing_insurance_policy_number',
+
+        // Additional Information
+        'additional_information',
+
+        // Declarations & Consent
+        'declaration_accuracy_at',
+        'consent_screening_at',
+        'consent_data_processing_at',
+        'consent_reference_contact_at',
+        'consent_data_sharing_at',
+        'consent_marketing_at',
+        'digital_signature',
+        'signature_ip_address',
 
         // Additional occupants
         'additional_occupants',
@@ -142,6 +190,7 @@ class Application extends Model
         'desired_move_in_date' => 'date',
         'lease_start_date' => 'date',
         'lease_end_date' => 'date',
+        'current_address_move_in_date' => 'date',
         'additional_occupants' => 'integer',
         'occupants_details' => 'array',
         'has_pets' => 'boolean',
@@ -149,10 +198,19 @@ class Application extends Model
         'references' => 'array',
         'snapshot_references' => 'array',
         'additional_documents' => 'array',
+        'previous_addresses' => 'array',
         'rejection_details' => 'array',
         'agreed_rent_amount' => 'decimal:2',
         'deposit_amount' => 'decimal:2',
+        'current_monthly_rent' => 'decimal:2',
         'lease_duration_months' => 'integer',
+        'self_reported_credit_score' => 'integer',
+        'is_flexible_on_move_in' => 'boolean',
+        'is_flexible_on_duration' => 'boolean',
+        'authorize_credit_check' => 'boolean',
+        'authorize_background_check' => 'boolean',
+        'has_ccjs_or_bankruptcies' => 'boolean',
+        'has_eviction_history' => 'boolean',
         'reviewed_at' => 'datetime',
         'visit_scheduled_at' => 'datetime',
         'visit_completed_at' => 'datetime',
@@ -161,6 +219,12 @@ class Application extends Model
         'submitted_at' => 'datetime',
         'withdrawn_at' => 'datetime',
         'archived_at' => 'datetime',
+        'declaration_accuracy_at' => 'datetime',
+        'consent_screening_at' => 'datetime',
+        'consent_data_processing_at' => 'datetime',
+        'consent_reference_contact_at' => 'datetime',
+        'consent_data_sharing_at' => 'datetime',
+        'consent_marketing_at' => 'datetime',
         'snapshot_date_of_birth' => 'date',
         'snapshot_employment_start_date' => 'date',
         'snapshot_expected_graduation_date' => 'date',
@@ -199,6 +263,54 @@ class Application extends Model
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by_user_id');
+    }
+
+    /**
+     * Get the co-signers for this application.
+     */
+    public function coSigners(): HasMany
+    {
+        return $this->hasMany(ApplicationCoSigner::class);
+    }
+
+    /**
+     * Get all guarantors for this application (for both primary and co-signers).
+     */
+    public function guarantors(): HasMany
+    {
+        return $this->hasMany(ApplicationGuarantor::class);
+    }
+
+    /**
+     * Get guarantors for the primary applicant only.
+     */
+    public function primaryGuarantors(): HasMany
+    {
+        return $this->guarantors()->where('for_signer_type', 'primary');
+    }
+
+    /**
+     * Get all references for this application.
+     */
+    public function applicationReferences(): HasMany
+    {
+        return $this->hasMany(ApplicationReference::class);
+    }
+
+    /**
+     * Get landlord references only.
+     */
+    public function landlordReferences(): HasMany
+    {
+        return $this->applicationReferences()->where('type', 'landlord');
+    }
+
+    /**
+     * Get employer references only.
+     */
+    public function employerReferences(): HasMany
+    {
+        return $this->applicationReferences()->where('type', 'employer');
     }
 
     /**

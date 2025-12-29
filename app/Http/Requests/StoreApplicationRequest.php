@@ -31,12 +31,34 @@ class StoreApplicationRequest extends FormRequest
 
         $rules = [
             // =====================================
-            // STEP 1: Personal Information (Required)
+            // STEP 1: Identity & Legal Eligibility
             // =====================================
             'profile_date_of_birth' => 'required|date|before:-18 years',
+            'profile_middle_name' => 'nullable|string|max:100',
             'profile_nationality' => ['required', 'string', 'max:2', new ValidCountryCode],
             'profile_phone_country_code' => 'required|string|max:5',
             'profile_phone_number' => ['required', 'string', 'max:20', new ValidPhoneNumber('profile_phone_country_code')],
+
+            // ID Document
+            'profile_id_document_type' => 'required|in:passport,national_id,drivers_license,residence_permit',
+            'profile_id_number' => 'required|string|max:100',
+            'profile_id_issuing_country' => ['required', 'string', 'max:2', new ValidCountryCode],
+            'profile_id_expiry_date' => 'required|date|after:today',
+
+            // Immigration (optional)
+            'profile_immigration_status' => 'nullable|in:citizen,permanent_resident,visa_holder,refugee,asylum_seeker,other',
+            'profile_immigration_status_other' => 'nullable|string|max:100|required_if:profile_immigration_status,other',
+            'profile_visa_type' => 'nullable|string|max:100|required_if:profile_immigration_status,visa_holder',
+            'profile_visa_expiry_date' => 'nullable|date|after:today|required_if:profile_immigration_status,visa_holder',
+            'profile_work_permit_number' => 'nullable|string|max:100',
+
+            // Regional enhancements (optional)
+            'profile_right_to_rent_share_code' => 'nullable|string|max:50',
+            'profile_identity_verification_method' => 'nullable|in:document_based,points_based',
+            'profile_identity_points_documents' => 'nullable|array',
+            'profile_identity_points_total' => 'nullable|integer|min:0|max:200',
+
+            // Current address (moved to Step 5 but kept here for backward compatibility)
             'profile_current_house_number' => 'required|string|max:20',
             'profile_current_address_line_2' => 'nullable|string|max:100',
             'profile_current_street_name' => 'required|string|max:255',
@@ -114,33 +136,153 @@ class StoreApplicationRequest extends FormRequest
             'profile_guarantor_other_income_proof' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
 
             // =====================================
-            // STEP 3: Application Details (Required)
+            // STEP 2: Household Composition
             // =====================================
             'desired_move_in_date' => 'required|date|after:today',
             'lease_duration_months' => 'required|integer|min:1|max:60',
-            'message_to_landlord' => 'nullable|string|max:2000',
+            'is_flexible_on_move_in' => 'nullable|boolean',
+            'is_flexible_on_duration' => 'nullable|boolean',
             'additional_occupants' => 'required|integer|min:0|max:20',
             'occupants_details' => 'nullable|array',
-            'occupants_details.*.name' => 'required|string|max:255',
-            'occupants_details.*.age' => 'required|integer|min:0|max:120',
+            'occupants_details.*.first_name' => 'required|string|max:100',
+            'occupants_details.*.last_name' => 'required|string|max:100',
+            'occupants_details.*.date_of_birth' => 'required|date',
             'occupants_details.*.relationship' => 'required|string|max:100',
+            'occupants_details.*.relationship_other' => 'nullable|string|max:100',
+            'occupants_details.*.will_sign_lease' => 'nullable|boolean',
+            'occupants_details.*.is_dependent' => 'nullable|boolean',
             'has_pets' => 'required|boolean',
             'pets_details' => 'nullable|array',
             'pets_details.*.type' => 'required|string|max:100',
+            'pets_details.*.type_other' => 'nullable|string|max:100',
             'pets_details.*.breed' => 'nullable|string|max:100',
-            'pets_details.*.age' => 'nullable|integer|min:0|max:50',
-            'pets_details.*.weight' => 'nullable|numeric|min:0',
+            'pets_details.*.name' => 'nullable|string|max:100',
+            'pets_details.*.age_years' => 'nullable|integer|min:0|max:50',
+            'pets_details.*.weight_kg' => 'nullable|numeric|min:0',
+            'pets_details.*.size' => 'nullable|in:small,medium,large',
+            'pets_details.*.is_registered_assistance_animal' => 'nullable|boolean',
+            // Emergency contact (optional, suggested for US/AU)
+            'emergency_contact_first_name' => 'nullable|string|max:100',
+            'emergency_contact_last_name' => 'nullable|string|max:100',
+            'emergency_contact_relationship' => 'nullable|string|max:100',
+            'emergency_contact_phone_country_code' => 'nullable|string|max:10',
+            'emergency_contact_phone_number' => 'nullable|string|max:30',
+            'emergency_contact_email' => 'nullable|email|max:255',
+            'message_to_landlord' => 'nullable|string|max:2000',
 
             // =====================================
-            // STEP 4: References (Optional)
+            // STEP 4: Risk Mitigation (Co-signers & Guarantors)
             // =====================================
+            'co_signers' => 'nullable|array',
+            'co_signers.*.occupant_index' => 'required|integer|min:0',
+            'co_signers.*.first_name' => 'required|string|max:100',
+            'co_signers.*.last_name' => 'required|string|max:100',
+            'co_signers.*.email' => 'required|email|max:255',
+            'co_signers.*.phone_country_code' => 'required|string|max:10',
+            'co_signers.*.phone_number' => 'required|string|max:30',
+            'co_signers.*.date_of_birth' => 'required|date|before:-18 years',
+            'co_signers.*.nationality' => 'required|string|max:2',
+            'co_signers.*.id_document_type' => 'required|in:passport,national_id,drivers_license,residence_permit',
+            'co_signers.*.id_number' => 'required|string|max:100',
+            'co_signers.*.id_issuing_country' => 'required|string|max:2',
+            'co_signers.*.id_expiry_date' => 'required|date|after:today',
+            'co_signers.*.immigration_status' => 'nullable|in:citizen,permanent_resident,visa_holder,refugee,asylum_seeker,other',
+            'co_signers.*.visa_type' => 'nullable|string|max:100',
+            'co_signers.*.visa_expiry_date' => 'nullable|date|after:today',
+            'co_signers.*.employment_status' => 'required|in:employed,self_employed,student,unemployed,retired,other',
+            'co_signers.*.employer_name' => 'nullable|string|max:200',
+            'co_signers.*.job_title' => 'nullable|string|max:100',
+            'co_signers.*.employment_type' => 'nullable|in:full_time,part_time,contract,temporary,zero_hours',
+            'co_signers.*.employment_start_date' => 'nullable|date|before_or_equal:today',
+            'co_signers.*.net_monthly_income' => 'nullable|numeric|min:0',
+            'co_signers.*.income_currency' => 'nullable|string|max:3',
+
+            'guarantors' => 'nullable|array',
+            'guarantors.*.for_signer_type' => 'required|in:primary,co_signer',
+            'guarantors.*.for_co_signer_index' => 'nullable|integer|min:0',
+            'guarantors.*.first_name' => 'required|string|max:100',
+            'guarantors.*.last_name' => 'required|string|max:100',
+            'guarantors.*.relationship' => 'required|in:parent,grandparent,sibling,spouse,partner,employer,other',
+            'guarantors.*.relationship_other' => 'nullable|string|max:100',
+            'guarantors.*.email' => 'required|email|max:255',
+            'guarantors.*.phone_country_code' => 'required|string|max:10',
+            'guarantors.*.phone_number' => 'required|string|max:30',
+            'guarantors.*.date_of_birth' => 'required|date|before:-18 years',
+            'guarantors.*.nationality' => 'required|string|max:2',
+            'guarantors.*.id_document_type' => 'required|in:passport,national_id,drivers_license',
+            'guarantors.*.street_address' => 'required|string|max:255',
+            'guarantors.*.city' => 'required|string|max:100',
+            'guarantors.*.state_province' => 'nullable|string|max:100',
+            'guarantors.*.postal_code' => 'required|string|max:20',
+            'guarantors.*.country' => 'required|string|max:2',
+            'guarantors.*.employment_status' => 'required|in:employed,self_employed,retired,other',
+            'guarantors.*.employer_name' => 'nullable|string|max:200',
+            'guarantors.*.job_title' => 'nullable|string|max:100',
+            'guarantors.*.net_monthly_income' => 'required|numeric|min:0',
+            'guarantors.*.income_currency' => 'required|string|max:3',
+            'guarantors.*.consent_to_credit_check' => 'required|boolean|accepted',
+            'guarantors.*.consent_to_contact' => 'required|boolean|accepted',
+            'guarantors.*.guarantee_consent_signed' => 'required|boolean|accepted',
+
+            // Rent guarantee insurance
+            'interested_in_rent_insurance' => 'nullable|in:yes,no,already_have',
+            'existing_insurance_provider' => 'nullable|string|max:200',
+            'existing_insurance_policy_number' => 'nullable|string|max:100',
+
+            // =====================================
+            // STEP 5: Credit & Rental History
+            // =====================================
+            'authorize_credit_check' => 'required|boolean|accepted',
+            'authorize_background_check' => 'nullable|boolean',
+            'credit_check_provider_preference' => 'nullable|in:experian,equifax,transunion,illion_au,no_preference',
+            'has_ccjs_or_bankruptcies' => 'nullable|boolean',
+            'ccj_bankruptcy_details' => 'nullable|string|max:2000|required_if:has_ccjs_or_bankruptcies,true',
+            'has_eviction_history' => 'nullable|boolean',
+            'eviction_details' => 'nullable|string|max:2000|required_if:has_eviction_history,true',
+            'self_reported_credit_score' => 'nullable|integer|min:300|max:850',
+
+            // Current address living situation
+            'current_living_situation' => 'required|in:renting,owner,living_with_family,student_housing,employer_provided,other',
+            'current_address_unit' => 'nullable|string|max:50',
+            'current_address_state_province' => 'nullable|string|max:100',
+            'current_address_move_in_date' => 'nullable|date|before_or_equal:today',
+            'current_monthly_rent' => 'nullable|numeric|min:0',
+            'current_rent_currency' => 'nullable|string|max:3',
+            'current_landlord_name' => 'nullable|string|max:200',
+            'current_landlord_contact' => 'nullable|string|max:200',
+            'reason_for_moving' => 'required|in:relocation_work,relocation_personal,upsizing,downsizing,end_of_lease,buying_property,relationship_change,closer_to_family,better_location,cost,first_time_renter,other',
+            'reason_for_moving_other' => 'nullable|string|max:200|required_if:reason_for_moving,other',
+
+            // Previous addresses
+            'previous_addresses' => 'nullable|array|max:5',
+            'previous_addresses.*.street' => 'required|string|max:255',
+            'previous_addresses.*.city' => 'required|string|max:100',
+            'previous_addresses.*.state_province' => 'nullable|string|max:100',
+            'previous_addresses.*.postal_code' => 'required|string|max:20',
+            'previous_addresses.*.country' => 'required|string|max:2',
+            'previous_addresses.*.from_date' => 'required|date',
+            'previous_addresses.*.to_date' => 'required|date|after:previous_addresses.*.from_date',
+            'previous_addresses.*.living_situation' => 'required|in:renting,owner,living_with_family,student_housing,employer_provided,other',
+            'previous_addresses.*.monthly_rent' => 'nullable|numeric|min:0',
+            'previous_addresses.*.landlord_name' => 'nullable|string|max:200',
+            'previous_addresses.*.landlord_contact' => 'nullable|string|max:200',
+            'previous_addresses.*.can_contact_landlord' => 'nullable|boolean',
+
+            // References (updated structure)
             'references' => 'nullable|array',
-            'references.*.type' => 'required|in:landlord,personal,professional',
-            'references.*.name' => 'required|string|max:255',
-            'references.*.phone' => 'nullable|string|max:20',
-            'references.*.email' => 'nullable|email|max:255',
-            'references.*.relationship' => 'nullable|string|max:100',
+            'references.*.type' => 'required|in:landlord,employer,personal,professional',
+            'references.*.name' => 'required|string|max:200',
+            'references.*.company' => 'nullable|string|max:200',
+            'references.*.email' => 'required|email|max:255',
+            'references.*.phone' => 'required|string|max:50',
+            'references.*.property_address' => 'nullable|string|max:500',
+            'references.*.tenancy_start_date' => 'nullable|date',
+            'references.*.tenancy_end_date' => 'nullable|date',
+            'references.*.monthly_rent_paid' => 'nullable|numeric|min:0',
+            'references.*.job_title' => 'nullable|string|max:100',
+            'references.*.relationship' => 'nullable|in:professional,personal',
             'references.*.years_known' => 'nullable|integer|min:0|max:100',
+            'references.*.consent_to_contact' => 'required|boolean|accepted',
 
             // Legacy fields (being phased out, kept for compatibility)
             'previous_landlord_name' => 'nullable|string|max:255',
@@ -148,11 +290,20 @@ class StoreApplicationRequest extends FormRequest
             'previous_landlord_email' => 'nullable|email|max:255',
 
             // =====================================
-            // STEP 5: Emergency Contact (Optional)
+            // STEP 6: Additional Information
             // =====================================
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_phone' => 'nullable|string|max:20',
-            'emergency_contact_relationship' => 'nullable|string|max:100',
+            'additional_information' => 'nullable|string|max:2000',
+
+            // =====================================
+            // STEP 7: Declarations & Consent
+            // =====================================
+            'declaration_accuracy' => 'required|boolean|accepted',
+            'consent_screening' => 'required|boolean|accepted',
+            'consent_data_processing' => 'required|boolean|accepted',
+            'consent_reference_contact' => 'required|boolean|accepted',
+            'consent_data_sharing' => 'nullable|boolean',
+            'consent_marketing' => 'nullable|boolean',
+            'digital_signature' => 'required|string|max:200',
 
             // =====================================
             // Additional documents (optional)
@@ -402,9 +553,12 @@ class StoreApplicationRequest extends FormRequest
             'additional_occupants.max' => 'Cannot have more than 20 additional occupants',
 
             // Occupants - must match APPLICATION_MESSAGES
-            'occupants_details.*.name.required' => 'Name is required',
-            'occupants_details.*.name.max' => 'Name cannot exceed 255 characters',
-            'occupants_details.*.age.required' => 'Age is required',
+            'occupants_details.*.first_name.required' => 'First name is required',
+            'occupants_details.*.first_name.max' => 'First name cannot exceed 100 characters',
+            'occupants_details.*.last_name.required' => 'Last name is required',
+            'occupants_details.*.last_name.max' => 'Last name cannot exceed 100 characters',
+            'occupants_details.*.date_of_birth.required' => 'Date of birth is required',
+            'occupants_details.*.date_of_birth.date' => 'Please enter a valid date of birth',
             'occupants_details.*.relationship.required' => 'Relationship is required',
             'occupants_details.*.relationship.max' => 'Relationship cannot exceed 100 characters',
 

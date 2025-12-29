@@ -1,10 +1,12 @@
 import {
+    AdditionalStep,
+    ConsentStep,
     DetailsStep,
-    EmergencyStep,
     EmploymentIncomeStep,
+    HistoryStep,
     PersonalInfoStep,
-    ReferencesStep,
     ReviewStep,
+    SupportStep,
 } from '@/components/application-wizard/steps';
 import { WizardNavigation, WizardProgress } from '@/components/wizard';
 import { useApplicationWizard, type ApplicationStep, type DraftApplication } from '@/hooks/useApplicationWizard';
@@ -44,13 +46,13 @@ export default function ApplicationCreate() {
 
     // Build translated step configs
     const translatedSteps = useMemo(() => {
-        const stepIds: ApplicationStep[] = ['personal', 'employment', 'details', 'references', 'emergency', 'review'];
+        const stepIds: ApplicationStep[] = ['identity', 'household', 'financial', 'risk', 'history', 'additional', 'consent', 'review'];
         return stepIds.map((id) => ({
             id,
             title: translate(translations, `wizard.application.steps.${id}.title`),
             shortTitle: translate(translations, `wizard.application.steps.${id}.shortTitle`),
             description: translate(translations, `wizard.application.steps.${id}.description`),
-            optional: id === 'references' || id === 'emergency',
+            optional: id === 'risk' || id === 'additional',
         }));
     }, [translations]);
 
@@ -158,7 +160,8 @@ export default function ApplicationCreate() {
     // Render current step content
     const renderStep = () => {
         switch (wizard.currentStep) {
-            case 'personal':
+            case 'identity':
+                // Step 1: Identity & Legal Eligibility (uses PersonalInfoStep for now)
                 return (
                     <PersonalInfoStep
                         data={wizard.data}
@@ -171,19 +174,8 @@ export default function ApplicationCreate() {
                         existingDocuments={existingDocuments}
                     />
                 );
-            case 'employment':
-                return (
-                    <EmploymentIncomeStep
-                        data={wizard.data}
-                        errors={wizard.errors}
-                        touchedFields={wizard.touchedFields}
-                        updateField={wizard.updateField}
-                        markFieldTouched={wizard.markFieldTouched}
-                        onBlur={handleBlur}
-                        existingDocuments={existingDocuments}
-                    />
-                );
-            case 'details':
+            case 'household':
+                // Step 2: Household Composition (uses DetailsStep for occupants, pets)
                 return (
                     <DetailsStep
                         data={wizard.data}
@@ -200,30 +192,87 @@ export default function ApplicationCreate() {
                         onBlur={handleBlur}
                     />
                 );
-            case 'references':
+            case 'financial':
+                // Step 3: Financial Capability (uses EmploymentIncomeStep)
                 return (
-                    <ReferencesStep
+                    <EmploymentIncomeStep
                         data={wizard.data}
                         errors={wizard.errors}
                         touchedFields={wizard.touchedFields}
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
+                        onBlur={handleBlur}
+                        existingDocuments={existingDocuments}
+                    />
+                );
+            case 'risk':
+                // Step 4: Financial Support (co-signers, guarantors, insurance)
+                return (
+                    <SupportStep
+                        data={wizard.data}
+                        errors={wizard.errors}
+                        touchedFields={wizard.touchedFields}
+                        updateField={wizard.updateField}
+                        markFieldTouched={wizard.markFieldTouched}
+                        onBlur={handleBlur}
+                        addCoSigner={wizard.addCoSigner}
+                        removeCoSigner={wizard.removeCoSigner}
+                        updateCoSigner={wizard.updateCoSigner}
+                        addGuarantor={wizard.addGuarantor}
+                        removeGuarantor={wizard.removeGuarantor}
+                        updateGuarantor={wizard.updateGuarantor}
+                    />
+                );
+            case 'history':
+                // Step 5: Credit & Rental History (per PLAN.md)
+                return (
+                    <HistoryStep
+                        data={wizard.data}
+                        errors={wizard.errors}
+                        touchedFields={wizard.touchedFields}
+                        updateField={wizard.updateField}
+                        markFieldTouched={wizard.markFieldTouched}
+                        // Previous addresses
+                        addPreviousAddress={wizard.addPreviousAddress}
+                        removePreviousAddress={wizard.removePreviousAddress}
+                        updatePreviousAddress={wizard.updatePreviousAddress}
+                        // Landlord references
+                        addLandlordReference={wizard.addLandlordReference}
+                        removeLandlordReference={wizard.removeLandlordReference}
+                        updateLandlordReference={wizard.updateLandlordReference}
+                        // Other references
+                        addOtherReference={wizard.addOtherReference}
+                        removeOtherReference={wizard.removeOtherReference}
+                        updateOtherReference={wizard.updateOtherReference}
+                        // Legacy references (backwards compatibility)
                         addReference={wizard.addReference}
                         removeReference={wizard.removeReference}
                         updateReference={wizard.updateReference}
                         onBlur={handleBlur}
                     />
                 );
-            case 'emergency':
+            case 'additional':
+                // Step 6: Additional Information
                 return (
-                    <EmergencyStep
+                    <AdditionalStep
                         data={wizard.data}
                         errors={wizard.errors}
                         touchedFields={wizard.touchedFields}
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
                         onBlur={handleBlur}
-                        hasProfileEmergencyContact={!!tenantProfile?.emergency_contact_name}
+                    />
+                );
+            case 'consent':
+                // Step 7: Declarations & Consent
+                return (
+                    <ConsentStep
+                        data={wizard.data}
+                        errors={wizard.errors}
+                        touchedFields={wizard.touchedFields}
+                        updateField={wizard.updateField}
+                        markFieldTouched={wizard.markFieldTouched}
+                        onBlur={handleBlur}
                     />
                 );
             case 'review':

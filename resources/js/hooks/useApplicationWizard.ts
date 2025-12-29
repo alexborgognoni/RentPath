@@ -14,40 +14,52 @@ import { useWizard, type AutosaveStatus, type WizardStepConfig } from './useWiza
 
 export type { AutosaveStatus } from './useWizard';
 
-export type ApplicationStep = 'personal' | 'employment' | 'details' | 'references' | 'emergency' | 'review';
+export type ApplicationStep = 'identity' | 'household' | 'financial' | 'risk' | 'history' | 'additional' | 'consent' | 'review';
 
 export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
     {
-        id: 'personal',
-        title: 'Personal Information',
-        shortTitle: 'Personal',
-        description: 'Your basic information and current address',
+        id: 'identity',
+        title: 'Identity & Legal Eligibility',
+        shortTitle: 'Identity',
+        description: 'Your identity documents and legal status',
     },
     {
-        id: 'employment',
-        title: 'Employment & Income',
-        shortTitle: 'Employment',
-        description: 'Your employment status and financial information',
+        id: 'household',
+        title: 'Household Composition',
+        shortTitle: 'Household',
+        description: 'Tell us about who will live in the property',
     },
     {
-        id: 'details',
-        title: 'Application Details',
-        shortTitle: 'Details',
-        description: 'Tell us about your move-in preferences',
+        id: 'financial',
+        title: 'Financial Capability',
+        shortTitle: 'Financial',
+        description: 'Your employment and income details',
     },
     {
-        id: 'references',
-        title: 'References',
-        shortTitle: 'References',
-        description: 'Previous landlord and personal references',
+        id: 'risk',
+        title: 'Financial Support',
+        shortTitle: 'Support',
+        description: 'Co-signers, guarantors, and insurance',
         optional: true,
     },
     {
-        id: 'emergency',
-        title: 'Emergency Contact',
-        shortTitle: 'Emergency',
-        description: 'Who should we contact in case of emergency?',
+        id: 'history',
+        title: 'Credit & Rental History',
+        shortTitle: 'History',
+        description: 'Your credit and rental background',
+    },
+    {
+        id: 'additional',
+        title: 'Additional Information',
+        shortTitle: 'Additional',
+        description: 'Any extra information or documents',
         optional: true,
+    },
+    {
+        id: 'consent',
+        title: 'Declarations & Consent',
+        shortTitle: 'Consent',
+        description: 'Review and sign your declarations',
     },
     {
         id: 'review',
@@ -60,21 +72,79 @@ export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
 // ===== Types =====
 
 export interface OccupantDetails {
-    name: string;
-    age: string;
+    first_name: string;
+    last_name: string;
+    date_of_birth: string;
     relationship: string;
     relationship_other: string;
+    will_sign_lease: boolean;
+    is_dependent: boolean;
 }
 
 export interface PetDetails {
     type: string;
     type_other: string;
     breed: string;
+    name: string;
     age: string;
     weight: string;
     weight_unit: string;
+    size: 'small' | 'medium' | 'large' | '';
+    is_registered_assistance_animal: boolean;
+    assistance_animal_documentation: File | null;
 }
 
+export interface LandlordReferenceDetails {
+    name: string;
+    company: string;
+    email: string;
+    phone: string;
+    property_address: string;
+    tenancy_start_date: string;
+    tenancy_end_date: string;
+    monthly_rent_paid: string;
+    consent_to_contact: boolean;
+}
+
+export interface EmployerReferenceDetails {
+    name: string;
+    email: string;
+    phone: string;
+    job_title: string;
+    consent_to_contact: boolean;
+}
+
+export interface OtherReferenceDetails {
+    name: string;
+    email: string;
+    phone: string;
+    relationship: 'professional' | 'personal' | '';
+    years_known: string;
+    consent_to_contact: boolean;
+}
+
+export interface PreviousAddressDetails {
+    street: string;
+    city: string;
+    state_province: string;
+    postal_code: string;
+    country: string;
+    from_date: string;
+    to_date: string;
+    living_situation: string;
+    monthly_rent: string;
+    landlord_name: string;
+    landlord_contact: string;
+    can_contact_landlord: boolean;
+}
+
+export interface AdditionalIncomeSource {
+    type: 'rental_income' | 'investments' | 'benefits' | 'child_support' | 'other' | '';
+    monthly_amount: string;
+    proof: File | null;
+}
+
+// Legacy reference type for backwards compatibility
 export interface ReferenceDetails {
     type: 'landlord' | 'personal' | 'professional';
     name: string;
@@ -85,12 +155,271 @@ export interface ReferenceDetails {
     years_known: string;
 }
 
+// Co-signer per PLAN.md - requires full identity + financial
+export interface CoSignerDetails {
+    occupant_index: number;
+    // Identity
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_country_code: string;
+    phone_number: string;
+    date_of_birth: string;
+    nationality: string;
+    relationship: string;
+    relationship_other: string;
+    // ID Document
+    id_document_type: 'passport' | 'national_id' | 'drivers_license' | 'residence_permit' | '';
+    id_number: string;
+    id_issuing_country: string;
+    id_expiry_date: string;
+    id_document_front: File | null;
+    id_document_back: File | null;
+    // Immigration (optional)
+    immigration_status: string;
+    visa_type: string;
+    visa_expiry_date: string;
+    // Financial
+    employment_status: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired' | 'other' | '';
+    employment_status_other: string;
+    employer_name: string;
+    job_title: string;
+    employment_type: 'full_time' | 'part_time' | 'contract' | 'temporary' | 'zero_hours' | '';
+    employment_start_date: string;
+    net_monthly_income: string;
+    income_currency: string;
+    employment_contract: File | null;
+    payslips: File[];
+    // Student specific
+    university_name: string;
+    enrollment_proof: File | null;
+    student_income_source: string;
+    student_monthly_income: string;
+    // Unemployed/retired specific
+    income_source: string;
+    income_proof: File | null;
+}
+
+// Guarantor per PLAN.md - full identity, address, financial, consent
+export interface GuarantorDetails {
+    for_signer_type: 'primary' | 'co_signer';
+    for_co_signer_index: number | null;
+    // Identity
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_country_code: string;
+    phone_number: string;
+    date_of_birth: string;
+    nationality: string;
+    relationship: string;
+    relationship_other: string;
+    // ID Document
+    id_document_type: 'passport' | 'national_id' | 'drivers_license' | '';
+    id_number: string;
+    id_issuing_country: string;
+    id_expiry_date: string;
+    id_document_front: File | null;
+    id_document_back: File | null;
+    // Address
+    street_address: string;
+    city: string;
+    state_province: string;
+    postal_code: string;
+    country: string;
+    years_at_address: string;
+    proof_of_residence: File | null;
+    // Financial
+    employment_status: 'employed' | 'self_employed' | 'retired' | 'other' | '';
+    employer_name: string;
+    job_title: string;
+    net_monthly_income: string;
+    income_currency: string;
+    proof_of_income: File | null;
+    credit_report: File | null;
+    // Consent & Legal
+    consent_to_credit_check: boolean;
+    consent_to_contact: boolean;
+    guarantee_consent_signed: boolean;
+}
+
 export interface ApplicationWizardData {
-    // Step 1: Personal Info (profile data)
+    // ===== Step 1: Identity & Legal Eligibility =====
+    // Personal Details
     profile_date_of_birth: string;
+    profile_middle_name: string;
     profile_nationality: string;
     profile_phone_country_code: string;
     profile_phone_number: string;
+    // ID Document
+    profile_id_document_type: 'passport' | 'national_id' | 'drivers_license' | 'residence_permit' | '';
+    profile_id_number: string;
+    profile_id_issuing_country: string;
+    profile_id_expiry_date: string;
+    profile_id_document_front: File | null;
+    profile_id_document_back: File | null;
+    // Immigration Status (Optional)
+    profile_immigration_status: 'citizen' | 'permanent_resident' | 'visa_holder' | 'refugee' | 'asylum_seeker' | 'other' | '';
+    profile_immigration_status_other: string;
+    profile_visa_type: string;
+    profile_visa_expiry_date: string;
+    profile_work_permit_number: string;
+    // Regional Enhancements (Optional)
+    profile_right_to_rent_document: File | null;
+    profile_right_to_rent_share_code: string;
+
+    // ===== Step 2: Household Composition =====
+    // Rental Intent
+    desired_move_in_date: string;
+    lease_duration_months: number;
+    is_flexible_on_move_in: boolean;
+    is_flexible_on_duration: boolean;
+    // Occupants
+    additional_occupants: number;
+    occupants_details: OccupantDetails[];
+    // Pets
+    has_pets: boolean;
+    pets_details: PetDetails[];
+    // Emergency Contact (optional, suggested for US/AU)
+    emergency_contact_first_name: string;
+    emergency_contact_last_name: string;
+    emergency_contact_relationship: string;
+    emergency_contact_relationship_other: string;
+    emergency_contact_phone_country_code: string;
+    emergency_contact_phone_number: string;
+    emergency_contact_email: string;
+
+    // ===== Step 3: Financial Capability (Tenant) =====
+    profile_employment_status: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired' | 'other' | '';
+    profile_employment_status_other: string;
+    // If employed
+    profile_employer_name: string;
+    profile_employer_address: string;
+    profile_employer_phone: string;
+    profile_job_title: string;
+    profile_employment_type: 'full_time' | 'part_time' | 'zero_hours' | '';
+    profile_employment_contract_type: 'permanent' | 'fixed_term' | 'freelance' | 'casual' | '';
+    profile_employment_start_date: string;
+    profile_employment_end_date: string;
+    profile_probation_end_date: string;
+    profile_net_monthly_income: string;
+    profile_gross_annual_income: string;
+    profile_income_currency: string;
+    profile_pay_frequency: 'weekly' | 'fortnightly' | 'monthly' | 'annually' | '';
+    profile_employment_contract: File | null;
+    profile_payslip_1: File | null;
+    profile_payslip_2: File | null;
+    profile_payslip_3: File | null;
+    profile_bank_statements: File[];
+    // If self_employed
+    profile_business_name: string;
+    profile_business_type: string;
+    profile_business_registration_number: string;
+    profile_business_start_date: string;
+    profile_gross_annual_revenue: string;
+    profile_tax_returns: File[];
+    profile_business_bank_statements: File[];
+    profile_accountant_reference: File | null;
+    // If student
+    profile_university_name: string;
+    profile_program_of_study: string;
+    profile_expected_graduation_date: string;
+    profile_student_id_number: string;
+    profile_enrollment_proof: File | null;
+    profile_student_income_source: 'loan' | 'grant' | 'parental_support' | 'part_time_work' | 'savings' | 'other' | '';
+    profile_student_monthly_income: string;
+    // If unemployed/retired/other
+    profile_income_source: string;
+    profile_other_income_proof: File | null;
+    // Additional income (all statuses)
+    profile_has_additional_income: boolean;
+    profile_additional_income_sources: AdditionalIncomeSource[];
+
+    // ===== Step 4: Risk Mitigation =====
+    // Co-signers (occupants with will_sign_lease = true)
+    co_signers: CoSignerDetails[];
+    // Guarantors (linked to signers)
+    guarantors: GuarantorDetails[];
+    // Rent Guarantee Insurance
+    interested_in_rent_insurance: 'yes' | 'no' | 'already_have' | '';
+    existing_insurance_provider: string;
+    existing_insurance_policy_number: string;
+
+    // ===== Step 5: Credit & Rental History =====
+    // Credit Check Authorization (Core)
+    authorize_credit_check: boolean;
+    credit_check_provider_preference: 'experian' | 'equifax' | 'transunion' | 'illion_au' | 'no_preference' | '';
+    // Background & History (Optional - Suggested for US)
+    authorize_background_check: boolean;
+    has_ccjs_or_bankruptcies: boolean;
+    ccj_bankruptcy_details: string;
+    has_eviction_history: boolean;
+    eviction_details: string;
+    self_reported_credit_score: string;
+    credit_report_upload: File | null;
+    // Current Address
+    current_living_situation: 'renting' | 'owner' | 'living_with_family' | 'student_housing' | 'employer_provided' | 'other' | '';
+    current_address_street: string;
+    current_address_unit: string;
+    current_address_city: string;
+    current_address_state_province: string;
+    current_address_postal_code: string;
+    current_address_country: string;
+    current_address_move_in_date: string;
+    current_monthly_rent: string;
+    current_rent_currency: string;
+    current_landlord_name: string;
+    current_landlord_contact: string;
+    reason_for_moving:
+        | 'relocation_work'
+        | 'relocation_personal'
+        | 'upsizing'
+        | 'downsizing'
+        | 'end_of_lease'
+        | 'buying_property'
+        | 'relationship_change'
+        | 'closer_to_family'
+        | 'better_location'
+        | 'cost'
+        | 'first_time_renter'
+        | 'other'
+        | '';
+    reason_for_moving_other: string;
+    // Previous Addresses (Last 3 years)
+    previous_addresses: PreviousAddressDetails[];
+    // Landlord References
+    landlord_references: LandlordReferenceDetails[];
+    // Employer Reference
+    employer_reference_name: string;
+    employer_reference_email: string;
+    employer_reference_phone: string;
+    employer_reference_job_title: string;
+    consent_to_contact_employer: boolean;
+    // Other References
+    other_references: OtherReferenceDetails[];
+
+    // ===== Step 6: Additional Information & Documents =====
+    additional_information: string;
+    additional_documents: { file: File; description: string }[];
+
+    // ===== Step 7: Declarations & Consent =====
+    declaration_accuracy: boolean;
+    consent_screening: boolean;
+    consent_data_processing: boolean;
+    consent_reference_contact: boolean;
+    consent_data_sharing: boolean;
+    consent_marketing: boolean;
+    digital_signature: string;
+    signature_date: string;
+    signature_ip_address: string;
+
+    // ===== Token =====
+    invited_via_token: string;
+
+    // ===== Legacy fields (kept for backwards compatibility) =====
+    profile_has_guarantor: boolean;
+    profile_monthly_income: string;
+    profile_student_proof: File | null;
     profile_current_house_number: string;
     profile_current_address_line_2: string;
     profile_current_street_name: string;
@@ -98,21 +427,14 @@ export interface ApplicationWizardData {
     profile_current_state_province: string;
     profile_current_postal_code: string;
     profile_current_country: string;
-
-    // Step 2: Employment & Income (profile data)
-    profile_employment_status: string;
-    profile_employer_name: string;
-    profile_job_title: string;
-    profile_employment_type: string;
-    profile_employment_start_date: string;
-    profile_monthly_income: string;
-    profile_income_currency: string;
-    profile_university_name: string;
-    profile_program_of_study: string;
-    profile_expected_graduation_date: string;
-    profile_student_income_source: string;
-    profile_has_guarantor: boolean;
-    // Guarantor - Basic Info
+    message_to_landlord: string;
+    references: ReferenceDetails[];
+    emergency_contact_name: string;
+    emergency_contact_phone: string;
+    previous_landlord_name: string;
+    previous_landlord_phone: string;
+    previous_landlord_email: string;
+    // Legacy guarantor fields (now in guarantors array)
     profile_guarantor_first_name: string;
     profile_guarantor_last_name: string;
     profile_guarantor_relationship: string;
@@ -127,7 +449,6 @@ export interface ApplicationWizardData {
     profile_guarantor_state_province: string;
     profile_guarantor_postal_code: string;
     profile_guarantor_country: string;
-    // Guarantor - Employment
     profile_guarantor_employment_status: string;
     profile_guarantor_employer_name: string;
     profile_guarantor_job_title: string;
@@ -135,21 +456,10 @@ export interface ApplicationWizardData {
     profile_guarantor_employment_start_date: string;
     profile_guarantor_monthly_income: string;
     profile_guarantor_income_currency: string;
-    // Guarantor - Student Info
     profile_guarantor_university_name: string;
     profile_guarantor_program_of_study: string;
     profile_guarantor_expected_graduation_date: string;
     profile_guarantor_student_income_source: string;
-    // Profile documents
-    profile_id_document_front: File | null;
-    profile_id_document_back: File | null;
-    profile_employment_contract: File | null;
-    profile_payslip_1: File | null;
-    profile_payslip_2: File | null;
-    profile_payslip_3: File | null;
-    profile_student_proof: File | null;
-    profile_other_income_proof: File | null;
-    // Guarantor documents
     profile_guarantor_id_front: File | null;
     profile_guarantor_id_back: File | null;
     profile_guarantor_proof_income: File | null;
@@ -159,31 +469,16 @@ export interface ApplicationWizardData {
     profile_guarantor_payslip_3: File | null;
     profile_guarantor_student_proof: File | null;
     profile_guarantor_other_income_proof: File | null;
-
-    // Step 3: Application Details
-    desired_move_in_date: string;
-    lease_duration_months: number;
-    message_to_landlord: string;
-    additional_occupants: number;
-    occupants_details: OccupantDetails[];
-    has_pets: boolean;
-    pets_details: PetDetails[];
-
-    // Step 4: References (unified - landlord refs merged with type field)
-    references: ReferenceDetails[];
-
-    // Step 5: Emergency Contact
-    emergency_contact_name: string;
-    emergency_contact_phone: string;
-    emergency_contact_relationship: string;
-
-    // Token
-    invited_via_token: string;
-
-    // Legacy fields (kept for backwards compatibility)
-    previous_landlord_name: string;
-    previous_landlord_phone: string;
-    previous_landlord_email: string;
+    // Old consent fields (replaced by new structure)
+    consent_accurate_info: boolean;
+    consent_background_check: boolean;
+    consent_terms: boolean;
+    signature_full_name: string;
+    // Old additional step fields
+    additional_bank_statements: File[] | null;
+    additional_tax_returns: File[] | null;
+    additional_other_documents: File[] | null;
+    additional_notes: string;
 }
 
 /**
@@ -227,12 +522,166 @@ function formatDateForInput(date: string | Date | null | undefined): string {
  * This ensures profile changes are automatically reflected across all draft applications.
  */
 function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantProfile, token?: string | null): ApplicationWizardData {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tp = tenantProfile as any; // Cast to any for accessing new fields not yet in TenantProfile type
+
     return {
-        // Step 1: Personal Info - ALWAYS from TenantProfile
+        // ===== Step 1: Identity & Legal Eligibility =====
         profile_date_of_birth: formatDateForInput(tenantProfile?.date_of_birth),
+        profile_middle_name: tp?.middle_name || '',
         profile_nationality: tenantProfile?.nationality || '',
         profile_phone_country_code: tenantProfile?.phone_country_code || '+31',
         profile_phone_number: tenantProfile?.phone_number || '',
+        // ID Document
+        profile_id_document_type: tp?.id_document_type || '',
+        profile_id_number: tp?.id_number || '',
+        profile_id_issuing_country: tp?.id_issuing_country || '',
+        profile_id_expiry_date: formatDateForInput(tp?.id_expiry_date),
+        profile_id_document_front: null,
+        profile_id_document_back: null,
+        // Immigration Status
+        profile_immigration_status: tp?.immigration_status || '',
+        profile_immigration_status_other: tp?.immigration_status_other || '',
+        profile_visa_type: tp?.visa_type || '',
+        profile_visa_expiry_date: formatDateForInput(tp?.visa_expiry_date),
+        profile_work_permit_number: tp?.work_permit_number || '',
+        // Regional Enhancements
+        profile_right_to_rent_document: null,
+        profile_right_to_rent_share_code: tp?.right_to_rent_share_code || '',
+
+        // ===== Step 2: Household Composition =====
+        // Rental Intent
+        desired_move_in_date: draft?.desired_move_in_date ? formatDateForInput(draft.desired_move_in_date) : '',
+        lease_duration_months: draft?.lease_duration_months || 12,
+        is_flexible_on_move_in: false,
+        is_flexible_on_duration: false,
+        // Occupants
+        additional_occupants: draft?.additional_occupants || 0,
+        occupants_details: draft?.occupants_details || [],
+        // Pets
+        has_pets: draft?.has_pets || false,
+        pets_details: draft?.pets_details || [],
+        // Emergency Contact
+        emergency_contact_first_name: tp?.emergency_contact_first_name || '',
+        emergency_contact_last_name: tp?.emergency_contact_last_name || '',
+        emergency_contact_relationship: tp?.emergency_contact_relationship || tenantProfile?.emergency_contact_relationship || '',
+        emergency_contact_relationship_other: '',
+        emergency_contact_phone_country_code: tp?.emergency_contact_phone_country_code || '+31',
+        emergency_contact_phone_number: tp?.emergency_contact_phone_number || '',
+        emergency_contact_email: tp?.emergency_contact_email || '',
+
+        // ===== Step 3: Financial Capability =====
+        profile_employment_status: tenantProfile?.employment_status || '',
+        profile_employment_status_other: '',
+        // Employed fields
+        profile_employer_name: tenantProfile?.employer_name || '',
+        profile_employer_address: tp?.employer_address || '',
+        profile_employer_phone: tp?.employer_phone || '',
+        profile_job_title: tenantProfile?.job_title || '',
+        profile_employment_type: (tenantProfile?.employment_type as ApplicationWizardData['profile_employment_type']) || '',
+        profile_employment_contract_type: tp?.employment_contract_type || '',
+        profile_employment_start_date: formatDateForInput(tenantProfile?.employment_start_date),
+        profile_employment_end_date: formatDateForInput(tp?.employment_end_date),
+        profile_probation_end_date: formatDateForInput(tp?.probation_end_date),
+        profile_net_monthly_income: tp?.net_monthly_income?.toString() || tenantProfile?.monthly_income?.toString() || '',
+        profile_gross_annual_income: tp?.gross_annual_income?.toString() || '',
+        profile_income_currency: tenantProfile?.income_currency || 'eur',
+        profile_pay_frequency: tp?.pay_frequency || '',
+        profile_employment_contract: null,
+        profile_payslip_1: null,
+        profile_payslip_2: null,
+        profile_payslip_3: null,
+        profile_bank_statements: [],
+        // Self-employed fields
+        profile_business_name: tp?.business_name || '',
+        profile_business_type: tp?.business_type || '',
+        profile_business_registration_number: tp?.business_registration_number || '',
+        profile_business_start_date: formatDateForInput(tp?.business_start_date),
+        profile_gross_annual_revenue: tp?.gross_annual_revenue?.toString() || '',
+        profile_tax_returns: [],
+        profile_business_bank_statements: [],
+        profile_accountant_reference: null,
+        // Student fields
+        profile_university_name: tenantProfile?.university_name || '',
+        profile_program_of_study: tenantProfile?.program_of_study || '',
+        profile_expected_graduation_date: formatDateForInput(tenantProfile?.expected_graduation_date),
+        profile_student_id_number: tp?.student_id_number || '',
+        profile_enrollment_proof: null,
+        profile_student_income_source: (tenantProfile?.student_income_source as ApplicationWizardData['profile_student_income_source']) || '',
+        profile_student_monthly_income: tp?.student_monthly_income?.toString() || '',
+        // Unemployed/retired/other
+        profile_income_source: tp?.income_source || '',
+        profile_other_income_proof: null,
+        // Additional income
+        profile_has_additional_income: tp?.has_additional_income || false,
+        profile_additional_income_sources: tp?.additional_income_sources || [],
+
+        // ===== Step 4: Risk Mitigation =====
+        co_signers: [],
+        guarantors: [],
+        interested_in_rent_insurance: '',
+        existing_insurance_provider: '',
+        existing_insurance_policy_number: '',
+
+        // ===== Step 5: Credit & Rental History =====
+        // Credit Check
+        authorize_credit_check: false,
+        credit_check_provider_preference: '',
+        authorize_background_check: false,
+        has_ccjs_or_bankruptcies: false,
+        ccj_bankruptcy_details: '',
+        has_eviction_history: false,
+        eviction_details: '',
+        self_reported_credit_score: '',
+        credit_report_upload: null,
+        // Current Address
+        current_living_situation: '',
+        current_address_street: tenantProfile?.current_street_name || '',
+        current_address_unit: tenantProfile?.current_address_line_2 || '',
+        current_address_city: tenantProfile?.current_city || '',
+        current_address_state_province: tenantProfile?.current_state_province || '',
+        current_address_postal_code: tenantProfile?.current_postal_code || '',
+        current_address_country: tenantProfile?.current_country || '',
+        current_address_move_in_date: '',
+        current_monthly_rent: '',
+        current_rent_currency: 'eur',
+        current_landlord_name: '',
+        current_landlord_contact: '',
+        reason_for_moving: '',
+        reason_for_moving_other: '',
+        // Previous Addresses
+        previous_addresses: [],
+        // References
+        landlord_references: [],
+        employer_reference_name: '',
+        employer_reference_email: '',
+        employer_reference_phone: '',
+        employer_reference_job_title: '',
+        consent_to_contact_employer: false,
+        other_references: [],
+
+        // ===== Step 6: Additional Information =====
+        additional_information: '',
+        additional_documents: [],
+
+        // ===== Step 7: Declarations & Consent =====
+        declaration_accuracy: false,
+        consent_screening: false,
+        consent_data_processing: false,
+        consent_reference_contact: false,
+        consent_data_sharing: false,
+        consent_marketing: false,
+        digital_signature: '',
+        signature_date: '',
+        signature_ip_address: '',
+
+        // ===== Token =====
+        invited_via_token: token || '',
+
+        // ===== Legacy fields (backwards compatibility) =====
+        profile_has_guarantor: tenantProfile?.has_guarantor ?? false,
+        profile_monthly_income: tenantProfile?.monthly_income?.toString() || '',
+        profile_student_proof: null,
         profile_current_house_number: tenantProfile?.current_house_number || '',
         profile_current_address_line_2: tenantProfile?.current_address_line_2 || '',
         profile_current_street_name: tenantProfile?.current_street_name || '',
@@ -240,21 +689,14 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_current_state_province: tenantProfile?.current_state_province || '',
         profile_current_postal_code: tenantProfile?.current_postal_code || '',
         profile_current_country: tenantProfile?.current_country || '',
-
-        // Step 2: Employment & Income - ALWAYS from TenantProfile
-        profile_employment_status: tenantProfile?.employment_status || '',
-        profile_employer_name: tenantProfile?.employer_name || '',
-        profile_job_title: tenantProfile?.job_title || '',
-        profile_employment_type: tenantProfile?.employment_type || '',
-        profile_employment_start_date: formatDateForInput(tenantProfile?.employment_start_date),
-        profile_monthly_income: tenantProfile?.monthly_income?.toString() || '',
-        profile_income_currency: tenantProfile?.income_currency || 'eur',
-        profile_university_name: tenantProfile?.university_name || '',
-        profile_program_of_study: tenantProfile?.program_of_study || '',
-        profile_expected_graduation_date: formatDateForInput(tenantProfile?.expected_graduation_date),
-        profile_student_income_source: tenantProfile?.student_income_source || '',
-        profile_has_guarantor: tenantProfile?.has_guarantor ?? false,
-        // Guarantor - Basic Info
+        message_to_landlord: draft?.message_to_landlord || '',
+        references: draft?.references || [],
+        emergency_contact_name: draft?.emergency_contact_name || tenantProfile?.emergency_contact_name || '',
+        emergency_contact_phone: draft?.emergency_contact_phone || tenantProfile?.emergency_contact_phone || '',
+        previous_landlord_name: draft?.previous_landlord_name || '',
+        previous_landlord_phone: draft?.previous_landlord_phone || '',
+        previous_landlord_email: draft?.previous_landlord_email || '',
+        // Legacy guarantor fields
         profile_guarantor_first_name: tenantProfile?.guarantor_first_name || '',
         profile_guarantor_last_name: tenantProfile?.guarantor_last_name || '',
         profile_guarantor_relationship: tenantProfile?.guarantor_relationship || '',
@@ -269,7 +711,6 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_guarantor_state_province: tenantProfile?.guarantor_state_province || '',
         profile_guarantor_postal_code: tenantProfile?.guarantor_postal_code || '',
         profile_guarantor_country: tenantProfile?.guarantor_country || '',
-        // Guarantor - Employment
         profile_guarantor_employment_status: tenantProfile?.guarantor_employment_status || '',
         profile_guarantor_employer_name: tenantProfile?.guarantor_employer_name || '',
         profile_guarantor_job_title: tenantProfile?.guarantor_job_title || '',
@@ -277,21 +718,10 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_guarantor_employment_start_date: formatDateForInput(tenantProfile?.guarantor_employment_start_date),
         profile_guarantor_monthly_income: tenantProfile?.guarantor_monthly_income?.toString() || '',
         profile_guarantor_income_currency: tenantProfile?.guarantor_income_currency || 'eur',
-        // Guarantor - Student Info
         profile_guarantor_university_name: tenantProfile?.guarantor_university_name || '',
         profile_guarantor_program_of_study: tenantProfile?.guarantor_program_of_study || '',
         profile_guarantor_expected_graduation_date: formatDateForInput(tenantProfile?.guarantor_expected_graduation_date),
         profile_guarantor_student_income_source: tenantProfile?.guarantor_student_income_source || '',
-        // Profile documents (always start null - existing docs shown from tenantProfile)
-        profile_id_document_front: null,
-        profile_id_document_back: null,
-        profile_employment_contract: null,
-        profile_payslip_1: null,
-        profile_payslip_2: null,
-        profile_payslip_3: null,
-        profile_student_proof: null,
-        profile_other_income_proof: null,
-        // Guarantor documents (always start null - existing docs shown from tenantProfile)
         profile_guarantor_id_front: null,
         profile_guarantor_id_back: null,
         profile_guarantor_proof_income: null,
@@ -301,31 +731,15 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_guarantor_payslip_3: null,
         profile_guarantor_student_proof: null,
         profile_guarantor_other_income_proof: null,
-
-        // Step 3: Application Details - from draft if resuming
-        desired_move_in_date: draft?.desired_move_in_date ? formatDateForInput(draft.desired_move_in_date) : '',
-        lease_duration_months: draft?.lease_duration_months || 12,
-        message_to_landlord: draft?.message_to_landlord || '',
-        additional_occupants: draft?.additional_occupants || 0,
-        occupants_details: draft?.occupants_details || [],
-        has_pets: draft?.has_pets || false,
-        pets_details: draft?.pets_details || [],
-
-        // Step 4: References - from draft if resuming
-        references: draft?.references || [],
-
-        // Step 5: Emergency Contact - prefer draft, fall back to profile
-        emergency_contact_name: draft?.emergency_contact_name || tenantProfile?.emergency_contact_name || '',
-        emergency_contact_phone: draft?.emergency_contact_phone || tenantProfile?.emergency_contact_phone || '',
-        emergency_contact_relationship: draft?.emergency_contact_relationship || tenantProfile?.emergency_contact_relationship || '',
-
-        // Token
-        invited_via_token: token || '',
-
-        // Legacy fields (kept for backwards compatibility)
-        previous_landlord_name: draft?.previous_landlord_name || '',
-        previous_landlord_phone: draft?.previous_landlord_phone || '',
-        previous_landlord_email: draft?.previous_landlord_email || '',
+        // Old consent/additional fields
+        consent_accurate_info: false,
+        consent_background_check: false,
+        consent_terms: false,
+        signature_full_name: '',
+        additional_bank_statements: null,
+        additional_tax_returns: null,
+        additional_other_documents: null,
+        additional_notes: '',
     };
 }
 
@@ -364,17 +778,47 @@ export interface UseApplicationWizardReturn {
     // Occupants helpers
     addOccupant: () => void;
     removeOccupant: (index: number) => void;
-    updateOccupant: (index: number, field: keyof OccupantDetails, value: string) => void;
+    updateOccupant: (index: number, field: keyof OccupantDetails, value: string | boolean) => void;
 
     // Pets helpers
     addPet: () => void;
     removePet: (index: number) => void;
-    updatePet: (index: number, field: keyof PetDetails, value: string) => void;
+    updatePet: (index: number, field: keyof PetDetails, value: string | boolean | File | null) => void;
 
-    // References helpers
+    // References helpers (legacy)
     addReference: (type?: 'landlord' | 'personal' | 'professional') => void;
     removeReference: (index: number) => void;
     updateReference: (index: number, field: keyof ReferenceDetails, value: string) => void;
+
+    // Co-signer helpers
+    addCoSigner: () => void;
+    removeCoSigner: (index: number) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateCoSigner: (index: number, field: keyof CoSignerDetails, value: any) => void;
+
+    // Guarantor helpers
+    addGuarantor: (forSignerType?: 'primary' | 'co_signer', forCoSignerIndex?: number | null) => void;
+    removeGuarantor: (index: number) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateGuarantor: (index: number, field: keyof GuarantorDetails, value: any) => void;
+
+    // Previous addresses helpers
+    addPreviousAddress: () => void;
+    removePreviousAddress: (index: number) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updatePreviousAddress: (index: number, field: keyof PreviousAddressDetails, value: any) => void;
+
+    // Landlord references helpers
+    addLandlordReference: () => void;
+    removeLandlordReference: (index: number) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateLandlordReference: (index: number, field: keyof LandlordReferenceDetails, value: any) => void;
+
+    // Other references helpers
+    addOtherReference: () => void;
+    removeOtherReference: (index: number) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateOtherReference: (index: number, field: keyof OtherReferenceDetails, value: any) => void;
 
     // Validation
     errors: Record<string, string>;
@@ -527,7 +971,18 @@ export function useApplicationWizard({
 
     // ===== Occupant Helpers =====
     const addOccupant = useCallback(() => {
-        const updated = [...wizard.data.occupants_details, { name: '', age: '', relationship: '', relationship_other: '' }];
+        const updated: OccupantDetails[] = [
+            ...wizard.data.occupants_details,
+            {
+                first_name: '',
+                last_name: '',
+                date_of_birth: '',
+                relationship: '',
+                relationship_other: '',
+                will_sign_lease: false,
+                is_dependent: false,
+            },
+        ];
         wizard.updateFields({
             occupants_details: updated,
             additional_occupants: updated.length,
@@ -546,7 +1001,7 @@ export function useApplicationWizard({
     );
 
     const updateOccupant = useCallback(
-        (index: number, field: keyof OccupantDetails, value: string) => {
+        (index: number, field: keyof OccupantDetails, value: string | boolean) => {
             const updated = [...wizard.data.occupants_details];
             updated[index] = { ...updated[index], [field]: value };
             wizard.updateField('occupants_details', updated);
@@ -557,10 +1012,19 @@ export function useApplicationWizard({
 
     // ===== Pet Helpers =====
     const addPet = useCallback(() => {
-        wizard.updateField('pets_details', [
-            ...wizard.data.pets_details,
-            { type: '', type_other: '', breed: '', age: '', weight: '', weight_unit: 'kg' },
-        ]);
+        const newPet: PetDetails = {
+            type: '',
+            type_other: '',
+            breed: '',
+            name: '',
+            age: '',
+            weight: '',
+            weight_unit: 'kg',
+            size: '',
+            is_registered_assistance_animal: false,
+            assistance_animal_documentation: null,
+        };
+        wizard.updateField('pets_details', [...wizard.data.pets_details, newPet]);
     }, [wizard]);
 
     const removePet = useCallback(
@@ -578,9 +1042,10 @@ export function useApplicationWizard({
     );
 
     const updatePet = useCallback(
-        (index: number, field: keyof PetDetails, value: string) => {
+        (index: number, field: keyof PetDetails, value: string | boolean | File | null) => {
             const updated = [...wizard.data.pets_details];
-            updated[index] = { ...updated[index], [field]: value };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            updated[index] = { ...updated[index], [field]: value as any };
             wizard.updateField('pets_details', updated);
             setTouchedFields((prev) => ({ ...prev, [`pet_${index}_${field}`]: true }));
         },
@@ -618,6 +1083,256 @@ export function useApplicationWizard({
         [wizard],
     );
 
+    // ===== Co-Signer Helpers =====
+    const addCoSigner = useCallback(() => {
+        const newCoSigner: CoSignerDetails = {
+            occupant_index: -1,
+            // Identity
+            first_name: '',
+            last_name: '',
+            email: '',
+            phone_country_code: '+31',
+            phone_number: '',
+            date_of_birth: '',
+            nationality: '',
+            relationship: '',
+            relationship_other: '',
+            // ID Document
+            id_document_type: '',
+            id_number: '',
+            id_issuing_country: '',
+            id_expiry_date: '',
+            id_document_front: null,
+            id_document_back: null,
+            // Immigration
+            immigration_status: '',
+            visa_type: '',
+            visa_expiry_date: '',
+            // Financial
+            employment_status: '',
+            employment_status_other: '',
+            employer_name: '',
+            job_title: '',
+            employment_type: '',
+            employment_start_date: '',
+            net_monthly_income: '',
+            income_currency: 'eur',
+            employment_contract: null,
+            payslips: [],
+            // Student
+            university_name: '',
+            enrollment_proof: null,
+            student_income_source: '',
+            student_monthly_income: '',
+            // Other
+            income_source: '',
+            income_proof: null,
+        };
+        wizard.updateField('co_signers', [...wizard.data.co_signers, newCoSigner]);
+    }, [wizard]);
+
+    const removeCoSigner = useCallback(
+        (index: number) => {
+            wizard.updateField(
+                'co_signers',
+                wizard.data.co_signers.filter((_, i) => i !== index),
+            );
+        },
+        [wizard],
+    );
+
+    const updateCoSigner = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (index: number, field: keyof CoSignerDetails, value: any) => {
+            const updated = [...wizard.data.co_signers];
+            updated[index] = { ...updated[index], [field]: value };
+            wizard.updateField('co_signers', updated);
+            setTouchedFields((prev) => ({ ...prev, [`cosigner_${index}_${field}`]: true }));
+        },
+        [wizard],
+    );
+
+    // ===== Guarantor Helpers =====
+    const addGuarantor = useCallback(
+        (forSignerType: 'primary' | 'co_signer' = 'primary', forCoSignerIndex: number | null = null) => {
+            const newGuarantor: GuarantorDetails = {
+                for_signer_type: forSignerType,
+                for_co_signer_index: forCoSignerIndex,
+                // Identity
+                first_name: '',
+                last_name: '',
+                email: '',
+                phone_country_code: '+31',
+                phone_number: '',
+                date_of_birth: '',
+                nationality: '',
+                relationship: '',
+                relationship_other: '',
+                // ID Document
+                id_document_type: '',
+                id_number: '',
+                id_issuing_country: '',
+                id_expiry_date: '',
+                id_document_front: null,
+                id_document_back: null,
+                // Address
+                street_address: '',
+                city: '',
+                state_province: '',
+                postal_code: '',
+                country: '',
+                years_at_address: '',
+                proof_of_residence: null,
+                // Financial
+                employment_status: '',
+                employer_name: '',
+                job_title: '',
+                net_monthly_income: '',
+                income_currency: 'eur',
+                proof_of_income: null,
+                credit_report: null,
+                // Consent
+                consent_to_credit_check: false,
+                consent_to_contact: false,
+                guarantee_consent_signed: false,
+            };
+            wizard.updateField('guarantors', [...wizard.data.guarantors, newGuarantor]);
+        },
+        [wizard],
+    );
+
+    const removeGuarantor = useCallback(
+        (index: number) => {
+            wizard.updateField(
+                'guarantors',
+                wizard.data.guarantors.filter((_, i) => i !== index),
+            );
+        },
+        [wizard],
+    );
+
+    const updateGuarantor = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (index: number, field: keyof GuarantorDetails, value: any) => {
+            const updated = [...wizard.data.guarantors];
+            updated[index] = { ...updated[index], [field]: value };
+            wizard.updateField('guarantors', updated);
+            setTouchedFields((prev) => ({ ...prev, [`guarantor_${index}_${field}`]: true }));
+        },
+        [wizard],
+    );
+
+    // ===== Previous Address Helpers =====
+    const addPreviousAddress = useCallback(() => {
+        const newAddress: PreviousAddressDetails = {
+            street: '',
+            city: '',
+            state_province: '',
+            postal_code: '',
+            country: '',
+            from_date: '',
+            to_date: '',
+            living_situation: '',
+            monthly_rent: '',
+            landlord_name: '',
+            landlord_contact: '',
+            can_contact_landlord: true,
+        };
+        wizard.updateField('previous_addresses', [...wizard.data.previous_addresses, newAddress]);
+    }, [wizard]);
+
+    const removePreviousAddress = useCallback(
+        (index: number) => {
+            wizard.updateField(
+                'previous_addresses',
+                wizard.data.previous_addresses.filter((_, i) => i !== index),
+            );
+        },
+        [wizard],
+    );
+
+    const updatePreviousAddress = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (index: number, field: keyof PreviousAddressDetails, value: any) => {
+            const updated = [...wizard.data.previous_addresses];
+            updated[index] = { ...updated[index], [field]: value };
+            wizard.updateField('previous_addresses', updated);
+            setTouchedFields((prev) => ({ ...prev, [`prevaddr_${index}_${field}`]: true }));
+        },
+        [wizard],
+    );
+
+    // ===== Landlord Reference Helpers =====
+    const addLandlordReference = useCallback(() => {
+        const newRef: LandlordReferenceDetails = {
+            name: '',
+            company: '',
+            email: '',
+            phone: '',
+            property_address: '',
+            tenancy_start_date: '',
+            tenancy_end_date: '',
+            monthly_rent_paid: '',
+            consent_to_contact: true,
+        };
+        wizard.updateField('landlord_references', [...wizard.data.landlord_references, newRef]);
+    }, [wizard]);
+
+    const removeLandlordReference = useCallback(
+        (index: number) => {
+            wizard.updateField(
+                'landlord_references',
+                wizard.data.landlord_references.filter((_, i) => i !== index),
+            );
+        },
+        [wizard],
+    );
+
+    const updateLandlordReference = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (index: number, field: keyof LandlordReferenceDetails, value: any) => {
+            const updated = [...wizard.data.landlord_references];
+            updated[index] = { ...updated[index], [field]: value };
+            wizard.updateField('landlord_references', updated);
+            setTouchedFields((prev) => ({ ...prev, [`landlordref_${index}_${field}`]: true }));
+        },
+        [wizard],
+    );
+
+    // ===== Other Reference Helpers =====
+    const addOtherReference = useCallback(() => {
+        const newRef: OtherReferenceDetails = {
+            name: '',
+            email: '',
+            phone: '',
+            relationship: '',
+            years_known: '',
+            consent_to_contact: true,
+        };
+        wizard.updateField('other_references', [...wizard.data.other_references, newRef]);
+    }, [wizard]);
+
+    const removeOtherReference = useCallback(
+        (index: number) => {
+            wizard.updateField(
+                'other_references',
+                wizard.data.other_references.filter((_, i) => i !== index),
+            );
+        },
+        [wizard],
+    );
+
+    const updateOtherReference = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (index: number, field: keyof OtherReferenceDetails, value: any) => {
+            const updated = [...wizard.data.other_references];
+            updated[index] = { ...updated[index], [field]: value };
+            wizard.updateField('other_references', updated);
+            setTouchedFields((prev) => ({ ...prev, [`otherref_${index}_${field}`]: true }));
+        },
+        [wizard],
+    );
+
     // ===== Touched Fields =====
     const markFieldTouched = useCallback((field: string) => {
         setTouchedFields((prev) => ({ ...prev, [field]: true }));
@@ -626,7 +1341,7 @@ export function useApplicationWizard({
     const markAllCurrentStepFieldsTouched = useCallback(() => {
         const newTouched: Record<string, boolean> = { ...touchedFields };
 
-        if (wizard.currentStep === 'personal') {
+        if (wizard.currentStep === 'identity') {
             newTouched.profile_date_of_birth = true;
             newTouched.profile_nationality = true;
             newTouched.profile_phone_number = true;
@@ -641,7 +1356,7 @@ export function useApplicationWizard({
             newTouched.profile_id_document_back = true;
         }
 
-        if (wizard.currentStep === 'employment') {
+        if (wizard.currentStep === 'financial') {
             newTouched.profile_employment_status = true;
 
             const isEmployed = wizard.data.profile_employment_status === 'employed' || wizard.data.profile_employment_status === 'self_employed';
@@ -721,7 +1436,7 @@ export function useApplicationWizard({
             }
         }
 
-        if (wizard.currentStep === 'details') {
+        if (wizard.currentStep === 'household') {
             newTouched.desired_move_in_date = true;
             newTouched.lease_duration_months = true;
 
@@ -744,7 +1459,7 @@ export function useApplicationWizard({
             }
         }
 
-        if (wizard.currentStep === 'references') {
+        if (wizard.currentStep === 'history') {
             wizard.data.references.forEach((_, index) => {
                 newTouched[`ref_${index}_name`] = true;
                 newTouched[`ref_${index}_phone`] = true;
@@ -772,7 +1487,7 @@ export function useApplicationWizard({
     const submit = useCallback(() => {
         if (!validateForSubmit()) {
             // Find first step with errors and navigate to it
-            const stepIds: ApplicationStep[] = ['personal', 'employment', 'details', 'references', 'emergency'];
+            const stepIds: ApplicationStep[] = ['identity', 'household', 'financial', 'risk', 'history', 'additional', 'consent'];
             for (const stepId of stepIds) {
                 const result = validateApplicationStep(
                     stepId as ApplicationStepId,
@@ -817,9 +1532,21 @@ export function useApplicationWizard({
             if (key === 'has_pets') {
                 if (value && wizard.data.pets_details.length === 0) {
                     // Add mandatory first pet when checking "I have pets"
+                    const newPet: PetDetails = {
+                        type: '',
+                        type_other: '',
+                        breed: '',
+                        name: '',
+                        age: '',
+                        weight: '',
+                        weight_unit: 'kg',
+                        size: '',
+                        is_registered_assistance_animal: false,
+                        assistance_animal_documentation: null,
+                    };
                     wizard.updateFields({
                         [key]: value,
-                        pets_details: [{ type: '', type_other: '', breed: '', age: '', weight: '', weight_unit: 'kg' }],
+                        pets_details: [newPet],
                     } as Partial<ApplicationWizardData>);
                     return;
                 } else if (!value) {
@@ -877,6 +1604,31 @@ export function useApplicationWizard({
         addReference,
         removeReference,
         updateReference,
+
+        // Co-signer helpers
+        addCoSigner,
+        removeCoSigner,
+        updateCoSigner,
+
+        // Guarantor helpers
+        addGuarantor,
+        removeGuarantor,
+        updateGuarantor,
+
+        // Previous addresses helpers
+        addPreviousAddress,
+        removePreviousAddress,
+        updatePreviousAddress,
+
+        // Landlord references helpers
+        addLandlordReference,
+        removeLandlordReference,
+        updateLandlordReference,
+
+        // Other references helpers
+        addOtherReference,
+        removeOtherReference,
+        updateOtherReference,
 
         // Validation
         errors: wizard.errors,
