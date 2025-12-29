@@ -101,16 +101,35 @@ export interface TenantProfile {
     expected_graduation_date?: string;
     student_income_source?: string;
 
-    // Guarantor
+    // Guarantor - Basic Info
     has_guarantor: boolean;
-    guarantor_name?: string;
+    guarantor_first_name?: string;
+    guarantor_last_name?: string;
     guarantor_relationship?: string;
-    guarantor_phone?: string;
+    guarantor_relationship_other?: string;
+    guarantor_phone_country_code?: string;
+    guarantor_phone_number?: string;
     guarantor_email?: string;
-    guarantor_address?: string;
-    guarantor_employer?: string;
+    guarantor_street_name?: string;
+    guarantor_house_number?: string;
+    guarantor_address_line_2?: string;
+    guarantor_city?: string;
+    guarantor_state_province?: string;
+    guarantor_postal_code?: string;
+    guarantor_country?: string;
+    // Guarantor - Employment
+    guarantor_employment_status?: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired';
+    guarantor_employer_name?: string;
+    guarantor_job_title?: string;
+    guarantor_employment_type?: 'full_time' | 'part_time' | 'contract' | 'temporary';
+    guarantor_employment_start_date?: string;
     guarantor_monthly_income?: number;
     guarantor_income_currency?: string;
+    // Guarantor - Student Info
+    guarantor_university_name?: string;
+    guarantor_program_of_study?: string;
+    guarantor_expected_graduation_date?: string;
+    guarantor_student_income_source?: string;
 
     // Documents
     id_document_front_path?: string;
@@ -129,10 +148,25 @@ export interface TenantProfile {
     student_proof_original_name?: string;
     other_income_proof_path?: string;
     other_income_proof_original_name?: string;
-    guarantor_id_path?: string;
-    guarantor_id_original_name?: string;
+    // Guarantor Documents
+    guarantor_id_front_path?: string;
+    guarantor_id_front_original_name?: string;
+    guarantor_id_back_path?: string;
+    guarantor_id_back_original_name?: string;
     guarantor_proof_income_path?: string;
     guarantor_proof_income_original_name?: string;
+    guarantor_employment_contract_path?: string;
+    guarantor_employment_contract_original_name?: string;
+    guarantor_payslip_1_path?: string;
+    guarantor_payslip_1_original_name?: string;
+    guarantor_payslip_2_path?: string;
+    guarantor_payslip_2_original_name?: string;
+    guarantor_payslip_3_path?: string;
+    guarantor_payslip_3_original_name?: string;
+    guarantor_student_proof_path?: string;
+    guarantor_student_proof_original_name?: string;
+    guarantor_other_income_proof_path?: string;
+    guarantor_other_income_proof_original_name?: string;
     reference_letter_path?: string;
     reference_letter_original_name?: string;
     profile_picture_path?: string;
@@ -169,8 +203,17 @@ export interface TenantProfile {
     payslip_3_url?: string;
     student_proof_url?: string;
     other_income_proof_url?: string;
-    guarantor_id_url?: string;
+    // Guarantor computed URLs
+    guarantor_full_name?: string;
+    guarantor_id_front_url?: string;
+    guarantor_id_back_url?: string;
     guarantor_proof_income_url?: string;
+    guarantor_employment_contract_url?: string;
+    guarantor_payslip_1_url?: string;
+    guarantor_payslip_2_url?: string;
+    guarantor_payslip_3_url?: string;
+    guarantor_student_proof_url?: string;
+    guarantor_other_income_proof_url?: string;
     documents_metadata?: Record<string, { size?: number; lastModified?: number } | null>;
 }
 

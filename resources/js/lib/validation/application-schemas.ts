@@ -80,20 +80,90 @@ export const APPLICATION_MESSAGES = {
     profile_student_proof: {
         required: 'Proof of student status is required',
     },
-    profile_guarantor_name: {
-        required: 'Guarantor name is required',
+    // Guarantor - Basic Info
+    profile_guarantor_first_name: {
+        required: 'Guarantor first name is required',
+    },
+    profile_guarantor_last_name: {
+        required: 'Guarantor last name is required',
     },
     profile_guarantor_relationship: {
         required: 'Guarantor relationship is required',
+    },
+    profile_guarantor_relationship_other: {
+        required: 'Please specify the relationship',
+    },
+    profile_guarantor_phone_number: {
+        required: 'Guarantor phone number is required',
+        invalid: 'Please enter a valid phone number',
+    },
+    profile_guarantor_email: {
+        required: 'Guarantor email is required',
+        invalid: 'Please enter a valid email address',
+    },
+    profile_guarantor_street_name: {
+        required: 'Street name is required',
+    },
+    profile_guarantor_house_number: {
+        required: 'House number is required',
+    },
+    profile_guarantor_city: {
+        required: 'City is required',
+    },
+    profile_guarantor_postal_code: {
+        required: 'Postal code is required',
+        invalid: 'Invalid postal code format for selected country',
+    },
+    profile_guarantor_country: {
+        required: 'Country is required',
+    },
+    profile_guarantor_state_province: {
+        required: 'State/Province is required for this country',
+    },
+    // Guarantor - Employment
+    profile_guarantor_employment_status: {
+        required: 'Guarantor employment status is required',
+    },
+    profile_guarantor_employer_name: {
+        required: 'Guarantor employer is required',
+    },
+    profile_guarantor_job_title: {
+        required: 'Guarantor job title is required',
+    },
+    profile_guarantor_employment_type: {
+        required: 'Employment type is required',
+    },
+    profile_guarantor_employment_start_date: {
+        required: 'Employment start date is required',
     },
     profile_guarantor_monthly_income: {
         required: 'Guarantor income is required',
         min: 'Income must be a positive number',
     },
-    profile_guarantor_id: {
-        required: 'Guarantor ID document is required',
+    // Guarantor - Student
+    profile_guarantor_university_name: {
+        required: 'University name is required',
     },
-    profile_guarantor_proof_income: {
+    profile_guarantor_program_of_study: {
+        required: 'Program of study is required',
+    },
+    // Guarantor - Documents
+    profile_guarantor_id_front: {
+        required: 'Guarantor ID document (front) is required',
+    },
+    profile_guarantor_id_back: {
+        required: 'Guarantor ID document (back) is required',
+    },
+    profile_guarantor_employment_contract: {
+        required: 'Guarantor employment contract is required',
+    },
+    profile_guarantor_payslip: {
+        required: 'Guarantor payslip is required',
+    },
+    profile_guarantor_student_proof: {
+        required: 'Guarantor student proof is required',
+    },
+    profile_guarantor_other_income_proof: {
         required: 'Guarantor proof of income is required',
     },
     profile_other_income_proof: {
@@ -178,6 +248,7 @@ export const APPLICATION_MESSAGES = {
 // ===== Existing Documents Context =====
 // Used to check if documents already exist in tenant profile
 export interface ExistingDocumentsContext {
+    // Main tenant documents
     id_document_front?: boolean;
     id_document_back?: boolean;
     employment_contract?: boolean;
@@ -186,8 +257,16 @@ export interface ExistingDocumentsContext {
     payslip_3?: boolean;
     student_proof?: boolean;
     other_income_proof?: boolean;
-    guarantor_id?: boolean;
+    // Guarantor documents
+    guarantor_id_front?: boolean;
+    guarantor_id_back?: boolean;
     guarantor_proof_income?: boolean;
+    guarantor_employment_contract?: boolean;
+    guarantor_payslip_1?: boolean;
+    guarantor_payslip_2?: boolean;
+    guarantor_payslip_3?: boolean;
+    guarantor_student_proof?: boolean;
+    guarantor_other_income_proof?: boolean;
 }
 
 // ===== Shared Sub-Schemas =====
@@ -369,13 +448,34 @@ const employmentBaseSchema = z.object({
     profile_expected_graduation_date: z.string(),
     profile_student_income_source: z.string(),
     profile_has_guarantor: z.boolean(),
-    profile_guarantor_name: z.string(),
+    // Guarantor - Basic Info
+    profile_guarantor_first_name: z.string(),
+    profile_guarantor_last_name: z.string(),
     profile_guarantor_relationship: z.string(),
-    profile_guarantor_phone: z.string(),
+    profile_guarantor_relationship_other: z.string(),
+    profile_guarantor_phone_country_code: z.string(),
+    profile_guarantor_phone_number: z.string(),
     profile_guarantor_email: z.string(),
-    profile_guarantor_address: z.string(),
-    profile_guarantor_employer: z.string(),
+    profile_guarantor_street_name: z.string(),
+    profile_guarantor_house_number: z.string(),
+    profile_guarantor_address_line_2: z.string(),
+    profile_guarantor_city: z.string(),
+    profile_guarantor_state_province: z.string(),
+    profile_guarantor_postal_code: z.string(),
+    profile_guarantor_country: z.string(),
+    // Guarantor - Employment
+    profile_guarantor_employment_status: z.string(),
+    profile_guarantor_employer_name: z.string(),
+    profile_guarantor_job_title: z.string(),
+    profile_guarantor_employment_type: z.string(),
+    profile_guarantor_employment_start_date: z.string(),
     profile_guarantor_monthly_income: z.string(),
+    profile_guarantor_income_currency: z.string(),
+    // Guarantor - Student Info
+    profile_guarantor_university_name: z.string(),
+    profile_guarantor_program_of_study: z.string(),
+    profile_guarantor_expected_graduation_date: z.string(),
+    profile_guarantor_student_income_source: z.string(),
     // Documents are validated as Files
     profile_id_document_front: z.any().nullable(),
     profile_id_document_back: z.any().nullable(),
@@ -385,8 +485,16 @@ const employmentBaseSchema = z.object({
     profile_payslip_3: z.any().nullable(),
     profile_student_proof: z.any().nullable(),
     profile_other_income_proof: z.any().nullable(),
-    profile_guarantor_id: z.any().nullable(),
+    // Guarantor Documents
+    profile_guarantor_id_front: z.any().nullable(),
+    profile_guarantor_id_back: z.any().nullable(),
     profile_guarantor_proof_income: z.any().nullable(),
+    profile_guarantor_employment_contract: z.any().nullable(),
+    profile_guarantor_payslip_1: z.any().nullable(),
+    profile_guarantor_payslip_2: z.any().nullable(),
+    profile_guarantor_payslip_3: z.any().nullable(),
+    profile_guarantor_student_proof: z.any().nullable(),
+    profile_guarantor_other_income_proof: z.any().nullable(),
 });
 
 // Factory function that creates employment schema with existing docs context
@@ -510,15 +618,30 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
             }
         }
 
-        // Guarantor validations
+        // Guarantor validations - all fields mandatory when guarantor is enabled
         if (hasGuarantor) {
-            if (!data.profile_guarantor_name?.trim()) {
+            const guarantorStatus = data.profile_guarantor_employment_status;
+            const isGuarantorEmployed = guarantorStatus === 'employed' || guarantorStatus === 'self_employed';
+            const isGuarantorStudent = guarantorStatus === 'student';
+            const isGuarantorUnemployedOrRetired = guarantorStatus === 'unemployed' || guarantorStatus === 'retired';
+
+            // First name
+            if (!data.profile_guarantor_first_name?.trim()) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_name.required,
-                    path: ['profile_guarantor_name'],
+                    message: APPLICATION_MESSAGES.profile_guarantor_first_name.required,
+                    path: ['profile_guarantor_first_name'],
                 });
             }
+            // Last name
+            if (!data.profile_guarantor_last_name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_last_name.required,
+                    path: ['profile_guarantor_last_name'],
+                });
+            }
+            // Relationship
             if (!data.profile_guarantor_relationship?.trim()) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -526,6 +649,111 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
                     path: ['profile_guarantor_relationship'],
                 });
             }
+            // Relationship "Other" - require specification
+            if (data.profile_guarantor_relationship === 'Other' && !data.profile_guarantor_relationship_other?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_relationship_other.required,
+                    path: ['profile_guarantor_relationship_other'],
+                });
+            }
+            // Phone
+            if (!data.profile_guarantor_phone_number?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_phone_number.required,
+                    path: ['profile_guarantor_phone_number'],
+                });
+            } else if (data.profile_guarantor_phone_country_code) {
+                if (!validatePhoneNumber(data.profile_guarantor_phone_number, data.profile_guarantor_phone_country_code)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_phone_number.invalid,
+                        path: ['profile_guarantor_phone_number'],
+                    });
+                }
+            }
+            // Email
+            if (!data.profile_guarantor_email?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_email.required,
+                    path: ['profile_guarantor_email'],
+                });
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.profile_guarantor_email)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_email.invalid,
+                    path: ['profile_guarantor_email'],
+                });
+            }
+            // Address - Street name
+            if (!data.profile_guarantor_street_name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_street_name.required,
+                    path: ['profile_guarantor_street_name'],
+                });
+            }
+            // Address - House number
+            if (!data.profile_guarantor_house_number?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_house_number.required,
+                    path: ['profile_guarantor_house_number'],
+                });
+            }
+            // Address - City
+            if (!data.profile_guarantor_city?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_city.required,
+                    path: ['profile_guarantor_city'],
+                });
+            }
+            // Address - Country
+            if (!data.profile_guarantor_country?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_country.required,
+                    path: ['profile_guarantor_country'],
+                });
+            }
+            // Address - Postal code
+            if (!data.profile_guarantor_postal_code?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_postal_code.required,
+                    path: ['profile_guarantor_postal_code'],
+                });
+            } else if (data.profile_guarantor_country) {
+                if (!validatePostalCode(data.profile_guarantor_postal_code, data.profile_guarantor_country)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_postal_code.invalid,
+                        path: ['profile_guarantor_postal_code'],
+                    });
+                }
+            }
+            // Address - State/Province (required for certain countries)
+            if (data.profile_guarantor_country && requiresStateProvince(data.profile_guarantor_country)) {
+                if (!data.profile_guarantor_state_province?.trim()) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_state_province.required,
+                        path: ['profile_guarantor_state_province'],
+                    });
+                }
+            }
+            // Employment status (always required for guarantor)
+            if (!guarantorStatus) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_guarantor_employment_status.required,
+                    path: ['profile_guarantor_employment_status'],
+                });
+            }
+            // Monthly income (always required)
             if (!data.profile_guarantor_monthly_income) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -533,19 +761,117 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
                     path: ['profile_guarantor_monthly_income'],
                 });
             }
-            if (!data.profile_guarantor_id && !existingDocs.guarantor_id) {
+            // ID Documents (always required for guarantor)
+            if (!data.profile_guarantor_id_front && !existingDocs.guarantor_id_front) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_id.required,
-                    path: ['profile_guarantor_id'],
+                    message: APPLICATION_MESSAGES.profile_guarantor_id_front.required,
+                    path: ['profile_guarantor_id_front'],
                 });
             }
-            if (!data.profile_guarantor_proof_income && !existingDocs.guarantor_proof_income) {
+            if (!data.profile_guarantor_id_back && !existingDocs.guarantor_id_back) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_proof_income.required,
-                    path: ['profile_guarantor_proof_income'],
+                    message: APPLICATION_MESSAGES.profile_guarantor_id_back.required,
+                    path: ['profile_guarantor_id_back'],
                 });
+            }
+
+            // Employed/Self-employed specific validations
+            if (isGuarantorEmployed) {
+                if (!data.profile_guarantor_employer_name?.trim()) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_employer_name.required,
+                        path: ['profile_guarantor_employer_name'],
+                    });
+                }
+                if (!data.profile_guarantor_job_title?.trim()) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_job_title.required,
+                        path: ['profile_guarantor_job_title'],
+                    });
+                }
+                if (!data.profile_guarantor_employment_type?.trim()) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_employment_type.required,
+                        path: ['profile_guarantor_employment_type'],
+                    });
+                }
+                if (!data.profile_guarantor_employment_start_date?.trim()) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_employment_start_date.required,
+                        path: ['profile_guarantor_employment_start_date'],
+                    });
+                }
+                // Employment documents
+                if (!data.profile_guarantor_employment_contract && !existingDocs.guarantor_employment_contract) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_employment_contract.required,
+                        path: ['profile_guarantor_employment_contract'],
+                    });
+                }
+                if (!data.profile_guarantor_payslip_1 && !existingDocs.guarantor_payslip_1) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_payslip.required,
+                        path: ['profile_guarantor_payslip_1'],
+                    });
+                }
+                if (!data.profile_guarantor_payslip_2 && !existingDocs.guarantor_payslip_2) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_payslip.required,
+                        path: ['profile_guarantor_payslip_2'],
+                    });
+                }
+                if (!data.profile_guarantor_payslip_3 && !existingDocs.guarantor_payslip_3) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_payslip.required,
+                        path: ['profile_guarantor_payslip_3'],
+                    });
+                }
+            }
+
+            // Student specific validations
+            if (isGuarantorStudent) {
+                if (!data.profile_guarantor_university_name?.trim()) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_university_name.required,
+                        path: ['profile_guarantor_university_name'],
+                    });
+                }
+                if (!data.profile_guarantor_program_of_study?.trim()) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_program_of_study.required,
+                        path: ['profile_guarantor_program_of_study'],
+                    });
+                }
+                if (!data.profile_guarantor_student_proof && !existingDocs.guarantor_student_proof) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_student_proof.required,
+                        path: ['profile_guarantor_student_proof'],
+                    });
+                }
+            }
+
+            // Unemployed/Retired specific validations
+            if (isGuarantorUnemployedOrRetired) {
+                if (!data.profile_guarantor_other_income_proof && !existingDocs.guarantor_other_income_proof) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_guarantor_other_income_proof.required,
+                        path: ['profile_guarantor_other_income_proof'],
+                    });
+                }
             }
         }
     });

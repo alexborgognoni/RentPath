@@ -35,6 +35,19 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
         return count === 1 ? parts[0].replace(':count', '1') : (parts[1] || parts[0]).replace(':count', String(count));
     };
 
+    const formatGuarantorAddress = () => {
+        const parts = [
+            data.profile_guarantor_house_number,
+            data.profile_guarantor_street_name,
+            data.profile_guarantor_address_line_2,
+            data.profile_guarantor_city,
+            data.profile_guarantor_state_province,
+            data.profile_guarantor_postal_code,
+            data.profile_guarantor_country ? tCountry(data.profile_guarantor_country) : null,
+        ].filter(Boolean);
+        return parts.length > 0 ? parts.join(', ') : undefined;
+    };
+
     const isEmployed = data.profile_employment_status === 'employed' || data.profile_employment_status === 'self_employed';
     const isStudent = data.profile_employment_status === 'student';
 
@@ -53,8 +66,8 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
         </div>
     );
 
-    const Field = ({ label, value }: { label: string; value: React.ReactNode }) => (
-        <div>
+    const Field = ({ label, value, className }: { label: string; value: React.ReactNode; className?: string }) => (
+        <div className={className}>
             <dt className="text-sm text-muted-foreground">{label}</dt>
             <dd className="font-medium">{value || t('notProvided')}</dd>
         </div>
@@ -177,9 +190,47 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                 {data.profile_has_guarantor && (
                     <div className="mt-4 border-t border-border pt-4">
                         <h4 className="mb-3 text-sm font-medium text-muted-foreground">{t('labels.guarantor')}</h4>
-                        <dl className="grid gap-4 md:grid-cols-3">
-                            <Field label={t('labels.name')} value={data.profile_guarantor_name} />
-                            <Field label={t('labels.relationship')} value={data.profile_guarantor_relationship} />
+                        <dl className="grid gap-4 md:grid-cols-2">
+                            <Field
+                                label={t('labels.name')}
+                                value={
+                                    data.profile_guarantor_first_name || data.profile_guarantor_last_name
+                                        ? `${data.profile_guarantor_first_name} ${data.profile_guarantor_last_name}`.trim()
+                                        : undefined
+                                }
+                            />
+                            <Field
+                                label={t('labels.relationship')}
+                                value={
+                                    data.profile_guarantor_relationship === 'Other' && data.profile_guarantor_relationship_other
+                                        ? `${data.profile_guarantor_relationship} (${data.profile_guarantor_relationship_other})`
+                                        : data.profile_guarantor_relationship
+                                }
+                            />
+                            <Field
+                                label={t('labels.phone')}
+                                value={
+                                    data.profile_guarantor_phone_number
+                                        ? `${data.profile_guarantor_phone_country_code} ${data.profile_guarantor_phone_number}`
+                                        : undefined
+                                }
+                            />
+                            <Field label={t('labels.email')} value={data.profile_guarantor_email} />
+                            <Field label={t('labels.address')} value={formatGuarantorAddress()} className="md:col-span-2" />
+                            <Field label={t('labels.employmentStatus')} value={data.profile_guarantor_employment_status} />
+                            {(data.profile_guarantor_employment_status === 'employed' ||
+                                data.profile_guarantor_employment_status === 'self_employed') && (
+                                <>
+                                    <Field label={t('labels.employer')} value={data.profile_guarantor_employer_name} />
+                                    <Field label={t('labels.jobTitle')} value={data.profile_guarantor_job_title} />
+                                </>
+                            )}
+                            {data.profile_guarantor_employment_status === 'student' && (
+                                <>
+                                    <Field label={t('labels.university')} value={data.profile_guarantor_university_name} />
+                                    <Field label={t('labels.program')} value={data.profile_guarantor_program_of_study} />
+                                </>
+                            )}
                             <Field
                                 label={t('labels.monthlyIncome')}
                                 value={formatCurrency(
@@ -189,8 +240,27 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                             />
                         </dl>
                         <div className="mt-3 flex flex-wrap gap-2">
-                            <DocumentBadge name={t('documentBadges.guarantorId')} exists={!!data.profile_guarantor_id} />
-                            <DocumentBadge name={t('documentBadges.guarantorIncomeProof')} exists={!!data.profile_guarantor_proof_income} />
+                            <DocumentBadge name={t('documentBadges.guarantorIdFront')} exists={!!data.profile_guarantor_id_front} />
+                            <DocumentBadge name={t('documentBadges.guarantorIdBack')} exists={!!data.profile_guarantor_id_back} />
+                            {(data.profile_guarantor_employment_status === 'employed' ||
+                                data.profile_guarantor_employment_status === 'self_employed') && (
+                                <>
+                                    <DocumentBadge
+                                        name={t('documentBadges.guarantorEmploymentContract')}
+                                        exists={!!data.profile_guarantor_employment_contract}
+                                    />
+                                    <DocumentBadge name={t('documentBadges.guarantorPayslip1')} exists={!!data.profile_guarantor_payslip_1} />
+                                    <DocumentBadge name={t('documentBadges.guarantorPayslip2')} exists={!!data.profile_guarantor_payslip_2} />
+                                    <DocumentBadge name={t('documentBadges.guarantorPayslip3')} exists={!!data.profile_guarantor_payslip_3} />
+                                </>
+                            )}
+                            {data.profile_guarantor_employment_status === 'student' && (
+                                <DocumentBadge name={t('documentBadges.guarantorStudentProof')} exists={!!data.profile_guarantor_student_proof} />
+                            )}
+                            {(data.profile_guarantor_employment_status === 'unemployed' ||
+                                data.profile_guarantor_employment_status === 'retired') && (
+                                <DocumentBadge name={t('documentBadges.guarantorIncomeProof')} exists={!!data.profile_guarantor_other_income_proof} />
+                            )}
                         </div>
                     </div>
                 )}

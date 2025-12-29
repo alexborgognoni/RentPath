@@ -112,14 +112,34 @@ export interface ApplicationWizardData {
     profile_expected_graduation_date: string;
     profile_student_income_source: string;
     profile_has_guarantor: boolean;
-    profile_guarantor_name: string;
+    // Guarantor - Basic Info
+    profile_guarantor_first_name: string;
+    profile_guarantor_last_name: string;
     profile_guarantor_relationship: string;
-    profile_guarantor_phone: string;
+    profile_guarantor_relationship_other: string;
+    profile_guarantor_phone_country_code: string;
+    profile_guarantor_phone_number: string;
     profile_guarantor_email: string;
-    profile_guarantor_address: string;
-    profile_guarantor_employer: string;
+    profile_guarantor_street_name: string;
+    profile_guarantor_house_number: string;
+    profile_guarantor_address_line_2: string;
+    profile_guarantor_city: string;
+    profile_guarantor_state_province: string;
+    profile_guarantor_postal_code: string;
+    profile_guarantor_country: string;
+    // Guarantor - Employment
+    profile_guarantor_employment_status: string;
+    profile_guarantor_employer_name: string;
+    profile_guarantor_job_title: string;
+    profile_guarantor_employment_type: string;
+    profile_guarantor_employment_start_date: string;
     profile_guarantor_monthly_income: string;
     profile_guarantor_income_currency: string;
+    // Guarantor - Student Info
+    profile_guarantor_university_name: string;
+    profile_guarantor_program_of_study: string;
+    profile_guarantor_expected_graduation_date: string;
+    profile_guarantor_student_income_source: string;
     // Profile documents
     profile_id_document_front: File | null;
     profile_id_document_back: File | null;
@@ -129,8 +149,16 @@ export interface ApplicationWizardData {
     profile_payslip_3: File | null;
     profile_student_proof: File | null;
     profile_other_income_proof: File | null;
-    profile_guarantor_id: File | null;
+    // Guarantor documents
+    profile_guarantor_id_front: File | null;
+    profile_guarantor_id_back: File | null;
     profile_guarantor_proof_income: File | null;
+    profile_guarantor_employment_contract: File | null;
+    profile_guarantor_payslip_1: File | null;
+    profile_guarantor_payslip_2: File | null;
+    profile_guarantor_payslip_3: File | null;
+    profile_guarantor_student_proof: File | null;
+    profile_guarantor_other_income_proof: File | null;
 
     // Step 3: Application Details
     desired_move_in_date: string;
@@ -226,14 +254,34 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_expected_graduation_date: formatDateForInput(tenantProfile?.expected_graduation_date),
         profile_student_income_source: tenantProfile?.student_income_source || '',
         profile_has_guarantor: tenantProfile?.has_guarantor ?? false,
-        profile_guarantor_name: tenantProfile?.guarantor_name || '',
+        // Guarantor - Basic Info
+        profile_guarantor_first_name: tenantProfile?.guarantor_first_name || '',
+        profile_guarantor_last_name: tenantProfile?.guarantor_last_name || '',
         profile_guarantor_relationship: tenantProfile?.guarantor_relationship || '',
-        profile_guarantor_phone: tenantProfile?.guarantor_phone || '',
+        profile_guarantor_relationship_other: tenantProfile?.guarantor_relationship_other || '',
+        profile_guarantor_phone_country_code: tenantProfile?.guarantor_phone_country_code || '+31',
+        profile_guarantor_phone_number: tenantProfile?.guarantor_phone_number || '',
         profile_guarantor_email: tenantProfile?.guarantor_email || '',
-        profile_guarantor_address: tenantProfile?.guarantor_address || '',
-        profile_guarantor_employer: tenantProfile?.guarantor_employer || '',
+        profile_guarantor_street_name: tenantProfile?.guarantor_street_name || '',
+        profile_guarantor_house_number: tenantProfile?.guarantor_house_number || '',
+        profile_guarantor_address_line_2: tenantProfile?.guarantor_address_line_2 || '',
+        profile_guarantor_city: tenantProfile?.guarantor_city || '',
+        profile_guarantor_state_province: tenantProfile?.guarantor_state_province || '',
+        profile_guarantor_postal_code: tenantProfile?.guarantor_postal_code || '',
+        profile_guarantor_country: tenantProfile?.guarantor_country || '',
+        // Guarantor - Employment
+        profile_guarantor_employment_status: tenantProfile?.guarantor_employment_status || '',
+        profile_guarantor_employer_name: tenantProfile?.guarantor_employer_name || '',
+        profile_guarantor_job_title: tenantProfile?.guarantor_job_title || '',
+        profile_guarantor_employment_type: tenantProfile?.guarantor_employment_type || '',
+        profile_guarantor_employment_start_date: formatDateForInput(tenantProfile?.guarantor_employment_start_date),
         profile_guarantor_monthly_income: tenantProfile?.guarantor_monthly_income?.toString() || '',
         profile_guarantor_income_currency: tenantProfile?.guarantor_income_currency || 'eur',
+        // Guarantor - Student Info
+        profile_guarantor_university_name: tenantProfile?.guarantor_university_name || '',
+        profile_guarantor_program_of_study: tenantProfile?.guarantor_program_of_study || '',
+        profile_guarantor_expected_graduation_date: formatDateForInput(tenantProfile?.guarantor_expected_graduation_date),
+        profile_guarantor_student_income_source: tenantProfile?.guarantor_student_income_source || '',
         // Profile documents (always start null - existing docs shown from tenantProfile)
         profile_id_document_front: null,
         profile_id_document_back: null,
@@ -243,8 +291,16 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_payslip_3: null,
         profile_student_proof: null,
         profile_other_income_proof: null,
-        profile_guarantor_id: null,
+        // Guarantor documents (always start null - existing docs shown from tenantProfile)
+        profile_guarantor_id_front: null,
+        profile_guarantor_id_back: null,
         profile_guarantor_proof_income: null,
+        profile_guarantor_employment_contract: null,
+        profile_guarantor_payslip_1: null,
+        profile_guarantor_payslip_2: null,
+        profile_guarantor_payslip_3: null,
+        profile_guarantor_student_proof: null,
+        profile_guarantor_other_income_proof: null,
 
         // Step 3: Application Details - from draft if resuming
         desired_move_in_date: draft?.desired_move_in_date ? formatDateForInput(draft.desired_move_in_date) : '',
@@ -371,6 +427,7 @@ export function useApplicationWizard({
 
     // Build existing documents context from tenant profile
     const existingDocsContext: ExistingDocumentsContext = {
+        // Main tenant documents
         id_document_front: !!tenantProfile?.id_document_front_path,
         id_document_back: !!tenantProfile?.id_document_back_path,
         employment_contract: !!tenantProfile?.employment_contract_path,
@@ -379,8 +436,16 @@ export function useApplicationWizard({
         payslip_3: !!tenantProfile?.payslip_3_path,
         student_proof: !!tenantProfile?.student_proof_path,
         other_income_proof: !!tenantProfile?.other_income_proof_path,
-        guarantor_id: !!tenantProfile?.guarantor_id_path,
+        // Guarantor documents
+        guarantor_id_front: !!tenantProfile?.guarantor_id_front_path,
+        guarantor_id_back: !!tenantProfile?.guarantor_id_back_path,
         guarantor_proof_income: !!tenantProfile?.guarantor_proof_income_path,
+        guarantor_employment_contract: !!tenantProfile?.guarantor_employment_contract_path,
+        guarantor_payslip_1: !!tenantProfile?.guarantor_payslip_1_path,
+        guarantor_payslip_2: !!tenantProfile?.guarantor_payslip_2_path,
+        guarantor_payslip_3: !!tenantProfile?.guarantor_payslip_3_path,
+        guarantor_student_proof: !!tenantProfile?.guarantor_student_proof_path,
+        guarantor_other_income_proof: !!tenantProfile?.guarantor_other_income_proof_path,
     };
 
     // Validation wrapper - passes existing docs context for employment step
@@ -607,11 +672,52 @@ export function useApplicationWizard({
             }
 
             if (wizard.data.profile_has_guarantor) {
-                newTouched.profile_guarantor_name = true;
+                const guarantorStatus = wizard.data.profile_guarantor_employment_status;
+                const isGuarantorEmployed = guarantorStatus === 'employed' || guarantorStatus === 'self_employed';
+                const isGuarantorStudent = guarantorStatus === 'student';
+                const isGuarantorUnemployedOrRetired = guarantorStatus === 'unemployed' || guarantorStatus === 'retired';
+
+                // Basic info
+                newTouched.profile_guarantor_first_name = true;
+                newTouched.profile_guarantor_last_name = true;
                 newTouched.profile_guarantor_relationship = true;
+                newTouched.profile_guarantor_relationship_other = true;
+                newTouched.profile_guarantor_phone_number = true;
+                newTouched.profile_guarantor_email = true;
+                newTouched.profile_guarantor_street_name = true;
+                newTouched.profile_guarantor_house_number = true;
+                newTouched.profile_guarantor_city = true;
+                newTouched.profile_guarantor_postal_code = true;
+                newTouched.profile_guarantor_country = true;
+                newTouched.profile_guarantor_state_province = true;
+                newTouched.profile_guarantor_employment_status = true;
                 newTouched.profile_guarantor_monthly_income = true;
-                newTouched.profile_guarantor_id = true;
-                newTouched.profile_guarantor_proof_income = true;
+                newTouched.profile_guarantor_id_front = true;
+                newTouched.profile_guarantor_id_back = true;
+
+                // Employed/Self-employed specific
+                if (isGuarantorEmployed) {
+                    newTouched.profile_guarantor_employer_name = true;
+                    newTouched.profile_guarantor_job_title = true;
+                    newTouched.profile_guarantor_employment_type = true;
+                    newTouched.profile_guarantor_employment_start_date = true;
+                    newTouched.profile_guarantor_employment_contract = true;
+                    newTouched.profile_guarantor_payslip_1 = true;
+                    newTouched.profile_guarantor_payslip_2 = true;
+                    newTouched.profile_guarantor_payslip_3 = true;
+                }
+
+                // Student specific
+                if (isGuarantorStudent) {
+                    newTouched.profile_guarantor_university_name = true;
+                    newTouched.profile_guarantor_program_of_study = true;
+                    newTouched.profile_guarantor_student_proof = true;
+                }
+
+                // Unemployed/Retired specific
+                if (isGuarantorUnemployedOrRetired) {
+                    newTouched.profile_guarantor_other_income_proof = true;
+                }
             }
         }
 

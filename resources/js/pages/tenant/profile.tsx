@@ -115,12 +115,28 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
         student_income_source: profile?.student_income_source || '',
         // Guarantor
         has_guarantor: profile?.has_guarantor || false,
-        guarantor_name: profile?.guarantor_name || '',
+        guarantor_first_name: profile?.guarantor_first_name || '',
+        guarantor_last_name: profile?.guarantor_last_name || '',
         guarantor_relationship: profile?.guarantor_relationship || '',
-        guarantor_phone: profile?.guarantor_phone || '',
+        guarantor_relationship_other: profile?.guarantor_relationship_other || '',
+        guarantor_phone_country_code: profile?.guarantor_phone_country_code || '',
+        guarantor_phone_number: profile?.guarantor_phone_number || '',
         guarantor_email: profile?.guarantor_email || '',
-        guarantor_address: profile?.guarantor_address || '',
-        guarantor_employer: profile?.guarantor_employer || '',
+        guarantor_street_name: profile?.guarantor_street_name || '',
+        guarantor_house_number: profile?.guarantor_house_number || '',
+        guarantor_address_line_2: profile?.guarantor_address_line_2 || '',
+        guarantor_city: profile?.guarantor_city || '',
+        guarantor_postal_code: profile?.guarantor_postal_code || '',
+        guarantor_country: profile?.guarantor_country || '',
+        guarantor_employment_status: profile?.guarantor_employment_status || '',
+        guarantor_employer_name: profile?.guarantor_employer_name || '',
+        guarantor_job_title: profile?.guarantor_job_title || '',
+        guarantor_employment_type: profile?.guarantor_employment_type || '',
+        guarantor_employment_start_date: profile?.guarantor_employment_start_date || '',
+        guarantor_university_name: profile?.guarantor_university_name || '',
+        guarantor_program_of_study: profile?.guarantor_program_of_study || '',
+        guarantor_expected_graduation_date: profile?.guarantor_expected_graduation_date || '',
+        guarantor_student_income_source: profile?.guarantor_student_income_source || '',
         guarantor_monthly_income: profile?.guarantor_monthly_income?.toString() || '',
         guarantor_income_currency: profile?.guarantor_income_currency || 'eur',
         // Emergency contact
@@ -185,7 +201,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                 icon: UserCheck,
                 isComplete: (p) => {
                     if (!p?.has_guarantor) return true;
-                    return !!(p?.guarantor_name && p?.guarantor_relationship);
+                    return !!(p?.guarantor_first_name && p?.guarantor_last_name && p?.guarantor_relationship);
                 },
                 isVisible: () => true,
             },
@@ -1117,12 +1133,23 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                                             <div className="grid gap-4 md:grid-cols-2">
                                                 <div>
                                                     <label className="mb-2 block text-sm font-medium">
-                                                        {tEdit('guarantor.name') || 'Guarantor Name'}
+                                                        {tEdit('guarantor.first_name') || 'First Name'}
                                                     </label>
                                                     <input
                                                         type="text"
-                                                        value={formData.guarantor_name}
-                                                        onChange={(e) => updateField('guarantor_name', e.target.value)}
+                                                        value={formData.guarantor_first_name}
+                                                        onChange={(e) => updateField('guarantor_first_name', e.target.value)}
+                                                        className={getInputClass()}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="mb-2 block text-sm font-medium">
+                                                        {tEdit('guarantor.last_name') || 'Last Name'}
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.guarantor_last_name}
+                                                        onChange={(e) => updateField('guarantor_last_name', e.target.value)}
                                                         className={getInputClass()}
                                                     />
                                                 </div>
@@ -1141,8 +1168,8 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                                                     <label className="mb-2 block text-sm font-medium">{tEdit('guarantor.phone') || 'Phone'}</label>
                                                     <input
                                                         type="tel"
-                                                        value={formData.guarantor_phone}
-                                                        onChange={(e) => updateField('guarantor_phone', e.target.value)}
+                                                        value={formData.guarantor_phone_number}
+                                                        onChange={(e) => updateField('guarantor_phone_number', e.target.value)}
                                                         className={getInputClass()}
                                                     />
                                                 </div>
@@ -1155,14 +1182,12 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                                                         className={getInputClass()}
                                                     />
                                                 </div>
-                                                <div className="md:col-span-2">
-                                                    <label className="mb-2 block text-sm font-medium">
-                                                        {tEdit('guarantor.address') || 'Address'}
-                                                    </label>
+                                                <div>
+                                                    <label className="mb-2 block text-sm font-medium">{tEdit('guarantor.city') || 'City'}</label>
                                                     <input
                                                         type="text"
-                                                        value={formData.guarantor_address}
-                                                        onChange={(e) => updateField('guarantor_address', e.target.value)}
+                                                        value={formData.guarantor_city}
+                                                        onChange={(e) => updateField('guarantor_city', e.target.value)}
                                                         className={getInputClass()}
                                                     />
                                                 </div>
@@ -1172,8 +1197,8 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                                                     </label>
                                                     <input
                                                         type="text"
-                                                        value={formData.guarantor_employer}
-                                                        onChange={(e) => updateField('guarantor_employer', e.target.value)}
+                                                        value={formData.guarantor_employer_name}
+                                                        onChange={(e) => updateField('guarantor_employer_name', e.target.value)}
                                                         className={getInputClass()}
                                                     />
                                                 </div>
@@ -1254,7 +1279,14 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                                 <div>
                                     {profile?.has_guarantor ? (
                                         <dl className="grid gap-4 md:grid-cols-3">
-                                            <DisplayField label={tEdit('guarantor.name') || 'Name'} value={profile?.guarantor_name} />
+                                            <DisplayField
+                                                label={tEdit('guarantor.name') || 'Name'}
+                                                value={
+                                                    profile?.guarantor_first_name || profile?.guarantor_last_name
+                                                        ? `${profile.guarantor_first_name || ''} ${profile.guarantor_last_name || ''}`.trim()
+                                                        : null
+                                                }
+                                            />
                                             <DisplayField
                                                 label={tEdit('guarantor.relationship') || 'Relationship'}
                                                 value={profile?.guarantor_relationship}

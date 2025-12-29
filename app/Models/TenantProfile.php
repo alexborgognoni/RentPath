@@ -50,16 +50,37 @@ class TenantProfile extends Model
         'expected_graduation_date',
         'student_income_source',
 
-        // Guarantor
+        // Guarantor - Basic Info
         'has_guarantor',
-        'guarantor_name',
+        'guarantor_first_name',
+        'guarantor_last_name',
         'guarantor_relationship',
-        'guarantor_phone',
+        'guarantor_relationship_other',
+        'guarantor_phone_country_code',
+        'guarantor_phone_number',
         'guarantor_email',
-        'guarantor_address',
-        'guarantor_employer',
+        'guarantor_street_name',
+        'guarantor_house_number',
+        'guarantor_address_line_2',
+        'guarantor_city',
+        'guarantor_state_province',
+        'guarantor_postal_code',
+        'guarantor_country',
+
+        // Guarantor - Employment
+        'guarantor_employment_status',
+        'guarantor_employer_name',
+        'guarantor_job_title',
+        'guarantor_employment_type',
+        'guarantor_employment_start_date',
         'guarantor_monthly_income',
         'guarantor_income_currency',
+
+        // Guarantor - Student Info
+        'guarantor_university_name',
+        'guarantor_program_of_study',
+        'guarantor_expected_graduation_date',
+        'guarantor_student_income_source',
 
         // Documents
         'id_document_front_path',
@@ -78,10 +99,26 @@ class TenantProfile extends Model
         'student_proof_original_name',
         'other_income_proof_path',
         'other_income_proof_original_name',
-        'guarantor_id_path',
-        'guarantor_id_original_name',
+
+        // Guarantor Documents
+        'guarantor_id_front_path',
+        'guarantor_id_front_original_name',
+        'guarantor_id_back_path',
+        'guarantor_id_back_original_name',
         'guarantor_proof_income_path',
         'guarantor_proof_income_original_name',
+        'guarantor_employment_contract_path',
+        'guarantor_employment_contract_original_name',
+        'guarantor_payslip_1_path',
+        'guarantor_payslip_1_original_name',
+        'guarantor_payslip_2_path',
+        'guarantor_payslip_2_original_name',
+        'guarantor_payslip_3_path',
+        'guarantor_payslip_3_original_name',
+        'guarantor_student_proof_path',
+        'guarantor_student_proof_original_name',
+        'guarantor_other_income_proof_path',
+        'guarantor_other_income_proof_original_name',
         'reference_letter_path',
         'reference_letter_original_name',
         'profile_picture_path',
@@ -116,6 +153,8 @@ class TenantProfile extends Model
         'expected_graduation_date' => 'date',
         'monthly_income' => 'decimal:2',
         'guarantor_monthly_income' => 'decimal:2',
+        'guarantor_employment_start_date' => 'date',
+        'guarantor_expected_graduation_date' => 'date',
         'has_guarantor' => 'boolean',
         'has_pets' => 'boolean',
         'is_smoker' => 'boolean',
@@ -142,8 +181,16 @@ class TenantProfile extends Model
         'payslip_3_url',
         'student_proof_url',
         'other_income_proof_url',
-        'guarantor_id_url',
+        'guarantor_full_name',
+        'guarantor_id_front_url',
+        'guarantor_id_back_url',
         'guarantor_proof_income_url',
+        'guarantor_employment_contract_url',
+        'guarantor_payslip_1_url',
+        'guarantor_payslip_2_url',
+        'guarantor_payslip_3_url',
+        'guarantor_student_proof_url',
+        'guarantor_other_income_proof_url',
         'documents_metadata',
     ];
 
@@ -253,6 +300,36 @@ class TenantProfile extends Model
     }
 
     /**
+     * Get the full guarantor address as a string.
+     */
+    public function getFullGuarantorAddressAttribute(): string
+    {
+        $parts = array_filter([
+            $this->guarantor_house_number,
+            $this->guarantor_street_name,
+            $this->guarantor_address_line_2,
+            $this->guarantor_city,
+            $this->guarantor_state_province,
+            $this->guarantor_postal_code,
+            $this->guarantor_country,
+        ]);
+
+        return implode(', ', $parts);
+    }
+
+    /**
+     * Get the full guarantor phone number as a string.
+     */
+    public function getFullGuarantorPhoneAttribute(): string
+    {
+        if (! $this->guarantor_phone_country_code || ! $this->guarantor_phone_number) {
+            return '';
+        }
+
+        return $this->guarantor_phone_country_code.' '.$this->guarantor_phone_number;
+    }
+
+    /**
      * Get the URL for the profile picture.
      */
     public function getProfilePictureUrlAttribute(): ?string
@@ -326,11 +403,79 @@ class TenantProfile extends Model
     }
 
     /**
-     * Get the URL for guarantor ID (5-minute signed URL).
+     * Get the guarantor's full name (first + last).
      */
-    public function getGuarantorIdUrlAttribute(): ?string
+    public function getGuarantorFullNameAttribute(): ?string
     {
-        return \App\Helpers\StorageHelper::url($this->guarantor_id_path, 'private', 5, $this->guarantor_id_original_name);
+        if (! $this->guarantor_first_name && ! $this->guarantor_last_name) {
+            return null;
+        }
+
+        return trim($this->guarantor_first_name.' '.$this->guarantor_last_name);
+    }
+
+    /**
+     * Get the URL for guarantor ID front (5-minute signed URL).
+     */
+    public function getGuarantorIdFrontUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->guarantor_id_front_path, 'private', 5, $this->guarantor_id_front_original_name);
+    }
+
+    /**
+     * Get the URL for guarantor ID back (5-minute signed URL).
+     */
+    public function getGuarantorIdBackUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->guarantor_id_back_path, 'private', 5, $this->guarantor_id_back_original_name);
+    }
+
+    /**
+     * Get the URL for guarantor employment contract (5-minute signed URL).
+     */
+    public function getGuarantorEmploymentContractUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->guarantor_employment_contract_path, 'private', 5, $this->guarantor_employment_contract_original_name);
+    }
+
+    /**
+     * Get the URL for guarantor payslip 1 (5-minute signed URL).
+     */
+    public function getGuarantorPayslip1UrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->guarantor_payslip_1_path, 'private', 5, $this->guarantor_payslip_1_original_name);
+    }
+
+    /**
+     * Get the URL for guarantor payslip 2 (5-minute signed URL).
+     */
+    public function getGuarantorPayslip2UrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->guarantor_payslip_2_path, 'private', 5, $this->guarantor_payslip_2_original_name);
+    }
+
+    /**
+     * Get the URL for guarantor payslip 3 (5-minute signed URL).
+     */
+    public function getGuarantorPayslip3UrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->guarantor_payslip_3_path, 'private', 5, $this->guarantor_payslip_3_original_name);
+    }
+
+    /**
+     * Get the URL for guarantor student proof (5-minute signed URL).
+     */
+    public function getGuarantorStudentProofUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->guarantor_student_proof_path, 'private', 5, $this->guarantor_student_proof_original_name);
+    }
+
+    /**
+     * Get the URL for guarantor other income proof (5-minute signed URL).
+     */
+    public function getGuarantorOtherIncomeProofUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->guarantor_other_income_proof_path, 'private', 5, $this->guarantor_other_income_proof_original_name);
     }
 
     /**
@@ -358,6 +503,7 @@ class TenantProfile extends Model
     public function getDocumentsMetadataAttribute(): array
     {
         $documents = [
+            // Main tenant documents
             'id_document_front' => $this->id_document_front_path,
             'id_document_back' => $this->id_document_back_path,
             'employment_contract' => $this->employment_contract_path,
@@ -366,9 +512,17 @@ class TenantProfile extends Model
             'payslip_3' => $this->payslip_3_path,
             'student_proof' => $this->student_proof_path,
             'other_income_proof' => $this->other_income_proof_path,
-            'guarantor_id' => $this->guarantor_id_path,
-            'guarantor_proof_income' => $this->guarantor_proof_income_path,
             'reference_letter' => $this->reference_letter_path,
+            // Guarantor documents
+            'guarantor_id_front' => $this->guarantor_id_front_path,
+            'guarantor_id_back' => $this->guarantor_id_back_path,
+            'guarantor_proof_income' => $this->guarantor_proof_income_path,
+            'guarantor_employment_contract' => $this->guarantor_employment_contract_path,
+            'guarantor_payslip_1' => $this->guarantor_payslip_1_path,
+            'guarantor_payslip_2' => $this->guarantor_payslip_2_path,
+            'guarantor_payslip_3' => $this->guarantor_payslip_3_path,
+            'guarantor_student_proof' => $this->guarantor_student_proof_path,
+            'guarantor_other_income_proof' => $this->guarantor_other_income_proof_path,
         ];
 
         $metadata = [];
@@ -387,6 +541,30 @@ class TenantProfile extends Model
     public function isUnemployedOrRetired(): bool
     {
         return in_array($this->employment_status, ['unemployed', 'retired']);
+    }
+
+    /**
+     * Check if the guarantor is employed or self-employed.
+     */
+    public function isGuarantorEmployed(): bool
+    {
+        return in_array($this->guarantor_employment_status, ['employed', 'self_employed']);
+    }
+
+    /**
+     * Check if the guarantor is a student.
+     */
+    public function isGuarantorStudent(): bool
+    {
+        return $this->guarantor_employment_status === 'student';
+    }
+
+    /**
+     * Check if the guarantor is unemployed or retired.
+     */
+    public function isGuarantorUnemployedOrRetired(): bool
+    {
+        return in_array($this->guarantor_employment_status, ['unemployed', 'retired']);
     }
 
     /**
@@ -412,8 +590,25 @@ class TenantProfile extends Model
         }
 
         if ($this->has_guarantor) {
-            $required[] = 'guarantor_id_path';
-            $required[] = 'guarantor_proof_income_path';
+            // Guarantor ID documents (always required)
+            $required[] = 'guarantor_id_front_path';
+            $required[] = 'guarantor_id_back_path';
+
+            // Guarantor employment-specific documents
+            if ($this->isGuarantorEmployed()) {
+                $required[] = 'guarantor_employment_contract_path';
+                $required[] = 'guarantor_payslip_1_path';
+                $required[] = 'guarantor_payslip_2_path';
+                $required[] = 'guarantor_payslip_3_path';
+            }
+
+            if ($this->isGuarantorStudent()) {
+                $required[] = 'guarantor_student_proof_path';
+            }
+
+            if ($this->isGuarantorUnemployedOrRetired()) {
+                $required[] = 'guarantor_other_income_proof_path';
+            }
         }
 
         return $required;
