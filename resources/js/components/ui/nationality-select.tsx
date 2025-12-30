@@ -18,6 +18,8 @@ export interface NationalitySelectProps {
     placeholder?: string;
     /** Additional class names */
     className?: string;
+    /** Name attribute for form identification and focus */
+    name?: string;
     /** Show validation state */
     'aria-invalid'?: boolean;
     /** Close on scroll (default: true) */
@@ -37,6 +39,7 @@ export function NationalitySelect({
     disabled = false,
     placeholder = 'Select nationality...',
     className,
+    name,
     'aria-invalid': ariaInvalid,
     closeOnScroll = true,
 }: NationalitySelectProps) {
@@ -70,6 +73,7 @@ export function NationalitySelect({
             onBlur={onBlur}
             disabled={disabled}
             className={className}
+            name={name}
             aria-invalid={ariaInvalid}
             error={error}
             closeOnScroll={closeOnScroll}

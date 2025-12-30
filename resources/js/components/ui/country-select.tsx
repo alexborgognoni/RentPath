@@ -18,6 +18,8 @@ export interface CountrySelectProps {
     placeholder?: string;
     /** Additional class names */
     className?: string;
+    /** Name attribute for form identification and focus */
+    name?: string;
     /** Show validation state */
     'aria-invalid'?: boolean;
     /** Close on scroll (default: true) */
@@ -37,6 +39,7 @@ export function CountrySelect({
     disabled = false,
     placeholder = 'Select country...',
     className,
+    name,
     'aria-invalid': ariaInvalid,
     closeOnScroll = true,
 }: CountrySelectProps) {
@@ -69,6 +72,7 @@ export function CountrySelect({
             onBlur={onBlur}
             disabled={disabled}
             className={className}
+            name={name}
             aria-invalid={ariaInvalid}
             error={error}
             closeOnScroll={closeOnScroll}

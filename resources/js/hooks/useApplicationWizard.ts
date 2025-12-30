@@ -17,56 +17,14 @@ export type { AutosaveStatus } from './useWizard';
 export type ApplicationStep = 'identity' | 'household' | 'financial' | 'risk' | 'history' | 'additional' | 'consent' | 'review';
 
 export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
-    {
-        id: 'identity',
-        title: 'Identity & Legal Eligibility',
-        shortTitle: 'Identity',
-        description: 'Your identity documents and legal status',
-    },
-    {
-        id: 'household',
-        title: 'Household Composition',
-        shortTitle: 'Household',
-        description: 'Tell us about who will live in the property',
-    },
-    {
-        id: 'financial',
-        title: 'Financial Capability',
-        shortTitle: 'Financial',
-        description: 'Your employment and income details',
-    },
-    {
-        id: 'risk',
-        title: 'Financial Support',
-        shortTitle: 'Support',
-        description: 'Co-signers, guarantors, and insurance',
-        optional: true,
-    },
-    {
-        id: 'history',
-        title: 'Credit & Rental History',
-        shortTitle: 'History',
-        description: 'Your credit and rental background',
-    },
-    {
-        id: 'additional',
-        title: 'Additional Information',
-        shortTitle: 'Additional',
-        description: 'Any extra information or documents',
-        optional: true,
-    },
-    {
-        id: 'consent',
-        title: 'Declarations & Consent',
-        shortTitle: 'Consent',
-        description: 'Review and sign your declarations',
-    },
-    {
-        id: 'review',
-        title: 'Review & Submit',
-        shortTitle: 'Review',
-        description: 'Review your application before submitting',
-    },
+    { id: 'identity', title: 'Identity & Legal Eligibility', shortTitle: 'Identity' },
+    { id: 'household', title: 'Household Composition', shortTitle: 'Household' },
+    { id: 'financial', title: 'Financial Capability', shortTitle: 'Financial' },
+    { id: 'risk', title: 'Financial Support', shortTitle: 'Support', optional: true },
+    { id: 'history', title: 'Credit & Rental History', shortTitle: 'History' },
+    { id: 'additional', title: 'Additional Information', shortTitle: 'Additional', optional: true },
+    { id: 'consent', title: 'Declarations & Consent', shortTitle: 'Consent' },
+    { id: 'review', title: 'Review & Submit', shortTitle: 'Review' },
 ];
 
 // ===== Types =====
@@ -1342,18 +1300,39 @@ export function useApplicationWizard({
         const newTouched: Record<string, boolean> = { ...touchedFields };
 
         if (wizard.currentStep === 'identity') {
+            // Personal details
             newTouched.profile_date_of_birth = true;
             newTouched.profile_nationality = true;
             newTouched.profile_phone_number = true;
-            newTouched.profile_current_street_name = true;
-            newTouched.profile_current_house_number = true;
-            newTouched.profile_current_address_line_2 = true;
-            newTouched.profile_current_city = true;
-            newTouched.profile_current_state_province = true;
-            newTouched.profile_current_postal_code = true;
-            newTouched.profile_current_country = true;
+            // ID Document
+            newTouched.profile_id_document_type = true;
+            newTouched.profile_id_number = true;
+            newTouched.profile_id_issuing_country = true;
+            newTouched.profile_id_expiry_date = true;
             newTouched.profile_id_document_front = true;
             newTouched.profile_id_document_back = true;
+            // Immigration (always required now)
+            newTouched.profile_immigration_status = true;
+            // Statuses that require permit details
+            const requiresPermitDetails = [
+                'temporary_resident',
+                'visa_holder',
+                'student',
+                'work_permit',
+                'family_reunification',
+                'refugee_or_protected',
+            ].includes(wizard.data.profile_immigration_status || '');
+            if (requiresPermitDetails) {
+                newTouched.profile_visa_type = true;
+                newTouched.profile_visa_expiry_date = true;
+                // Residence permit document required for visa_holder
+                if (wizard.data.profile_immigration_status === 'visa_holder') {
+                    newTouched.profile_residence_permit_document = true;
+                }
+            }
+            if (wizard.data.profile_immigration_status === 'other') {
+                newTouched.profile_immigration_status_other = true;
+            }
         }
 
         if (wizard.currentStep === 'financial') {

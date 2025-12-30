@@ -354,58 +354,55 @@ return [
             'identity' => [
                 'title' => 'Identiteit & Juridische Geschiktheid',
                 'shortTitle' => 'Identiteit',
-                'description' => 'Uw identiteitsdocumenten en juridische status',
             ],
             'household' => [
                 'title' => 'Huishoudsamenstelling',
                 'shortTitle' => 'Huishouden',
-                'description' => 'Vertel ons wie er in de woning gaat wonen',
             ],
             'financial' => [
                 'title' => 'Financiële Capaciteit',
                 'shortTitle' => 'Financiën',
-                'description' => 'Uw werk- en inkomensgegevens',
             ],
             'risk' => [
                 'title' => 'Financiële Ondersteuning',
                 'shortTitle' => 'Ondersteuning',
-                'description' => 'Mede-ondertekenaars, borgen en verzekering',
             ],
             'history' => [
                 'title' => 'Krediet- & Huurgeschiedenis',
                 'shortTitle' => 'Geschiedenis',
-                'description' => 'Uw krediet- en huurgeschiedenis',
             ],
             'additional' => [
                 'title' => 'Aanvullende Informatie',
                 'shortTitle' => 'Aanvullend',
-                'description' => 'Aanvullende informatie of documenten',
             ],
             'consent' => [
                 'title' => 'Verklaringen & Toestemming',
                 'shortTitle' => 'Toestemming',
-                'description' => 'Bekijk en onderteken uw verklaringen',
             ],
             'review' => [
                 'title' => 'Controleren & Versturen',
                 'shortTitle' => 'Controleren',
-                'description' => 'Controleer en verstuur uw aanvraag',
             ],
         ],
 
         // Personal Info Step (Identity & Legal Eligibility)
         'personalStep' => [
             'title' => 'Identiteit & Juridische Geschiktheid',
-            'description' => 'Verifieer uw identiteit en huurrecht. Uw profiel wordt bijgewerkt wanneer u deze aanvraag verstuurt.',
+            'description' => 'Verifieer uw identiteit en huurrecht. Wij versleutelen en bewaren uw gegevens veilig in uw profiel zodat u ze later kunt hergebruiken. Vastgoedbeheerders kunnen uw gegevens pas zien nadat u uw aanvraag heeft ingediend.',
+            'required' => 'Verplicht',
             'sections' => [
+                'personalDetails' => 'Persoonlijke gegevens',
                 'currentAddress' => 'Huidig adres',
                 'idDocument' => 'Identiteitsbewijs',
                 'immigration' => 'Immigratiestatus',
-                'immigrationDescription' => 'Optioneel maar versterkt uw aanvraag',
+                'immigrationDescription' => 'Versterkt uw aanvraag',
                 'rightToRent' => 'Recht om te huren',
-                'rightToRentDescription' => 'Aanbevolen voor UK/Ierland woningen',
+                'rightToRentDescription' => 'Voor UK/Ierland woningen',
             ],
             'fields' => [
+                'firstName' => 'Voornaam',
+                'lastName' => 'Achternaam',
+                'email' => 'E-mail',
                 'dateOfBirth' => 'Geboortedatum',
                 'nationality' => 'Nationaliteit',
                 'phoneNumber' => 'Telefoonnummer',
@@ -422,8 +419,10 @@ return [
                 'idIssuingCountry' => 'Land van uitgifte',
                 'idExpiryDate' => 'Vervaldatum',
                 // Immigration fields
-                'immigrationStatus' => 'Immigratiestatus',
+                'immigrationStatus' => 'Immigratie-/verblijfsstatus',
                 'immigrationStatusOther' => 'Specificeer',
+                'permitType' => 'Verblijfsvergunning-/visumtype',
+                'permitExpiryDate' => 'Vervaldatum',
                 'visaType' => 'Visumtype',
                 'visaExpiryDate' => 'Visum vervaldatum',
                 'workPermitNumber' => 'Werkvergunningsnummer',
@@ -441,13 +440,14 @@ return [
                 'idIssuingCountry' => 'Selecteer land...',
                 'immigrationStatus' => 'Selecteer status...',
                 'immigrationStatusOther' => 'Specificeer uw status...',
+                'permitType' => 'bijv. Werkvergunning, Studentenvisum',
                 'visaType' => 'bijv. Werkvisum, Studentenvisum',
                 'workPermitNumber' => 'Indien van toepassing',
                 'shareCode' => 'Voer uw deelcode van gov.uk in',
             ],
             'help' => [
                 'idNumber' => 'Uw documentnummer wordt versleuteld en veilig opgeslagen',
-                'shareCode' => 'Verkrijg uw deelcode op gov.uk/prove-right-to-rent',
+                'shareCodePrefix' => 'Verkrijg uw deelcode op',
             ],
             'idDocumentTypes' => [
                 'passport' => 'Paspoort',
@@ -458,17 +458,24 @@ return [
             'immigrationStatuses' => [
                 'citizen' => 'Staatsburger',
                 'permanentResident' => 'Permanente verblijfsvergunning',
+                'temporaryResident' => 'Tijdelijk verblijf',
                 'visaHolder' => 'Visumhouder',
-                'refugee' => 'Vluchteling',
-                'asylumSeeker' => 'Asielzoeker',
+                'student' => 'Student',
+                'workPermit' => 'Werkvergunning',
+                'familyReunification' => 'Gezinshereniging',
+                'refugeeOrProtected' => 'Vluchteling / Beschermde status',
                 'other' => 'Anders',
             ],
+            'immigration' => [
+                'notice' => 'Dit is uw wettelijke verblijfsstatus in het land waar het pand zich bevindt.',
+            ],
             'rightToRent' => [
-                'notice' => 'Verhuurders in het VK/Ierland kunnen bewijs van uw huurrecht vragen. Het verstrekken van deze documenten kan uw aanvraag versterken.',
+                'notice' => 'Als u solliciteert voor een woning in het VK of Ierland, kunnen verhuurders bewijs van uw huurrecht vragen. Het verstrekken van deze documenten kan uw aanvraag versterken.',
             ],
             'fileLabels' => [
                 'frontSide' => 'Voorkant',
                 'backSide' => 'Achterkant',
+                'residencePermit' => 'Verblijfsvergunning',
                 'rightToRentDocument' => 'Huurrecht document',
             ],
             'optional' => 'optioneel',

@@ -20,8 +20,12 @@ export interface SimpleSelectProps {
     disabled?: boolean;
     /** Additional class names for trigger */
     className?: string;
+    /** Name attribute for form identification and focus */
+    name?: string;
     /** Show validation error state */
     'aria-invalid'?: boolean;
+    /** Error message to display */
+    error?: string;
     /** Close on scroll (default: true) */
     closeOnScroll?: boolean;
 }
@@ -34,7 +38,9 @@ export function SimpleSelect({
     onBlur,
     disabled = false,
     className,
+    name,
     'aria-invalid': ariaInvalid,
+    error,
     closeOnScroll = true,
 }: SimpleSelectProps) {
     return (
@@ -49,7 +55,9 @@ export function SimpleSelect({
             onBlur={onBlur}
             disabled={disabled}
             className={className}
+            name={name}
             aria-invalid={ariaInvalid}
+            error={error}
             closeOnScroll={closeOnScroll}
         />
     );

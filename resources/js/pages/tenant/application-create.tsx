@@ -51,7 +51,6 @@ export default function ApplicationCreate() {
             id,
             title: translate(translations, `wizard.application.steps.${id}.title`),
             shortTitle: translate(translations, `wizard.application.steps.${id}.shortTitle`),
-            description: translate(translations, `wizard.application.steps.${id}.description`),
             optional: id === 'risk' || id === 'additional',
         }));
     }, [translations]);
@@ -172,6 +171,7 @@ export default function ApplicationCreate() {
                         onBlur={handleBlur}
                         onFieldBlur={handleFieldBlur}
                         existingDocuments={existingDocuments}
+                        propertyCountry={property.country}
                     />
                 );
             case 'household':
@@ -296,8 +296,7 @@ export default function ApplicationCreate() {
             <Head title={t('page.metaTitle', { property: property.title })} />
             {/* Title */}
             <div className="mb-6 text-center">
-                <h1 className="mb-2 text-3xl font-bold">{t('page.title', { property: property.title })}</h1>
-                <p className="text-sm text-muted-foreground">{wizard.currentStepConfig.description}</p>
+                <h1 className="text-3xl font-bold">{t('page.title', { property: property.title })}</h1>
             </div>
 
             {/* Progress Stepper */}
@@ -334,8 +333,8 @@ export default function ApplicationCreate() {
                     </div>
                 </div>
 
-                {/* Property Summary Sidebar - Fixed width */}
-                <div className="order-1 space-y-4 lg:order-2">
+                {/* Property Summary Sidebar - Fixed width, sticky on desktop */}
+                <div className="order-1 space-y-4 lg:sticky lg:top-[5.5rem] lg:order-2 lg:self-start">
                     {/* Property Manager Card */}
                     {property.property_manager && (
                         <div className="rounded-lg border border-border bg-card p-4">

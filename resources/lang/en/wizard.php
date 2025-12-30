@@ -354,42 +354,34 @@ return [
             'identity' => [
                 'title' => 'Identity & Legal Eligibility',
                 'shortTitle' => 'Identity',
-                'description' => 'Your identity documents and legal status',
             ],
             'household' => [
                 'title' => 'Household Composition',
                 'shortTitle' => 'Household',
-                'description' => 'Tell us about who will live in the property',
             ],
             'financial' => [
                 'title' => 'Financial Capability',
                 'shortTitle' => 'Financial',
-                'description' => 'Your employment and income details',
             ],
             'risk' => [
                 'title' => 'Financial Support',
                 'shortTitle' => 'Support',
-                'description' => 'Co-signers, guarantors, and insurance',
             ],
             'history' => [
                 'title' => 'Credit & Rental History',
                 'shortTitle' => 'History',
-                'description' => 'Your credit and rental background',
             ],
             'additional' => [
                 'title' => 'Additional Information',
                 'shortTitle' => 'Additional',
-                'description' => 'Any extra information or documents',
             ],
             'consent' => [
                 'title' => 'Declarations & Consent',
                 'shortTitle' => 'Consent',
-                'description' => 'Review and sign your declarations',
             ],
             'review' => [
                 'title' => 'Review & Submit',
                 'shortTitle' => 'Review',
-                'description' => 'Review and submit your application',
             ],
             // Legacy steps (kept for backwards compatibility)
             'personal' => [
@@ -422,16 +414,21 @@ return [
         // Personal Info Step
         'personalStep' => [
             'title' => 'Identity & Legal Eligibility',
-            'description' => 'Verify your identity and right to rent. Your profile will be updated when you submit this application.',
+            'description' => 'Verify your identity and right to rent. We encrypt and securely store your data to your profile so that you can reuse it later. Property managers will only be able to see your data after you submit your application.',
+            'required' => 'Required',
             'sections' => [
+                'personalDetails' => 'Personal Details',
                 'currentAddress' => 'Current Address',
                 'idDocument' => 'ID Document',
                 'immigration' => 'Immigration Status',
-                'immigrationDescription' => 'Optional but strengthens your application',
+                'immigrationDescription' => 'Strengthens your application',
                 'rightToRent' => 'Right to Rent',
-                'rightToRentDescription' => 'Recommended for UK/Ireland properties',
+                'rightToRentDescription' => 'For UK/Ireland properties',
             ],
             'fields' => [
+                'firstName' => 'First Name',
+                'lastName' => 'Last Name',
+                'email' => 'Email',
                 'dateOfBirth' => 'Date of Birth',
                 'nationality' => 'Nationality',
                 'phoneNumber' => 'Phone Number',
@@ -448,8 +445,10 @@ return [
                 'idIssuingCountry' => 'Issuing Country',
                 'idExpiryDate' => 'Expiry Date',
                 // Immigration fields
-                'immigrationStatus' => 'Immigration Status',
+                'immigrationStatus' => 'Immigration / Residency Status',
                 'immigrationStatusOther' => 'Please Specify',
+                'permitType' => 'Permit / Visa Type',
+                'permitExpiryDate' => 'Expiry Date',
                 'visaType' => 'Visa Type',
                 'visaExpiryDate' => 'Visa Expiry Date',
                 'workPermitNumber' => 'Work Permit Number',
@@ -467,13 +466,14 @@ return [
                 'idIssuingCountry' => 'Select country...',
                 'immigrationStatus' => 'Select status...',
                 'immigrationStatusOther' => 'Specify your status...',
+                'permitType' => 'e.g., Work Permit, Student Visa',
                 'visaType' => 'e.g., Work Visa, Student Visa',
                 'workPermitNumber' => 'If applicable',
                 'shareCode' => 'Enter your share code from gov.uk',
             ],
             'help' => [
                 'idNumber' => 'Your document number is encrypted and stored securely',
-                'shareCode' => 'Get your share code from gov.uk/prove-right-to-rent',
+                'shareCodePrefix' => 'Get your share code from',
             ],
             'idDocumentTypes' => [
                 'passport' => 'Passport',
@@ -484,17 +484,24 @@ return [
             'immigrationStatuses' => [
                 'citizen' => 'Citizen',
                 'permanentResident' => 'Permanent Resident',
+                'temporaryResident' => 'Temporary Resident',
                 'visaHolder' => 'Visa Holder',
-                'refugee' => 'Refugee',
-                'asylumSeeker' => 'Asylum Seeker',
+                'student' => 'Student',
+                'workPermit' => 'Work Permit',
+                'familyReunification' => 'Family Reunification',
+                'refugeeOrProtected' => 'Refugee / Protected Status',
                 'other' => 'Other',
             ],
+            'immigration' => [
+                'notice' => 'This is your legal residency status in the country where the property is located.',
+            ],
             'rightToRent' => [
-                'notice' => 'Landlords in the UK/Ireland may request proof of your right to rent. Providing these documents can strengthen your application.',
+                'notice' => 'If you are applying for a property in the UK or Ireland, landlords may request proof of your right to rent. Providing these documents can strengthen your application.',
             ],
             'fileLabels' => [
                 'frontSide' => 'Front Side',
                 'backSide' => 'Back Side',
+                'residencePermit' => 'Residence Permit',
                 'rightToRentDocument' => 'Right to Rent Document',
             ],
             'optional' => 'optional',

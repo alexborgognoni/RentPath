@@ -354,58 +354,55 @@ return [
             'identity' => [
                 'title' => 'Identité & Éligibilité légale',
                 'shortTitle' => 'Identité',
-                'description' => 'Vos documents d\'identité et statut légal',
             ],
             'household' => [
                 'title' => 'Composition du foyer',
                 'shortTitle' => 'Foyer',
-                'description' => 'Dites-nous qui vivra dans le logement',
             ],
             'financial' => [
                 'title' => 'Capacité financière',
                 'shortTitle' => 'Finances',
-                'description' => 'Vos informations d\'emploi et de revenus',
             ],
             'risk' => [
                 'title' => 'Soutien financier',
                 'shortTitle' => 'Soutien',
-                'description' => 'Co-signataires, garants et assurance',
             ],
             'history' => [
                 'title' => 'Historique de crédit & Location',
                 'shortTitle' => 'Historique',
-                'description' => 'Votre historique de crédit et de location',
             ],
             'additional' => [
                 'title' => 'Informations supplémentaires',
                 'shortTitle' => 'Supplément',
-                'description' => 'Informations ou documents supplémentaires',
             ],
             'consent' => [
                 'title' => 'Déclarations & Consentement',
                 'shortTitle' => 'Consentement',
-                'description' => 'Examinez et signez vos déclarations',
             ],
             'review' => [
                 'title' => 'Vérifier & Soumettre',
                 'shortTitle' => 'Vérifier',
-                'description' => 'Vérifiez et soumettez votre candidature',
             ],
         ],
 
         // Personal Info Step (Identity & Legal Eligibility)
         'personalStep' => [
             'title' => 'Identité & Éligibilité légale',
-            'description' => 'Vérifiez votre identité et votre droit de louer. Votre profil sera mis à jour lorsque vous soumettrez cette candidature.',
+            'description' => 'Vérifiez votre identité et votre droit de louer. Nous chiffrons et stockons vos données en toute sécurité dans votre profil afin que vous puissiez les réutiliser ultérieurement. Les gestionnaires immobiliers ne pourront voir vos données qu\'après avoir soumis votre candidature.',
+            'required' => 'Obligatoire',
             'sections' => [
+                'personalDetails' => 'Informations personnelles',
                 'currentAddress' => 'Adresse actuelle',
                 'idDocument' => 'Pièce d\'identité',
                 'immigration' => 'Statut d\'immigration',
-                'immigrationDescription' => 'Optionnel mais renforce votre candidature',
+                'immigrationDescription' => 'Renforce votre candidature',
                 'rightToRent' => 'Droit de location',
-                'rightToRentDescription' => 'Recommandé pour les propriétés UK/Irlande',
+                'rightToRentDescription' => 'Pour les propriétés UK/Irlande',
             ],
             'fields' => [
+                'firstName' => 'Prénom',
+                'lastName' => 'Nom de famille',
+                'email' => 'E-mail',
                 'dateOfBirth' => 'Date de naissance',
                 'nationality' => 'Nationalité',
                 'phoneNumber' => 'Numéro de téléphone',
@@ -422,8 +419,10 @@ return [
                 'idIssuingCountry' => 'Pays d\'émission',
                 'idExpiryDate' => 'Date d\'expiration',
                 // Immigration fields
-                'immigrationStatus' => 'Statut d\'immigration',
+                'immigrationStatus' => 'Statut d\'immigration / résidence',
                 'immigrationStatusOther' => 'Veuillez préciser',
+                'permitType' => 'Type de permis / visa',
+                'permitExpiryDate' => 'Date d\'expiration',
                 'visaType' => 'Type de visa',
                 'visaExpiryDate' => 'Date d\'expiration du visa',
                 'workPermitNumber' => 'Numéro de permis de travail',
@@ -441,13 +440,14 @@ return [
                 'idIssuingCountry' => 'Sélectionner le pays...',
                 'immigrationStatus' => 'Sélectionner le statut...',
                 'immigrationStatusOther' => 'Précisez votre statut...',
+                'permitType' => 'ex. Permis de travail, Visa étudiant',
                 'visaType' => 'ex. Visa de travail, Visa étudiant',
                 'workPermitNumber' => 'Si applicable',
                 'shareCode' => 'Entrez votre code de partage de gov.uk',
             ],
             'help' => [
                 'idNumber' => 'Votre numéro de document est chiffré et stocké en toute sécurité',
-                'shareCode' => 'Obtenez votre code de partage sur gov.uk/prove-right-to-rent',
+                'shareCodePrefix' => 'Obtenez votre code de partage sur',
             ],
             'idDocumentTypes' => [
                 'passport' => 'Passeport',
@@ -458,17 +458,24 @@ return [
             'immigrationStatuses' => [
                 'citizen' => 'Citoyen',
                 'permanentResident' => 'Résident permanent',
+                'temporaryResident' => 'Résident temporaire',
                 'visaHolder' => 'Titulaire de visa',
-                'refugee' => 'Réfugié',
-                'asylumSeeker' => 'Demandeur d\'asile',
+                'student' => 'Étudiant',
+                'workPermit' => 'Permis de travail',
+                'familyReunification' => 'Regroupement familial',
+                'refugeeOrProtected' => 'Réfugié / Statut protégé',
                 'other' => 'Autre',
             ],
+            'immigration' => [
+                'notice' => 'Ceci est votre statut de résidence légale dans le pays où se trouve la propriété.',
+            ],
             'rightToRent' => [
-                'notice' => 'Les propriétaires au Royaume-Uni/Irlande peuvent demander une preuve de votre droit de louer. Fournir ces documents peut renforcer votre candidature.',
+                'notice' => 'Si vous postulez pour une propriété au Royaume-Uni ou en Irlande, les propriétaires peuvent demander une preuve de votre droit de louer. Fournir ces documents peut renforcer votre candidature.',
             ],
             'fileLabels' => [
                 'frontSide' => 'Recto',
                 'backSide' => 'Verso',
+                'residencePermit' => 'Titre de séjour',
                 'rightToRentDocument' => 'Document de droit de location',
             ],
             'optional' => 'optionnel',

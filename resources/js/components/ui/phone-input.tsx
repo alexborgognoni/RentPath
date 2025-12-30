@@ -96,55 +96,58 @@ export function PhoneInput({
     const hasError = ariaInvalid || !!error;
 
     return (
-        <div className={cn('flex', className)}>
-            {/* Country Selector */}
-            <SearchableSelect
-                value={internalCountryIso}
-                onChange={handleCountryChange}
-                options={COUNTRIES_WITH_DIAL_CODES}
-                getOptionValue={(c) => c.iso2}
-                filterOptions={filterCountries}
-                renderTrigger={(country) => (
-                    <span className="flex items-center gap-1.5">
-                        <span className="text-base">{country ? iso2ToFlagEmoji(country.iso2) : '?'}</span>
-                        <span>{country ? formatDialCode(country.dialCode) : ''}</span>
-                    </span>
-                )}
-                renderOption={(c) => (
-                    <>
-                        <span className="text-base">{iso2ToFlagEmoji(c.iso2)}</span>
-                        <span className="flex-1 truncate text-left">{c.name}</span>
-                        <span className="text-muted-foreground">{formatDialCode(c.dialCode)}</span>
-                    </>
-                )}
-                placeholder=""
-                searchPlaceholder="Search countries..."
-                emptyText="No countries found"
-                disabled={disabled}
-                aria-invalid={hasError}
-                closeOnScroll={closeOnScroll}
-                minWidth="288px"
-                compact
-            />
+        <div className={cn('w-full', className)}>
+            <div className="flex">
+                {/* Country Selector - never shows error state since it always has a default */}
+                <SearchableSelect
+                    value={internalCountryIso}
+                    onChange={handleCountryChange}
+                    options={COUNTRIES_WITH_DIAL_CODES}
+                    getOptionValue={(c) => c.iso2}
+                    filterOptions={filterCountries}
+                    renderTrigger={(country) => (
+                        <span className="flex items-center gap-1.5">
+                            <span className="text-base">{country ? iso2ToFlagEmoji(country.iso2) : '?'}</span>
+                            <span>{country ? formatDialCode(country.dialCode) : ''}</span>
+                        </span>
+                    )}
+                    renderOption={(c) => (
+                        <>
+                            <span className="text-base">{iso2ToFlagEmoji(c.iso2)}</span>
+                            <span className="flex-1 truncate text-left">{c.name}</span>
+                            <span className="text-muted-foreground">{formatDialCode(c.dialCode)}</span>
+                        </>
+                    )}
+                    placeholder=""
+                    searchPlaceholder="Search countries..."
+                    emptyText="No countries found"
+                    disabled={disabled}
+                    closeOnScroll={closeOnScroll}
+                    minWidth="288px"
+                    compact
+                />
 
-            {/* Phone Number Input */}
-            <input
-                ref={phoneInputRef}
-                type="tel"
-                value={value}
-                onChange={handlePhoneChange}
-                onBlur={onBlur}
-                disabled={disabled}
-                placeholder={placeholder}
-                aria-invalid={hasError}
-                className={cn(
-                    'w-full min-w-0 flex-1 rounded-l-none rounded-r-lg border bg-background px-4 py-2',
-                    'border-border placeholder:text-muted-foreground',
-                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                    'disabled:cursor-not-allowed disabled:opacity-50',
-                    hasError && 'border-destructive bg-destructive/5',
-                )}
-            />
+                {/* Phone Number Input */}
+                <input
+                    ref={phoneInputRef}
+                    type="tel"
+                    name="profile_phone_number"
+                    value={value}
+                    onChange={handlePhoneChange}
+                    onBlur={onBlur}
+                    disabled={disabled}
+                    placeholder={placeholder}
+                    aria-invalid={hasError}
+                    className={cn(
+                        'w-full min-w-0 flex-1 rounded-l-none rounded-r-lg border bg-background px-4 py-2',
+                        'border-border placeholder:text-muted-foreground',
+                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                        'disabled:cursor-not-allowed disabled:opacity-50',
+                        hasError && 'border-destructive bg-destructive/5',
+                    )}
+                />
+            </div>
+            {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
         </div>
     );
 }

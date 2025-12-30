@@ -354,58 +354,55 @@ return [
             'identity' => [
                 'title' => 'Identität & Rechtliche Berechtigung',
                 'shortTitle' => 'Identität',
-                'description' => 'Ihre Ausweisdokumente und rechtlicher Status',
             ],
             'household' => [
                 'title' => 'Haushaltszusammensetzung',
                 'shortTitle' => 'Haushalt',
-                'description' => 'Erzählen Sie uns, wer in der Immobilie wohnen wird',
             ],
             'financial' => [
                 'title' => 'Finanzielle Leistungsfähigkeit',
                 'shortTitle' => 'Finanzen',
-                'description' => 'Ihre Beschäftigungs- und Einkommensdaten',
             ],
             'risk' => [
                 'title' => 'Finanzielle Unterstützung',
                 'shortTitle' => 'Unterstützung',
-                'description' => 'Mitunterzeichner, Bürgen und Versicherung',
             ],
             'history' => [
                 'title' => 'Bonitäts- & Miethistorie',
                 'shortTitle' => 'Historie',
-                'description' => 'Ihre Bonitäts- und Mietgeschichte',
             ],
             'additional' => [
                 'title' => 'Zusätzliche Informationen',
                 'shortTitle' => 'Zusätzlich',
-                'description' => 'Weitere Informationen oder Dokumente',
             ],
             'consent' => [
                 'title' => 'Erklärungen & Einwilligung',
                 'shortTitle' => 'Einwilligung',
-                'description' => 'Überprüfen und unterschreiben Sie Ihre Erklärungen',
             ],
             'review' => [
                 'title' => 'Überprüfen & Absenden',
                 'shortTitle' => 'Prüfen',
-                'description' => 'Überprüfen und senden Sie Ihre Bewerbung',
             ],
         ],
 
         // Personal Info Step (Identity & Legal Eligibility)
         'personalStep' => [
             'title' => 'Identität & Rechtliche Berechtigung',
-            'description' => 'Verifizieren Sie Ihre Identität und Ihr Mietrecht. Ihr Profil wird aktualisiert, wenn Sie diese Bewerbung absenden.',
+            'description' => 'Verifizieren Sie Ihre Identität und Ihr Mietrecht. Wir verschlüsseln und speichern Ihre Daten sicher in Ihrem Profil, damit Sie sie später wiederverwenden können. Immobilienverwalter können Ihre Daten erst nach Absenden Ihrer Bewerbung einsehen.',
+            'required' => 'Erforderlich',
             'sections' => [
+                'personalDetails' => 'Persönliche Daten',
                 'currentAddress' => 'Aktuelle Adresse',
                 'idDocument' => 'Ausweisdokument',
                 'immigration' => 'Einwanderungsstatus',
-                'immigrationDescription' => 'Optional, stärkt aber Ihre Bewerbung',
+                'immigrationDescription' => 'Stärkt Ihre Bewerbung',
                 'rightToRent' => 'Mietberechtigung',
-                'rightToRentDescription' => 'Empfohlen für UK/Irland-Immobilien',
+                'rightToRentDescription' => 'Für UK/Irland-Immobilien',
             ],
             'fields' => [
+                'firstName' => 'Vorname',
+                'lastName' => 'Nachname',
+                'email' => 'E-Mail',
                 'dateOfBirth' => 'Geburtsdatum',
                 'nationality' => 'Nationalität',
                 'phoneNumber' => 'Telefonnummer',
@@ -422,8 +419,10 @@ return [
                 'idIssuingCountry' => 'Ausstellungsland',
                 'idExpiryDate' => 'Ablaufdatum',
                 // Immigration fields
-                'immigrationStatus' => 'Einwanderungsstatus',
+                'immigrationStatus' => 'Einwanderungs-/Aufenthaltsstatus',
                 'immigrationStatusOther' => 'Bitte angeben',
+                'permitType' => 'Aufenthalts-/Visumsart',
+                'permitExpiryDate' => 'Ablaufdatum',
                 'visaType' => 'Visumsart',
                 'visaExpiryDate' => 'Visums-Ablaufdatum',
                 'workPermitNumber' => 'Arbeitserlaubnisnummer',
@@ -441,13 +440,14 @@ return [
                 'idIssuingCountry' => 'Land auswählen...',
                 'immigrationStatus' => 'Status auswählen...',
                 'immigrationStatusOther' => 'Ihren Status angeben...',
+                'permitType' => 'z.B. Arbeitserlaubnis, Studentenvisum',
                 'visaType' => 'z.B. Arbeitsvisum, Studentenvisum',
                 'workPermitNumber' => 'Falls zutreffend',
                 'shareCode' => 'Freigabecode von gov.uk eingeben',
             ],
             'help' => [
                 'idNumber' => 'Ihre Dokumentnummer wird verschlüsselt und sicher gespeichert',
-                'shareCode' => 'Erhalten Sie Ihren Freigabecode unter gov.uk/prove-right-to-rent',
+                'shareCodePrefix' => 'Erhalten Sie Ihren Freigabecode unter',
             ],
             'idDocumentTypes' => [
                 'passport' => 'Reisepass',
@@ -458,17 +458,24 @@ return [
             'immigrationStatuses' => [
                 'citizen' => 'Staatsbürger',
                 'permanentResident' => 'Daueraufenthaltsberechtigter',
+                'temporaryResident' => 'Befristeter Aufenthalt',
                 'visaHolder' => 'Visuminhaber',
-                'refugee' => 'Flüchtling',
-                'asylumSeeker' => 'Asylbewerber',
+                'student' => 'Student',
+                'workPermit' => 'Arbeitserlaubnis',
+                'familyReunification' => 'Familienzusammenführung',
+                'refugeeOrProtected' => 'Flüchtling / Schutzstatus',
                 'other' => 'Sonstiges',
             ],
+            'immigration' => [
+                'notice' => 'Dies ist Ihr rechtlicher Aufenthaltsstatus im Land, in dem sich die Immobilie befindet.',
+            ],
             'rightToRent' => [
-                'notice' => 'Vermieter in Großbritannien/Irland können einen Nachweis Ihrer Mietberechtigung verlangen. Die Bereitstellung dieser Dokumente kann Ihre Bewerbung stärken.',
+                'notice' => 'Wenn Sie sich für eine Immobilie in Großbritannien oder Irland bewerben, können Vermieter einen Nachweis Ihrer Mietberechtigung verlangen. Die Bereitstellung dieser Dokumente kann Ihre Bewerbung stärken.',
             ],
             'fileLabels' => [
                 'frontSide' => 'Vorderseite',
                 'backSide' => 'Rückseite',
+                'residencePermit' => 'Aufenthaltstitel',
                 'rightToRentDocument' => 'Mietberechtigungsdokument',
             ],
             'optional' => 'optional',

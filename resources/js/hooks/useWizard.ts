@@ -6,7 +6,7 @@ export interface WizardStepConfig<TStepId extends string> {
     id: TStepId;
     title: string;
     shortTitle: string;
-    description: string;
+    description?: string;
     optional?: boolean;
 }
 

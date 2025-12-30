@@ -56,6 +56,9 @@ export const APPLICATION_MESSAGES = {
         required: 'Visa expiry date is required',
         future: 'Visa must not be expired',
     },
+    profile_residence_permit_document: {
+        required: 'Residence permit document is required',
+    },
     profile_current_street_name: {
         required: 'Street name is required',
     },
@@ -471,21 +474,43 @@ const referenceSchema = z.object({
 
 // ===== Step Schemas =====
 
-// Step 1: Personal Info - Base schema
+// Immigration / Residency Status Enum (must match backend)
+export const IMMIGRATION_STATUS_VALUES = [
+    'citizen',
+    'permanent_resident',
+    'temporary_resident',
+    'visa_holder',
+    'student',
+    'work_permit',
+    'family_reunification',
+    'refugee_or_protected',
+    'other',
+] as const;
+export type ImmigrationStatus = (typeof IMMIGRATION_STATUS_VALUES)[number];
+
+// Step 1: Personal Info - Base schema (Identity & Legal Eligibility)
 const personalInfoBaseSchema = z.object({
+    // Personal Details
     profile_date_of_birth: z.string().min(1, APPLICATION_MESSAGES.profile_date_of_birth.required),
     profile_nationality: z.string().min(1, APPLICATION_MESSAGES.profile_nationality.required),
     profile_phone_country_code: z.string(),
     profile_phone_number: z.string().min(1, APPLICATION_MESSAGES.profile_phone_number.required),
-    profile_current_street_name: z.string().min(1, APPLICATION_MESSAGES.profile_current_street_name.required),
-    profile_current_house_number: z.string().min(1, APPLICATION_MESSAGES.profile_current_house_number.required),
-    profile_current_address_line_2: z.string().optional(),
-    profile_current_city: z.string().min(1, APPLICATION_MESSAGES.profile_current_city.required),
-    profile_current_state_province: z.string().optional(),
-    profile_current_postal_code: z.string().min(1, APPLICATION_MESSAGES.profile_current_postal_code.required),
-    profile_current_country: z.string().min(1, APPLICATION_MESSAGES.profile_current_country.required),
+    // ID Document
+    profile_id_document_type: z.string().min(1, APPLICATION_MESSAGES.profile_id_document_type.required),
+    profile_id_number: z.string().min(1, APPLICATION_MESSAGES.profile_id_number.required),
+    profile_id_issuing_country: z.string().min(1, APPLICATION_MESSAGES.profile_id_issuing_country.required),
+    profile_id_expiry_date: z.string().min(1, APPLICATION_MESSAGES.profile_id_expiry_date.required),
     profile_id_document_front: z.any().nullable(),
     profile_id_document_back: z.any().nullable(),
+    // Immigration Status (required for all applicants)
+    profile_immigration_status: z.string().min(1, APPLICATION_MESSAGES.profile_immigration_status.required),
+    profile_immigration_status_other: z.string().optional(),
+    profile_visa_type: z.string().optional(),
+    profile_visa_expiry_date: z.string().optional(),
+    profile_residence_permit_document: z.any().nullable().optional(),
+    // Right to Rent (optional)
+    profile_right_to_rent_share_code: z.string().optional(),
+    profile_right_to_rent_document: z.any().nullable().optional(),
 });
 
 // Factory function that creates personal info schema with existing docs context
@@ -518,24 +543,16 @@ export function createPersonalInfoStepSchema(existingDocs: ExistingDocumentsCont
             }
         }
 
-        // Validate postal code format for selected country
-        if (data.profile_current_postal_code && data.profile_current_country) {
-            if (!validatePostalCode(data.profile_current_postal_code, data.profile_current_country)) {
+        // Validate ID expiry date is in the future
+        if (data.profile_id_expiry_date) {
+            const expiryDate = new Date(data.profile_id_expiry_date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (expiryDate <= today) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_current_postal_code.invalid,
-                    path: ['profile_current_postal_code'],
-                });
-            }
-        }
-
-        // Validate state/province is provided for countries that require it
-        if (data.profile_current_country && requiresStateProvince(data.profile_current_country)) {
-            if (!data.profile_current_state_province?.trim()) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_current_state_province.required,
-                    path: ['profile_current_state_province'],
+                    message: APPLICATION_MESSAGES.profile_id_expiry_date.future,
+                    path: ['profile_id_expiry_date'],
                 });
             }
         }
@@ -556,6 +573,63 @@ export function createPersonalInfoStepSchema(existingDocs: ExistingDocumentsCont
                 message: APPLICATION_MESSAGES.profile_id_document_back.required,
                 path: ['profile_id_document_back'],
             });
+        }
+
+        // Immigration status conditional validation
+        // If status is "other", require specification
+        if (data.profile_immigration_status === 'other' && !data.profile_immigration_status_other?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.profile_immigration_status_other.required,
+                path: ['profile_immigration_status_other'],
+            });
+        }
+
+        // If status is one that requires permit details, make those fields mandatory
+        const requiresPermitDetails = [
+            'temporary_resident',
+            'visa_holder',
+            'student',
+            'work_permit',
+            'family_reunification',
+            'refugee_or_protected',
+        ].includes(data.profile_immigration_status || '');
+
+        if (requiresPermitDetails) {
+            if (!data.profile_visa_type?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_visa_type.required,
+                    path: ['profile_visa_type'],
+                });
+            }
+            if (!data.profile_visa_expiry_date) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_visa_expiry_date.required,
+                    path: ['profile_visa_expiry_date'],
+                });
+            } else {
+                // Validate visa expiry date is in the future
+                const visaExpiryDate = new Date(data.profile_visa_expiry_date);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (visaExpiryDate <= today) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.profile_visa_expiry_date.future,
+                        path: ['profile_visa_expiry_date'],
+                    });
+                }
+            }
+            // Residence permit document required for visa_holder
+            if (data.profile_immigration_status === 'visa_holder' && !data.profile_residence_permit_document) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_residence_permit_document?.required || 'Residence permit document is required',
+                    path: ['profile_residence_permit_document'],
+                });
+            }
         }
     });
 }
