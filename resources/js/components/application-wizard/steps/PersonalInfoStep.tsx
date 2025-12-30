@@ -2,6 +2,7 @@ import { CountrySelect } from '@/components/ui/country-select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
 import { NationalitySelect } from '@/components/ui/nationality-select';
+import { OptionalBadge } from '@/components/ui/optional-badge';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
@@ -646,7 +647,7 @@ export function PersonalInfoStep({
                         <h3 className="font-semibold">{t('sections.rightToRent') || 'Right to Rent'}</h3>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t('optional') || 'Optional'}</span>
+                        <OptionalBadge />
                         {expandedSections.rightToRent ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                     </div>
                 </button>

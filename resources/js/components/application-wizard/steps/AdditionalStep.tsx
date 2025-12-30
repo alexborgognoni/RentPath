@@ -1,4 +1,5 @@
 import { FileUpload } from '@/components/ui/file-upload';
+import { OptionalBadge } from '@/components/ui/optional-badge';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
@@ -51,7 +52,7 @@ export function AdditionalStep({ data, errors, touchedFields, updateField, markF
                 <div className="mb-4 flex items-center gap-2">
                     <Upload className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">{t('documents.title') || 'Supporting Documents'}</h3>
-                    <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t('optional') || 'Optional'}</span>
+                    <OptionalBadge />
                 </div>
                 <p className="mb-4 text-sm text-muted-foreground">
                     {t('documents.description') || 'Upload additional documents that may support your application.'}
@@ -143,7 +144,7 @@ export function AdditionalStep({ data, errors, touchedFields, updateField, markF
                 <div className="mb-4 flex items-center gap-2">
                     <FileText className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">{t('notes.title')}</h3>
-                    <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t('optional')}</span>
+                    <OptionalBadge />
                 </div>
                 <p className="mb-4 text-sm text-muted-foreground">{t('notes.description')}</p>
 

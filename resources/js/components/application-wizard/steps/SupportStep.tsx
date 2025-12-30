@@ -1,5 +1,6 @@
 import { CurrencySelect } from '@/components/ui/currency-select';
 import { DatePicker } from '@/components/ui/date-picker';
+import { OptionalBadge } from '@/components/ui/optional-badge';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData, CoSignerDetails, GuarantorDetails } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
@@ -99,7 +100,7 @@ export function SupportStep({
                 <div className="mb-4 flex items-center gap-2">
                     <Users className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">{t('coSigners.title')}</h3>
-                    <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t('optional')}</span>
+                    <OptionalBadge />
                 </div>
                 <p className="mb-4 text-sm text-muted-foreground">{t('coSigners.description')}</p>
 
@@ -251,7 +252,7 @@ export function SupportStep({
                 <div className="mb-4 flex items-center gap-2">
                     <UserPlus className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">{t('guarantors.title')}</h3>
-                    <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t('optional')}</span>
+                    <OptionalBadge />
                 </div>
                 <p className="mb-4 text-sm text-muted-foreground">{t('guarantors.description')}</p>
 
@@ -424,7 +425,7 @@ export function SupportStep({
                 <div className="mb-4 flex items-center gap-2">
                     <Shield className="h-5 w-5 text-green-500" />
                     <h3 className="font-semibold">{t('insurance.title')}</h3>
-                    <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t('optional')}</span>
+                    <OptionalBadge />
                 </div>
                 <p className="mb-4 text-sm text-muted-foreground">{t('insurance.description')}</p>
 

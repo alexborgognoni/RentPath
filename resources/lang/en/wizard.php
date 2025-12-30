@@ -122,7 +122,7 @@ return [
         'number' => 'Number',
         'streetName' => 'Street Name',
         'apartmentSuite' => 'Apartment, Suite, Unit',
-        'optional' => 'optional',
+        'optional' => 'Optional',
         'city' => 'City',
         'postalCode' => 'Postal Code',
         'stateRegion' => 'State/Region',
@@ -519,14 +519,14 @@ return [
                 'residencePermit' => 'Residence Permit',
                 'rightToRentDocument' => 'Right to Rent Document',
             ],
-            'optional' => 'optional',
+            'optional' => 'Optional',
         ],
 
         // Employment & Income Step
         'employmentStep' => [
             'title' => 'Employment & Income',
             'description' => 'This information helps landlords assess your ability to pay rent. It will be saved to your profile.',
-            'optional' => 'optional',
+            'optional' => 'Optional',
             'fields' => [
                 'employmentStatus' => 'Employment Status',
                 'employerName' => 'Employer Name',
@@ -861,7 +861,7 @@ return [
                 ],
             ],
             'characters' => ':count/:max characters',
-            'optional' => 'optional',
+            'optional' => 'Optional',
         ],
 
         // References Step
@@ -1103,7 +1103,7 @@ return [
                 'policyNumberLabel' => 'Policy Number',
                 'policyNumberPlaceholder' => 'Enter policy number...',
             ],
-            'optional' => 'optional',
+            'optional' => 'Optional',
         ],
 
         // Emergency Step
@@ -1143,7 +1143,7 @@ return [
                 'placeholder' => 'Share any additional information that might be relevant to your application...',
                 'characters' => ':count/:max characters',
             ],
-            'optional' => 'optional',
+            'optional' => 'Optional',
         ],
 
         // Consent Step

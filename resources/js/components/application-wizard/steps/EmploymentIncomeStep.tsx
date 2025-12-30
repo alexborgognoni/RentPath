@@ -1,6 +1,7 @@
 import { CurrencySelect } from '@/components/ui/currency-select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
+import { OptionalBadge } from '@/components/ui/optional-badge';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
@@ -595,7 +596,7 @@ export function EmploymentIncomeStep({
                         <div>
                             <label className="mb-2 flex items-center gap-2 text-sm font-medium">
                                 {t('fields.expectedGraduation')}
-                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">{t('optional')}</span>
+                                <OptionalBadge />
                             </label>
                             <DatePicker
                                 value={data.profile_expected_graduation_date}
@@ -717,7 +718,7 @@ export function EmploymentIncomeStep({
                         <div>
                             <label className="mb-2 flex items-center gap-2 text-sm font-medium">
                                 {t('fields.pensionProvider')}
-                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">{t('optional')}</span>
+                                <OptionalBadge />
                             </label>
                             <input
                                 type="text"
@@ -761,7 +762,7 @@ export function EmploymentIncomeStep({
                         <div>
                             <label className="mb-2 flex items-center gap-2 text-sm font-medium">
                                 {t('fields.otherRetirementIncome')}
-                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">{t('optional')}</span>
+                                <OptionalBadge />
                             </label>
                             <div className="flex">
                                 <CurrencySelect
@@ -1001,7 +1002,7 @@ export function EmploymentIncomeStep({
                         <div>
                             <label className="mb-2 flex items-center gap-2 text-sm font-medium">
                                 {t('fields.expectedReturnToWork')}
-                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">{t('optional')}</span>
+                                <OptionalBadge />
                             </label>
                             <DatePicker
                                 value={data.profile_expected_return_to_work}

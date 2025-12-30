@@ -1,5 +1,6 @@
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
+import { OptionalBadge } from '@/components/ui/optional-badge';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData, OccupantDetails, PetDetails } from '@/hooks/useApplicationWizard';
@@ -269,9 +270,7 @@ export function DetailsStep({
                         <div>
                             <label className="mb-2 flex items-center gap-2 text-sm font-medium">
                                 {t('fields.messageToLandlord') || 'Message to Landlord'}
-                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
-                                    {t('optional') || 'Optional'}
-                                </span>
+                                <OptionalBadge />
                             </label>
                             <textarea
                                 value={data.message_to_landlord}
@@ -520,9 +519,7 @@ export function DetailsStep({
                                     <div>
                                         <label className="mb-1 flex items-center gap-2 text-sm">
                                             {t('pets.breed') || 'Breed'}
-                                            <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                                                {t('optional') || 'Optional'}
-                                            </span>
+                                            <OptionalBadge />
                                         </label>
                                         <input
                                             type="text"
@@ -535,9 +532,7 @@ export function DetailsStep({
                                     <div>
                                         <label className="mb-1 flex items-center gap-2 text-sm">
                                             {t('pets.name') || 'Name'}
-                                            <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                                                {t('optional') || 'Optional'}
-                                            </span>
+                                            <OptionalBadge />
                                         </label>
                                         <input
                                             type="text"
@@ -555,9 +550,7 @@ export function DetailsStep({
                                     <div>
                                         <label className="mb-1 flex items-center gap-2 text-sm">
                                             {t('pets.age') || 'Age'}
-                                            <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                                                {t('optional') || 'Optional'}
-                                            </span>
+                                            <OptionalBadge />
                                         </label>
                                         <input
                                             type="text"
@@ -571,9 +564,7 @@ export function DetailsStep({
                                     <div>
                                         <label className="mb-1 flex items-center gap-2 text-sm">
                                             {t('pets.size') || 'Size'}
-                                            <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                                                {t('optional') || 'Optional'}
-                                            </span>
+                                            <OptionalBadge />
                                         </label>
                                         <SimpleSelect
                                             value={pet.size}
@@ -675,7 +666,7 @@ export function DetailsStep({
                         <h3 className="font-semibold">{t('emergencyContact.title') || 'Emergency Contact'}</h3>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t('optional') || 'Optional'}</span>
+                        <OptionalBadge />
                         {expandedSections.emergencyContact ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                     </div>
                 </button>
@@ -785,7 +776,7 @@ export function DetailsStep({
                         <div>
                             <label className="mb-2 flex items-center gap-2 text-sm font-medium">
                                 {t('emergencyContact.fields.email') || 'Email Address'}
-                                <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t('optional') || 'Optional'}</span>
+                                <OptionalBadge />
                             </label>
                             <input
                                 type="email"

@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { FileIcon } from '@untitledui/file-icons';
 import { AlertCircle, CheckCircle2, Download, Eye, Loader2, RefreshCw, Trash2, Upload } from 'lucide-react';
+import { OptionalBadge } from './optional-badge';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { useDropzone, type Accept } from 'react-dropzone';
 
@@ -261,11 +262,7 @@ export function FileUpload({
             {label && (
                 <label className="flex items-center gap-2 text-sm font-medium">
                     {label}
-                    {optional && (
-                        <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
-                            Optional
-                        </span>
-                    )}
+                    {optional && <OptionalBadge />}
                 </label>
             )}
 
