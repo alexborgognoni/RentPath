@@ -39,6 +39,8 @@ class TenantProfile extends Model
         'work_permit_number',
 
         // Identity - Regional Enhancements
+        'residence_permit_document_path',
+        'residence_permit_document_original_name',
         'right_to_rent_document_path',
         'right_to_rent_document_original_name',
         'right_to_rent_share_code',

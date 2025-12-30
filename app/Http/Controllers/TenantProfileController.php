@@ -79,6 +79,8 @@ class TenantProfileController extends Controller
             // Main tenant documents
             'id_document_front',
             'id_document_back',
+            'residence_permit_document',
+            'right_to_rent_document',
             'employment_contract',
             'payslip_1',
             'payslip_2',
@@ -471,6 +473,8 @@ class TenantProfileController extends Controller
             // Main tenant documents
             'id_document_front' => ['folder' => 'profiles/id-documents', 'disk' => 'private'],
             'id_document_back' => ['folder' => 'profiles/id-documents', 'disk' => 'private'],
+            'residence_permit_document' => ['folder' => 'profiles/residence-permits', 'disk' => 'private'],
+            'right_to_rent_document' => ['folder' => 'profiles/right-to-rent', 'disk' => 'private'],
             'employment_contract' => ['folder' => 'profiles/employment-contracts', 'disk' => 'private'],
             'payslip_1' => ['folder' => 'profiles/payslips', 'disk' => 'private'],
             'payslip_2' => ['folder' => 'profiles/payslips', 'disk' => 'private'],
@@ -539,8 +543,8 @@ class TenantProfileController extends Controller
 
         $documentTypes = [
             // Main tenant documents
-            'id_document_front', 'id_document_back', 'employment_contract',
-            'payslip_1', 'payslip_2', 'payslip_3', 'student_proof', 'other_income_proof',
+            'id_document_front', 'id_document_back', 'residence_permit_document', 'right_to_rent_document',
+            'employment_contract', 'payslip_1', 'payslip_2', 'payslip_3', 'student_proof', 'other_income_proof',
             // Guarantor documents
             'guarantor_id_front', 'guarantor_id_back', 'guarantor_proof_income',
             'guarantor_employment_contract', 'guarantor_payslip_1', 'guarantor_payslip_2',
