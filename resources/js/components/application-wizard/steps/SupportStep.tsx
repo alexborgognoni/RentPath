@@ -1,4 +1,3 @@
-import { CurrencySelect } from '@/components/ui/currency-select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { OptionalBadge } from '@/components/ui/optional-badge';
 import { SimpleSelect } from '@/components/ui/simple-select';
@@ -6,8 +5,9 @@ import type { ApplicationWizardData, CoSignerDetails, GuarantorDetails } from '@
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { Info, Plus, Shield, Trash2, UserPlus, Users } from 'lucide-react';
-import { useMemo } from 'react';
+import { Info, Link2, Plus, Shield, Trash2, UserPlus, Users } from 'lucide-react';
+import { useCallback, useEffect, useMemo } from 'react';
+import { FinancialInfoSection } from '../shared';
 
 interface SupportStepProps {
     data: ApplicationWizardData;
@@ -22,6 +22,7 @@ interface SupportStepProps {
     addGuarantor: () => void;
     removeGuarantor: (index: number) => void;
     updateGuarantor: (index: number, field: keyof GuarantorDetails, value: string) => void;
+    syncCoSignersFromOccupants: () => void;
 }
 
 export function SupportStep({
@@ -37,9 +38,15 @@ export function SupportStep({
     addGuarantor,
     removeGuarantor,
     updateGuarantor,
+    syncCoSignersFromOccupants,
 }: SupportStepProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.supportStep.${key}`);
+
+    // Sync co-signers from occupants on mount
+    useEffect(() => {
+        syncCoSignersFromOccupants();
+    }, [syncCoSignersFromOccupants]);
 
     const RELATIONSHIP_OPTIONS = useMemo(
         () => [
@@ -51,16 +58,6 @@ export function SupportStep({
             { value: 'friend', label: t('relationships.friend') },
             { value: 'employer', label: t('relationships.employer') },
             { value: 'other', label: t('relationships.other') },
-        ],
-        [translations],
-    );
-
-    const EMPLOYMENT_STATUS_OPTIONS = useMemo(
-        () => [
-            { value: 'employed', label: t('employmentStatus.employed') },
-            { value: 'self_employed', label: t('employmentStatus.selfEmployed') },
-            { value: 'retired', label: t('employmentStatus.retired') },
-            { value: 'other', label: t('employmentStatus.other') },
         ],
         [translations],
     );
@@ -78,6 +75,50 @@ export function SupportStep({
         updateField(field, value as ApplicationWizardData[typeof field]);
         markFieldTouched(field);
     };
+
+    // Count auto-generated vs manual co-signers
+    const autoCoSignersCount = data.co_signers.filter((cs) => cs.from_occupant_index !== null).length;
+    const manualCoSignersCount = data.co_signers.filter((cs) => cs.from_occupant_index === null).length;
+
+    // Create handlers for each co-signer's FinancialInfoSection
+    const createCoSignerHandlers = useCallback(
+        (index: number) => ({
+            getValue: (field: string) => {
+                const coSigner = data.co_signers[index];
+                return String(coSigner?.[field as keyof CoSignerDetails] ?? '');
+            },
+            setValue: (field: string, value: string) => {
+                updateCoSigner(index, field as keyof CoSignerDetails, value);
+            },
+            getError: (field: string) => {
+                return errors[`co_signers.${index}.${field}`];
+            },
+            isTouched: (field: string) => {
+                return !!touchedFields[`cosigner_${index}_${field}`];
+            },
+        }),
+        [data.co_signers, updateCoSigner, errors, touchedFields],
+    );
+
+    // Create handlers for each guarantor's FinancialInfoSection
+    const createGuarantorHandlers = useCallback(
+        (index: number) => ({
+            getValue: (field: string) => {
+                const guarantor = data.guarantors[index];
+                return String(guarantor?.[field as keyof GuarantorDetails] ?? '');
+            },
+            setValue: (field: string, value: string) => {
+                updateGuarantor(index, field as keyof GuarantorDetails, value);
+            },
+            getError: (field: string) => {
+                return errors[`guarantors.${index}.${field}`];
+            },
+            isTouched: (field: string) => {
+                return !!touchedFields[`guarantor_${index}_${field}`];
+            },
+        }),
+        [data.guarantors, updateGuarantor, errors, touchedFields],
+    );
 
     return (
         <div className="space-y-6">
@@ -100,146 +141,150 @@ export function SupportStep({
                 <div className="mb-4 flex items-center gap-2">
                     <Users className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold">{t('coSigners.title')}</h3>
-                    <OptionalBadge />
+                    {autoCoSignersCount > 0 && (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                            {autoCoSignersCount} {t('coSigners.fromHousehold')}
+                        </span>
+                    )}
+                    {manualCoSignersCount > 0 && (
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                            {manualCoSignersCount} {t('coSigners.additional')}
+                        </span>
+                    )}
+                    {data.co_signers.length === 0 && <OptionalBadge />}
                 </div>
                 <p className="mb-4 text-sm text-muted-foreground">{t('coSigners.description')}</p>
 
-                {data.co_signers.map((coSigner, index) => (
-                    <div key={index} className="mb-4 rounded-lg border border-border bg-background p-4">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h4 className="font-medium">{t('coSigners.coSigner').replace(':index', (index + 1).toString())}</h4>
-                            <button type="button" onClick={() => removeCoSigner(index)} className="cursor-pointer text-red-500 hover:text-red-700">
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
+                {data.co_signers.map((coSigner, index) => {
+                    const isFromOccupant = coSigner.from_occupant_index !== null;
+                    const handlers = createCoSignerHandlers(index);
 
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.firstName')}</label>
-                                <input
-                                    type="text"
-                                    value={coSigner.first_name}
-                                    onChange={(e) => updateCoSigner(index, 'first_name', e.target.value)}
-                                    onBlur={onBlur}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                />
+                    return (
+                        <div key={index} className="mb-4 rounded-lg border border-border bg-background p-4">
+                            {/* Header */}
+                            <div className="mb-4 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <h4 className="font-medium">
+                                        {coSigner.first_name && coSigner.last_name
+                                            ? `${coSigner.first_name} ${coSigner.last_name}`
+                                            : t('coSigners.coSigner').replace(':index', (index + 1).toString())}
+                                    </h4>
+                                    {isFromOccupant && (
+                                        <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                            <Link2 className="h-3 w-3" />
+                                            {t('coSigners.leaseSignerBadge')}
+                                        </span>
+                                    )}
+                                </div>
+                                {!isFromOccupant && (
+                                    <button
+                                        type="button"
+                                        onClick={() => removeCoSigner(index)}
+                                        className="cursor-pointer text-red-500 hover:text-red-700"
+                                        title={t('coSigners.remove')}
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                )}
                             </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.lastName')}</label>
-                                <input
-                                    type="text"
-                                    value={coSigner.last_name}
-                                    onChange={(e) => updateCoSigner(index, 'last_name', e.target.value)}
-                                    onBlur={onBlur}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.email')}</label>
-                                <input
-                                    type="email"
-                                    value={coSigner.email}
-                                    onChange={(e) => updateCoSigner(index, 'email', e.target.value)}
-                                    onBlur={onBlur}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.phone')}</label>
-                                <input
-                                    type="tel"
-                                    value={coSigner.phone_number}
-                                    onChange={(e) => updateCoSigner(index, 'phone_number', e.target.value)}
-                                    onBlur={onBlur}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.dateOfBirth')}</label>
-                                <DatePicker
-                                    value={coSigner.date_of_birth}
-                                    onChange={(value) => updateCoSigner(index, 'date_of_birth', value || '')}
-                                    onBlur={onBlur}
-                                    max={new Date()}
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.relationship')}</label>
-                                <SimpleSelect
-                                    value={coSigner.relationship}
-                                    onChange={(value) => updateCoSigner(index, 'relationship', value)}
-                                    options={RELATIONSHIP_OPTIONS}
-                                    placeholder={t('placeholders.selectRelationship')}
-                                    onBlur={onBlur}
-                                />
-                            </div>
-                            {coSigner.relationship === 'other' && (
-                                <div className="md:col-span-2">
-                                    <label className="mb-1 block text-sm">{t('fields.relationshipOther')}</label>
+
+                            {/* Identity Fields */}
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.firstName')}</label>
                                     <input
                                         type="text"
-                                        value={coSigner.relationship_other}
-                                        onChange={(e) => updateCoSigner(index, 'relationship_other', e.target.value)}
+                                        value={coSigner.first_name}
+                                        onChange={(e) => updateCoSigner(index, 'first_name', e.target.value)}
                                         onBlur={onBlur}
-                                        placeholder={t('placeholders.specifyRelationship')}
+                                        disabled={isFromOccupant}
+                                        className={`w-full rounded-lg border border-border px-4 py-2 ${isFromOccupant ? 'bg-muted' : 'bg-background'}`}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.lastName')}</label>
+                                    <input
+                                        type="text"
+                                        value={coSigner.last_name}
+                                        onChange={(e) => updateCoSigner(index, 'last_name', e.target.value)}
+                                        onBlur={onBlur}
+                                        disabled={isFromOccupant}
+                                        className={`w-full rounded-lg border border-border px-4 py-2 ${isFromOccupant ? 'bg-muted' : 'bg-background'}`}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.email')}</label>
+                                    <input
+                                        type="email"
+                                        value={coSigner.email}
+                                        onChange={(e) => updateCoSigner(index, 'email', e.target.value)}
+                                        onBlur={onBlur}
                                         className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                     />
                                 </div>
-                            )}
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.employmentStatus')}</label>
-                                <SimpleSelect
-                                    value={coSigner.employment_status}
-                                    onChange={(value) => updateCoSigner(index, 'employment_status', value)}
-                                    options={EMPLOYMENT_STATUS_OPTIONS}
-                                    placeholder={t('placeholders.selectStatus')}
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.phone')}</label>
+                                    <input
+                                        type="tel"
+                                        value={coSigner.phone_number}
+                                        onChange={(e) => updateCoSigner(index, 'phone_number', e.target.value)}
+                                        onBlur={onBlur}
+                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.dateOfBirth')}</label>
+                                    <DatePicker
+                                        value={coSigner.date_of_birth}
+                                        onChange={(value) => updateCoSigner(index, 'date_of_birth', value || '')}
+                                        onBlur={onBlur}
+                                        max={new Date()}
+                                        disabled={isFromOccupant}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.relationship')}</label>
+                                    <SimpleSelect
+                                        value={coSigner.relationship}
+                                        onChange={(value) => updateCoSigner(index, 'relationship', value)}
+                                        options={RELATIONSHIP_OPTIONS}
+                                        placeholder={t('placeholders.selectRelationship')}
+                                        onBlur={onBlur}
+                                        disabled={isFromOccupant}
+                                    />
+                                </div>
+                                {coSigner.relationship === 'other' && !isFromOccupant && (
+                                    <div className="md:col-span-2">
+                                        <label className="mb-1 block text-sm">{t('fields.relationshipOther')}</label>
+                                        <input
+                                            type="text"
+                                            value={coSigner.relationship_other}
+                                            onChange={(e) => updateCoSigner(index, 'relationship_other', e.target.value)}
+                                            onBlur={onBlur}
+                                            placeholder={t('placeholders.specifyRelationship')}
+                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Financial Information Section */}
+                            <div className="mt-4 border-t border-border pt-4">
+                                <h5 className="mb-3 text-sm font-medium">{t('coSigners.financialInfo')}</h5>
+                                <FinancialInfoSection
+                                    entityType="co_signer"
+                                    translations={translations}
+                                    fieldPrefix=""
+                                    getValue={handlers.getValue}
+                                    setValue={handlers.setValue}
+                                    getError={handlers.getError}
+                                    isTouched={handlers.isTouched}
                                     onBlur={onBlur}
                                 />
                             </div>
-                            {(coSigner.employment_status === 'employed' || coSigner.employment_status === 'self_employed') && (
-                                <>
-                                    <div>
-                                        <label className="mb-1 block text-sm">{t('fields.employer')}</label>
-                                        <input
-                                            type="text"
-                                            value={coSigner.employer_name}
-                                            onChange={(e) => updateCoSigner(index, 'employer_name', e.target.value)}
-                                            onBlur={onBlur}
-                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="mb-1 block text-sm">{t('fields.jobTitle')}</label>
-                                        <input
-                                            type="text"
-                                            value={coSigner.job_title}
-                                            onChange={(e) => updateCoSigner(index, 'job_title', e.target.value)}
-                                            onBlur={onBlur}
-                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                        />
-                                    </div>
-                                </>
-                            )}
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.monthlyIncome')}</label>
-                                <div className="flex">
-                                    <CurrencySelect
-                                        value={coSigner.income_currency}
-                                        onChange={(value) => updateCoSigner(index, 'income_currency', value)}
-                                        compact
-                                    />
-                                    <input
-                                        type="number"
-                                        value={coSigner.net_monthly_income}
-                                        onChange={(e) => updateCoSigner(index, 'net_monthly_income', e.target.value)}
-                                        onBlur={onBlur}
-                                        className="w-full rounded-l-none rounded-r-lg border border-border bg-background px-4 py-2"
-                                    />
-                                </div>
-                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
 
                 <button type="button" onClick={addCoSigner} className="flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline">
                     <Plus size={16} />
@@ -256,163 +301,147 @@ export function SupportStep({
                 </div>
                 <p className="mb-4 text-sm text-muted-foreground">{t('guarantors.description')}</p>
 
-                {data.guarantors.map((guarantor, index) => (
-                    <div key={index} className="mb-4 rounded-lg border border-border bg-background p-4">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h4 className="font-medium">{t('guarantors.guarantor').replace(':index', (index + 1).toString())}</h4>
-                            <button type="button" onClick={() => removeGuarantor(index)} className="cursor-pointer text-red-500 hover:text-red-700">
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
+                {data.guarantors.map((guarantor, index) => {
+                    const handlers = createGuarantorHandlers(index);
 
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.firstName')}</label>
-                                <input
-                                    type="text"
-                                    value={guarantor.first_name}
-                                    onChange={(e) => updateGuarantor(index, 'first_name', e.target.value)}
-                                    onBlur={onBlur}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                />
+                    return (
+                        <div key={index} className="mb-4 rounded-lg border border-border bg-background p-4">
+                            <div className="mb-4 flex items-center justify-between">
+                                <h4 className="font-medium">
+                                    {guarantor.first_name && guarantor.last_name
+                                        ? `${guarantor.first_name} ${guarantor.last_name}`
+                                        : t('guarantors.guarantor').replace(':index', (index + 1).toString())}
+                                </h4>
+                                <button
+                                    type="button"
+                                    onClick={() => removeGuarantor(index)}
+                                    className="cursor-pointer text-red-500 hover:text-red-700"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
                             </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.lastName')}</label>
-                                <input
-                                    type="text"
-                                    value={guarantor.last_name}
-                                    onChange={(e) => updateGuarantor(index, 'last_name', e.target.value)}
-                                    onBlur={onBlur}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.email')}</label>
-                                <input
-                                    type="email"
-                                    value={guarantor.email}
-                                    onChange={(e) => updateGuarantor(index, 'email', e.target.value)}
-                                    onBlur={onBlur}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.phone')}</label>
-                                <input
-                                    type="tel"
-                                    value={guarantor.phone_number}
-                                    onChange={(e) => updateGuarantor(index, 'phone_number', e.target.value)}
-                                    onBlur={onBlur}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('fields.relationship')}</label>
-                                <SimpleSelect
-                                    value={guarantor.relationship}
-                                    onChange={(value) => updateGuarantor(index, 'relationship', value)}
-                                    options={RELATIONSHIP_OPTIONS}
-                                    placeholder={t('placeholders.selectRelationship')}
-                                    onBlur={onBlur}
-                                />
-                            </div>
-                            {guarantor.relationship === 'other' && (
-                                <div>
-                                    <label className="mb-1 block text-sm">{t('fields.relationshipOther')}</label>
-                                    <input
-                                        type="text"
-                                        value={guarantor.relationship_other}
-                                        onChange={(e) => updateGuarantor(index, 'relationship_other', e.target.value)}
-                                        onBlur={onBlur}
-                                        placeholder={t('placeholders.specifyRelationship')}
-                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                    />
-                                </div>
-                            )}
-                        </div>
 
-                        <div className="mt-4 border-t border-border pt-4">
-                            <h5 className="mb-3 text-sm font-medium">{t('guarantors.address')}</h5>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <div className="md:col-span-2">
-                                    <label className="mb-1 block text-sm">{t('fields.streetAddress')}</label>
-                                    <input
-                                        type="text"
-                                        value={guarantor.street_address}
-                                        onChange={(e) => updateGuarantor(index, 'street_address', e.target.value)}
-                                        onBlur={onBlur}
-                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-sm">{t('fields.city')}</label>
-                                    <input
-                                        type="text"
-                                        value={guarantor.city}
-                                        onChange={(e) => updateGuarantor(index, 'city', e.target.value)}
-                                        onBlur={onBlur}
-                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-sm">{t('fields.postalCode')}</label>
-                                    <input
-                                        type="text"
-                                        value={guarantor.postal_code}
-                                        onChange={(e) => updateGuarantor(index, 'postal_code', e.target.value)}
-                                        onBlur={onBlur}
-                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mt-4 border-t border-border pt-4">
-                            <h5 className="mb-3 text-sm font-medium">{t('guarantors.employment')}</h5>
+                            {/* Identity Fields */}
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <label className="mb-1 block text-sm">{t('fields.employmentStatus')}</label>
+                                    <label className="mb-1 block text-sm">{t('fields.firstName')}</label>
+                                    <input
+                                        type="text"
+                                        value={guarantor.first_name}
+                                        onChange={(e) => updateGuarantor(index, 'first_name', e.target.value)}
+                                        onBlur={onBlur}
+                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.lastName')}</label>
+                                    <input
+                                        type="text"
+                                        value={guarantor.last_name}
+                                        onChange={(e) => updateGuarantor(index, 'last_name', e.target.value)}
+                                        onBlur={onBlur}
+                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.email')}</label>
+                                    <input
+                                        type="email"
+                                        value={guarantor.email}
+                                        onChange={(e) => updateGuarantor(index, 'email', e.target.value)}
+                                        onBlur={onBlur}
+                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.phone')}</label>
+                                    <input
+                                        type="tel"
+                                        value={guarantor.phone_number}
+                                        onChange={(e) => updateGuarantor(index, 'phone_number', e.target.value)}
+                                        onBlur={onBlur}
+                                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm">{t('fields.relationship')}</label>
                                     <SimpleSelect
-                                        value={guarantor.employment_status}
-                                        onChange={(value) => updateGuarantor(index, 'employment_status', value)}
-                                        options={EMPLOYMENT_STATUS_OPTIONS}
-                                        placeholder={t('placeholders.selectStatus')}
+                                        value={guarantor.relationship}
+                                        onChange={(value) => updateGuarantor(index, 'relationship', value)}
+                                        options={RELATIONSHIP_OPTIONS}
+                                        placeholder={t('placeholders.selectRelationship')}
                                         onBlur={onBlur}
                                     />
                                 </div>
-                                {(guarantor.employment_status === 'employed' || guarantor.employment_status === 'self_employed') && (
+                                {guarantor.relationship === 'other' && (
                                     <div>
-                                        <label className="mb-1 block text-sm">{t('fields.employer')}</label>
+                                        <label className="mb-1 block text-sm">{t('fields.relationshipOther')}</label>
                                         <input
                                             type="text"
-                                            value={guarantor.employer_name}
-                                            onChange={(e) => updateGuarantor(index, 'employer_name', e.target.value)}
+                                            value={guarantor.relationship_other}
+                                            onChange={(e) => updateGuarantor(index, 'relationship_other', e.target.value)}
                                             onBlur={onBlur}
+                                            placeholder={t('placeholders.specifyRelationship')}
                                             className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
                                 )}
-                                <div>
-                                    <label className="mb-1 block text-sm">{t('fields.monthlyIncome')}</label>
-                                    <div className="flex">
-                                        <CurrencySelect
-                                            value={guarantor.income_currency}
-                                            onChange={(value) => updateGuarantor(index, 'income_currency', value)}
-                                            compact
-                                        />
+                            </div>
+
+                            {/* Address Section */}
+                            <div className="mt-4 border-t border-border pt-4">
+                                <h5 className="mb-3 text-sm font-medium">{t('guarantors.address')}</h5>
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <div className="md:col-span-2">
+                                        <label className="mb-1 block text-sm">{t('fields.streetAddress')}</label>
                                         <input
-                                            type="number"
-                                            value={guarantor.net_monthly_income}
-                                            onChange={(e) => updateGuarantor(index, 'net_monthly_income', e.target.value)}
+                                            type="text"
+                                            value={guarantor.street_address}
+                                            onChange={(e) => updateGuarantor(index, 'street_address', e.target.value)}
                                             onBlur={onBlur}
-                                            className="w-full rounded-l-none rounded-r-lg border border-border bg-background px-4 py-2"
+                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm">{t('fields.city')}</label>
+                                        <input
+                                            type="text"
+                                            value={guarantor.city}
+                                            onChange={(e) => updateGuarantor(index, 'city', e.target.value)}
+                                            onBlur={onBlur}
+                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm">{t('fields.postalCode')}</label>
+                                        <input
+                                            type="text"
+                                            value={guarantor.postal_code}
+                                            onChange={(e) => updateGuarantor(index, 'postal_code', e.target.value)}
+                                            onBlur={onBlur}
+                                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Financial Information Section */}
+                            <div className="mt-4 border-t border-border pt-4">
+                                <h5 className="mb-3 text-sm font-medium">{t('guarantors.employment')}</h5>
+                                <FinancialInfoSection
+                                    entityType="guarantor"
+                                    translations={translations}
+                                    fieldPrefix=""
+                                    getValue={handlers.getValue}
+                                    setValue={handlers.setValue}
+                                    getError={handlers.getError}
+                                    isTouched={handlers.isTouched}
+                                    onBlur={onBlur}
+                                />
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
 
                 <button type="button" onClick={addGuarantor} className="flex cursor-pointer items-center gap-2 text-sm text-primary hover:underline">
                     <Plus size={16} />

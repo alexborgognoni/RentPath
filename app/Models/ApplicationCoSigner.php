@@ -11,6 +11,7 @@ class ApplicationCoSigner extends Model
     protected $fillable = [
         'application_id',
         'occupant_index',
+        'from_occupant_index',
         // Identity - Basic
         'first_name',
         'last_name',
@@ -75,6 +76,7 @@ class ApplicationCoSigner extends Model
             'student_monthly_income' => 'decimal:2',
             'payslips_paths' => 'array',
             'occupant_index' => 'integer',
+            'from_occupant_index' => 'integer',
         ];
     }
 
@@ -108,5 +110,13 @@ class ApplicationCoSigner extends Model
     public function requiresIdDocumentBack(): bool
     {
         return in_array($this->id_document_type, ['national_id', 'drivers_license']);
+    }
+
+    /**
+     * Check if this co-signer was auto-created from a household occupant.
+     */
+    public function isFromOccupant(): bool
+    {
+        return $this->from_occupant_index !== null;
     }
 }

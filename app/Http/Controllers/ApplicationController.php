@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Helpers\StorageHelper;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
+use App\Models\ApplicationCoSigner;
+use App\Models\ApplicationGuarantor;
 use App\Models\Lead;
 use App\Models\Property;
 use App\Models\TenantReference;
@@ -464,6 +466,10 @@ class ApplicationController extends Controller
 
         // Refresh to get updated values
         $application->refresh();
+
+        // Sync co-signers and guarantors to their respective tables
+        $this->syncCoSignersFromRequest($application, $allData['co_signers'] ?? []);
+        $this->syncGuarantorsFromRequest($application, $allData['guarantors'] ?? []);
 
         // Update lead status to 'drafting' if exists
         $this->updateLeadOnDraft($user, $property);
@@ -1249,6 +1255,165 @@ class ApplicationController extends Controller
                     'years_known' => $ref['years_known'] ?? null,
                 ]
             );
+        }
+    }
+
+    /**
+     * Sync co-signers from request data to application_co_signers table.
+     * Handles both auto-generated (from occupants) and manually added co-signers.
+     */
+    private function syncCoSignersFromRequest(Application $application, array $coSigners): void
+    {
+        if (empty($coSigners)) {
+            // Clear all co-signers if empty
+            $application->coSigners()->delete();
+
+            return;
+        }
+
+        // Get existing co-signer IDs for cleanup
+        $existingIds = $application->coSigners()->pluck('id')->toArray();
+        $processedIds = [];
+
+        foreach ($coSigners as $index => $coSignerData) {
+            if (empty($coSignerData['first_name']) && empty($coSignerData['last_name'])) {
+                continue;
+            }
+
+            $fromOccupantIndex = $coSignerData['from_occupant_index'] ?? null;
+
+            // For auto-generated co-signers, try to find existing record by from_occupant_index
+            if ($fromOccupantIndex !== null) {
+                $coSigner = $application->coSigners()
+                    ->where('from_occupant_index', $fromOccupantIndex)
+                    ->first();
+            } else {
+                // For manually added, use the index to track position
+                $coSigner = null;
+            }
+
+            $data = [
+                'application_id' => $application->id,
+                'occupant_index' => $coSignerData['occupant_index'] ?? $index,
+                'from_occupant_index' => $fromOccupantIndex,
+                'first_name' => $coSignerData['first_name'] ?? '',
+                'last_name' => $coSignerData['last_name'] ?? '',
+                'email' => $coSignerData['email'] ?? '',
+                'phone_country_code' => $coSignerData['phone_country_code'] ?? '+31',
+                'phone_number' => $coSignerData['phone_number'] ?? '',
+                'date_of_birth' => $coSignerData['date_of_birth'] ?: null,
+                'nationality' => $coSignerData['nationality'] ?? '',
+                'relationship' => $coSignerData['relationship'] ?? '',
+                'relationship_other' => $coSignerData['relationship_other'] ?? '',
+                // ID Document (ENUM fields must be null, not empty string)
+                'id_document_type' => $coSignerData['id_document_type'] ?: null,
+                'id_number' => $coSignerData['id_number'] ?? '',
+                'id_issuing_country' => $coSignerData['id_issuing_country'] ?? '',
+                'id_expiry_date' => $coSignerData['id_expiry_date'] ?: null,
+                // Immigration (ENUM fields)
+                'immigration_status' => $coSignerData['immigration_status'] ?: null,
+                'visa_type' => $coSignerData['visa_type'] ?: null,
+                'visa_expiry_date' => $coSignerData['visa_expiry_date'] ?: null,
+                // Financial (ENUM fields)
+                'employment_status' => $coSignerData['employment_status'] ?: null,
+                'employment_status_other' => $coSignerData['employment_status_other'] ?? '',
+                'employer_name' => $coSignerData['employer_name'] ?? '',
+                'job_title' => $coSignerData['job_title'] ?? '',
+                'employment_type' => $coSignerData['employment_type'] ?: null,
+                'employment_start_date' => $coSignerData['employment_start_date'] ?: null,
+                'net_monthly_income' => $coSignerData['net_monthly_income'] ?: null,
+                'income_currency' => $coSignerData['income_currency'] ?: 'eur',
+                // Student
+                'university_name' => $coSignerData['university_name'] ?? '',
+                'student_income_source' => $coSignerData['student_income_source'] ?? '',
+                'student_monthly_income' => $coSignerData['student_monthly_income'] ?: null,
+                // Other
+                'income_source' => $coSignerData['income_source'] ?? '',
+            ];
+
+            if ($coSigner) {
+                $coSigner->update($data);
+                $processedIds[] = $coSigner->id;
+            } else {
+                $newCoSigner = ApplicationCoSigner::create($data);
+                $processedIds[] = $newCoSigner->id;
+            }
+        }
+
+        // Remove co-signers that are no longer in the list
+        $toDelete = array_diff($existingIds, $processedIds);
+        if (! empty($toDelete)) {
+            $application->coSigners()->whereIn('id', $toDelete)->delete();
+        }
+    }
+
+    /**
+     * Sync guarantors from request data to application_guarantors table.
+     */
+    private function syncGuarantorsFromRequest(Application $application, array $guarantors): void
+    {
+        if (empty($guarantors)) {
+            // Clear all guarantors if empty
+            $application->guarantors()->delete();
+
+            return;
+        }
+
+        // Get existing guarantor IDs for cleanup
+        $existingIds = $application->guarantors()->pluck('id')->toArray();
+        $processedIds = [];
+
+        foreach ($guarantors as $index => $guarantorData) {
+            if (empty($guarantorData['first_name']) && empty($guarantorData['last_name'])) {
+                continue;
+            }
+
+            $data = [
+                'application_id' => $application->id,
+                'for_signer_type' => $guarantorData['for_signer_type'] ?: 'primary',
+                'for_co_signer_index' => $guarantorData['for_co_signer_index'] ?: null,
+                'first_name' => $guarantorData['first_name'] ?? '',
+                'last_name' => $guarantorData['last_name'] ?? '',
+                'email' => $guarantorData['email'] ?? '',
+                'phone_country_code' => $guarantorData['phone_country_code'] ?? '+31',
+                'phone_number' => $guarantorData['phone_number'] ?? '',
+                'date_of_birth' => $guarantorData['date_of_birth'] ?: null,
+                'nationality' => $guarantorData['nationality'] ?? '',
+                'relationship' => $guarantorData['relationship'] ?? '',
+                'relationship_other' => $guarantorData['relationship_other'] ?? '',
+                // ID Document (ENUM fields must be null, not empty string)
+                'id_document_type' => $guarantorData['id_document_type'] ?: null,
+                'id_number' => $guarantorData['id_number'] ?? '',
+                'id_issuing_country' => $guarantorData['id_issuing_country'] ?? '',
+                'id_expiry_date' => $guarantorData['id_expiry_date'] ?: null,
+                // Address
+                'street_address' => $guarantorData['street_address'] ?? '',
+                'city' => $guarantorData['city'] ?? '',
+                'state_province' => $guarantorData['state_province'] ?? '',
+                'postal_code' => $guarantorData['postal_code'] ?? '',
+                'country' => $guarantorData['country'] ?? '',
+                'years_at_address' => $guarantorData['years_at_address'] ?: null,
+                // Financial (ENUM fields)
+                'employment_status' => $guarantorData['employment_status'] ?: null,
+                'employer_name' => $guarantorData['employer_name'] ?? '',
+                'job_title' => $guarantorData['job_title'] ?? '',
+                'net_monthly_income' => $guarantorData['net_monthly_income'] ?: null,
+                'income_currency' => $guarantorData['income_currency'] ?: 'eur',
+                // Consent
+                'consent_to_credit_check' => $guarantorData['consent_to_credit_check'] ?? false,
+                'consent_to_contact' => $guarantorData['consent_to_contact'] ?? false,
+                'guarantee_consent_signed' => $guarantorData['guarantee_consent_signed'] ?? false,
+            ];
+
+            // For now, just create/recreate all guarantors since we don't have a unique identifier
+            $newGuarantor = ApplicationGuarantor::create($data);
+            $processedIds[] = $newGuarantor->id;
+        }
+
+        // Remove guarantors that are no longer in the list
+        $toDelete = array_diff($existingIds, $processedIds);
+        if (! empty($toDelete)) {
+            $application->guarantors()->whereIn('id', $toDelete)->delete();
         }
     }
 

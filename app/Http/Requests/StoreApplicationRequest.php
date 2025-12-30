@@ -175,6 +175,7 @@ class StoreApplicationRequest extends FormRequest
             // =====================================
             'co_signers' => 'nullable|array',
             'co_signers.*.occupant_index' => 'required|integer|min:0',
+            'co_signers.*.from_occupant_index' => 'nullable|integer|min:0',
             'co_signers.*.first_name' => 'required|string|max:100',
             'co_signers.*.last_name' => 'required|string|max:100',
             'co_signers.*.email' => 'required|email|max:255',

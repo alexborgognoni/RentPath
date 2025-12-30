@@ -7,6 +7,7 @@ const DEBOUNCE_MS = 500;
 const PROFILE_FIELDS = new Set([
     // Personal details
     'profile_date_of_birth',
+    'profile_middle_name',
     'profile_nationality',
     'profile_phone_country_code',
     'profile_phone_number',
@@ -21,6 +22,7 @@ const PROFILE_FIELDS = new Set([
     'profile_visa_type',
     'profile_visa_type_other',
     'profile_visa_expiry_date',
+    'profile_work_permit_number',
     // Right to Rent
     'profile_right_to_rent_share_code',
     // Current Address
@@ -31,30 +33,98 @@ const PROFILE_FIELDS = new Set([
     'profile_current_state_province',
     'profile_current_postal_code',
     'profile_current_country',
-    // Employment
+
+    // ===== Employment & Income (Expanded) =====
     'profile_employment_status',
+    'profile_income_currency',
+
+    // Employed fields
     'profile_employer_name',
     'profile_job_title',
     'profile_employment_type',
     'profile_employment_start_date',
-    'profile_monthly_income',
-    'profile_income_currency',
-    // Student
+    'profile_gross_annual_income',
+    'profile_net_monthly_income',
+    'profile_monthly_income', // Legacy field
+    'profile_pay_frequency',
+    'profile_employment_contract_type',
+    'profile_employment_end_date',
+    'profile_probation_end_date',
+    'profile_employer_address',
+    'profile_employer_phone',
+
+    // Self-employed fields
+    'profile_business_name',
+    'profile_business_type',
+    'profile_business_registration_number',
+    'profile_business_start_date',
+    'profile_gross_annual_revenue',
+
+    // Student fields
     'profile_university_name',
     'profile_program_of_study',
     'profile_expected_graduation_date',
     'profile_student_id_number',
     'profile_student_income_source',
-    // Guarantor
+    'profile_student_income_source_type',
+    'profile_student_income_source_other',
+    'profile_student_monthly_income',
+
+    // Retired fields
+    'profile_pension_type',
+    'profile_pension_provider',
+    'profile_pension_monthly_income',
+    'profile_retirement_other_income',
+
+    // Unemployed fields
+    'profile_receiving_unemployment_benefits',
+    'profile_unemployment_benefits_amount',
+    'profile_unemployed_income_source',
+    'profile_unemployed_income_source_other',
+
+    // Other employment situation fields
+    'profile_other_employment_situation',
+    'profile_other_employment_situation_details',
+    'profile_expected_return_to_work',
+    'profile_other_situation_monthly_income',
+    'profile_other_situation_income_source',
+
+    // Additional income
+    'profile_has_additional_income',
+    'profile_additional_income_sources',
+
+    // ===== Guarantor =====
     'profile_has_guarantor',
-    'profile_guarantor_name',
+    'profile_guarantor_first_name',
+    'profile_guarantor_last_name',
+    'profile_guarantor_name', // Legacy
     'profile_guarantor_relationship',
-    'profile_guarantor_phone',
+    'profile_guarantor_relationship_other',
+    'profile_guarantor_phone_country_code',
+    'profile_guarantor_phone_number',
+    'profile_guarantor_phone', // Legacy
     'profile_guarantor_email',
-    'profile_guarantor_address',
-    'profile_guarantor_employer',
+    'profile_guarantor_street_name',
+    'profile_guarantor_house_number',
+    'profile_guarantor_address_line_2',
+    'profile_guarantor_city',
+    'profile_guarantor_state_province',
+    'profile_guarantor_postal_code',
+    'profile_guarantor_country',
+    'profile_guarantor_address', // Legacy
+    'profile_guarantor_employment_status',
+    'profile_guarantor_employer_name',
+    'profile_guarantor_employer', // Legacy
+    'profile_guarantor_job_title',
+    'profile_guarantor_employment_type',
+    'profile_guarantor_employment_start_date',
     'profile_guarantor_monthly_income',
     'profile_guarantor_income_currency',
+    'profile_guarantor_university_name',
+    'profile_guarantor_program_of_study',
+    'profile_guarantor_expected_graduation_date',
+    'profile_guarantor_student_income_source',
+
     // Emergency Contact
     'profile_emergency_contact_name',
     'profile_emergency_contact_phone',

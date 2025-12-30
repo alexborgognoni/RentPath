@@ -114,6 +114,7 @@ export interface ReferenceDetails {
 // Co-signer per PLAN.md - requires full identity + financial
 export interface CoSignerDetails {
     occupant_index: number;
+    from_occupant_index: number | null; // null = manually added, number = auto-generated from occupant at this index
     // Identity
     first_name: string;
     last_name: string;
@@ -822,6 +823,7 @@ export interface UseApplicationWizardReturn {
     removeCoSigner: (index: number) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updateCoSigner: (index: number, field: keyof CoSignerDetails, value: any) => void;
+    syncCoSignersFromOccupants: () => void;
 
     // Guarantor helpers
     addGuarantor: (forSignerType?: 'primary' | 'co_signer', forCoSignerIndex?: number | null) => void;
@@ -1110,6 +1112,7 @@ export function useApplicationWizard({
     const addCoSigner = useCallback(() => {
         const newCoSigner: CoSignerDetails = {
             occupant_index: -1,
+            from_occupant_index: null, // Manually added co-signer
             // Identity
             first_name: '',
             last_name: '',
@@ -1156,6 +1159,12 @@ export function useApplicationWizard({
 
     const removeCoSigner = useCallback(
         (index: number) => {
+            const coSigner = wizard.data.co_signers[index];
+            // Cannot remove auto-generated co-signers (linked to occupant)
+            if (coSigner?.from_occupant_index !== null) {
+                console.warn('Cannot remove co-signer linked to occupant');
+                return;
+            }
             wizard.updateField(
                 'co_signers',
                 wizard.data.co_signers.filter((_, i) => i !== index),
@@ -1174,6 +1183,96 @@ export function useApplicationWizard({
         },
         [wizard],
     );
+
+    /**
+     * Sync co-signers from occupants marked as "will_sign_lease".
+     * - Creates/updates auto-generated co-signers for each will_sign_lease occupant
+     * - Preserves manually added co-signers (from_occupant_index === null)
+     * - Removes auto-generated co-signers for occupants no longer signing
+     */
+    const syncCoSignersFromOccupants = useCallback(() => {
+        const occupantsDetails = wizard.data.occupants_details;
+        const currentCoSigners = wizard.data.co_signers;
+
+        // Keep existing manual co-signers (from_occupant_index === null)
+        const manualCoSigners = currentCoSigners.filter((cs) => cs.from_occupant_index === null);
+
+        // Create/update co-signers for each will_sign_lease occupant
+        const autoCoSigners: CoSignerDetails[] = [];
+
+        occupantsDetails.forEach((occupant, occupantIndex) => {
+            if (!occupant.will_sign_lease) return;
+
+            // Check if we already have a co-signer for this occupant
+            const existing = currentCoSigners.find((cs) => cs.from_occupant_index === occupantIndex);
+
+            if (existing) {
+                // Update name/relationship if occupant details changed, keep other fields
+                autoCoSigners.push({
+                    ...existing,
+                    first_name: occupant.first_name,
+                    last_name: occupant.last_name,
+                    date_of_birth: occupant.date_of_birth,
+                    relationship: occupant.relationship,
+                    relationship_other: occupant.relationship_other,
+                });
+            } else {
+                // Create new co-signer from occupant
+                autoCoSigners.push({
+                    occupant_index: occupantIndex,
+                    from_occupant_index: occupantIndex,
+                    // Identity - pre-filled from occupant
+                    first_name: occupant.first_name,
+                    last_name: occupant.last_name,
+                    email: '',
+                    phone_country_code: '+31',
+                    phone_number: '',
+                    date_of_birth: occupant.date_of_birth,
+                    nationality: '',
+                    relationship: occupant.relationship,
+                    relationship_other: occupant.relationship_other,
+                    // ID Document
+                    id_document_type: '',
+                    id_number: '',
+                    id_issuing_country: '',
+                    id_expiry_date: '',
+                    id_document_front: null,
+                    id_document_back: null,
+                    // Immigration
+                    immigration_status: '',
+                    visa_type: '',
+                    visa_expiry_date: '',
+                    // Financial
+                    employment_status: '',
+                    employment_status_other: '',
+                    employer_name: '',
+                    job_title: '',
+                    employment_type: '',
+                    employment_start_date: '',
+                    net_monthly_income: '',
+                    income_currency: 'eur',
+                    employment_contract: null,
+                    payslips: [],
+                    // Student
+                    university_name: '',
+                    enrollment_proof: null,
+                    student_income_source: '',
+                    student_monthly_income: '',
+                    // Other
+                    income_source: '',
+                    income_proof: null,
+                });
+            }
+        });
+
+        // Combine: auto-generated first, then manual
+        const newCoSigners = [...autoCoSigners, ...manualCoSigners];
+
+        // Only update if there are changes
+        if (JSON.stringify(newCoSigners) !== JSON.stringify(currentCoSigners)) {
+            wizard.updateField('co_signers', newCoSigners);
+        }
+    }, [wizard]);
 
     // ===== Guarantor Helpers =====
     const addGuarantor = useCallback(
@@ -1630,6 +1729,7 @@ export function useApplicationWizard({
         addCoSigner,
         removeCoSigner,
         updateCoSigner,
+        syncCoSignersFromOccupants,
 
         // Guarantor helpers
         addGuarantor,

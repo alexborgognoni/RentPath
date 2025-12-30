@@ -593,9 +593,11 @@ class TenantProfileController extends Controller
 
         // Define allowed fields that can be autosaved
         // These are profile fields, not application-specific fields
+        // Must match PROFILE_FIELDS in useProfileAutosave.ts (without 'profile_' prefix)
         $allowedFields = [
             // Personal Info
             'date_of_birth',
+            'middle_name',
             'nationality',
             'phone_country_code',
             'phone_number',
@@ -610,6 +612,7 @@ class TenantProfileController extends Controller
             'visa_type',
             'visa_type_other',
             'visa_expiry_date',
+            'work_permit_number',
             // Right to Rent
             'right_to_rent_share_code',
             // Current Address
@@ -620,28 +623,76 @@ class TenantProfileController extends Controller
             'current_state_province',
             'current_postal_code',
             'current_country',
-            // Employment
+
+            // ===== Employment & Income =====
             'employment_status',
+            'income_currency',
+
+            // Employed fields
             'employer_name',
             'job_title',
             'employment_type',
             'employment_start_date',
-            'monthly_income',
-            'income_currency',
-            // Student
+            'gross_annual_income',
+            'net_monthly_income',
+            'monthly_income', // Legacy
+            'pay_frequency',
+            'employment_contract_type',
+            'employment_end_date',
+            'probation_end_date',
+            'employer_address',
+            'employer_phone',
+
+            // Self-employed fields
+            'business_name',
+            'business_type',
+            'business_registration_number',
+            'business_start_date',
+            'gross_annual_revenue',
+
+            // Student fields
             'university_name',
             'program_of_study',
             'expected_graduation_date',
             'student_id_number',
             'student_income_source',
-            // Guarantor - Basic Info
+            'student_income_source_type',
+            'student_income_source_other',
+            'student_monthly_income',
+
+            // Retired fields
+            'pension_type',
+            'pension_provider',
+            'pension_monthly_income',
+            'retirement_other_income',
+
+            // Unemployed fields
+            'receiving_unemployment_benefits',
+            'unemployment_benefits_amount',
+            'unemployed_income_source',
+            'unemployed_income_source_other',
+
+            // Other employment situation fields
+            'other_employment_situation',
+            'other_employment_situation_details',
+            'expected_return_to_work',
+            'other_situation_monthly_income',
+            'other_situation_income_source',
+
+            // Additional income
+            'has_additional_income',
+            'additional_income_sources',
+
+            // ===== Guarantor =====
             'has_guarantor',
             'guarantor_first_name',
             'guarantor_last_name',
+            'guarantor_name', // Legacy
             'guarantor_relationship',
             'guarantor_relationship_other',
             'guarantor_phone_country_code',
             'guarantor_phone_number',
+            'guarantor_phone', // Legacy
             'guarantor_email',
             'guarantor_street_name',
             'guarantor_house_number',
@@ -650,19 +701,20 @@ class TenantProfileController extends Controller
             'guarantor_state_province',
             'guarantor_postal_code',
             'guarantor_country',
-            // Guarantor - Employment
+            'guarantor_address', // Legacy
             'guarantor_employment_status',
             'guarantor_employer_name',
+            'guarantor_employer', // Legacy
             'guarantor_job_title',
             'guarantor_employment_type',
             'guarantor_employment_start_date',
             'guarantor_monthly_income',
             'guarantor_income_currency',
-            // Guarantor - Student Info
             'guarantor_university_name',
             'guarantor_program_of_study',
             'guarantor_expected_graduation_date',
             'guarantor_student_income_source',
+
             // Emergency Contact
             'emergency_contact_name',
             'emergency_contact_phone',

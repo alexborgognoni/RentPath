@@ -1042,6 +1042,11 @@ return [
                 'description' => 'Co-signers are additional people who will sign the lease with you and share responsibility for the rent.',
                 'coSigner' => 'Co-signer :index',
                 'addCoSigner' => 'Add Co-signer',
+                'fromHousehold' => 'from household',
+                'additional' => 'additional',
+                'leaseSignerBadge' => 'Lease signer',
+                'financialInfo' => 'Financial Information',
+                'remove' => 'Remove co-signer',
             ],
             'guarantors' => [
                 'title' => 'Guarantors',
