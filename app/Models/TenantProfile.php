@@ -63,6 +63,7 @@ class TenantProfile extends Model
         'business_name',
         'business_type',
         'business_registration_number',
+        'business_start_date',
         'job_title',
         'employment_start_date',
         'employment_end_date',
@@ -70,6 +71,7 @@ class TenantProfile extends Model
         'employment_type',
         'employment_contract_type',
         'monthly_income',
+        'net_monthly_income',
         'gross_annual_income',
         'gross_annual_revenue',
         'income_currency',
@@ -94,6 +96,28 @@ class TenantProfile extends Model
         'program_of_study',
         'expected_graduation_date',
         'student_income_source',
+        'student_income_source_type',
+        'student_income_source_other',
+        'student_monthly_income',
+
+        // Retired info
+        'pension_monthly_income',
+        'pension_provider',
+        'pension_type',
+        'retirement_other_income',
+
+        // Unemployed info
+        'receiving_unemployment_benefits',
+        'unemployment_benefits_amount',
+        'unemployed_income_source',
+        'unemployed_income_source_other',
+
+        // Other employment situation
+        'other_employment_situation',
+        'other_employment_situation_details',
+        'expected_return_to_work',
+        'other_situation_monthly_income',
+        'other_situation_income_source',
 
         // Guarantor - Basic Info
         'has_guarantor',
@@ -142,6 +166,10 @@ class TenantProfile extends Model
         'payslip_3_original_name',
         'student_proof_path',
         'student_proof_original_name',
+        'pension_statement_path',
+        'pension_statement_original_name',
+        'benefits_statement_path',
+        'benefits_statement_original_name',
         'other_income_proof_path',
         'other_income_proof_original_name',
 
@@ -201,8 +229,17 @@ class TenantProfile extends Model
         'probation_end_date' => 'date',
         'expected_graduation_date' => 'date',
         'monthly_income' => 'decimal:2',
+        'net_monthly_income' => 'decimal:2',
         'gross_annual_income' => 'decimal:2',
         'gross_annual_revenue' => 'decimal:2',
+        'business_start_date' => 'date',
+        'student_monthly_income' => 'decimal:2',
+        'pension_monthly_income' => 'decimal:2',
+        'retirement_other_income' => 'decimal:2',
+        'receiving_unemployment_benefits' => 'boolean',
+        'unemployment_benefits_amount' => 'decimal:2',
+        'expected_return_to_work' => 'date',
+        'other_situation_monthly_income' => 'decimal:2',
         'guarantor_monthly_income' => 'decimal:2',
         'guarantor_employment_start_date' => 'date',
         'guarantor_expected_graduation_date' => 'date',
@@ -240,6 +277,8 @@ class TenantProfile extends Model
         'payslip_2_url',
         'payslip_3_url',
         'student_proof_url',
+        'pension_statement_url',
+        'benefits_statement_url',
         'other_income_proof_url',
         'guarantor_full_name',
         'guarantor_id_front_url',
@@ -470,6 +509,22 @@ class TenantProfile extends Model
     }
 
     /**
+     * Get the URL for pension statement document (5-minute signed URL).
+     */
+    public function getPensionStatementUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->pension_statement_path, 'private', 5, $this->pension_statement_original_name);
+    }
+
+    /**
+     * Get the URL for benefits statement document (5-minute signed URL).
+     */
+    public function getBenefitsStatementUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->benefits_statement_path, 'private', 5, $this->benefits_statement_original_name);
+    }
+
+    /**
      * Get the URL for other income proof document (5-minute signed URL).
      * Used for unemployed/retired tenants to prove benefits, savings, pension, etc.
      */
@@ -587,6 +642,8 @@ class TenantProfile extends Model
             'payslip_2' => $this->payslip_2_path,
             'payslip_3' => $this->payslip_3_path,
             'student_proof' => $this->student_proof_path,
+            'pension_statement' => $this->pension_statement_path,
+            'benefits_statement' => $this->benefits_statement_path,
             'other_income_proof' => $this->other_income_proof_path,
             'reference_letter' => $this->reference_letter_path,
             // Guarantor documents

@@ -147,7 +147,6 @@ class ApplicationController extends Controller
                 'message_to_landlord',
                 'additional_occupants',
                 'occupants_details',
-                'has_pets',
                 'pets_details',
                 'references',
                 'previous_landlord_name',
@@ -344,23 +343,75 @@ class ApplicationController extends Controller
 
         $allData = $request->all();
 
+        // Save profile fields to TenantProfile (ensures data is persisted even if autosave hasn't run)
+        // Note: Emergency contact fields are now application-specific, NOT stored in profile
+        // Only include fields that actually exist in tenant_profiles table
+        $profileFields = [
+            'date_of_birth', 'middle_name', 'nationality', 'phone_country_code', 'phone_number',
+            'id_document_type', 'id_number', 'id_issuing_country', 'id_expiry_date',
+            'immigration_status', 'immigration_status_other', 'visa_type', 'visa_type_other', 'visa_expiry_date',
+            'right_to_rent_share_code',
+            'current_house_number', 'current_address_line_2', 'current_street_name', 'current_city',
+            'current_state_province', 'current_postal_code', 'current_country',
+            'employment_status', 'employer_name', 'job_title', 'employment_type', 'employment_start_date',
+            'monthly_income', 'income_currency',
+            'university_name', 'program_of_study', 'expected_graduation_date', 'student_income_source',
+            'has_guarantor', 'guarantor_first_name', 'guarantor_last_name', 'guarantor_relationship',
+            'guarantor_phone_country_code', 'guarantor_phone_number',
+            'guarantor_email', 'guarantor_street_name', 'guarantor_house_number', 'guarantor_address_line_2',
+            'guarantor_city', 'guarantor_state_province', 'guarantor_postal_code', 'guarantor_country',
+            'guarantor_employment_status', 'guarantor_employer_name', 'guarantor_job_title',
+            'guarantor_monthly_income', 'guarantor_income_currency',
+        ];
+
+        $profileData = [];
+        foreach ($allData as $key => $value) {
+            // Handle profile_ prefix from wizard form fields
+            $fieldName = str_starts_with($key, 'profile_') ? substr($key, 8) : $key;
+            if (in_array($fieldName, $profileFields)) {
+                // Handle boolean conversion for has_guarantor
+                if ($fieldName === 'has_guarantor') {
+                    $profileData[$fieldName] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                } else {
+                    $profileData[$fieldName] = $value === '' ? null : $value;
+                }
+            }
+        }
+
+        if (! empty($profileData)) {
+            $tenantProfile->update($profileData);
+            $tenantProfile->refresh();
+        }
+
         // Only save application-specific fields to draft (not profile fields)
-        // Profile fields are autosaved directly to TenantProfile
         $applicationFields = [
+            // Rental Intent
             'desired_move_in_date',
             'lease_duration_months',
+            'is_flexible_on_move_in',
+            'is_flexible_on_duration',
             'message_to_landlord',
+            // Occupants
             'additional_occupants',
             'occupants_details',
-            'has_pets',
+            // Pets
             'pets_details',
+            // References
             'references',
             'previous_landlord_name',
             'previous_landlord_phone',
             'previous_landlord_email',
+            // Emergency Contact (application-specific, split fields)
+            'emergency_contact_first_name',
+            'emergency_contact_last_name',
+            'emergency_contact_relationship',
+            'emergency_contact_relationship_other',
+            'emergency_contact_phone_country_code',
+            'emergency_contact_phone_number',
+            'emergency_contact_email',
+            // Legacy fields (for backwards compatibility during migration)
             'emergency_contact_name',
             'emergency_contact_phone',
-            'emergency_contact_relationship',
             'invited_via_token',
         ];
 
@@ -427,10 +478,31 @@ class ApplicationController extends Controller
     private function mapProfileToValidationData($tenantProfile): array
     {
         return [
+            // Personal Info
             'profile_date_of_birth' => $tenantProfile->date_of_birth,
+            'profile_middle_name' => $tenantProfile->middle_name,
             'profile_nationality' => $tenantProfile->nationality,
             'profile_phone_country_code' => $tenantProfile->phone_country_code,
             'profile_phone_number' => $tenantProfile->phone_number,
+            // ID Document
+            'profile_id_document_type' => $tenantProfile->id_document_type,
+            'profile_id_number' => $tenantProfile->id_number,
+            'profile_id_issuing_country' => $tenantProfile->id_issuing_country,
+            'profile_id_expiry_date' => $tenantProfile->id_expiry_date,
+            // Immigration Status
+            'profile_immigration_status' => $tenantProfile->immigration_status,
+            'profile_immigration_status_other' => $tenantProfile->immigration_status_other,
+            'profile_visa_type' => $tenantProfile->visa_type,
+            'profile_visa_type_other' => $tenantProfile->visa_type_other,
+            'profile_visa_expiry_date' => $tenantProfile->visa_expiry_date,
+            // Right to Rent
+            'profile_right_to_rent_share_code' => $tenantProfile->right_to_rent_share_code,
+            // Document paths (for validation)
+            'profile_id_document_front_path' => $tenantProfile->id_document_front_path,
+            'profile_id_document_back_path' => $tenantProfile->id_document_back_path,
+            'profile_residence_permit_document_path' => $tenantProfile->residence_permit_document_path,
+            'profile_right_to_rent_document_path' => $tenantProfile->right_to_rent_document_path,
+            // Current Address
             'profile_current_house_number' => $tenantProfile->current_house_number,
             'profile_current_address_line_2' => $tenantProfile->current_address_line_2,
             'profile_current_street_name' => $tenantProfile->current_street_name,
@@ -438,121 +510,290 @@ class ApplicationController extends Controller
             'profile_current_state_province' => $tenantProfile->current_state_province,
             'profile_current_postal_code' => $tenantProfile->current_postal_code,
             'profile_current_country' => $tenantProfile->current_country,
+            // Employment (Employed)
             'profile_employment_status' => $tenantProfile->employment_status,
             'profile_employer_name' => $tenantProfile->employer_name,
             'profile_job_title' => $tenantProfile->job_title,
             'profile_employment_type' => $tenantProfile->employment_type,
             'profile_employment_start_date' => $tenantProfile->employment_start_date,
-            'profile_monthly_income' => $tenantProfile->monthly_income,
+            'profile_gross_annual_income' => $tenantProfile->gross_annual_income,
+            'profile_net_monthly_income' => $tenantProfile->net_monthly_income,
+            'profile_monthly_income' => $tenantProfile->monthly_income, // Deprecated
             'profile_income_currency' => $tenantProfile->income_currency,
+            // Self-Employed
+            'profile_business_name' => $tenantProfile->business_name,
+            'profile_business_type' => $tenantProfile->business_type,
+            'profile_business_start_date' => $tenantProfile->business_start_date,
+            'profile_gross_annual_revenue' => $tenantProfile->gross_annual_revenue,
+            // Student
             'profile_university_name' => $tenantProfile->university_name,
             'profile_program_of_study' => $tenantProfile->program_of_study,
             'profile_expected_graduation_date' => $tenantProfile->expected_graduation_date,
             'profile_student_income_source' => $tenantProfile->student_income_source,
+            'profile_student_income_source_type' => $tenantProfile->student_income_source_type,
+            'profile_student_income_source_other' => $tenantProfile->student_income_source_other,
+            'profile_student_monthly_income' => $tenantProfile->student_monthly_income,
+            // Retired
+            'profile_pension_monthly_income' => $tenantProfile->pension_monthly_income,
+            'profile_pension_provider' => $tenantProfile->pension_provider,
+            'profile_retirement_other_income' => $tenantProfile->retirement_other_income,
+            // Unemployed
+            'profile_receiving_unemployment_benefits' => $tenantProfile->receiving_unemployment_benefits,
+            'profile_unemployment_benefits_amount' => $tenantProfile->unemployment_benefits_amount,
+            'profile_unemployed_income_source' => $tenantProfile->unemployed_income_source,
+            'profile_unemployed_income_source_other' => $tenantProfile->unemployed_income_source_other,
+            // Other Employment Situation
+            'profile_other_employment_situation' => $tenantProfile->other_employment_situation,
+            'profile_other_employment_situation_details' => $tenantProfile->other_employment_situation_details,
+            'profile_expected_return_to_work' => $tenantProfile->expected_return_to_work,
+            'profile_other_situation_monthly_income' => $tenantProfile->other_situation_monthly_income,
+            'profile_other_situation_income_source' => $tenantProfile->other_situation_income_source,
+            // Guarantor
             'profile_has_guarantor' => $tenantProfile->has_guarantor,
-            'profile_guarantor_name' => $tenantProfile->guarantor_name,
+            'profile_guarantor_first_name' => $tenantProfile->guarantor_first_name,
+            'profile_guarantor_last_name' => $tenantProfile->guarantor_last_name,
             'profile_guarantor_relationship' => $tenantProfile->guarantor_relationship,
-            'profile_guarantor_phone' => $tenantProfile->guarantor_phone,
+            'profile_guarantor_phone_country_code' => $tenantProfile->guarantor_phone_country_code,
+            'profile_guarantor_phone_number' => $tenantProfile->guarantor_phone_number,
             'profile_guarantor_email' => $tenantProfile->guarantor_email,
-            'profile_guarantor_address' => $tenantProfile->guarantor_address,
-            'profile_guarantor_employer' => $tenantProfile->guarantor_employer,
             'profile_guarantor_monthly_income' => $tenantProfile->guarantor_monthly_income,
+            // Document paths for guarantor
+            'profile_employment_contract_path' => $tenantProfile->employment_contract_path,
+            'profile_payslip_1_path' => $tenantProfile->payslip_1_path,
+            'profile_payslip_2_path' => $tenantProfile->payslip_2_path,
+            'profile_payslip_3_path' => $tenantProfile->payslip_3_path,
+            'profile_student_proof_path' => $tenantProfile->student_proof_path,
+            'profile_pension_statement_path' => $tenantProfile->pension_statement_path,
+            'profile_benefits_statement_path' => $tenantProfile->benefits_statement_path,
+            'profile_other_income_proof_path' => $tenantProfile->other_income_proof_path,
         ];
     }
 
     /**
      * Get validation rules for a specific step.
-     * 6-step structure (Documents step removed):
-     * 1: Personal Info, 2: Employment & Income, 3: Details, 4: References (opt),
-     * 5: Emergency (opt), 6: Review
+     * 8-step structure:
+     * 1: Identity & Legal Eligibility
+     * 2: Household Composition
+     * 3: Financial Capability
+     * 4: Risk Mitigation (optional)
+     * 5: Credit & Rental History
+     * 6: Additional Information (optional)
+     * 7: Declarations & Consent
+     * 8: Review
      */
     private function getStepValidationRules(int $step, array $data): array
     {
         switch ($step) {
             case 1:
-                // Step 1: Personal Information
-                return [
+                // Step 1: Identity & Legal Eligibility
+                $rules = [
                     'profile_date_of_birth' => 'required|date|before:-18 years',
                     'profile_nationality' => 'required|string|max:100',
-                    'profile_phone_country_code' => 'required|string|max:5',
+                    'profile_phone_country_code' => 'required|string|max:10',
                     'profile_phone_number' => 'required|string|max:20',
-                    'profile_current_house_number' => 'required|string|max:20',
-                    'profile_current_address_line_2' => 'nullable|string|max:100',
-                    'profile_current_street_name' => 'required|string|max:255',
-                    'profile_current_city' => 'required|string|max:100',
-                    'profile_current_state_province' => 'nullable|string|max:100',
-                    'profile_current_postal_code' => 'required|string|max:20',
-                    'profile_current_country' => 'required|string|max:2',
+                    // ID Document
+                    'profile_id_document_type' => 'required|in:passport,national_id,drivers_license,residence_permit',
+                    'profile_id_number' => 'required|string|max:100',
+                    'profile_id_issuing_country' => 'required|string|max:2',
+                    'profile_id_expiry_date' => 'required|date|after:today',
+                    // Immigration Status
+                    'profile_immigration_status' => 'required|string',
                 ];
+
+                // Require ID documents unless already uploaded
+                if (empty($data['profile_id_document_front_path'])) {
+                    $rules['profile_id_document_front'] = 'required';
+                }
+                if (empty($data['profile_id_document_back_path'])) {
+                    $rules['profile_id_document_back'] = 'required';
+                }
+
+                // Immigration status conditional validation
+                $immigrationStatus = $data['profile_immigration_status'] ?? '';
+                if ($immigrationStatus === 'other') {
+                    $rules['profile_immigration_status_other'] = 'required|string|max:100';
+                }
+
+                // Statuses that require permit details
+                $requiresPermitDetails = in_array($immigrationStatus, [
+                    'temporary_resident', 'visa_holder', 'student', 'work_permit',
+                    'family_reunification', 'refugee_or_protected',
+                ]);
+                if ($requiresPermitDetails) {
+                    $rules['profile_visa_type'] = 'required|string|max:100';
+                    $rules['profile_visa_expiry_date'] = 'required|date|after:today';
+
+                    // Residence permit document required for visa_holder
+                    if ($immigrationStatus === 'visa_holder' && empty($data['profile_residence_permit_document_path'])) {
+                        $rules['profile_residence_permit_document'] = 'required';
+                    }
+                }
+
+                return $rules;
 
             case 2:
-                // Step 2: Employment & Income (with conditional document validation)
+                // Step 2: Household Composition
                 $rules = [
-                    'profile_employment_status' => 'required|in:employed,self_employed,student,unemployed,retired',
-                    'profile_income_currency' => 'required|in:eur,usd,gbp,chf',
-                    'profile_has_guarantor' => 'required|boolean',
+                    'desired_move_in_date' => 'required|date|after:today',
+                    'lease_duration_months' => 'required|integer|min:1|max:60',
+                    'message_to_landlord' => 'nullable|string|max:2000',
                 ];
 
-                $status = $data['profile_employment_status'] ?? '';
-
-                // Add conditional rules based on employment status
-                if (in_array($status, ['employed', 'self_employed'])) {
-                    $rules['profile_employer_name'] = 'required|string|max:255';
-                    $rules['profile_job_title'] = 'required|string|max:255';
-                    $rules['profile_monthly_income'] = 'required|numeric|min:0';
+                // Validate occupant details (if any occupants provided, validate them)
+                $occupants = $data['occupants_details'] ?? [];
+                if (is_array($occupants) && count($occupants) > 0) {
+                    $rules['occupants_details.*.first_name'] = 'required|string|max:100';
+                    $rules['occupants_details.*.last_name'] = 'required|string|max:100';
+                    $rules['occupants_details.*.date_of_birth'] = 'required|date';
+                    $rules['occupants_details.*.relationship'] = 'required|string|max:100';
+                    // Require relationship_other when relationship is 'other'
+                    foreach ($occupants as $index => $occupant) {
+                        if (($occupant['relationship'] ?? '') === 'other') {
+                            $rules["occupants_details.{$index}.relationship_other"] = 'required|string|max:100';
+                        }
+                    }
                 }
 
-                if ($status === 'student') {
-                    $rules['profile_university_name'] = 'required|string|max:255';
-                    $rules['profile_program_of_study'] = 'required|string|max:255';
+                // Validate pet details (if any pets provided, validate them)
+                $pets = $data['pets_details'] ?? [];
+                if (is_array($pets) && count($pets) > 0) {
+                    $rules['pets_details.*.type'] = 'required|string|max:100';
+                    // Require type_other when type is 'other'
+                    foreach ($pets as $index => $pet) {
+                        if (($pet['type'] ?? '') === 'other') {
+                            $rules["pets_details.{$index}.type_other"] = 'required|string|max:100';
+                        }
+                    }
                 }
 
-                // Guarantor validation if has_guarantor is true
-                if (isset($data['profile_has_guarantor']) && $data['profile_has_guarantor']) {
-                    $rules['profile_guarantor_name'] = 'required|string|max:255';
-                    $rules['profile_guarantor_relationship'] = 'required|string|max:100';
-                    $rules['profile_guarantor_monthly_income'] = 'required|numeric|min:0';
+                // Emergency contact: if first name OR last name is filled, all fields become required (except email)
+                $ecFirstName = $data['emergency_contact_first_name'] ?? '';
+                $ecLastName = $data['emergency_contact_last_name'] ?? '';
+                $ecRelationship = $data['emergency_contact_relationship'] ?? '';
+
+                $hasEmergencyContactName = trim($ecFirstName) || trim($ecLastName);
+
+                if ($hasEmergencyContactName) {
+                    $rules['emergency_contact_first_name'] = 'required|string|max:100';
+                    $rules['emergency_contact_last_name'] = 'required|string|max:100';
+                    $rules['emergency_contact_relationship'] = 'required|string|max:100';
+                    $rules['emergency_contact_phone_number'] = 'required|string|max:20';
+                    // Email stays optional
+
+                    // If relationship is 'other', require specification
+                    if ($ecRelationship === 'other') {
+                        $rules['emergency_contact_relationship_other'] = 'required|string|max:100';
+                    }
                 }
 
                 return $rules;
 
             case 3:
-                // Step 3: Application Details
+                // Step 3: Financial Capability
                 $rules = [
-                    'desired_move_in_date' => 'required|date|after:today',
-                    'lease_duration_months' => 'required|integer|min:1|max:60',
-                    'message_to_landlord' => 'nullable|string|max:2000',
-                    'additional_occupants' => 'required|integer|min:0|max:20',
-                    'has_pets' => 'required|boolean',
+                    'profile_employment_status' => 'required|in:employed,self_employed,student,unemployed,retired,other',
                 ];
 
-                // Validate occupant details if additional_occupants > 0
-                $occupantCount = intval($data['additional_occupants'] ?? 0);
-                if ($occupantCount > 0) {
-                    $rules['occupants_details'] = 'required|array|min:1';
-                    $rules['occupants_details.*.name'] = 'required|string|max:255';
-                    $rules['occupants_details.*.age'] = 'required|integer|min:0|max:120';
-                    $rules['occupants_details.*.relationship'] = 'required|string|max:100';
+                $status = $data['profile_employment_status'] ?? '';
+
+                // EMPLOYED
+                if ($status === 'employed') {
+                    $rules['profile_employer_name'] = 'required|string|max:255';
+                    $rules['profile_job_title'] = 'required|string|max:255';
+                    $rules['profile_employment_type'] = 'required|in:full_time,part_time,contract,temporary';
+                    $rules['profile_employment_start_date'] = 'required|date';
+                    $rules['profile_gross_annual_income'] = 'required|numeric|min:0';
+                    $rules['profile_net_monthly_income'] = 'required|numeric|min:0';
                 }
 
-                // Add pets validation only if has_pets is true
-                if (isset($data['has_pets']) && $data['has_pets'] === true) {
-                    $rules['pets_details'] = 'required|array|min:1';
-                    $rules['pets_details.*.type'] = 'required|string|max:100';
+                // SELF-EMPLOYED
+                if ($status === 'self_employed') {
+                    $rules['profile_business_name'] = 'required|string|max:255';
+                    $rules['profile_business_type'] = 'required|string|max:100';
+                    $rules['profile_business_start_date'] = 'required|date';
+                    $rules['profile_gross_annual_revenue'] = 'required|numeric|min:0';
+                    $rules['profile_net_monthly_income'] = 'required|numeric|min:0';
+                }
+
+                // STUDENT
+                if ($status === 'student') {
+                    $rules['profile_university_name'] = 'required|string|max:255';
+                    $rules['profile_program_of_study'] = 'required|string|max:255';
+                    $rules['profile_student_income_source_type'] = 'required|in:scholarship,stipend,part_time_job,parental_support,student_loan,savings,other';
+                    $rules['profile_student_monthly_income'] = 'required|numeric|min:0';
+
+                    // If income source is 'other', require specification
+                    $incomeSource = $data['profile_student_income_source_type'] ?? '';
+                    if ($incomeSource === 'other') {
+                        $rules['profile_student_income_source_other'] = 'required|string|max:200';
+                    }
+                }
+
+                // RETIRED
+                if ($status === 'retired') {
+                    $rules['profile_pension_type'] = 'required|in:state_pension,employer_pension,private_pension,annuity,other';
+                    $rules['profile_pension_monthly_income'] = 'required|numeric|min:0';
+                    // retirement_other_income is optional
+                }
+
+                // UNEMPLOYED
+                if ($status === 'unemployed') {
+                    $rules['profile_unemployed_income_source'] = 'required|in:unemployment_benefits,severance_pay,savings,family_support,rental_income,investment_income,alimony,social_assistance,disability_allowance,freelance_gig,other';
+
+                    // If income source is 'other', require specification
+                    $incomeSource = $data['profile_unemployed_income_source'] ?? '';
+                    if ($incomeSource === 'other') {
+                        $rules['profile_unemployed_income_source_other'] = 'required|string|max:200';
+                    }
+
+                    // Always require income amount when income source is selected
+                    if (! empty($incomeSource)) {
+                        $rules['profile_unemployment_benefits_amount'] = 'required|numeric|min:0';
+
+                        // If income source is unemployment_benefits, require benefits statement
+                        if ($incomeSource === 'unemployment_benefits' && empty($data['profile_benefits_statement_path'])) {
+                            $rules['profile_benefits_statement'] = 'required';
+                        }
+
+                        // If income source is NOT unemployment_benefits, require other income proof
+                        if ($incomeSource !== 'unemployment_benefits' && empty($data['profile_other_income_proof_path'])) {
+                            $rules['profile_other_income_proof'] = 'required';
+                        }
+                    }
+                }
+
+                // OTHER
+                if ($status === 'other') {
+                    $rules['profile_other_employment_situation'] = 'required|in:parental_leave,disability,sabbatical,career_break,medical_leave,caregiver,homemaker,volunteer,gap_year,early_retirement,military_service,other';
+                    $rules['profile_other_situation_monthly_income'] = 'required|numeric|min:0';
+                    $rules['profile_other_situation_income_source'] = 'required|string|max:200';
+
+                    $situation = $data['profile_other_employment_situation'] ?? '';
+                    if ($situation === 'other') {
+                        $rules['profile_other_employment_situation_details'] = 'required|string|max:200';
+                    }
                 }
 
                 return $rules;
 
             case 4:
-                // Step 4: References (optional step - no required fields)
+                // Step 4: Risk Mitigation (optional)
                 return [];
 
             case 5:
-                // Step 5: Emergency Contact (optional step - no required fields)
+                // Step 5: Credit & Rental History
                 return [];
 
             case 6:
-                // Step 6: Review (no validation needed)
+                // Step 6: Additional Information (optional)
+                return [];
+
+            case 7:
+                // Step 7: Declarations & Consent
+                return [];
+
+            case 8:
+                // Step 8: Review (no validation needed)
                 return [];
 
             default:
@@ -640,7 +881,6 @@ class ApplicationController extends Controller
             'message_to_landlord' => 'nullable|string|max:2000',
             'additional_occupants' => 'required|integer|min:0|max:20',
             'occupants_details' => 'nullable|array',
-            'has_pets' => 'required|boolean',
             'pets_details' => 'nullable|array',
             'previous_landlord_name' => 'required|string|max:255',
             'previous_landlord_phone' => 'required|string|max:20',
@@ -749,20 +989,49 @@ class ApplicationController extends Controller
             'current_postal_code' => $request->input('profile_current_postal_code'),
             'current_country' => $request->input('profile_current_country'),
 
-            // Employment & Income
+            // Employment & Income (Employed)
             'employment_status' => $request->input('profile_employment_status'),
             'employer_name' => $request->input('profile_employer_name'),
             'job_title' => $request->input('profile_job_title'),
             'employment_type' => $request->input('profile_employment_type'),
             'employment_start_date' => $request->input('profile_employment_start_date'),
-            'monthly_income' => $request->input('profile_monthly_income'),
+            'gross_annual_income' => $request->input('profile_gross_annual_income'),
+            'net_monthly_income' => $request->input('profile_net_monthly_income'),
+            'monthly_income' => $request->input('profile_net_monthly_income'), // Deprecated field, sync with net
             'income_currency' => $request->input('profile_income_currency'),
+
+            // Self-Employed
+            'business_name' => $request->input('profile_business_name'),
+            'business_type' => $request->input('profile_business_type'),
+            'business_start_date' => $request->input('profile_business_start_date'),
+            'gross_annual_revenue' => $request->input('profile_gross_annual_revenue'),
 
             // Student Info
             'university_name' => $request->input('profile_university_name'),
             'program_of_study' => $request->input('profile_program_of_study'),
             'expected_graduation_date' => $request->input('profile_expected_graduation_date'),
             'student_income_source' => $request->input('profile_student_income_source'),
+            'student_income_source_type' => $request->input('profile_student_income_source_type'),
+            'student_income_source_other' => $request->input('profile_student_income_source_other'),
+            'student_monthly_income' => $request->input('profile_student_monthly_income'),
+
+            // Retired
+            'pension_monthly_income' => $request->input('profile_pension_monthly_income'),
+            'pension_provider' => $request->input('profile_pension_provider'),
+            'retirement_other_income' => $request->input('profile_retirement_other_income'),
+
+            // Unemployed
+            'receiving_unemployment_benefits' => $request->boolean('profile_receiving_unemployment_benefits'),
+            'unemployment_benefits_amount' => $request->input('profile_unemployment_benefits_amount'),
+            'unemployed_income_source' => $request->input('profile_unemployed_income_source'),
+            'unemployed_income_source_other' => $request->input('profile_unemployed_income_source_other'),
+
+            // Other Employment Situation
+            'other_employment_situation' => $request->input('profile_other_employment_situation'),
+            'other_employment_situation_details' => $request->input('profile_other_employment_situation_details'),
+            'expected_return_to_work' => $request->input('profile_expected_return_to_work'),
+            'other_situation_monthly_income' => $request->input('profile_other_situation_monthly_income'),
+            'other_situation_income_source' => $request->input('profile_other_situation_income_source'),
 
             // Guarantor
             'has_guarantor' => $request->boolean('profile_has_guarantor'),
@@ -786,6 +1055,8 @@ class ApplicationController extends Controller
             'profile_payslip_2' => ['path' => 'payslip_2_path', 'name' => 'payslip_2_original_name', 'folder' => 'profiles/payslips'],
             'profile_payslip_3' => ['path' => 'payslip_3_path', 'name' => 'payslip_3_original_name', 'folder' => 'profiles/payslips'],
             'profile_student_proof' => ['path' => 'student_proof_path', 'name' => 'student_proof_original_name', 'folder' => 'profiles/student-proofs'],
+            'profile_pension_statement' => ['path' => 'pension_statement_path', 'name' => 'pension_statement_original_name', 'folder' => 'profiles/pension-statements'],
+            'profile_benefits_statement' => ['path' => 'benefits_statement_path', 'name' => 'benefits_statement_original_name', 'folder' => 'profiles/benefits-statements'],
             'profile_other_income_proof' => ['path' => 'other_income_proof_path', 'name' => 'other_income_proof_original_name', 'folder' => 'profiles/other-income-proofs'],
             'profile_guarantor_id' => ['path' => 'guarantor_id_path', 'name' => 'guarantor_id_original_name', 'folder' => 'profiles/guarantor-ids'],
             'profile_guarantor_proof_income' => ['path' => 'guarantor_proof_income_path', 'name' => 'guarantor_proof_income_original_name', 'folder' => 'profiles/guarantor-income-proofs'],
@@ -911,8 +1182,7 @@ class ApplicationController extends Controller
         }
 
         // Sync Pets
-        if ($application->has_pets !== null) {
-            $profileUpdates['has_pets'] = $application->has_pets;
+        if ($application->pets_details !== null) {
             $profileUpdates['pets_details'] = $application->pets_details;
             // Generate description from details
             if ($application->pets_details && is_array($application->pets_details)) {

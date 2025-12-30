@@ -1,14 +1,12 @@
-import { AddressForm, type AddressData } from '@/components/ui/address-form';
 import { CurrencySelect } from '@/components/ui/currency-select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
-import { PhoneInput } from '@/components/ui/phone-input';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';
-import { Briefcase, GraduationCap, UserCheck } from 'lucide-react';
+import { Briefcase, Building, GraduationCap, HeartHandshake, UserCheck } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 
 interface EmploymentIncomeStepProps {
@@ -40,56 +38,28 @@ interface EmploymentIncomeStepProps {
         student_proof_url?: string;
         student_proof_size?: number;
         student_proof_uploaded_at?: number;
+        pension_statement?: string;
+        pension_statement_url?: string;
+        pension_statement_size?: number;
+        pension_statement_uploaded_at?: number;
+        benefits_statement?: string;
+        benefits_statement_url?: string;
+        benefits_statement_size?: number;
+        benefits_statement_uploaded_at?: number;
         other_income_proof?: string;
         other_income_proof_url?: string;
         other_income_proof_size?: number;
         other_income_proof_uploaded_at?: number;
-        // Guarantor documents
-        guarantor_id_front?: string;
-        guarantor_id_front_url?: string;
-        guarantor_id_front_size?: number;
-        guarantor_id_front_uploaded_at?: number;
-        guarantor_id_back?: string;
-        guarantor_id_back_url?: string;
-        guarantor_id_back_size?: number;
-        guarantor_id_back_uploaded_at?: number;
-        guarantor_proof_income?: string;
-        guarantor_proof_income_url?: string;
-        guarantor_proof_income_size?: number;
-        guarantor_proof_income_uploaded_at?: number;
-        guarantor_employment_contract?: string;
-        guarantor_employment_contract_url?: string;
-        guarantor_employment_contract_size?: number;
-        guarantor_employment_contract_uploaded_at?: number;
-        guarantor_payslip_1?: string;
-        guarantor_payslip_1_url?: string;
-        guarantor_payslip_1_size?: number;
-        guarantor_payslip_1_uploaded_at?: number;
-        guarantor_payslip_2?: string;
-        guarantor_payslip_2_url?: string;
-        guarantor_payslip_2_size?: number;
-        guarantor_payslip_2_uploaded_at?: number;
-        guarantor_payslip_3?: string;
-        guarantor_payslip_3_url?: string;
-        guarantor_payslip_3_size?: number;
-        guarantor_payslip_3_uploaded_at?: number;
-        guarantor_student_proof?: string;
-        guarantor_student_proof_url?: string;
-        guarantor_student_proof_size?: number;
-        guarantor_student_proof_uploaded_at?: number;
-        guarantor_other_income_proof?: string;
-        guarantor_other_income_proof_url?: string;
-        guarantor_other_income_proof_size?: number;
-        guarantor_other_income_proof_uploaded_at?: number;
     };
 }
 
 const EMPLOYMENT_STATUS_ICONS = {
     employed: Briefcase,
-    self_employed: Briefcase,
+    self_employed: Building,
     student: GraduationCap,
     unemployed: UserCheck,
     retired: UserCheck,
+    other: HeartHandshake,
 } as const;
 
 export function EmploymentIncomeStep({
@@ -110,8 +80,9 @@ export function EmploymentIncomeStep({
             { value: 'employed', label: t('employmentStatuses.employed'), icon: EMPLOYMENT_STATUS_ICONS.employed },
             { value: 'self_employed', label: t('employmentStatuses.self_employed'), icon: EMPLOYMENT_STATUS_ICONS.self_employed },
             { value: 'student', label: t('employmentStatuses.student'), icon: EMPLOYMENT_STATUS_ICONS.student },
-            { value: 'unemployed', label: t('employmentStatuses.unemployed'), icon: EMPLOYMENT_STATUS_ICONS.unemployed },
             { value: 'retired', label: t('employmentStatuses.retired'), icon: EMPLOYMENT_STATUS_ICONS.retired },
+            { value: 'unemployed', label: t('employmentStatuses.unemployed'), icon: EMPLOYMENT_STATUS_ICONS.unemployed },
+            { value: 'other', label: t('employmentStatuses.other'), icon: EMPLOYMENT_STATUS_ICONS.other },
         ],
         [translations],
     );
@@ -126,17 +97,71 @@ export function EmploymentIncomeStep({
         [translations],
     );
 
-    const GUARANTOR_RELATIONSHIPS = useMemo(
+    const BUSINESS_TYPES = useMemo(
         () => [
-            { value: 'Parent', label: t('guarantor.relationships.parent') },
-            { value: 'Grandparent', label: t('guarantor.relationships.grandparent') },
-            { value: 'Sibling', label: t('guarantor.relationships.sibling') },
-            { value: 'Spouse', label: t('guarantor.relationships.spouse') },
-            { value: 'Partner', label: t('guarantor.relationships.partner') },
-            { value: 'Other Family', label: t('guarantor.relationships.other_family') },
-            { value: 'Friend', label: t('guarantor.relationships.friend') },
-            { value: 'Employer', label: t('guarantor.relationships.employer') },
-            { value: 'Other', label: t('guarantor.relationships.other') },
+            { value: 'freelancer', label: t('businessTypes.freelancer') },
+            { value: 'sole_proprietor', label: t('businessTypes.sole_proprietor') },
+            { value: 'limited_company', label: t('businessTypes.limited_company') },
+            { value: 'partnership', label: t('businessTypes.partnership') },
+        ],
+        [translations],
+    );
+
+    const STUDENT_INCOME_SOURCES = useMemo(
+        () => [
+            { value: 'scholarship', label: t('studentIncomeSources.scholarship') },
+            { value: 'stipend', label: t('studentIncomeSources.stipend') },
+            { value: 'part_time_job', label: t('studentIncomeSources.part_time_job') },
+            { value: 'parental_support', label: t('studentIncomeSources.parental_support') },
+            { value: 'student_loan', label: t('studentIncomeSources.student_loan') },
+            { value: 'savings', label: t('studentIncomeSources.savings') },
+            { value: 'other', label: t('studentIncomeSources.other') },
+        ],
+        [translations],
+    );
+
+    const UNEMPLOYED_INCOME_SOURCES = useMemo(
+        () => [
+            { value: 'unemployment_benefits', label: t('unemployedIncomeSources.unemployment_benefits') },
+            { value: 'severance_pay', label: t('unemployedIncomeSources.severance_pay') },
+            { value: 'savings', label: t('unemployedIncomeSources.savings') },
+            { value: 'family_support', label: t('unemployedIncomeSources.family_support') },
+            { value: 'rental_income', label: t('unemployedIncomeSources.rental_income') },
+            { value: 'investment_income', label: t('unemployedIncomeSources.investment_income') },
+            { value: 'alimony', label: t('unemployedIncomeSources.alimony') },
+            { value: 'social_assistance', label: t('unemployedIncomeSources.social_assistance') },
+            { value: 'disability_allowance', label: t('unemployedIncomeSources.disability_allowance') },
+            { value: 'freelance_gig', label: t('unemployedIncomeSources.freelance_gig') },
+            { value: 'other', label: t('unemployedIncomeSources.other') },
+        ],
+        [translations],
+    );
+
+    const PENSION_TYPES = useMemo(
+        () => [
+            { value: 'state_pension', label: t('pensionTypes.state_pension') },
+            { value: 'employer_pension', label: t('pensionTypes.employer_pension') },
+            { value: 'private_pension', label: t('pensionTypes.private_pension') },
+            { value: 'annuity', label: t('pensionTypes.annuity') },
+            { value: 'other', label: t('pensionTypes.other') },
+        ],
+        [translations],
+    );
+
+    const OTHER_SITUATIONS = useMemo(
+        () => [
+            { value: 'parental_leave', label: t('otherSituations.parental_leave') },
+            { value: 'disability', label: t('otherSituations.disability') },
+            { value: 'sabbatical', label: t('otherSituations.sabbatical') },
+            { value: 'career_break', label: t('otherSituations.career_break') },
+            { value: 'medical_leave', label: t('otherSituations.medical_leave') },
+            { value: 'caregiver', label: t('otherSituations.caregiver') },
+            { value: 'homemaker', label: t('otherSituations.homemaker') },
+            { value: 'volunteer', label: t('otherSituations.volunteer') },
+            { value: 'gap_year', label: t('otherSituations.gap_year') },
+            { value: 'early_retirement', label: t('otherSituations.early_retirement') },
+            { value: 'military_service', label: t('otherSituations.military_service') },
+            { value: 'other', label: t('otherSituations.other') },
         ],
         [translations],
     );
@@ -151,60 +176,13 @@ export function EmploymentIncomeStep({
         return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
 
-    const handleGuarantorPhoneChange = (phoneNumber: string, countryCode: string) => {
-        updateField('profile_guarantor_phone_number', phoneNumber);
-        updateField('profile_guarantor_phone_country_code', countryCode);
-        markFieldTouched('profile_guarantor_phone_number');
-    };
-
-    // Handler for guarantor address changes from AddressForm
-    const handleGuarantorAddressChange = (field: keyof AddressData, value: string) => {
-        const fullFieldName = `profile_guarantor_${field}` as keyof ApplicationWizardData;
-        updateField(fullFieldName, value);
-        markFieldTouched(fullFieldName);
-    };
-
-    // Guarantor address data for AddressForm
-    const guarantorAddressData: AddressData = {
-        street_name: data.profile_guarantor_street_name,
-        house_number: data.profile_guarantor_house_number,
-        address_line_2: data.profile_guarantor_address_line_2,
-        city: data.profile_guarantor_city,
-        state_province: data.profile_guarantor_state_province,
-        postal_code: data.profile_guarantor_postal_code,
-        country: data.profile_guarantor_country,
-    };
-
-    // Translations for guarantor address form
-    const guarantorAddressTranslations = useMemo(
-        () => ({
-            streetName: t('guarantor.streetName'),
-            houseNumber: t('guarantor.houseNumber'),
-            apartment: t('guarantor.apartment'),
-            city: t('guarantor.city'),
-            country: t('guarantor.country'),
-            optional: t('optional'),
-            placeholders: {
-                streetName: t('guarantor.placeholders.streetName'),
-                houseNumber: t('guarantor.placeholders.houseNumber'),
-                apartment: t('guarantor.placeholders.apartment'),
-                city: t('guarantor.placeholders.city'),
-                country: t('guarantor.placeholders.country'),
-            },
-        }),
-        [translations],
-    );
-
-    const isEmployed = data.profile_employment_status === 'employed' || data.profile_employment_status === 'self_employed';
-    const isStudent = data.profile_employment_status === 'student';
-    const isUnemployedOrRetired = data.profile_employment_status === 'unemployed' || data.profile_employment_status === 'retired';
-
-    // Guarantor employment status
-    const isGuarantorEmployed =
-        data.profile_guarantor_employment_status === 'employed' || data.profile_guarantor_employment_status === 'self_employed';
-    const isGuarantorStudent = data.profile_guarantor_employment_status === 'student';
-    const isGuarantorUnemployedOrRetired =
-        data.profile_guarantor_employment_status === 'unemployed' || data.profile_guarantor_employment_status === 'retired';
+    const status = data.profile_employment_status;
+    const isEmployed = status === 'employed';
+    const isSelfEmployed = status === 'self_employed';
+    const isStudent = status === 'student';
+    const isRetired = status === 'retired';
+    const isUnemployed = status === 'unemployed';
+    const isOther = status === 'other';
 
     // Reload tenant profile data after successful upload
     const handleUploadSuccess = useCallback(() => {
@@ -231,15 +209,15 @@ export function EmploymentIncomeStep({
             {/* Employment Status Selection */}
             <div>
                 <label className="mb-3 block text-sm font-medium">{t('fields.employmentStatus')}</label>
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-                    {EMPLOYMENT_STATUSES.map((status) => {
-                        const Icon = status.icon;
-                        const isSelected = data.profile_employment_status === status.value;
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+                    {EMPLOYMENT_STATUSES.map((statusOption) => {
+                        const Icon = statusOption.icon;
+                        const isSelected = data.profile_employment_status === statusOption.value;
                         return (
                             <button
-                                key={status.value}
+                                key={statusOption.value}
                                 type="button"
-                                onClick={() => handleFieldChange('profile_employment_status', status.value)}
+                                onClick={() => handleFieldChange('profile_employment_status', statusOption.value)}
                                 className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-colors ${
                                     isSelected
                                         ? 'border-primary bg-primary/5 text-primary'
@@ -247,7 +225,7 @@ export function EmploymentIncomeStep({
                                 }`}
                             >
                                 <Icon className="h-5 w-5" />
-                                <span className="text-xs font-medium">{status.label}</span>
+                                <span className="text-xs font-medium">{statusOption.label}</span>
                             </button>
                         );
                     })}
@@ -257,7 +235,7 @@ export function EmploymentIncomeStep({
                 )}
             </div>
 
-            {/* Employed / Self-Employed Fields */}
+            {/* EMPLOYED Section */}
             {isEmployed && (
                 <div className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
@@ -299,7 +277,7 @@ export function EmploymentIncomeStep({
                                 value={data.profile_employment_type}
                                 onChange={(value) => handleFieldChange('profile_employment_type', value)}
                                 options={EMPLOYMENT_TYPES}
-                                placeholder="Select type..."
+                                placeholder={t('placeholders.selectType')}
                                 onBlur={onBlur}
                                 aria-invalid={!!(touchedFields.profile_employment_type && errors.profile_employment_type)}
                             />
@@ -323,31 +301,59 @@ export function EmploymentIncomeStep({
                         </div>
                     </div>
 
-                    {/* Income */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">{t('fields.monthlyIncomeGross')}</label>
-                        <div className="flex">
-                            <CurrencySelect
-                                value={data.profile_income_currency}
-                                onChange={(value) => handleFieldChange('profile_income_currency', value)}
-                                onBlur={onBlur}
-                                compact
-                            />
-                            <input
-                                type="number"
-                                value={data.profile_monthly_income}
-                                onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
-                                onBlur={onBlur}
-                                placeholder={t('placeholders.income')}
-                                min="0"
-                                step="100"
-                                className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_monthly_income')}`}
-                                required
-                            />
+                    {/* Income Fields for Employed */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.grossAnnualSalary')}</label>
+                            <div className="flex">
+                                <CurrencySelect
+                                    value={data.profile_income_currency}
+                                    onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                    onBlur={onBlur}
+                                    compact
+                                />
+                                <input
+                                    type="number"
+                                    value={data.profile_gross_annual_income}
+                                    onChange={(e) => handleFieldChange('profile_gross_annual_income', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.grossAnnual')}
+                                    min="0"
+                                    step="1000"
+                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_gross_annual_income')}`}
+                                    required
+                                />
+                            </div>
+                            {touchedFields.profile_gross_annual_income && errors.profile_gross_annual_income && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_gross_annual_income}</p>
+                            )}
                         </div>
-                        {touchedFields.profile_monthly_income && errors.profile_monthly_income && (
-                            <p className="mt-1 text-sm text-destructive">{errors.profile_monthly_income}</p>
-                        )}
+
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.netMonthlyIncome')}</label>
+                            <div className="flex">
+                                <CurrencySelect
+                                    value={data.profile_income_currency}
+                                    onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                    onBlur={onBlur}
+                                    compact
+                                />
+                                <input
+                                    type="number"
+                                    value={data.profile_net_monthly_income}
+                                    onChange={(e) => handleFieldChange('profile_net_monthly_income', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.netMonthly')}
+                                    min="0"
+                                    step="100"
+                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_net_monthly_income')}`}
+                                    required
+                                />
+                            </div>
+                            {touchedFields.profile_net_monthly_income && errors.profile_net_monthly_income && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_net_monthly_income}</p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Employment Documents */}
@@ -440,18 +446,128 @@ export function EmploymentIncomeStep({
                 </div>
             )}
 
-            {/* Student Fields */}
+            {/* SELF-EMPLOYED Section */}
+            {isSelfEmployed && (
+                <div className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.businessName')}</label>
+                            <input
+                                type="text"
+                                value={data.profile_business_name}
+                                onChange={(e) => handleFieldChange('profile_business_name', e.target.value)}
+                                onBlur={onBlur}
+                                placeholder={t('placeholders.businessName')}
+                                className={getFieldClass('profile_business_name')}
+                                required
+                            />
+                            {touchedFields.profile_business_name && errors.profile_business_name && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_business_name}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.businessType')}</label>
+                            <SimpleSelect
+                                value={data.profile_business_type}
+                                onChange={(value) => handleFieldChange('profile_business_type', value)}
+                                options={BUSINESS_TYPES}
+                                placeholder={t('placeholders.selectBusinessType')}
+                                onBlur={onBlur}
+                                aria-invalid={!!(touchedFields.profile_business_type && errors.profile_business_type)}
+                            />
+                            {touchedFields.profile_business_type && errors.profile_business_type && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_business_type}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.businessStartDate')}</label>
+                            <DatePicker
+                                value={data.profile_business_start_date}
+                                onChange={(value) => handleFieldChange('profile_business_start_date', value)}
+                                onBlur={onBlur}
+                                max={new Date()}
+                                aria-invalid={!!(touchedFields.profile_business_start_date && errors.profile_business_start_date)}
+                            />
+                            {touchedFields.profile_business_start_date && errors.profile_business_start_date && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_business_start_date}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Income Fields for Self-Employed */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.grossAnnualRevenue')}</label>
+                            <div className="flex">
+                                <CurrencySelect
+                                    value={data.profile_income_currency}
+                                    onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                    onBlur={onBlur}
+                                    compact
+                                />
+                                <input
+                                    type="number"
+                                    value={data.profile_gross_annual_revenue}
+                                    onChange={(e) => handleFieldChange('profile_gross_annual_revenue', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.grossRevenue')}
+                                    min="0"
+                                    step="1000"
+                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_gross_annual_revenue')}`}
+                                    required
+                                />
+                            </div>
+                            {touchedFields.profile_gross_annual_revenue && errors.profile_gross_annual_revenue && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_gross_annual_revenue}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.netMonthlyIncome')}</label>
+                            <div className="flex">
+                                <CurrencySelect
+                                    value={data.profile_income_currency}
+                                    onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                    onBlur={onBlur}
+                                    compact
+                                />
+                                <input
+                                    type="number"
+                                    value={data.profile_net_monthly_income}
+                                    onChange={(e) => handleFieldChange('profile_net_monthly_income', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.netMonthly')}
+                                    min="0"
+                                    step="100"
+                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_net_monthly_income')}`}
+                                    required
+                                />
+                            </div>
+                            {touchedFields.profile_net_monthly_income && errors.profile_net_monthly_income && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_net_monthly_income}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Self-Employed Documents Note */}
+                    <p className="text-sm text-muted-foreground">{t('hints.selfEmployedDocs')}</p>
+                </div>
+            )}
+
+            {/* STUDENT Section */}
             {isStudent && (
                 <div className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label className="mb-2 block text-sm font-medium">{t('fields.university')}</label>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.universityName')}</label>
                             <input
                                 type="text"
                                 value={data.profile_university_name}
                                 onChange={(e) => handleFieldChange('profile_university_name', e.target.value)}
                                 onBlur={onBlur}
-                                placeholder={t('placeholders.university')}
+                                placeholder={t('placeholders.universityName')}
                                 className={getFieldClass('profile_university_name')}
                                 required
                             />
@@ -467,7 +583,7 @@ export function EmploymentIncomeStep({
                                 value={data.profile_program_of_study}
                                 onChange={(e) => handleFieldChange('profile_program_of_study', e.target.value)}
                                 onBlur={onBlur}
-                                placeholder={t('placeholders.program')}
+                                placeholder={t('placeholders.programOfStudy')}
                                 className={getFieldClass('profile_program_of_study')}
                                 required
                             />
@@ -477,7 +593,10 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">{t('fields.expectedGraduation')}</label>
+                            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                                {t('fields.expectedGraduation')}
+                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">{t('optional')}</span>
+                            </label>
                             <DatePicker
                                 value={data.profile_expected_graduation_date}
                                 onChange={(value) => handleFieldChange('profile_expected_graduation_date', value)}
@@ -487,21 +606,43 @@ export function EmploymentIncomeStep({
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium">{t('fields.incomeSource')}</label>
-                            <input
-                                type="text"
-                                value={data.profile_student_income_source}
-                                onChange={(e) => handleFieldChange('profile_student_income_source', e.target.value)}
+                            <label className="mb-2 block text-sm font-medium">{t('fields.studentIncomeSource')}</label>
+                            <SimpleSelect
+                                value={data.profile_student_income_source_type}
+                                onChange={(value) => handleFieldChange('profile_student_income_source_type', value)}
+                                options={STUDENT_INCOME_SOURCES}
+                                placeholder={t('placeholders.selectIncomeSource')}
                                 onBlur={onBlur}
-                                placeholder={t('placeholders.incomeSource')}
-                                className={getFieldClass('profile_student_income_source')}
+                                aria-invalid={!!(touchedFields.profile_student_income_source_type && errors.profile_student_income_source_type)}
                             />
+                            {touchedFields.profile_student_income_source_type && errors.profile_student_income_source_type && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_student_income_source_type}</p>
+                            )}
                         </div>
+
+                        {/* Other income source specification */}
+                        {data.profile_student_income_source_type === 'other' && (
+                            <div>
+                                <label className="mb-2 block text-sm font-medium">{t('fields.incomeSourceOther')}</label>
+                                <input
+                                    type="text"
+                                    value={data.profile_student_income_source_other}
+                                    onChange={(e) => handleFieldChange('profile_student_income_source_other', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.specifyIncomeSource')}
+                                    className={getFieldClass('profile_student_income_source_other')}
+                                    required
+                                />
+                                {touchedFields.profile_student_income_source_other && errors.profile_student_income_source_other && (
+                                    <p className="mt-1 text-sm text-destructive">{errors.profile_student_income_source_other}</p>
+                                )}
+                            </div>
+                        )}
                     </div>
 
-                    {/* Monthly Income for Students */}
+                    {/* Student Income */}
                     <div>
-                        <label className="mb-2 block text-sm font-medium">{t('fields.monthlyIncome')}</label>
+                        <label className="mb-2 block text-sm font-medium">{t('fields.studentMonthlyIncome')}</label>
                         <div className="flex">
                             <CurrencySelect
                                 value={data.profile_income_currency}
@@ -511,20 +652,27 @@ export function EmploymentIncomeStep({
                             />
                             <input
                                 type="number"
-                                value={data.profile_monthly_income}
-                                onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
+                                value={data.profile_student_monthly_income}
+                                onChange={(e) => handleFieldChange('profile_student_monthly_income', e.target.value)}
                                 onBlur={onBlur}
-                                placeholder={t('placeholders.incomeZero')}
+                                placeholder={t('placeholders.monthlyIncome')}
                                 min="0"
                                 step="100"
-                                className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_monthly_income')}`}
+                                className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_student_monthly_income')}`}
+                                required
                             />
                         </div>
+                        {data.profile_student_income_source_type === 'student_loan' && (
+                            <p className="mt-1 text-xs text-amber-600">{t('hints.studentLoanNote')}</p>
+                        )}
+                        {touchedFields.profile_student_monthly_income && errors.profile_student_monthly_income && (
+                            <p className="mt-1 text-sm text-destructive">{errors.profile_student_monthly_income}</p>
+                        )}
                     </div>
 
                     {/* Student Document */}
                     <FileUpload
-                        label={`${t('documents.studentProof')} (${t('documents.studentProofDesc')})`}
+                        label={t('documents.studentProof')}
                         required
                         documentType="student_proof"
                         uploadUrl="/tenant-profile/document/upload"
@@ -547,39 +695,371 @@ export function EmploymentIncomeStep({
                 </div>
             )}
 
-            {/* Unemployed / Retired Fields */}
-            {isUnemployedOrRetired && (
+            {/* RETIRED Section */}
+            {isRetired && (
                 <div className="space-y-4">
-                    {/* Optional: Monthly Income field */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">{t('fields.monthlyIncome')}</label>
-                        <div className="flex">
-                            <CurrencySelect
-                                value={data.profile_income_currency}
-                                onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.pensionType')}</label>
+                            <SimpleSelect
+                                value={data.profile_pension_type}
+                                onChange={(value) => handleFieldChange('profile_pension_type', value)}
+                                options={PENSION_TYPES}
+                                placeholder={t('placeholders.selectPensionType')}
                                 onBlur={onBlur}
-                                compact
+                                aria-invalid={!!(touchedFields.profile_pension_type && errors.profile_pension_type)}
                             />
+                            {touchedFields.profile_pension_type && errors.profile_pension_type && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_pension_type}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                                {t('fields.pensionProvider')}
+                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">{t('optional')}</span>
+                            </label>
                             <input
-                                type="number"
-                                value={data.profile_monthly_income}
-                                onChange={(e) => handleFieldChange('profile_monthly_income', e.target.value)}
+                                type="text"
+                                value={data.profile_pension_provider}
+                                onChange={(e) => handleFieldChange('profile_pension_provider', e.target.value)}
                                 onBlur={onBlur}
-                                placeholder={t('placeholders.incomeZero')}
-                                min="0"
-                                step="100"
-                                className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_monthly_income')}`}
+                                placeholder={t('placeholders.pensionProvider')}
+                                className={getFieldClass('profile_pension_provider')}
                             />
                         </div>
                     </div>
 
-                    {/* Income Proof Document */}
+                    {/* Pension Income Fields */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.monthlyPension')}</label>
+                            <div className="flex">
+                                <CurrencySelect
+                                    value={data.profile_income_currency}
+                                    onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                    onBlur={onBlur}
+                                    compact
+                                />
+                                <input
+                                    type="number"
+                                    value={data.profile_pension_monthly_income}
+                                    onChange={(e) => handleFieldChange('profile_pension_monthly_income', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.monthlyPension')}
+                                    min="0"
+                                    step="100"
+                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_pension_monthly_income')}`}
+                                    required
+                                />
+                            </div>
+                            {touchedFields.profile_pension_monthly_income && errors.profile_pension_monthly_income && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_pension_monthly_income}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                                {t('fields.otherRetirementIncome')}
+                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">{t('optional')}</span>
+                            </label>
+                            <div className="flex">
+                                <CurrencySelect
+                                    value={data.profile_income_currency}
+                                    onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                    onBlur={onBlur}
+                                    compact
+                                />
+                                <input
+                                    type="number"
+                                    value={data.profile_retirement_other_income}
+                                    onChange={(e) => handleFieldChange('profile_retirement_other_income', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.otherIncome')}
+                                    min="0"
+                                    step="100"
+                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_retirement_other_income')}`}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Pension Statement Document */}
                     <FileUpload
-                        label={
-                            data.profile_employment_status === 'retired'
-                                ? t('documents.pensionProof')
-                                : `${t('documents.otherIncomeProof')} (${t('documents.otherIncomeProofDesc')})`
+                        label={t('documents.pensionStatement')}
+                        required
+                        documentType="pension_statement"
+                        uploadUrl="/tenant-profile/document/upload"
+                        accept={fileUploadAccept}
+                        maxSize={20 * 1024 * 1024}
+                        description={fileUploadDescription}
+                        existingFile={
+                            existingDocuments?.pension_statement
+                                ? {
+                                      originalName: existingDocuments.pension_statement,
+                                      previewUrl: existingDocuments.pension_statement_url,
+                                      size: existingDocuments.pension_statement_size,
+                                      uploadedAt: existingDocuments.pension_statement_uploaded_at,
+                                  }
+                                : null
                         }
+                        onUploadSuccess={handleUploadSuccess}
+                        error={touchedFields.profile_pension_statement ? errors.profile_pension_statement : undefined}
+                    />
+
+                    {/* Other Income Proof Document (optional) */}
+                    <FileUpload
+                        label={t('documents.otherIncomeProof')}
+                        optional
+                        documentType="other_income_proof"
+                        uploadUrl="/tenant-profile/document/upload"
+                        accept={fileUploadAccept}
+                        maxSize={20 * 1024 * 1024}
+                        description={fileUploadDescription}
+                        existingFile={
+                            existingDocuments?.other_income_proof
+                                ? {
+                                      originalName: existingDocuments.other_income_proof,
+                                      previewUrl: existingDocuments.other_income_proof_url,
+                                      size: existingDocuments.other_income_proof_size,
+                                      uploadedAt: existingDocuments.other_income_proof_uploaded_at,
+                                  }
+                                : null
+                        }
+                        onUploadSuccess={handleUploadSuccess}
+                    />
+                </div>
+            )}
+
+            {/* UNEMPLOYED Section */}
+            {isUnemployed && (
+                <div className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.incomeSource')}</label>
+                            <SimpleSelect
+                                value={data.profile_unemployed_income_source}
+                                onChange={(value) => {
+                                    handleFieldChange('profile_unemployed_income_source', value);
+                                    // Auto-set receiving_unemployment_benefits based on selection
+                                    handleFieldChange('profile_receiving_unemployment_benefits', value === 'unemployment_benefits');
+                                }}
+                                options={UNEMPLOYED_INCOME_SOURCES}
+                                placeholder={t('placeholders.selectIncomeSource')}
+                                onBlur={onBlur}
+                                aria-invalid={!!(touchedFields.profile_unemployed_income_source && errors.profile_unemployed_income_source)}
+                            />
+                            {touchedFields.profile_unemployed_income_source && errors.profile_unemployed_income_source && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_unemployed_income_source}</p>
+                            )}
+                        </div>
+
+                        {/* Other income source specification */}
+                        {data.profile_unemployed_income_source === 'other' && (
+                            <div>
+                                <label className="mb-2 block text-sm font-medium">{t('fields.incomeSourceOther')}</label>
+                                <input
+                                    type="text"
+                                    value={data.profile_unemployed_income_source_other}
+                                    onChange={(e) => handleFieldChange('profile_unemployed_income_source_other', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.specifyIncomeSource')}
+                                    className={getFieldClass('profile_unemployed_income_source_other')}
+                                    required
+                                />
+                                {touchedFields.profile_unemployed_income_source_other && errors.profile_unemployed_income_source_other && (
+                                    <p className="mt-1 text-sm text-destructive">{errors.profile_unemployed_income_source_other}</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Income Amount - shown based on income source */}
+                    {data.profile_unemployed_income_source && (
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                {data.profile_unemployed_income_source === 'unemployment_benefits'
+                                    ? t('fields.benefitsAmount')
+                                    : t('fields.monthlyIncome')}
+                            </label>
+                            <div className="flex">
+                                <CurrencySelect
+                                    value={data.profile_income_currency}
+                                    onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                    onBlur={onBlur}
+                                    compact
+                                />
+                                <input
+                                    type="number"
+                                    value={data.profile_unemployment_benefits_amount}
+                                    onChange={(e) => handleFieldChange('profile_unemployment_benefits_amount', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={
+                                        data.profile_unemployed_income_source === 'unemployment_benefits'
+                                            ? t('placeholders.benefitsAmount')
+                                            : t('placeholders.monthlyIncome')
+                                    }
+                                    min="0"
+                                    step="100"
+                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_unemployment_benefits_amount')}`}
+                                    required
+                                />
+                            </div>
+                            {touchedFields.profile_unemployment_benefits_amount && errors.profile_unemployment_benefits_amount && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_unemployment_benefits_amount}</p>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Income Proof Document - always required when income source is selected */}
+                    {data.profile_unemployed_income_source && (
+                        <FileUpload
+                            label={
+                                data.profile_unemployed_income_source === 'unemployment_benefits'
+                                    ? t('documents.benefitsStatement')
+                                    : t('documents.otherIncomeProof')
+                            }
+                            required
+                            documentType={
+                                data.profile_unemployed_income_source === 'unemployment_benefits' ? 'benefits_statement' : 'other_income_proof'
+                            }
+                            uploadUrl="/tenant-profile/document/upload"
+                            accept={fileUploadAccept}
+                            maxSize={20 * 1024 * 1024}
+                            description={fileUploadDescription}
+                            existingFile={
+                                data.profile_unemployed_income_source === 'unemployment_benefits'
+                                    ? existingDocuments?.benefits_statement
+                                        ? {
+                                              originalName: existingDocuments.benefits_statement,
+                                              previewUrl: existingDocuments.benefits_statement_url,
+                                              size: existingDocuments.benefits_statement_size,
+                                              uploadedAt: existingDocuments.benefits_statement_uploaded_at,
+                                          }
+                                        : null
+                                    : existingDocuments?.other_income_proof
+                                      ? {
+                                            originalName: existingDocuments.other_income_proof,
+                                            previewUrl: existingDocuments.other_income_proof_url,
+                                            size: existingDocuments.other_income_proof_size,
+                                            uploadedAt: existingDocuments.other_income_proof_uploaded_at,
+                                        }
+                                      : null
+                            }
+                            onUploadSuccess={handleUploadSuccess}
+                            error={
+                                data.profile_unemployed_income_source === 'unemployment_benefits'
+                                    ? touchedFields.profile_benefits_statement
+                                        ? errors.profile_benefits_statement
+                                        : undefined
+                                    : touchedFields.profile_other_income_proof
+                                      ? errors.profile_other_income_proof
+                                      : undefined
+                            }
+                        />
+                    )}
+                </div>
+            )}
+
+            {/* OTHER Employment Situation Section */}
+            {isOther && (
+                <div className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.situationType')}</label>
+                            <SimpleSelect
+                                value={data.profile_other_employment_situation}
+                                onChange={(value) => handleFieldChange('profile_other_employment_situation', value)}
+                                options={OTHER_SITUATIONS}
+                                placeholder={t('placeholders.selectSituation')}
+                                onBlur={onBlur}
+                                aria-invalid={!!(touchedFields.profile_other_employment_situation && errors.profile_other_employment_situation)}
+                            />
+                            {touchedFields.profile_other_employment_situation && errors.profile_other_employment_situation && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_other_employment_situation}</p>
+                            )}
+                        </div>
+
+                        {data.profile_other_employment_situation === 'other' && (
+                            <div>
+                                <label className="mb-2 block text-sm font-medium">{t('fields.situationDetails')}</label>
+                                <input
+                                    type="text"
+                                    value={data.profile_other_employment_situation_details}
+                                    onChange={(e) => handleFieldChange('profile_other_employment_situation_details', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.situationDetails')}
+                                    className={getFieldClass('profile_other_employment_situation_details')}
+                                    required
+                                />
+                                {touchedFields.profile_other_employment_situation_details && errors.profile_other_employment_situation_details && (
+                                    <p className="mt-1 text-sm text-destructive">{errors.profile_other_employment_situation_details}</p>
+                                )}
+                            </div>
+                        )}
+
+                        <div>
+                            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                                {t('fields.expectedReturnToWork')}
+                                <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">{t('optional')}</span>
+                            </label>
+                            <DatePicker
+                                value={data.profile_expected_return_to_work}
+                                onChange={(value) => handleFieldChange('profile_expected_return_to_work', value)}
+                                onBlur={onBlur}
+                                min={new Date()}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Other Situation Income Fields */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.monthlyIncome')}</label>
+                            <div className="flex">
+                                <CurrencySelect
+                                    value={data.profile_income_currency}
+                                    onChange={(value) => handleFieldChange('profile_income_currency', value)}
+                                    onBlur={onBlur}
+                                    compact
+                                />
+                                <input
+                                    type="number"
+                                    value={data.profile_other_situation_monthly_income}
+                                    onChange={(e) => handleFieldChange('profile_other_situation_monthly_income', e.target.value)}
+                                    onBlur={onBlur}
+                                    placeholder={t('placeholders.monthlyIncome')}
+                                    min="0"
+                                    step="100"
+                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_other_situation_monthly_income')}`}
+                                    required
+                                />
+                            </div>
+                            {touchedFields.profile_other_situation_monthly_income && errors.profile_other_situation_monthly_income && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_other_situation_monthly_income}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.incomeSource')}</label>
+                            <input
+                                type="text"
+                                value={data.profile_other_situation_income_source}
+                                onChange={(e) => handleFieldChange('profile_other_situation_income_source', e.target.value)}
+                                onBlur={onBlur}
+                                placeholder={t('placeholders.incomeSource')}
+                                className={getFieldClass('profile_other_situation_income_source')}
+                                required
+                            />
+                            {touchedFields.profile_other_situation_income_source && errors.profile_other_situation_income_source && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_other_situation_income_source}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Other Income Proof Document */}
+                    <FileUpload
+                        label={t('documents.otherIncomeProof')}
                         required
                         documentType="other_income_proof"
                         uploadUrl="/tenant-profile/document/upload"
@@ -601,546 +1081,6 @@ export function EmploymentIncomeStep({
                     />
                 </div>
             )}
-
-            {/* Guarantor Section */}
-            <div className="border-t border-border pt-6">
-                <div className="mb-4 flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        id="has_guarantor"
-                        checked={data.profile_has_guarantor}
-                        onChange={(e) => handleFieldChange('profile_has_guarantor', e.target.checked)}
-                        className="h-4 w-4"
-                    />
-                    <label htmlFor="has_guarantor" className="text-sm font-medium">
-                        {t('guarantor.title')}
-                    </label>
-                </div>
-                <p className="mb-4 text-sm text-muted-foreground">{t('guarantor.description')}</p>
-
-                {data.profile_has_guarantor && (
-                    <div className="space-y-4">
-                        {/* First Name & Last Name */}
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="mb-2 block text-sm font-medium">{t('guarantor.firstName')}</label>
-                                <input
-                                    type="text"
-                                    value={data.profile_guarantor_first_name}
-                                    onChange={(e) => handleFieldChange('profile_guarantor_first_name', e.target.value)}
-                                    onBlur={onBlur}
-                                    placeholder={t('guarantor.placeholders.firstName')}
-                                    className={getFieldClass('profile_guarantor_first_name')}
-                                    required
-                                />
-                                {touchedFields.profile_guarantor_first_name && errors.profile_guarantor_first_name && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_first_name}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label className="mb-2 block text-sm font-medium">{t('guarantor.lastName')}</label>
-                                <input
-                                    type="text"
-                                    value={data.profile_guarantor_last_name}
-                                    onChange={(e) => handleFieldChange('profile_guarantor_last_name', e.target.value)}
-                                    onBlur={onBlur}
-                                    placeholder={t('guarantor.placeholders.lastName')}
-                                    className={getFieldClass('profile_guarantor_last_name')}
-                                    required
-                                />
-                                {touchedFields.profile_guarantor_last_name && errors.profile_guarantor_last_name && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_last_name}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Relationship */}
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="mb-2 block text-sm font-medium">{t('guarantor.relationship')}</label>
-                                <SimpleSelect
-                                    value={data.profile_guarantor_relationship}
-                                    onChange={(value) => handleFieldChange('profile_guarantor_relationship', value)}
-                                    options={GUARANTOR_RELATIONSHIPS}
-                                    placeholder={t('guarantor.placeholders.relationship')}
-                                    onBlur={onBlur}
-                                    aria-invalid={!!(touchedFields.profile_guarantor_relationship && errors.profile_guarantor_relationship)}
-                                />
-                                {touchedFields.profile_guarantor_relationship && errors.profile_guarantor_relationship && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_relationship}</p>
-                                )}
-                            </div>
-
-                            {/* "Other" relationship - specify */}
-                            {data.profile_guarantor_relationship === 'Other' && (
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium">{t('guarantor.specifyRelationship')}</label>
-                                    <input
-                                        type="text"
-                                        value={data.profile_guarantor_relationship_other}
-                                        onChange={(e) => handleFieldChange('profile_guarantor_relationship_other', e.target.value)}
-                                        onBlur={onBlur}
-                                        placeholder={t('guarantor.placeholders.specifyRelationship')}
-                                        className={getFieldClass('profile_guarantor_relationship_other')}
-                                        required
-                                    />
-                                    {touchedFields.profile_guarantor_relationship_other && errors.profile_guarantor_relationship_other && (
-                                        <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_relationship_other}</p>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Phone & Email */}
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="mb-2 block text-sm font-medium">{t('guarantor.phone')}</label>
-                                <PhoneInput
-                                    value={data.profile_guarantor_phone_number}
-                                    countryCode={data.profile_guarantor_phone_country_code}
-                                    onChange={handleGuarantorPhoneChange}
-                                    onBlur={onBlur}
-                                    aria-invalid={!!(touchedFields.profile_guarantor_phone_number && errors.profile_guarantor_phone_number)}
-                                    error={touchedFields.profile_guarantor_phone_number ? errors.profile_guarantor_phone_number : undefined}
-                                    placeholder={t('guarantor.placeholders.phone')}
-                                />
-                                {touchedFields.profile_guarantor_phone_number && errors.profile_guarantor_phone_number && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_phone_number}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label className="mb-2 block text-sm font-medium">{t('guarantor.email')}</label>
-                                <input
-                                    type="email"
-                                    value={data.profile_guarantor_email}
-                                    onChange={(e) => handleFieldChange('profile_guarantor_email', e.target.value)}
-                                    onBlur={onBlur}
-                                    placeholder={t('guarantor.placeholders.email')}
-                                    className={getFieldClass('profile_guarantor_email')}
-                                    required
-                                />
-                                {touchedFields.profile_guarantor_email && errors.profile_guarantor_email && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_email}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Address Section */}
-                        <div className="border-t border-border pt-4">
-                            <h4 className="mb-4 text-sm font-medium">{t('guarantor.addressSection')}</h4>
-                            <AddressForm
-                                data={guarantorAddressData}
-                                onChange={handleGuarantorAddressChange}
-                                onBlur={onBlur}
-                                errors={errors}
-                                touchedFields={touchedFields}
-                                fieldPrefix="profile_guarantor"
-                                translations={guarantorAddressTranslations}
-                            />
-                        </div>
-
-                        {/* ID Documents */}
-                        <div className="border-t border-border pt-4">
-                            <h4 className="mb-4 text-sm font-medium">{t('guarantor.idDocumentsSection')}</h4>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <FileUpload
-                                    label={t('documents.guarantorIdFront')}
-                                    required
-                                    documentType="guarantor_id_front"
-                                    uploadUrl="/tenant-profile/document/upload"
-                                    accept={fileUploadAccept}
-                                    maxSize={20 * 1024 * 1024}
-                                    description={fileUploadDescription}
-                                    existingFile={
-                                        existingDocuments?.guarantor_id_front
-                                            ? {
-                                                  originalName: existingDocuments.guarantor_id_front,
-                                                  previewUrl: existingDocuments.guarantor_id_front_url,
-                                                  size: existingDocuments.guarantor_id_front_size,
-                                                  uploadedAt: existingDocuments.guarantor_id_front_uploaded_at,
-                                              }
-                                            : null
-                                    }
-                                    onUploadSuccess={handleUploadSuccess}
-                                    error={touchedFields.profile_guarantor_id_front ? errors.profile_guarantor_id_front : undefined}
-                                />
-                                <FileUpload
-                                    label={t('documents.guarantorIdBack')}
-                                    required
-                                    documentType="guarantor_id_back"
-                                    uploadUrl="/tenant-profile/document/upload"
-                                    accept={fileUploadAccept}
-                                    maxSize={20 * 1024 * 1024}
-                                    description={fileUploadDescription}
-                                    existingFile={
-                                        existingDocuments?.guarantor_id_back
-                                            ? {
-                                                  originalName: existingDocuments.guarantor_id_back,
-                                                  previewUrl: existingDocuments.guarantor_id_back_url,
-                                                  size: existingDocuments.guarantor_id_back_size,
-                                                  uploadedAt: existingDocuments.guarantor_id_back_uploaded_at,
-                                              }
-                                            : null
-                                    }
-                                    onUploadSuccess={handleUploadSuccess}
-                                    error={touchedFields.profile_guarantor_id_back ? errors.profile_guarantor_id_back : undefined}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Employment Status Section */}
-                        <div className="border-t border-border pt-4">
-                            <h4 className="mb-4 text-sm font-medium">{t('guarantor.employmentSection')}</h4>
-
-                            {/* Employment Status Selection */}
-                            <div className="mb-4">
-                                <label className="mb-3 block text-sm font-medium">{t('guarantor.employmentStatus')}</label>
-                                <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-                                    {EMPLOYMENT_STATUSES.map((status) => {
-                                        const Icon = status.icon;
-                                        const isSelected = data.profile_guarantor_employment_status === status.value;
-                                        return (
-                                            <button
-                                                key={status.value}
-                                                type="button"
-                                                onClick={() => handleFieldChange('profile_guarantor_employment_status', status.value)}
-                                                className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-colors ${
-                                                    isSelected
-                                                        ? 'border-primary bg-primary/5 text-primary'
-                                                        : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                                                }`}
-                                            >
-                                                <Icon className="h-5 w-5" />
-                                                <span className="text-xs font-medium">{status.label}</span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                                {touchedFields.profile_guarantor_employment_status && errors.profile_guarantor_employment_status && (
-                                    <p className="mt-2 text-sm text-destructive">{errors.profile_guarantor_employment_status}</p>
-                                )}
-                            </div>
-
-                            {/* Employed / Self-Employed Fields for Guarantor */}
-                            {isGuarantorEmployed && (
-                                <div className="space-y-4">
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium">{t('guarantor.employerName')}</label>
-                                            <input
-                                                type="text"
-                                                value={data.profile_guarantor_employer_name}
-                                                onChange={(e) => handleFieldChange('profile_guarantor_employer_name', e.target.value)}
-                                                onBlur={onBlur}
-                                                placeholder={t('guarantor.placeholders.employerName')}
-                                                className={getFieldClass('profile_guarantor_employer_name')}
-                                                required
-                                            />
-                                            {touchedFields.profile_guarantor_employer_name && errors.profile_guarantor_employer_name && (
-                                                <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_employer_name}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium">{t('guarantor.jobTitle')}</label>
-                                            <input
-                                                type="text"
-                                                value={data.profile_guarantor_job_title}
-                                                onChange={(e) => handleFieldChange('profile_guarantor_job_title', e.target.value)}
-                                                onBlur={onBlur}
-                                                placeholder={t('guarantor.placeholders.jobTitle')}
-                                                className={getFieldClass('profile_guarantor_job_title')}
-                                                required
-                                            />
-                                            {touchedFields.profile_guarantor_job_title && errors.profile_guarantor_job_title && (
-                                                <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_job_title}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium">{t('guarantor.employmentType')}</label>
-                                            <SimpleSelect
-                                                value={data.profile_guarantor_employment_type}
-                                                onChange={(value) => handleFieldChange('profile_guarantor_employment_type', value)}
-                                                options={EMPLOYMENT_TYPES}
-                                                placeholder="Select type..."
-                                                onBlur={onBlur}
-                                                aria-invalid={
-                                                    !!(touchedFields.profile_guarantor_employment_type && errors.profile_guarantor_employment_type)
-                                                }
-                                            />
-                                            {touchedFields.profile_guarantor_employment_type && errors.profile_guarantor_employment_type && (
-                                                <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_employment_type}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium">{t('guarantor.employmentStartDate')}</label>
-                                            <DatePicker
-                                                value={data.profile_guarantor_employment_start_date}
-                                                onChange={(value) => handleFieldChange('profile_guarantor_employment_start_date', value)}
-                                                onBlur={onBlur}
-                                                max={new Date()}
-                                                aria-invalid={
-                                                    !!(
-                                                        touchedFields.profile_guarantor_employment_start_date &&
-                                                        errors.profile_guarantor_employment_start_date
-                                                    )
-                                                }
-                                            />
-                                            {touchedFields.profile_guarantor_employment_start_date &&
-                                                errors.profile_guarantor_employment_start_date && (
-                                                    <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_employment_start_date}</p>
-                                                )}
-                                        </div>
-                                    </div>
-
-                                    {/* Employment Documents for Guarantor */}
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <FileUpload
-                                            label={t('documents.guarantorEmploymentContract')}
-                                            required
-                                            documentType="guarantor_employment_contract"
-                                            uploadUrl="/tenant-profile/document/upload"
-                                            accept={fileUploadAccept}
-                                            maxSize={20 * 1024 * 1024}
-                                            description={fileUploadDescription}
-                                            existingFile={
-                                                existingDocuments?.guarantor_employment_contract
-                                                    ? {
-                                                          originalName: existingDocuments.guarantor_employment_contract,
-                                                          previewUrl: existingDocuments.guarantor_employment_contract_url,
-                                                          size: existingDocuments.guarantor_employment_contract_size,
-                                                          uploadedAt: existingDocuments.guarantor_employment_contract_uploaded_at,
-                                                      }
-                                                    : null
-                                            }
-                                            onUploadSuccess={handleUploadSuccess}
-                                            error={
-                                                touchedFields.profile_guarantor_employment_contract
-                                                    ? errors.profile_guarantor_employment_contract
-                                                    : undefined
-                                            }
-                                        />
-                                        <FileUpload
-                                            label={t('documents.guarantorPayslip1')}
-                                            required
-                                            documentType="guarantor_payslip_1"
-                                            uploadUrl="/tenant-profile/document/upload"
-                                            accept={fileUploadAccept}
-                                            maxSize={20 * 1024 * 1024}
-                                            description={fileUploadDescription}
-                                            existingFile={
-                                                existingDocuments?.guarantor_payslip_1
-                                                    ? {
-                                                          originalName: existingDocuments.guarantor_payslip_1,
-                                                          previewUrl: existingDocuments.guarantor_payslip_1_url,
-                                                          size: existingDocuments.guarantor_payslip_1_size,
-                                                          uploadedAt: existingDocuments.guarantor_payslip_1_uploaded_at,
-                                                      }
-                                                    : null
-                                            }
-                                            onUploadSuccess={handleUploadSuccess}
-                                            error={touchedFields.profile_guarantor_payslip_1 ? errors.profile_guarantor_payslip_1 : undefined}
-                                        />
-                                        <FileUpload
-                                            label={t('documents.guarantorPayslip2')}
-                                            required
-                                            documentType="guarantor_payslip_2"
-                                            uploadUrl="/tenant-profile/document/upload"
-                                            accept={fileUploadAccept}
-                                            maxSize={20 * 1024 * 1024}
-                                            description={fileUploadDescription}
-                                            existingFile={
-                                                existingDocuments?.guarantor_payslip_2
-                                                    ? {
-                                                          originalName: existingDocuments.guarantor_payslip_2,
-                                                          previewUrl: existingDocuments.guarantor_payslip_2_url,
-                                                          size: existingDocuments.guarantor_payslip_2_size,
-                                                          uploadedAt: existingDocuments.guarantor_payslip_2_uploaded_at,
-                                                      }
-                                                    : null
-                                            }
-                                            onUploadSuccess={handleUploadSuccess}
-                                            error={touchedFields.profile_guarantor_payslip_2 ? errors.profile_guarantor_payslip_2 : undefined}
-                                        />
-                                        <FileUpload
-                                            label={t('documents.guarantorPayslip3')}
-                                            required
-                                            documentType="guarantor_payslip_3"
-                                            uploadUrl="/tenant-profile/document/upload"
-                                            accept={fileUploadAccept}
-                                            maxSize={20 * 1024 * 1024}
-                                            description={fileUploadDescription}
-                                            existingFile={
-                                                existingDocuments?.guarantor_payslip_3
-                                                    ? {
-                                                          originalName: existingDocuments.guarantor_payslip_3,
-                                                          previewUrl: existingDocuments.guarantor_payslip_3_url,
-                                                          size: existingDocuments.guarantor_payslip_3_size,
-                                                          uploadedAt: existingDocuments.guarantor_payslip_3_uploaded_at,
-                                                      }
-                                                    : null
-                                            }
-                                            onUploadSuccess={handleUploadSuccess}
-                                            error={touchedFields.profile_guarantor_payslip_3 ? errors.profile_guarantor_payslip_3 : undefined}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Student Fields for Guarantor */}
-                            {isGuarantorStudent && (
-                                <div className="space-y-4">
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium">{t('guarantor.universityName')}</label>
-                                            <input
-                                                type="text"
-                                                value={data.profile_guarantor_university_name}
-                                                onChange={(e) => handleFieldChange('profile_guarantor_university_name', e.target.value)}
-                                                onBlur={onBlur}
-                                                placeholder={t('guarantor.placeholders.universityName')}
-                                                className={getFieldClass('profile_guarantor_university_name')}
-                                                required
-                                            />
-                                            {touchedFields.profile_guarantor_university_name && errors.profile_guarantor_university_name && (
-                                                <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_university_name}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium">{t('guarantor.programOfStudy')}</label>
-                                            <input
-                                                type="text"
-                                                value={data.profile_guarantor_program_of_study}
-                                                onChange={(e) => handleFieldChange('profile_guarantor_program_of_study', e.target.value)}
-                                                onBlur={onBlur}
-                                                placeholder={t('guarantor.placeholders.programOfStudy')}
-                                                className={getFieldClass('profile_guarantor_program_of_study')}
-                                                required
-                                            />
-                                            {touchedFields.profile_guarantor_program_of_study && errors.profile_guarantor_program_of_study && (
-                                                <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_program_of_study}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium">{t('guarantor.expectedGraduation')}</label>
-                                            <DatePicker
-                                                value={data.profile_guarantor_expected_graduation_date}
-                                                onChange={(value) => handleFieldChange('profile_guarantor_expected_graduation_date', value)}
-                                                onBlur={onBlur}
-                                                min={new Date()}
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium">{t('guarantor.incomeSource')}</label>
-                                            <input
-                                                type="text"
-                                                value={data.profile_guarantor_student_income_source}
-                                                onChange={(e) => handleFieldChange('profile_guarantor_student_income_source', e.target.value)}
-                                                onBlur={onBlur}
-                                                placeholder={t('guarantor.placeholders.incomeSource')}
-                                                className={getFieldClass('profile_guarantor_student_income_source')}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Student Document for Guarantor */}
-                                    <FileUpload
-                                        label={t('documents.guarantorStudentProof')}
-                                        required
-                                        documentType="guarantor_student_proof"
-                                        uploadUrl="/tenant-profile/document/upload"
-                                        accept={fileUploadAccept}
-                                        maxSize={20 * 1024 * 1024}
-                                        description={fileUploadDescription}
-                                        existingFile={
-                                            existingDocuments?.guarantor_student_proof
-                                                ? {
-                                                      originalName: existingDocuments.guarantor_student_proof,
-                                                      previewUrl: existingDocuments.guarantor_student_proof_url,
-                                                      size: existingDocuments.guarantor_student_proof_size,
-                                                      uploadedAt: existingDocuments.guarantor_student_proof_uploaded_at,
-                                                  }
-                                                : null
-                                        }
-                                        onUploadSuccess={handleUploadSuccess}
-                                        error={touchedFields.profile_guarantor_student_proof ? errors.profile_guarantor_student_proof : undefined}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Unemployed / Retired Fields for Guarantor */}
-                            {isGuarantorUnemployedOrRetired && (
-                                <div className="space-y-4">
-                                    {/* Income Proof Document for Guarantor */}
-                                    <FileUpload
-                                        label={
-                                            data.profile_guarantor_employment_status === 'retired'
-                                                ? t('documents.guarantorPensionProof')
-                                                : t('documents.guarantorOtherIncomeProof')
-                                        }
-                                        required
-                                        documentType="guarantor_other_income_proof"
-                                        uploadUrl="/tenant-profile/document/upload"
-                                        accept={fileUploadAccept}
-                                        maxSize={20 * 1024 * 1024}
-                                        description={fileUploadDescription}
-                                        existingFile={
-                                            existingDocuments?.guarantor_other_income_proof
-                                                ? {
-                                                      originalName: existingDocuments.guarantor_other_income_proof,
-                                                      previewUrl: existingDocuments.guarantor_other_income_proof_url,
-                                                      size: existingDocuments.guarantor_other_income_proof_size,
-                                                      uploadedAt: existingDocuments.guarantor_other_income_proof_uploaded_at,
-                                                  }
-                                                : null
-                                        }
-                                        onUploadSuccess={handleUploadSuccess}
-                                        error={
-                                            touchedFields.profile_guarantor_other_income_proof
-                                                ? errors.profile_guarantor_other_income_proof
-                                                : undefined
-                                        }
-                                    />
-                                </div>
-                            )}
-
-                            {/* Monthly Income (always shown for guarantor) */}
-                            <div className="mt-4">
-                                <label className="mb-2 block text-sm font-medium">{t('guarantor.monthlyIncome')}</label>
-                                <div className="flex">
-                                    <CurrencySelect
-                                        value={data.profile_guarantor_income_currency}
-                                        onChange={(value) => handleFieldChange('profile_guarantor_income_currency', value)}
-                                        onBlur={onBlur}
-                                        compact
-                                    />
-                                    <input
-                                        type="number"
-                                        value={data.profile_guarantor_monthly_income}
-                                        onChange={(e) => handleFieldChange('profile_guarantor_monthly_income', e.target.value)}
-                                        onBlur={onBlur}
-                                        placeholder={t('guarantor.placeholders.income')}
-                                        min="0"
-                                        step="100"
-                                        className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('profile_guarantor_monthly_income')}`}
-                                        required
-                                    />
-                                </div>
-                                {touchedFields.profile_guarantor_monthly_income && errors.profile_guarantor_monthly_income && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.profile_guarantor_monthly_income}</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
         </div>
     );
 }

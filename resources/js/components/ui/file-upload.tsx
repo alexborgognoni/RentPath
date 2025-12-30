@@ -87,6 +87,8 @@ export interface FileUploadProps {
     label?: string;
     /** Whether the field is required */
     required?: boolean;
+    /** Whether the field is optional (shows optional badge) */
+    optional?: boolean;
     /** Whether to show delete button (default: true for non-required, false for required) */
     allowDelete?: boolean;
 }
@@ -108,6 +110,7 @@ export function FileUpload({
     error,
     label,
     required = false,
+    optional = false,
     allowDelete,
 }: FileUploadProps) {
     // Default allowDelete based on required prop if not explicitly set
@@ -255,7 +258,16 @@ export function FileUpload({
 
     return (
         <div className={cn('space-y-2', className)}>
-            {label && <label className="block text-sm font-medium">{label}</label>}
+            {label && (
+                <label className="flex items-center gap-2 text-sm font-medium">
+                    {label}
+                    {optional && (
+                        <span className="rounded bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
+                            Optional
+                        </span>
+                    )}
+                </label>
+            )}
 
             {/* Existing file display */}
             {hasExistingFile && (

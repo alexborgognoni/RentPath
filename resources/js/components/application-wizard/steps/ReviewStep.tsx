@@ -272,7 +272,7 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                     <Field label={t('labels.moveInDate')} value={formatDate(data.desired_move_in_date)} />
                     <Field label={t('labels.leaseDuration')} value={formatMonths(data.lease_duration_months)} />
                     <Field label={t('labels.additionalOccupants')} value={data.additional_occupants || 0} />
-                    <Field label={t('labels.pets')} value={data.has_pets ? 'Yes' : 'No'} />
+                    <Field label={t('labels.pets')} value={data.pets_details.length > 0 ? 'Yes' : 'No'} />
                 </dl>
 
                 {data.message_to_landlord && (
@@ -310,7 +310,7 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                     </div>
                 )}
 
-                {data.has_pets && data.pets_details.length > 0 && (
+                {data.pets_details.length > 0 && (
                     <div className="mt-4 border-t border-border pt-4">
                         <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
                             <PawPrint className="h-3 w-3" /> {t('labels.pets')}

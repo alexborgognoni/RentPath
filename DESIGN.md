@@ -497,6 +497,7 @@ Note: Application-related stages (under_review, visit_scheduled, approved) are n
 5. **Token-Based Access**: Control property visibility (public vs. private invites)
 6. **Document Privacy**: All sensitive documents in private storage with signed URLs
 7. **Verification Gates**: Both tenants and PMs must verify before full access
+8. **"Other" Options Require Specification**: Whenever a dropdown/select includes an "Other" option, a required text field must appear conditionally to have the user specify what "other" means. This applies to all enum fields with an "other" value (e.g., employment status, income source, relationship type). The specification field is validated as required when "other" is selected.
 
 ---
 
@@ -543,6 +544,82 @@ Frontend updates maxStepReached from backend response
 5. **Data preservation**: Invalid states don't delete data from later steps, just lock access
 6. **Lazy draft creation**: Only create the database record on first user interaction, not on page load
 
+### Step Locking & Max Valid Step Calculation
+
+The wizard enforces progressive completion by calculating the **maximum valid step** on every data change:
+
+```
+findFirstInvalidStep(data, existingDocs):
+    for step = 1 to totalSteps:
+        result = validateStep(step, data, existingDocs)
+        if result.invalid:
+            return step - 1  // Last valid step
+    return totalSteps  // All valid
+```
+
+**Locking Behavior**:
+
+| Scenario                                          | Action                                      |
+| ------------------------------------------------- | ------------------------------------------- |
+| User on step 3, edits step 1, makes it invalid    | User locked to step 1 until fixed           |
+| User on step 3, edits step 2, makes it invalid    | User locked to step 2 until fixed           |
+| User on step 3, completes step 3, clicks Continue | maxStepReached increases to 4               |
+| Page refresh                                      | maxStepReached recalculated from saved data |
+
+**Implementation**:
+
+```typescript
+// Frontend: useWizard hook
+useEffect(() => {
+    // Skip on initial mount - trust initialMaxStepReached from server
+    if (skipInitialCheck) return;
+
+    const maxValid = findFirstInvalidStep(data, existingDocs);
+
+    // Lock to invalid step if current progress is beyond valid
+    if (maxValid < maxStepReached) {
+        setMaxStepReached(maxValid);
+    }
+
+    // Navigate back if viewing beyond valid
+    if (currentStepIndex > maxValid) {
+        setCurrentStepIndex(maxValid);
+        showValidationErrors(maxValid);
+    }
+}, [data]);
+
+// Backend: saveDraft
+for ($step = 1; $step <= $requestedStep; $step++) {
+    $rules = getStepValidationRules($step, $data);
+    if (Validator::make($data, $rules)->fails()) {
+        break;  // Can't progress beyond this step
+    }
+    $validatedMaxStep = $step;
+}
+$draft->current_step = $validatedMaxStep;
+```
+
+**ExistingDocumentsContext**:
+
+Document validation checks both new uploads AND existing documents:
+
+```typescript
+const existingDocsContext = {
+    id_document_front: !!tenantProfile?.id_document_front_path,
+    id_document_back: !!tenantProfile?.id_document_back_path,
+    residence_permit_document: !!tenantProfile?.residence_permit_document_path,
+    employment_contract: !!tenantProfile?.employment_contract_path,
+    // ...
+};
+
+// Validation passes if EITHER new file uploaded OR existing doc present
+if (!data.profile_id_document_front && !existingDocs.id_document_front) {
+    addError('ID document front is required');
+}
+```
+
+This prevents re-upload requirements when documents already exist in the profile.
+
 ### State Management
 
 | State              | Purpose            | When Updated                 |
@@ -573,6 +650,70 @@ status ENUM('draft', ...)      -- Draft until published
 -- Only required fields: enough to identify the draft
 -- Full validation only on publish/submit
 ```
+
+### Application Wizard Data Separation
+
+The tenant application wizard separates data into two categories with different storage strategies:
+
+**Profile Fields** (stored in `tenant_profiles`):
+
+- Personal info: DOB, nationality, phone
+- ID document: type, number, issuing country, expiry
+- Immigration status and visa details
+- Employment and income
+- Guarantor information
+- Uploaded documents (ID, payslips, contracts)
+
+**Application Fields** (stored in `applications` draft):
+
+- Move-in date and lease duration
+- Message to landlord
+- Occupants details
+- Pets details
+- Emergency contact (application-specific)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  User fills wizard form                                     │
+│                                                             │
+│  Profile Fields ──────► TenantProfile (autosave + draft)    │
+│                         - Reusable across applications      │
+│                         - Updated on every save             │
+│                                                             │
+│  Application Fields ──► Application (draft only)            │
+│                         - Specific to this application      │
+│                         - Saved with current_step           │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+                    On Submit (status: submitted)
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Snapshot Creation                                          │
+│                                                             │
+│  Profile data is COPIED to Application as snapshot_* fields │
+│  - snapshot_employment_status                               │
+│  - snapshot_monthly_income                                  │
+│  - snapshot_id_document_front_path                          │
+│  - etc.                                                     │
+│                                                             │
+│  This preserves the tenant's data at submission time,       │
+│  even if they later update their profile for other apps.    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Why Snapshot?**
+
+- Tenant may update profile after submission (new job, new income)
+- Manager needs to see data as it was when tenant applied
+- Legal/audit trail: what was the tenant's situation at application time
+- Prevents confusion if profile data changes during review period
+
+**Data Flow**:
+
+1. **During wizard**: Profile fields saved to TenantProfile, application fields saved to Application draft
+2. **On submission**: Profile data copied to `snapshot_*` fields on Application
+3. **Manager review**: Shows snapshot data (frozen at submission), not live profile
+4. **Tenant updates profile**: Only affects future applications, not submitted ones
 
 ### Autosave Strategy
 

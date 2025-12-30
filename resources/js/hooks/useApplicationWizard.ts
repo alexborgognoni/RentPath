@@ -45,8 +45,6 @@ export interface PetDetails {
     breed: string;
     name: string;
     age: string;
-    weight: string;
-    weight_unit: string;
     size: 'small' | 'medium' | 'large' | '';
     is_registered_assistance_animal: boolean;
     assistance_animal_documentation: File | null;
@@ -237,7 +235,6 @@ export interface ApplicationWizardData {
     additional_occupants: number;
     occupants_details: OccupantDetails[];
     // Pets
-    has_pets: boolean;
     pets_details: PetDetails[];
     // Emergency Contact (optional, suggested for US/AU)
     emergency_contact_first_name: string;
@@ -286,8 +283,53 @@ export interface ApplicationWizardData {
     profile_student_id_number: string;
     profile_enrollment_proof: File | null;
     profile_student_income_source: 'loan' | 'grant' | 'parental_support' | 'part_time_work' | 'savings' | 'other' | '';
+    profile_student_income_source_type: 'scholarship' | 'stipend' | 'part_time_job' | 'parental_support' | 'student_loan' | 'savings' | 'other' | '';
+    profile_student_income_source_other: string;
     profile_student_monthly_income: string;
-    // If unemployed/retired/other
+    // If retired
+    profile_pension_monthly_income: string;
+    profile_pension_provider: string;
+    profile_pension_type: 'state_pension' | 'employer_pension' | 'private_pension' | 'annuity' | 'other' | '';
+    profile_retirement_other_income: string;
+    profile_pension_statement: File | null;
+    // If unemployed
+    profile_receiving_unemployment_benefits: boolean;
+    profile_unemployment_benefits_amount: string;
+    profile_unemployed_income_source:
+        | 'unemployment_benefits'
+        | 'severance_pay'
+        | 'savings'
+        | 'family_support'
+        | 'rental_income'
+        | 'investment_income'
+        | 'alimony'
+        | 'social_assistance'
+        | 'disability_allowance'
+        | 'freelance_gig'
+        | 'other'
+        | '';
+    profile_unemployed_income_source_other: string;
+    profile_benefits_statement: File | null;
+    // If other employment situation
+    profile_other_employment_situation:
+        | 'parental_leave'
+        | 'disability'
+        | 'sabbatical'
+        | 'career_break'
+        | 'medical_leave'
+        | 'caregiver'
+        | 'homemaker'
+        | 'volunteer'
+        | 'gap_year'
+        | 'early_retirement'
+        | 'military_service'
+        | 'other'
+        | '';
+    profile_other_employment_situation_details: string;
+    profile_expected_return_to_work: string;
+    profile_other_situation_monthly_income: string;
+    profile_other_situation_income_source: string;
+    // Legacy/generic
     profile_income_source: string;
     profile_other_income_proof: File | null;
     // Additional income (all statuses)
@@ -451,17 +493,23 @@ export interface DraftApplication {
     // Application specific fields only
     desired_move_in_date: string;
     lease_duration_months: number;
+    is_flexible_on_move_in: boolean;
+    is_flexible_on_duration: boolean;
     message_to_landlord: string;
     additional_occupants: number;
     occupants_details: OccupantDetails[];
-    has_pets: boolean;
     pets_details: PetDetails[];
     previous_landlord_name: string;
     previous_landlord_phone: string;
     previous_landlord_email: string;
-    emergency_contact_name: string;
-    emergency_contact_phone: string;
+    // Emergency contact (application-specific)
+    emergency_contact_first_name: string;
+    emergency_contact_last_name: string;
     emergency_contact_relationship: string;
+    emergency_contact_relationship_other: string;
+    emergency_contact_phone_country_code: string;
+    emergency_contact_phone_number: string;
+    emergency_contact_email: string;
     references: ReferenceDetails[];
 }
 
@@ -513,25 +561,24 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         // Rental Intent
         desired_move_in_date: draft?.desired_move_in_date ? formatDateForInput(draft.desired_move_in_date) : '',
         lease_duration_months: draft?.lease_duration_months || 12,
-        is_flexible_on_move_in: false,
-        is_flexible_on_duration: false,
+        is_flexible_on_move_in: draft?.is_flexible_on_move_in || false,
+        is_flexible_on_duration: draft?.is_flexible_on_duration || false,
         // Occupants
         additional_occupants: draft?.additional_occupants || 0,
         occupants_details: draft?.occupants_details || [],
         // Pets
-        has_pets: draft?.has_pets || false,
         pets_details: draft?.pets_details || [],
-        // Emergency Contact
-        emergency_contact_first_name: tp?.emergency_contact_first_name || '',
-        emergency_contact_last_name: tp?.emergency_contact_last_name || '',
-        emergency_contact_relationship: tp?.emergency_contact_relationship || tenantProfile?.emergency_contact_relationship || '',
-        emergency_contact_relationship_other: '',
-        emergency_contact_phone_country_code: tp?.emergency_contact_phone_country_code || '+31',
-        emergency_contact_phone_number: tp?.emergency_contact_phone_number || '',
-        emergency_contact_email: tp?.emergency_contact_email || '',
+        // Emergency Contact (application-specific, loaded from draft)
+        emergency_contact_first_name: draft?.emergency_contact_first_name || '',
+        emergency_contact_last_name: draft?.emergency_contact_last_name || '',
+        emergency_contact_relationship: draft?.emergency_contact_relationship || '',
+        emergency_contact_relationship_other: draft?.emergency_contact_relationship_other || '',
+        emergency_contact_phone_country_code: draft?.emergency_contact_phone_country_code || '+31',
+        emergency_contact_phone_number: draft?.emergency_contact_phone_number || '',
+        emergency_contact_email: draft?.emergency_contact_email || '',
 
         // ===== Step 3: Financial Capability =====
-        profile_employment_status: tenantProfile?.employment_status || '',
+        profile_employment_status: tenantProfile?.employment_status || 'employed',
         profile_employment_status_other: '',
         // Employed fields
         profile_employer_name: tenantProfile?.employer_name || '',
@@ -568,8 +615,28 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_student_id_number: tp?.student_id_number || '',
         profile_enrollment_proof: null,
         profile_student_income_source: (tenantProfile?.student_income_source as ApplicationWizardData['profile_student_income_source']) || '',
+        profile_student_income_source_type: tp?.student_income_source_type || '',
+        profile_student_income_source_other: tp?.student_income_source_other || '',
         profile_student_monthly_income: tp?.student_monthly_income?.toString() || '',
-        // Unemployed/retired/other
+        // Retired fields
+        profile_pension_monthly_income: tp?.pension_monthly_income?.toString() || '',
+        profile_pension_provider: tp?.pension_provider || '',
+        profile_pension_type: tp?.pension_type || '',
+        profile_retirement_other_income: tp?.retirement_other_income?.toString() || '',
+        profile_pension_statement: null,
+        // Unemployed fields
+        profile_receiving_unemployment_benefits: tp?.receiving_unemployment_benefits || false,
+        profile_unemployment_benefits_amount: tp?.unemployment_benefits_amount?.toString() || '',
+        profile_unemployed_income_source: tp?.unemployed_income_source || '',
+        profile_unemployed_income_source_other: tp?.unemployed_income_source_other || '',
+        profile_benefits_statement: null,
+        // Other employment situation fields
+        profile_other_employment_situation: tp?.other_employment_situation || '',
+        profile_other_employment_situation_details: tp?.other_employment_situation_details || '',
+        profile_expected_return_to_work: formatDateForInput(tp?.expected_return_to_work),
+        profile_other_situation_monthly_income: tp?.other_situation_monthly_income?.toString() || '',
+        profile_other_situation_income_source: tp?.other_situation_income_source || '',
+        // Legacy/generic
         profile_income_source: tp?.income_source || '',
         profile_other_income_proof: null,
         // Additional income
@@ -651,8 +718,8 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_current_country: tenantProfile?.current_country || '',
         message_to_landlord: draft?.message_to_landlord || '',
         references: draft?.references || [],
-        emergency_contact_name: draft?.emergency_contact_name || tenantProfile?.emergency_contact_name || '',
-        emergency_contact_phone: draft?.emergency_contact_phone || tenantProfile?.emergency_contact_phone || '',
+        emergency_contact_name: tenantProfile?.emergency_contact_name || '',
+        emergency_contact_phone: tenantProfile?.emergency_contact_phone || '',
         previous_landlord_name: draft?.previous_landlord_name || '',
         previous_landlord_phone: draft?.previous_landlord_phone || '',
         previous_landlord_email: draft?.previous_landlord_email || '',
@@ -980,8 +1047,6 @@ export function useApplicationWizard({
             breed: '',
             name: '',
             age: '',
-            weight: '',
-            weight_unit: 'kg',
             size: '',
             is_registered_assistance_animal: false,
             assistance_animal_documentation: null,
@@ -991,10 +1056,6 @@ export function useApplicationWizard({
 
     const removePet = useCallback(
         (index: number) => {
-            // Prevent removing the first pet if has_pets is checked
-            if (wizard.data.has_pets && wizard.data.pets_details.length === 1) {
-                return;
-            }
             wizard.updateField(
                 'pets_details',
                 wizard.data.pets_details.filter((_, i) => i !== index),
@@ -1341,104 +1402,112 @@ export function useApplicationWizard({
 
         if (wizard.currentStep === 'financial') {
             newTouched.profile_employment_status = true;
+            const status = wizard.data.profile_employment_status;
 
-            const isEmployed = wizard.data.profile_employment_status === 'employed' || wizard.data.profile_employment_status === 'self_employed';
-            const isStudent = wizard.data.profile_employment_status === 'student';
-            const isUnemployedOrRetired =
-                wizard.data.profile_employment_status === 'unemployed' || wizard.data.profile_employment_status === 'retired';
-
-            if (isEmployed) {
+            // EMPLOYED
+            if (status === 'employed') {
                 newTouched.profile_employer_name = true;
                 newTouched.profile_job_title = true;
                 newTouched.profile_employment_type = true;
                 newTouched.profile_employment_start_date = true;
-                newTouched.profile_monthly_income = true;
+                newTouched.profile_gross_annual_income = true;
+                newTouched.profile_net_monthly_income = true;
                 newTouched.profile_employment_contract = true;
                 newTouched.profile_payslip_1 = true;
                 newTouched.profile_payslip_2 = true;
                 newTouched.profile_payslip_3 = true;
             }
 
-            if (isStudent) {
+            // SELF-EMPLOYED
+            if (status === 'self_employed') {
+                newTouched.profile_business_name = true;
+                newTouched.profile_business_type = true;
+                newTouched.profile_business_start_date = true;
+                newTouched.profile_gross_annual_revenue = true;
+                newTouched.profile_net_monthly_income = true;
+            }
+
+            // STUDENT
+            if (status === 'student') {
                 newTouched.profile_university_name = true;
                 newTouched.profile_program_of_study = true;
+                newTouched.profile_student_income_source_type = true;
+                newTouched.profile_student_monthly_income = true;
                 newTouched.profile_student_proof = true;
+                if (wizard.data.profile_student_income_source_type === 'other') {
+                    newTouched.profile_student_income_source_other = true;
+                }
             }
 
-            if (isUnemployedOrRetired) {
+            // RETIRED
+            if (status === 'retired') {
+                newTouched.profile_pension_type = true;
+                newTouched.profile_pension_monthly_income = true;
+                newTouched.profile_pension_statement = true;
+            }
+
+            // UNEMPLOYED
+            if (status === 'unemployed') {
+                newTouched.profile_unemployed_income_source = true;
+                newTouched.profile_unemployment_benefits_amount = true;
+                if (wizard.data.profile_unemployed_income_source === 'other') {
+                    newTouched.profile_unemployed_income_source_other = true;
+                }
+                if (wizard.data.profile_unemployed_income_source === 'unemployment_benefits') {
+                    newTouched.profile_benefits_statement = true;
+                } else if (wizard.data.profile_unemployed_income_source) {
+                    newTouched.profile_other_income_proof = true;
+                }
+            }
+
+            // OTHER
+            if (status === 'other') {
+                newTouched.profile_other_employment_situation = true;
+                newTouched.profile_other_situation_monthly_income = true;
+                newTouched.profile_other_situation_income_source = true;
                 newTouched.profile_other_income_proof = true;
-            }
-
-            if (wizard.data.profile_has_guarantor) {
-                const guarantorStatus = wizard.data.profile_guarantor_employment_status;
-                const isGuarantorEmployed = guarantorStatus === 'employed' || guarantorStatus === 'self_employed';
-                const isGuarantorStudent = guarantorStatus === 'student';
-                const isGuarantorUnemployedOrRetired = guarantorStatus === 'unemployed' || guarantorStatus === 'retired';
-
-                // Basic info
-                newTouched.profile_guarantor_first_name = true;
-                newTouched.profile_guarantor_last_name = true;
-                newTouched.profile_guarantor_relationship = true;
-                newTouched.profile_guarantor_relationship_other = true;
-                newTouched.profile_guarantor_phone_number = true;
-                newTouched.profile_guarantor_email = true;
-                newTouched.profile_guarantor_street_name = true;
-                newTouched.profile_guarantor_house_number = true;
-                newTouched.profile_guarantor_city = true;
-                newTouched.profile_guarantor_postal_code = true;
-                newTouched.profile_guarantor_country = true;
-                newTouched.profile_guarantor_state_province = true;
-                newTouched.profile_guarantor_employment_status = true;
-                newTouched.profile_guarantor_monthly_income = true;
-                newTouched.profile_guarantor_id_front = true;
-                newTouched.profile_guarantor_id_back = true;
-
-                // Employed/Self-employed specific
-                if (isGuarantorEmployed) {
-                    newTouched.profile_guarantor_employer_name = true;
-                    newTouched.profile_guarantor_job_title = true;
-                    newTouched.profile_guarantor_employment_type = true;
-                    newTouched.profile_guarantor_employment_start_date = true;
-                    newTouched.profile_guarantor_employment_contract = true;
-                    newTouched.profile_guarantor_payslip_1 = true;
-                    newTouched.profile_guarantor_payslip_2 = true;
-                    newTouched.profile_guarantor_payslip_3 = true;
-                }
-
-                // Student specific
-                if (isGuarantorStudent) {
-                    newTouched.profile_guarantor_university_name = true;
-                    newTouched.profile_guarantor_program_of_study = true;
-                    newTouched.profile_guarantor_student_proof = true;
-                }
-
-                // Unemployed/Retired specific
-                if (isGuarantorUnemployedOrRetired) {
-                    newTouched.profile_guarantor_other_income_proof = true;
+                if (wizard.data.profile_other_employment_situation === 'other') {
+                    newTouched.profile_other_employment_situation_details = true;
                 }
             }
         }
 
         if (wizard.currentStep === 'household') {
+            // Rental Intent
             newTouched.desired_move_in_date = true;
             newTouched.lease_duration_months = true;
 
+            // Occupants (if any)
             wizard.data.occupants_details.forEach((occupant, index) => {
-                newTouched[`occupant_${index}_name`] = true;
-                newTouched[`occupant_${index}_age`] = true;
+                newTouched[`occupant_${index}_first_name`] = true;
+                newTouched[`occupant_${index}_last_name`] = true;
+                newTouched[`occupant_${index}_date_of_birth`] = true;
                 newTouched[`occupant_${index}_relationship`] = true;
-                if (occupant.relationship === 'Other') {
+                if (occupant.relationship === 'other') {
                     newTouched[`occupant_${index}_relationship_other`] = true;
                 }
             });
 
-            if (wizard.data.has_pets) {
-                wizard.data.pets_details.forEach((pet, index) => {
-                    newTouched[`pet_${index}_type`] = true;
-                    if (pet.type === 'Other') {
-                        newTouched[`pet_${index}_type_other`] = true;
-                    }
-                });
+            // Pets (if any)
+            wizard.data.pets_details.forEach((pet, index) => {
+                newTouched[`pet_${index}_type`] = true;
+                if (pet.type === 'other') {
+                    newTouched[`pet_${index}_type_other`] = true;
+                }
+            });
+
+            // Emergency contact: if first name OR last name is filled, mark all as touched
+            const hasEmergencyContactName = wizard.data.emergency_contact_first_name?.trim() || wizard.data.emergency_contact_last_name?.trim();
+
+            if (hasEmergencyContactName) {
+                newTouched.emergency_contact_first_name = true;
+                newTouched.emergency_contact_last_name = true;
+                newTouched.emergency_contact_relationship = true;
+                newTouched.emergency_contact_phone_number = true;
+                // Only mark relationship_other if relationship is 'other'
+                if (wizard.data.emergency_contact_relationship === 'other') {
+                    newTouched.emergency_contact_relationship_other = true;
+                }
             }
         }
 
@@ -1508,40 +1577,9 @@ export function useApplicationWizard({
         });
     }, [validateForSubmit, wizard, propertyId, token, markAllCurrentStepFieldsTouched]);
 
-    // ===== Custom updateField that handles has_pets toggle and profile autosave =====
+    // ===== Custom updateField that handles profile autosave =====
     const updateField = useCallback(
         <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => {
-            // Handle has_pets toggle
-            if (key === 'has_pets') {
-                if (value && wizard.data.pets_details.length === 0) {
-                    // Add mandatory first pet when checking "I have pets"
-                    const newPet: PetDetails = {
-                        type: '',
-                        type_other: '',
-                        breed: '',
-                        name: '',
-                        age: '',
-                        weight: '',
-                        weight_unit: 'kg',
-                        size: '',
-                        is_registered_assistance_animal: false,
-                        assistance_animal_documentation: null,
-                    };
-                    wizard.updateFields({
-                        [key]: value,
-                        pets_details: [newPet],
-                    } as Partial<ApplicationWizardData>);
-                    return;
-                } else if (!value) {
-                    // Clear pets when unchecking
-                    wizard.updateFields({
-                        [key]: value,
-                        pets_details: [],
-                    } as Partial<ApplicationWizardData>);
-                    return;
-                }
-            }
-
             wizard.updateField(key, value);
 
             // Autosave profile fields immediately to TenantProfile

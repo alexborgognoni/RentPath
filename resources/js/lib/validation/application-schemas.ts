@@ -1,4 +1,3 @@
-import { requiresStateProvince, validatePostalCode } from '@/utils/address-validation';
 import { validatePhoneNumber } from '@/utils/phone-validation';
 import { z } from 'zod';
 
@@ -79,10 +78,12 @@ export const APPLICATION_MESSAGES = {
         required: 'State/Province is required for this country',
     },
 
-    // Employment Step
+    // Employment Step - Common
     profile_employment_status: {
         required: 'Please select your employment status',
     },
+
+    // Employed fields
     profile_employer_name: {
         required: 'Employer name is required',
     },
@@ -95,15 +96,92 @@ export const APPLICATION_MESSAGES = {
     profile_employment_start_date: {
         required: 'Employment start date is required',
     },
+    profile_gross_annual_income: {
+        required: 'Gross annual salary is required',
+        min: 'Salary must be a positive number',
+    },
+    profile_net_monthly_income: {
+        required: 'Net monthly income is required',
+        min: 'Income must be a positive number',
+    },
     profile_monthly_income: {
         required: 'Monthly income is required',
         min: 'Income must be a positive number',
     },
+
+    // Self-employed fields
+    profile_business_name: {
+        required: 'Business name is required',
+    },
+    profile_business_type: {
+        required: 'Business type is required',
+    },
+    profile_business_start_date: {
+        required: 'Business start date is required',
+    },
+    profile_gross_annual_revenue: {
+        required: 'Gross annual revenue is required',
+        min: 'Revenue must be a positive number',
+    },
+
+    // Student fields
     profile_university_name: {
         required: 'University name is required',
     },
     profile_program_of_study: {
         required: 'Program of study is required',
+    },
+    profile_student_income_source_type: {
+        required: 'Please select your income source',
+    },
+    profile_student_income_source_other: {
+        required: 'Please specify your income source',
+    },
+    profile_student_monthly_income: {
+        required: 'Monthly income is required',
+        min: 'Income must be a positive number',
+    },
+
+    // Retired fields
+    profile_pension_type: {
+        required: 'Pension type is required',
+    },
+    profile_pension_monthly_income: {
+        required: 'Monthly pension income is required',
+        min: 'Pension must be a positive number',
+    },
+    profile_pension_statement: {
+        required: 'Pension statement is required',
+    },
+
+    // Unemployed fields
+    profile_unemployed_income_source: {
+        required: 'Please select your income source',
+    },
+    profile_unemployed_income_source_other: {
+        required: 'Please specify your income source',
+    },
+    profile_unemployment_benefits_amount: {
+        required: 'Benefits amount is required',
+        min: 'Amount must be a positive number',
+    },
+    profile_benefits_statement: {
+        required: 'Benefits statement is required',
+    },
+
+    // Other employment situation fields
+    profile_other_employment_situation: {
+        required: 'Please select your current situation',
+    },
+    profile_other_employment_situation_details: {
+        required: 'Please describe your situation',
+    },
+    profile_other_situation_monthly_income: {
+        required: 'Monthly income is required',
+        min: 'Income must be a positive number',
+    },
+    profile_other_situation_income_source: {
+        required: 'Income source is required',
     },
     profile_id_document_front: {
         required: 'Front side of ID document is required',
@@ -365,6 +443,15 @@ export const APPLICATION_MESSAGES = {
         consent_to_contact: { required: 'Guarantor must consent to be contacted' },
         guarantee_consent_signed: { required: 'Guarantor must sign the guarantee consent' },
     },
+
+    // Emergency Contact (Step 2)
+    emergency_contact: {
+        first_name: { required: 'First name is required' },
+        last_name: { required: 'Last name is required' },
+        relationship: { required: 'Relationship is required' },
+        relationship_other: { required: 'Please specify the relationship' },
+        phone_number: { required: 'Phone number is required' },
+    },
 };
 
 // ===== Existing Documents Context =====
@@ -375,11 +462,18 @@ export interface ExistingDocumentsContext {
     id_document_back?: boolean;
     residence_permit_document?: boolean;
     right_to_rent_document?: boolean;
+    // Employment documents
     employment_contract?: boolean;
     payslip_1?: boolean;
     payslip_2?: boolean;
     payslip_3?: boolean;
+    // Student documents
     student_proof?: boolean;
+    // Retired documents
+    pension_statement?: boolean;
+    // Unemployed documents
+    benefits_statement?: boolean;
+    // Other documents
     other_income_proof?: boolean;
     // Guarantor documents
     guarantor_id_front?: boolean;
@@ -425,7 +519,8 @@ const occupantSchema = z.object({
 
 const occupantWithOtherSchema = occupantSchema.refine(
     (data) => {
-        if (data.relationship === 'Other') {
+        // Check for lowercase 'other' (matching component values)
+        if (data.relationship === 'other') {
             return data.relationship_other.trim().length > 0;
         }
         return true;
@@ -437,23 +532,27 @@ const occupantWithOtherSchema = occupantSchema.refine(
 );
 
 const petSchema = z.object({
-    type: z.string().min(1, APPLICATION_MESSAGES.pet.type.required).max(100, APPLICATION_MESSAGES.pet.type.maxLength),
-    type_other: z.string().max(100, APPLICATION_MESSAGES.pet.type_other.maxLength),
-    breed: z.string().max(100, APPLICATION_MESSAGES.pet.breed.maxLength),
-    age: z.string().refine(
-        (val) => {
-            if (!val) return true; // Optional
-            const num = parseInt(val);
-            return !isNaN(num) && num >= 0 && num <= 50;
-        },
-        { message: APPLICATION_MESSAGES.pet.age.max },
+    type: stringField().pipe(z.string().min(1, APPLICATION_MESSAGES.pet.type.required).max(100, APPLICATION_MESSAGES.pet.type.maxLength)),
+    type_other: stringField().pipe(z.string().max(100, APPLICATION_MESSAGES.pet.type_other.maxLength)),
+    breed: stringField().pipe(z.string().max(100, APPLICATION_MESSAGES.pet.breed.maxLength)),
+    age: stringField().pipe(
+        z.string().refine(
+            (val) => {
+                if (!val) return true; // Optional
+                const num = parseInt(val);
+                return !isNaN(num) && num >= 0 && num <= 50;
+            },
+            { message: APPLICATION_MESSAGES.pet.age.max },
+        ),
     ),
-    weight: z.string(),
+    size: z.preprocess((val) => val ?? '', z.enum(['small', 'medium', 'large', '']).optional()),
+    name: stringField().pipe(z.string().max(100)),
 });
 
 const petWithOtherSchema = petSchema.refine(
     (data) => {
-        if (data.type === 'Other') {
+        // Check for lowercase 'other' (matching component values)
+        if (data.type === 'other') {
             return data.type_other.trim().length > 0;
         }
         return true;
@@ -652,48 +751,55 @@ export function createPersonalInfoStepSchema(existingDocs: ExistingDocumentsCont
 // Default export for backwards compatibility (no existing docs context)
 export const personalInfoStepSchema = createPersonalInfoStepSchema();
 
-// Step 2: Employment & Income - Base schema with all fields
+// Step 3: Employment & Income - Base schema with all fields (Financial step)
 const employmentBaseSchema = z.object({
+    // Common
     profile_employment_status: z.string(),
+    profile_income_currency: z.string(),
+
+    // Employed fields
     profile_employer_name: z.string(),
     profile_job_title: z.string(),
     profile_employment_type: z.string(),
     profile_employment_start_date: z.string(),
-    profile_monthly_income: z.string(),
-    profile_income_currency: z.string(),
+    profile_gross_annual_income: z.string(),
+    profile_net_monthly_income: z.string(),
+    profile_monthly_income: z.string(), // Deprecated, kept for backwards compatibility
+
+    // Self-employed fields
+    profile_business_name: z.string(),
+    profile_business_type: z.string(),
+    profile_business_start_date: z.string(),
+    profile_gross_annual_revenue: z.string(),
+
+    // Student fields
     profile_university_name: z.string(),
     profile_program_of_study: z.string(),
     profile_expected_graduation_date: z.string(),
-    profile_student_income_source: z.string(),
-    profile_has_guarantor: z.boolean(),
-    // Guarantor - Basic Info
-    profile_guarantor_first_name: z.string(),
-    profile_guarantor_last_name: z.string(),
-    profile_guarantor_relationship: z.string(),
-    profile_guarantor_relationship_other: z.string(),
-    profile_guarantor_phone_country_code: z.string(),
-    profile_guarantor_phone_number: z.string(),
-    profile_guarantor_email: z.string(),
-    profile_guarantor_street_name: z.string(),
-    profile_guarantor_house_number: z.string(),
-    profile_guarantor_address_line_2: z.string(),
-    profile_guarantor_city: z.string(),
-    profile_guarantor_state_province: z.string(),
-    profile_guarantor_postal_code: z.string(),
-    profile_guarantor_country: z.string(),
-    // Guarantor - Employment
-    profile_guarantor_employment_status: z.string(),
-    profile_guarantor_employer_name: z.string(),
-    profile_guarantor_job_title: z.string(),
-    profile_guarantor_employment_type: z.string(),
-    profile_guarantor_employment_start_date: z.string(),
-    profile_guarantor_monthly_income: z.string(),
-    profile_guarantor_income_currency: z.string(),
-    // Guarantor - Student Info
-    profile_guarantor_university_name: z.string(),
-    profile_guarantor_program_of_study: z.string(),
-    profile_guarantor_expected_graduation_date: z.string(),
-    profile_guarantor_student_income_source: z.string(),
+    profile_student_income_source: z.string(), // Deprecated
+    profile_student_income_source_type: z.string(),
+    profile_student_income_source_other: z.string(),
+    profile_student_monthly_income: z.string(),
+
+    // Retired fields
+    profile_pension_monthly_income: z.string(),
+    profile_pension_provider: z.string(),
+    profile_pension_type: z.string(),
+    profile_retirement_other_income: z.string(),
+
+    // Unemployed fields
+    profile_receiving_unemployment_benefits: z.boolean(),
+    profile_unemployment_benefits_amount: z.string(),
+    profile_unemployed_income_source: z.string(),
+    profile_unemployed_income_source_other: z.string(),
+
+    // Other employment situation fields
+    profile_other_employment_situation: z.string(),
+    profile_other_employment_situation_details: z.string(),
+    profile_expected_return_to_work: z.string(),
+    profile_other_situation_monthly_income: z.string(),
+    profile_other_situation_income_source: z.string(),
+
     // Documents are validated as Files
     profile_id_document_front: z.any().nullable(),
     profile_id_document_back: z.any().nullable(),
@@ -702,27 +808,15 @@ const employmentBaseSchema = z.object({
     profile_payslip_2: z.any().nullable(),
     profile_payslip_3: z.any().nullable(),
     profile_student_proof: z.any().nullable(),
+    profile_pension_statement: z.any().nullable(),
+    profile_benefits_statement: z.any().nullable(),
     profile_other_income_proof: z.any().nullable(),
-    // Guarantor Documents
-    profile_guarantor_id_front: z.any().nullable(),
-    profile_guarantor_id_back: z.any().nullable(),
-    profile_guarantor_proof_income: z.any().nullable(),
-    profile_guarantor_employment_contract: z.any().nullable(),
-    profile_guarantor_payslip_1: z.any().nullable(),
-    profile_guarantor_payslip_2: z.any().nullable(),
-    profile_guarantor_payslip_3: z.any().nullable(),
-    profile_guarantor_student_proof: z.any().nullable(),
-    profile_guarantor_other_income_proof: z.any().nullable(),
 });
 
 // Factory function that creates employment schema with existing docs context
 export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContext = {}) {
     return employmentBaseSchema.superRefine((data, ctx) => {
         const status = data.profile_employment_status;
-        const isEmployed = status === 'employed' || status === 'self_employed';
-        const isStudent = status === 'student';
-        const isUnemployedOrRetired = status === 'unemployed' || status === 'retired';
-        const hasGuarantor = data.profile_has_guarantor;
 
         // Employment status is always required
         if (!status) {
@@ -731,10 +825,11 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
                 message: APPLICATION_MESSAGES.profile_employment_status.required,
                 path: ['profile_employment_status'],
             });
+            return; // Stop here if no status
         }
 
-        // Employed/Self-employed validations
-        if (isEmployed) {
+        // EMPLOYED validations
+        if (status === 'employed') {
             if (!data.profile_employer_name?.trim()) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -763,13 +858,21 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
                     path: ['profile_employment_start_date'],
                 });
             }
-            if (!data.profile_monthly_income) {
+            if (!data.profile_gross_annual_income) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_monthly_income.required,
-                    path: ['profile_monthly_income'],
+                    message: APPLICATION_MESSAGES.profile_gross_annual_income.required,
+                    path: ['profile_gross_annual_income'],
                 });
             }
+            if (!data.profile_net_monthly_income) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_net_monthly_income.required,
+                    path: ['profile_net_monthly_income'],
+                });
+            }
+            // Document validations for employed
             if (!data.profile_employment_contract && !existingDocs.employment_contract) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -800,8 +903,48 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
             }
         }
 
-        // Student validations
-        if (isStudent) {
+        // SELF-EMPLOYED validations
+        if (status === 'self_employed') {
+            if (!data.profile_business_name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_business_name.required,
+                    path: ['profile_business_name'],
+                });
+            }
+            if (!data.profile_business_type?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_business_type.required,
+                    path: ['profile_business_type'],
+                });
+            }
+            if (!data.profile_business_start_date?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_business_start_date.required,
+                    path: ['profile_business_start_date'],
+                });
+            }
+            if (!data.profile_gross_annual_revenue) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_gross_annual_revenue.required,
+                    path: ['profile_gross_annual_revenue'],
+                });
+            }
+            if (!data.profile_net_monthly_income) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_net_monthly_income.required,
+                    path: ['profile_net_monthly_income'],
+                });
+            }
+            // Self-employed typically needs tax returns/bank statements (handled via other_income_proof)
+        }
+
+        // STUDENT validations
+        if (status === 'student') {
             if (!data.profile_university_name?.trim()) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -816,6 +959,28 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
                     path: ['profile_program_of_study'],
                 });
             }
+            if (!data.profile_student_income_source_type?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_student_income_source_type.required,
+                    path: ['profile_student_income_source_type'],
+                });
+            }
+            if (!data.profile_student_monthly_income) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_student_monthly_income.required,
+                    path: ['profile_student_monthly_income'],
+                });
+            }
+            // If income source is 'other', require specification
+            if (data.profile_student_income_source_type === 'other' && !data.profile_student_income_source_other?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_student_income_source_other.required,
+                    path: ['profile_student_income_source_other'],
+                });
+            }
             if (!data.profile_student_proof && !existingDocs.student_proof) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -825,9 +990,75 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
             }
         }
 
-        // Unemployed/Retired validations
-        if (isUnemployedOrRetired) {
-            if (!data.profile_other_income_proof && !existingDocs.other_income_proof) {
+        // RETIRED validations
+        if (status === 'retired') {
+            if (!data.profile_pension_type?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_pension_type.required,
+                    path: ['profile_pension_type'],
+                });
+            }
+            if (!data.profile_pension_monthly_income) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_pension_monthly_income.required,
+                    path: ['profile_pension_monthly_income'],
+                });
+            }
+            if (!data.profile_pension_statement && !existingDocs.pension_statement) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_pension_statement.required,
+                    path: ['profile_pension_statement'],
+                });
+            }
+        }
+
+        // UNEMPLOYED validations
+        if (status === 'unemployed') {
+            if (!data.profile_unemployed_income_source?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_unemployed_income_source.required,
+                    path: ['profile_unemployed_income_source'],
+                });
+            }
+            // If income source is 'other', require specification
+            if (data.profile_unemployed_income_source === 'other' && !data.profile_unemployed_income_source_other?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_unemployed_income_source_other.required,
+                    path: ['profile_unemployed_income_source_other'],
+                });
+            }
+            // Always require income/benefits amount when income source is selected
+            if (data.profile_unemployed_income_source && !data.profile_unemployment_benefits_amount) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_unemployment_benefits_amount.required,
+                    path: ['profile_unemployment_benefits_amount'],
+                });
+            }
+            // If income source is unemployment_benefits, require benefits statement
+            if (
+                data.profile_unemployed_income_source === 'unemployment_benefits' &&
+                !data.profile_benefits_statement &&
+                !existingDocs.benefits_statement
+            ) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.profile_benefits_statement.required,
+                    path: ['profile_benefits_statement'],
+                });
+            }
+            // If income source is NOT unemployment_benefits, require other income proof
+            if (
+                data.profile_unemployed_income_source &&
+                data.profile_unemployed_income_source !== 'unemployment_benefits' &&
+                !data.profile_other_income_proof &&
+                !existingDocs.other_income_proof
+            ) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: APPLICATION_MESSAGES.profile_other_income_proof.required,
@@ -836,260 +1067,43 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
             }
         }
 
-        // Guarantor validations - all fields mandatory when guarantor is enabled
-        if (hasGuarantor) {
-            const guarantorStatus = data.profile_guarantor_employment_status;
-            const isGuarantorEmployed = guarantorStatus === 'employed' || guarantorStatus === 'self_employed';
-            const isGuarantorStudent = guarantorStatus === 'student';
-            const isGuarantorUnemployedOrRetired = guarantorStatus === 'unemployed' || guarantorStatus === 'retired';
-
-            // First name
-            if (!data.profile_guarantor_first_name?.trim()) {
+        // OTHER employment situation validations
+        if (status === 'other') {
+            if (!data.profile_other_employment_situation?.trim()) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_first_name.required,
-                    path: ['profile_guarantor_first_name'],
+                    message: APPLICATION_MESSAGES.profile_other_employment_situation.required,
+                    path: ['profile_other_employment_situation'],
                 });
             }
-            // Last name
-            if (!data.profile_guarantor_last_name?.trim()) {
+            // If situation is 'other', require details
+            if (data.profile_other_employment_situation === 'other' && !data.profile_other_employment_situation_details?.trim()) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_last_name.required,
-                    path: ['profile_guarantor_last_name'],
+                    message: APPLICATION_MESSAGES.profile_other_employment_situation_details.required,
+                    path: ['profile_other_employment_situation_details'],
                 });
             }
-            // Relationship
-            if (!data.profile_guarantor_relationship?.trim()) {
+            if (!data.profile_other_situation_monthly_income) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_relationship.required,
-                    path: ['profile_guarantor_relationship'],
+                    message: APPLICATION_MESSAGES.profile_other_situation_monthly_income.required,
+                    path: ['profile_other_situation_monthly_income'],
                 });
             }
-            // Relationship "Other" - require specification
-            if (data.profile_guarantor_relationship === 'Other' && !data.profile_guarantor_relationship_other?.trim()) {
+            if (!data.profile_other_situation_income_source?.trim()) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_relationship_other.required,
-                    path: ['profile_guarantor_relationship_other'],
+                    message: APPLICATION_MESSAGES.profile_other_situation_income_source.required,
+                    path: ['profile_other_situation_income_source'],
                 });
             }
-            // Phone
-            if (!data.profile_guarantor_phone_number?.trim()) {
+            if (!data.profile_other_income_proof && !existingDocs.other_income_proof) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_phone_number.required,
-                    path: ['profile_guarantor_phone_number'],
+                    message: APPLICATION_MESSAGES.profile_other_income_proof.required,
+                    path: ['profile_other_income_proof'],
                 });
-            } else if (data.profile_guarantor_phone_country_code) {
-                if (!validatePhoneNumber(data.profile_guarantor_phone_number, data.profile_guarantor_phone_country_code)) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_phone_number.invalid,
-                        path: ['profile_guarantor_phone_number'],
-                    });
-                }
-            }
-            // Email
-            if (!data.profile_guarantor_email?.trim()) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_email.required,
-                    path: ['profile_guarantor_email'],
-                });
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.profile_guarantor_email)) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_email.invalid,
-                    path: ['profile_guarantor_email'],
-                });
-            }
-            // Address - Street name
-            if (!data.profile_guarantor_street_name?.trim()) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_street_name.required,
-                    path: ['profile_guarantor_street_name'],
-                });
-            }
-            // Address - House number
-            if (!data.profile_guarantor_house_number?.trim()) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_house_number.required,
-                    path: ['profile_guarantor_house_number'],
-                });
-            }
-            // Address - City
-            if (!data.profile_guarantor_city?.trim()) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_city.required,
-                    path: ['profile_guarantor_city'],
-                });
-            }
-            // Address - Country
-            if (!data.profile_guarantor_country?.trim()) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_country.required,
-                    path: ['profile_guarantor_country'],
-                });
-            }
-            // Address - Postal code
-            if (!data.profile_guarantor_postal_code?.trim()) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_postal_code.required,
-                    path: ['profile_guarantor_postal_code'],
-                });
-            } else if (data.profile_guarantor_country) {
-                if (!validatePostalCode(data.profile_guarantor_postal_code, data.profile_guarantor_country)) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_postal_code.invalid,
-                        path: ['profile_guarantor_postal_code'],
-                    });
-                }
-            }
-            // Address - State/Province (required for certain countries)
-            if (data.profile_guarantor_country && requiresStateProvince(data.profile_guarantor_country)) {
-                if (!data.profile_guarantor_state_province?.trim()) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_state_province.required,
-                        path: ['profile_guarantor_state_province'],
-                    });
-                }
-            }
-            // Employment status (always required for guarantor)
-            if (!guarantorStatus) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_employment_status.required,
-                    path: ['profile_guarantor_employment_status'],
-                });
-            }
-            // Monthly income (always required)
-            if (!data.profile_guarantor_monthly_income) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_monthly_income.required,
-                    path: ['profile_guarantor_monthly_income'],
-                });
-            }
-            // ID Documents (always required for guarantor)
-            if (!data.profile_guarantor_id_front && !existingDocs.guarantor_id_front) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_id_front.required,
-                    path: ['profile_guarantor_id_front'],
-                });
-            }
-            if (!data.profile_guarantor_id_back && !existingDocs.guarantor_id_back) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_guarantor_id_back.required,
-                    path: ['profile_guarantor_id_back'],
-                });
-            }
-
-            // Employed/Self-employed specific validations
-            if (isGuarantorEmployed) {
-                if (!data.profile_guarantor_employer_name?.trim()) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_employer_name.required,
-                        path: ['profile_guarantor_employer_name'],
-                    });
-                }
-                if (!data.profile_guarantor_job_title?.trim()) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_job_title.required,
-                        path: ['profile_guarantor_job_title'],
-                    });
-                }
-                if (!data.profile_guarantor_employment_type?.trim()) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_employment_type.required,
-                        path: ['profile_guarantor_employment_type'],
-                    });
-                }
-                if (!data.profile_guarantor_employment_start_date?.trim()) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_employment_start_date.required,
-                        path: ['profile_guarantor_employment_start_date'],
-                    });
-                }
-                // Employment documents
-                if (!data.profile_guarantor_employment_contract && !existingDocs.guarantor_employment_contract) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_employment_contract.required,
-                        path: ['profile_guarantor_employment_contract'],
-                    });
-                }
-                if (!data.profile_guarantor_payslip_1 && !existingDocs.guarantor_payslip_1) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_payslip.required,
-                        path: ['profile_guarantor_payslip_1'],
-                    });
-                }
-                if (!data.profile_guarantor_payslip_2 && !existingDocs.guarantor_payslip_2) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_payslip.required,
-                        path: ['profile_guarantor_payslip_2'],
-                    });
-                }
-                if (!data.profile_guarantor_payslip_3 && !existingDocs.guarantor_payslip_3) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_payslip.required,
-                        path: ['profile_guarantor_payslip_3'],
-                    });
-                }
-            }
-
-            // Student specific validations
-            if (isGuarantorStudent) {
-                if (!data.profile_guarantor_university_name?.trim()) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_university_name.required,
-                        path: ['profile_guarantor_university_name'],
-                    });
-                }
-                if (!data.profile_guarantor_program_of_study?.trim()) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_program_of_study.required,
-                        path: ['profile_guarantor_program_of_study'],
-                    });
-                }
-                if (!data.profile_guarantor_student_proof && !existingDocs.guarantor_student_proof) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_student_proof.required,
-                        path: ['profile_guarantor_student_proof'],
-                    });
-                }
-            }
-
-            // Unemployed/Retired specific validations
-            if (isGuarantorUnemployedOrRetired) {
-                if (!data.profile_guarantor_other_income_proof && !existingDocs.guarantor_other_income_proof) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        message: APPLICATION_MESSAGES.profile_guarantor_other_income_proof.required,
-                        path: ['profile_guarantor_other_income_proof'],
-                    });
-                }
             }
         }
     });
@@ -1098,7 +1112,8 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
 // Default export for backwards compatibility (no existing docs context)
 export const employmentIncomeStepSchema = createEmploymentStepSchema();
 
-// Step 3: Details (move-in, lease, occupants, pets)
+// Step 2: Household Composition (move-in, lease, occupants, pets, emergency contact)
+// Emergency contact is optional, but once any field is filled, all become required (except email)
 export const detailsStepSchema = z
     .object({
         desired_move_in_date: z.string().min(1, APPLICATION_MESSAGES.desired_move_in_date.required),
@@ -1109,8 +1124,53 @@ export const detailsStepSchema = z
         message_to_landlord: z.string().max(2000, APPLICATION_MESSAGES.message_to_landlord.maxLength),
         additional_occupants: z.number().min(0).max(20, APPLICATION_MESSAGES.additional_occupants.max),
         occupants_details: z.array(occupantSchema),
-        has_pets: z.boolean(),
         pets_details: z.array(petSchema),
+        // Emergency contact fields (optional until any field is filled)
+        // Use nullable().transform() to convert null to empty string
+        emergency_contact_first_name: z
+            .string()
+            .max(100)
+            .nullable()
+            .optional()
+            .transform((v) => v ?? ''),
+        emergency_contact_last_name: z
+            .string()
+            .max(100)
+            .nullable()
+            .optional()
+            .transform((v) => v ?? ''),
+        emergency_contact_relationship: z
+            .string()
+            .max(100)
+            .nullable()
+            .optional()
+            .transform((v) => v ?? ''),
+        emergency_contact_relationship_other: z
+            .string()
+            .max(100)
+            .nullable()
+            .optional()
+            .transform((v) => v ?? ''),
+        emergency_contact_phone_country_code: z
+            .string()
+            .max(10)
+            .nullable()
+            .optional()
+            .transform((v) => v ?? ''),
+        emergency_contact_phone_number: z
+            .string()
+            .max(20)
+            .nullable()
+            .optional()
+            .transform((v) => v ?? ''),
+        emergency_contact_email: z
+            .string()
+            .email()
+            .max(255)
+            .or(z.literal(''))
+            .nullable()
+            .optional()
+            .transform((v) => v ?? ''),
     })
     .refine(
         (data) => {
@@ -1126,19 +1186,6 @@ export const detailsStepSchema = z
         {
             message: APPLICATION_MESSAGES.desired_move_in_date.future,
             path: ['desired_move_in_date'],
-        },
-    )
-    .refine(
-        (data) => {
-            // If has_pets is true, must have at least one pet
-            if (data.has_pets && data.pets_details.length === 0) {
-                return false;
-            }
-            return true;
-        },
-        {
-            message: APPLICATION_MESSAGES.pet.required,
-            path: ['pets_details'],
         },
     );
 
@@ -1351,7 +1398,17 @@ export function validateApplicationStep(
 
     if (!result.success) {
         result.error.issues.forEach((issue) => {
-            const path = issue.path.map(String).join('.');
+            let path = issue.path.map(String).join('.');
+
+            // Transform nested array paths to match component field naming
+            // e.g., "occupants_details.0.first_name" -> "occupant_0_first_name"
+            // e.g., "pets_details.0.type" -> "pet_0_type"
+            if (path.startsWith('occupants_details.')) {
+                path = path.replace(/^occupants_details\.(\d+)\.(.+)$/, 'occupant_$1_$2');
+            } else if (path.startsWith('pets_details.')) {
+                path = path.replace(/^pets_details\.(\d+)\.(.+)$/, 'pet_$1_$2');
+            }
+
             // Only set the first error for each path
             if (!errors[path]) {
                 errors[path] = issue.message;
@@ -1361,7 +1418,13 @@ export function validateApplicationStep(
 
     // Additional validation for occupants with "Other" relationship
     if (stepId === 'household') {
-        const occupants = data.occupants_details as Array<{ name: string; age: string; relationship: string; relationship_other: string }>;
+        const occupants = data.occupants_details as Array<{
+            first_name: string;
+            last_name: string;
+            date_of_birth: string;
+            relationship: string;
+            relationship_other: string;
+        }>;
         occupants?.forEach((occupant, index) => {
             const validationResult = occupantWithOtherSchema.safeParse(occupant);
             if (!validationResult.success) {
@@ -1374,21 +1437,47 @@ export function validateApplicationStep(
             }
         });
 
-        // Validate pets with "Other" type
-        const hasPets = data.has_pets as boolean;
-        const pets = data.pets_details as Array<{ type: string; type_other: string; breed: string; age: string; weight: string }>;
-        if (hasPets) {
-            pets?.forEach((pet, index) => {
-                const validationResult = petWithOtherSchema.safeParse(pet);
-                if (!validationResult.success) {
-                    validationResult.error.issues.forEach((issue) => {
-                        const fieldKey = `pet_${index}_${String(issue.path[0])}`;
-                        if (!errors[fieldKey]) {
-                            errors[fieldKey] = issue.message;
-                        }
-                    });
-                }
-            });
+        // Validate pets with "Other" type (if any pets provided)
+        const pets = data.pets_details as Array<{ type: string; type_other: string; breed: string; age: string; size: string }>;
+        pets?.forEach((pet, index) => {
+            const validationResult = petWithOtherSchema.safeParse(pet);
+            if (!validationResult.success) {
+                validationResult.error.issues.forEach((issue) => {
+                    const fieldKey = `pet_${index}_${String(issue.path[0])}`;
+                    if (!errors[fieldKey]) {
+                        errors[fieldKey] = issue.message;
+                    }
+                });
+            }
+        });
+
+        // Emergency contact: if first name OR last name is filled, all fields become required (except email)
+        const ecFirstName = (data.emergency_contact_first_name as string) || '';
+        const ecLastName = (data.emergency_contact_last_name as string) || '';
+        const ecRelationship = (data.emergency_contact_relationship as string) || '';
+        const ecRelationshipOther = (data.emergency_contact_relationship_other as string) || '';
+        const ecPhoneNumber = (data.emergency_contact_phone_number as string) || '';
+
+        const hasEmergencyContactName = ecFirstName.trim() || ecLastName.trim();
+
+        if (hasEmergencyContactName) {
+            if (!ecFirstName.trim()) {
+                errors.emergency_contact_first_name = APPLICATION_MESSAGES.emergency_contact.first_name.required;
+            }
+            if (!ecLastName.trim()) {
+                errors.emergency_contact_last_name = APPLICATION_MESSAGES.emergency_contact.last_name.required;
+            }
+            if (!ecRelationship) {
+                errors.emergency_contact_relationship = APPLICATION_MESSAGES.emergency_contact.relationship.required;
+            }
+            // If relationship is 'other', require specification
+            if (ecRelationship === 'other' && !ecRelationshipOther.trim()) {
+                errors.emergency_contact_relationship_other = APPLICATION_MESSAGES.emergency_contact.relationship_other.required;
+            }
+            if (!ecPhoneNumber.trim()) {
+                errors.emergency_contact_phone_number = APPLICATION_MESSAGES.emergency_contact.phone_number.required;
+            }
+            // Email stays optional
         }
     }
 
