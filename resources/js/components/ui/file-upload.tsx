@@ -242,14 +242,16 @@ export function FileUpload({
 
     // Determine what to show
     const hasExistingFile = existingFile && !uploadedFile;
-    const hasUploadedFile = uploadedFile;
+    const hasUploadedFile = !!uploadedFile;
     const showDropzone = !hasExistingFile && !hasUploadedFile && status !== 'uploading';
     const isUploading = status === 'uploading';
     const hasError = status === 'error' || !!error || fileRejections.length > 0;
 
     // Get file rejection error message
     const rejectionError = fileRejections[0]?.errors[0]?.message;
-    const displayError = error || uploadError || rejectionError;
+    // Don't show external validation error if file was just uploaded successfully or already exists
+    const shouldHideValidationError = hasExistingFile || hasUploadedFile || status === 'success';
+    const displayError = shouldHideValidationError ? (uploadError || rejectionError) : (error || uploadError || rejectionError);
 
     return (
         <div className={cn('space-y-2', className)}>

@@ -220,6 +220,7 @@ export interface ApplicationWizardData {
     profile_immigration_status: 'citizen' | 'permanent_resident' | 'visa_holder' | 'refugee' | 'asylum_seeker' | 'other' | '';
     profile_immigration_status_other: string;
     profile_visa_type: string;
+    profile_visa_type_other: string;
     profile_visa_expiry_date: string;
     profile_work_permit_number: string;
     // Regional Enhancements (Optional)
@@ -501,6 +502,7 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_immigration_status: tp?.immigration_status || '',
         profile_immigration_status_other: tp?.immigration_status_other || '',
         profile_visa_type: tp?.visa_type || '',
+        profile_visa_type_other: tp?.visa_type_other || '',
         profile_visa_expiry_date: formatDateForInput(tp?.visa_expiry_date),
         profile_work_permit_number: tp?.work_permit_number || '',
         // Regional Enhancements

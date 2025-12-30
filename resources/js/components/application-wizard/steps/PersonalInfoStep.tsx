@@ -65,11 +65,11 @@ export function PersonalInfoStep({
     }, [propertyCountry]);
 
     // Collapsible sections state (card-based layout like HistoryStep)
-    // Immigration is now mandatory, so start it expanded
+    // Only the first section is expanded by default
     const [expandedSections, setExpandedSections] = useState({
         personalDetails: true,
         idDocument: false,
-        immigration: true,
+        immigration: false,
         rightToRent: false,
     });
 
@@ -140,6 +140,28 @@ export function PersonalInfoStep({
         ],
         [translations],
     );
+
+    // Visa/Permit type options for European market
+    const VISA_TYPES = useMemo(
+        () => [
+            { value: 'student_visa', label: t('visaTypes.studentVisa') || 'Student Visa' },
+            { value: 'work_visa', label: t('visaTypes.workVisa') || 'Work Visa' },
+            { value: 'skilled_worker', label: t('visaTypes.skilledWorker') || 'Skilled Worker Visa' },
+            { value: 'eu_blue_card', label: t('visaTypes.euBlueCard') || 'EU Blue Card' },
+            { value: 'family_visa', label: t('visaTypes.familyVisa') || 'Family Reunification Visa' },
+            { value: 'entrepreneur_visa', label: t('visaTypes.entrepreneurVisa') || 'Entrepreneur / Business Visa' },
+            { value: 'temporary_residence', label: t('visaTypes.temporaryResidence') || 'Temporary Residence Permit' },
+            { value: 'long_term_residence', label: t('visaTypes.longTermResidence') || 'Long-Term Residence Permit' },
+            { value: 'schengen_visa', label: t('visaTypes.schengenVisa') || 'Schengen Visa' },
+            { value: 'working_holiday', label: t('visaTypes.workingHoliday') || 'Working Holiday Visa' },
+            { value: 'research_visa', label: t('visaTypes.researchVisa') || 'Research Visa' },
+            { value: 'other', label: t('visaTypes.other') || 'Other' },
+        ],
+        [translations],
+    );
+
+    // Track if visa type is "other" to show text input
+    const isVisaTypeOther = data.profile_visa_type === 'other';
 
     // Check if immigration status requires permit details
     const requiresPermitDetails = [
@@ -526,18 +548,16 @@ export function PersonalInfoStep({
                                 <div className="grid gap-4 md:grid-cols-2">
                                     <div>
                                         <label className="mb-2 block text-sm font-medium">{t('fields.permitType') || 'Permit / Visa Type'}</label>
-                                        <input
-                                            type="text"
-                                            value={data.profile_visa_type}
-                                            onChange={(e) => handleFieldChange('profile_visa_type', e.target.value)}
+                                        <SimpleSelect
+                                            value={isVisaTypeOther ? 'other' : data.profile_visa_type}
+                                            onChange={(value) => handleFieldChange('profile_visa_type', value)}
+                                            options={VISA_TYPES}
+                                            placeholder={t('placeholders.selectPermitType') || 'Select permit type...'}
                                             onBlur={onBlur}
-                                            placeholder={t('placeholders.permitType') || 'e.g., Work Permit, Student Visa'}
+                                            name="profile_visa_type"
                                             aria-invalid={!!(touchedFields.profile_visa_type && errors.profile_visa_type)}
-                                            className={getFieldClass('profile_visa_type')}
+                                            error={touchedFields.profile_visa_type ? errors.profile_visa_type : undefined}
                                         />
-                                        {showError('profile_visa_type') && (
-                                            <p className="mt-1 text-sm text-destructive">{errors.profile_visa_type}</p>
-                                        )}
                                     </div>
 
                                     <div>
@@ -555,6 +575,27 @@ export function PersonalInfoStep({
                                         )}
                                     </div>
                                 </div>
+
+                                {/* Show text input when "Other" is selected */}
+                                {isVisaTypeOther && (
+                                    <div>
+                                        <label className="mb-2 block text-sm font-medium">
+                                            {t('fields.visaTypeOther') || 'Please Specify Visa/Permit Type'}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.profile_visa_type_other || ''}
+                                            onChange={(e) => handleFieldChange('profile_visa_type_other', e.target.value)}
+                                            onBlur={onBlur}
+                                            placeholder={t('placeholders.visaTypeOther') || 'Enter your visa/permit type...'}
+                                            aria-invalid={!!(touchedFields.profile_visa_type_other && errors.profile_visa_type_other)}
+                                            className={getFieldClass('profile_visa_type_other')}
+                                        />
+                                        {showError('profile_visa_type_other') && (
+                                            <p className="mt-1 text-sm text-destructive">{errors.profile_visa_type_other}</p>
+                                        )}
+                                    </div>
+                                )}
 
                                 <FileUpload
                                     label={t('fileLabels.residencePermit') || 'Residence Permit'}

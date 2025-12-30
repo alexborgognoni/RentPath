@@ -595,6 +595,19 @@ class TenantProfileController extends Controller
             'nationality',
             'phone_country_code',
             'phone_number',
+            // ID Document
+            'id_document_type',
+            'id_number',
+            'id_issuing_country',
+            'id_expiry_date',
+            // Immigration Status
+            'immigration_status',
+            'immigration_status_other',
+            'visa_type',
+            'visa_type_other',
+            'visa_expiry_date',
+            // Right to Rent
+            'right_to_rent_share_code',
             // Current Address
             'current_house_number',
             'current_address_line_2',
@@ -615,6 +628,7 @@ class TenantProfileController extends Controller
             'university_name',
             'program_of_study',
             'expected_graduation_date',
+            'student_id_number',
             'student_income_source',
             // Guarantor - Basic Info
             'has_guarantor',

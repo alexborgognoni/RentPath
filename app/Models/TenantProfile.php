@@ -34,6 +34,7 @@ class TenantProfile extends Model
         'immigration_status',
         'immigration_status_other',
         'visa_type',
+        'visa_type_other',
         'visa_expiry_date',
         'work_permit_number',
 
