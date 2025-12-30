@@ -233,6 +233,8 @@ class TenantProfile extends Model
         'age',
         'id_document_front_url',
         'id_document_back_url',
+        'residence_permit_document_url',
+        'right_to_rent_document_url',
         'employment_contract_url',
         'payslip_1_url',
         'payslip_2_url',
@@ -409,6 +411,22 @@ class TenantProfile extends Model
     public function getIdDocumentBackUrlAttribute(): ?string
     {
         return \App\Helpers\StorageHelper::url($this->id_document_back_path, 'private', 5, $this->id_document_back_original_name);
+    }
+
+    /**
+     * Get the URL for the residence permit document (5-minute signed URL).
+     */
+    public function getResidencePermitDocumentUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->residence_permit_document_path, 'private', 5, $this->residence_permit_document_original_name);
+    }
+
+    /**
+     * Get the URL for the right to rent document (5-minute signed URL).
+     */
+    public function getRightToRentDocumentUrlAttribute(): ?string
+    {
+        return \App\Helpers\StorageHelper::url($this->right_to_rent_document_path, 'private', 5, $this->right_to_rent_document_original_name);
     }
 
     /**

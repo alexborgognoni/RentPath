@@ -30,6 +30,10 @@ interface PersonalInfoStepProps {
         id_document_back_url?: string;
         id_document_back_size?: number;
         id_document_back_uploaded_at?: number;
+        residence_permit_document?: string;
+        residence_permit_document_url?: string;
+        residence_permit_document_size?: number;
+        residence_permit_document_uploaded_at?: number;
         right_to_rent_document?: string;
         right_to_rent_document_url?: string;
         right_to_rent_document_size?: number;
@@ -611,6 +615,16 @@ export function PersonalInfoStep({
                                         fileTypes: 'PDF, PNG, JPG',
                                         maxFileSize: '20MB',
                                     }}
+                                    existingFile={
+                                        existingDocuments?.residence_permit_document
+                                            ? {
+                                                  originalName: existingDocuments.residence_permit_document,
+                                                  previewUrl: existingDocuments.residence_permit_document_url,
+                                                  size: existingDocuments.residence_permit_document_size,
+                                                  uploadedAt: existingDocuments.residence_permit_document_uploaded_at,
+                                              }
+                                            : undefined
+                                    }
                                     onUploadSuccess={handleUploadSuccess}
                                     error={touchedFields.profile_residence_permit_document ? errors.profile_residence_permit_document : undefined}
                                 />

@@ -138,6 +138,10 @@ export interface TenantProfile {
     id_document_front_original_name?: string;
     id_document_back_path?: string;
     id_document_back_original_name?: string;
+    residence_permit_document_path?: string;
+    residence_permit_document_original_name?: string;
+    right_to_rent_document_path?: string;
+    right_to_rent_document_original_name?: string;
     employment_contract_path?: string;
     employment_contract_original_name?: string;
     payslip_1_path?: string;
@@ -199,6 +203,8 @@ export interface TenantProfile {
     profile_picture_url?: string;
     id_document_front_url?: string;
     id_document_back_url?: string;
+    residence_permit_document_url?: string;
+    right_to_rent_document_url?: string;
     employment_contract_url?: string;
     payslip_1_url?: string;
     payslip_2_url?: string;

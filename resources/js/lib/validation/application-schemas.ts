@@ -373,6 +373,8 @@ export interface ExistingDocumentsContext {
     // Main tenant documents
     id_document_front?: boolean;
     id_document_back?: boolean;
+    residence_permit_document?: boolean;
+    right_to_rent_document?: boolean;
     employment_contract?: boolean;
     payslip_1?: boolean;
     payslip_2?: boolean;
@@ -506,6 +508,7 @@ const personalInfoBaseSchema = z.object({
     profile_immigration_status: z.string().min(1, APPLICATION_MESSAGES.profile_immigration_status.required),
     profile_immigration_status_other: z.string().optional(),
     profile_visa_type: z.string().optional(),
+    profile_visa_type_other: z.string().optional(),
     profile_visa_expiry_date: z.string().optional(),
     profile_residence_permit_document: z.any().nullable().optional(),
     // Right to Rent (optional)
@@ -603,6 +606,14 @@ export function createPersonalInfoStepSchema(existingDocs: ExistingDocumentsCont
                     path: ['profile_visa_type'],
                 });
             }
+            // If visa type is "other", require specification
+            if (data.profile_visa_type === 'other' && !data.profile_visa_type_other?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'Please specify your visa/permit type',
+                    path: ['profile_visa_type_other'],
+                });
+            }
             if (!data.profile_visa_expiry_date) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -622,8 +633,12 @@ export function createPersonalInfoStepSchema(existingDocs: ExistingDocumentsCont
                     });
                 }
             }
-            // Residence permit document required for visa_holder
-            if (data.profile_immigration_status === 'visa_holder' && !data.profile_residence_permit_document) {
+            // Residence permit document required for visa_holder (unless existing)
+            if (
+                data.profile_immigration_status === 'visa_holder' &&
+                !data.profile_residence_permit_document &&
+                !existingDocs.residence_permit_document
+            ) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: APPLICATION_MESSAGES.profile_residence_permit_document?.required || 'Residence permit document is required',

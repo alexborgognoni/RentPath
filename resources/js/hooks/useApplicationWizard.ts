@@ -834,6 +834,8 @@ export function useApplicationWizard({
         // Main tenant documents
         id_document_front: !!tenantProfile?.id_document_front_path,
         id_document_back: !!tenantProfile?.id_document_back_path,
+        residence_permit_document: !!tenantProfile?.residence_permit_document_path,
+        right_to_rent_document: !!tenantProfile?.right_to_rent_document_path,
         employment_contract: !!tenantProfile?.employment_contract_path,
         payslip_1: !!tenantProfile?.payslip_1_path,
         payslip_2: !!tenantProfile?.payslip_2_path,
