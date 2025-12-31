@@ -1,5 +1,4 @@
 import {
-    findFirstInvalidApplicationStep,
     validateApplicationForSubmit,
     validateApplicationStep,
     type ApplicationStepId,
@@ -864,7 +863,7 @@ export interface UseApplicationWizardReturn {
     // Autosave
     autosaveStatus: AutosaveStatus;
     lastSavedAt: Date | null;
-    saveNow: () => Promise<void>;
+    saveNow: (stepOverride?: number) => Promise<void>;
     pendingSave: boolean;
 
     // Submission
@@ -924,6 +923,10 @@ export function useApplicationWizard({
     };
 
     // Validation wrapper - passes existing docs context for employment step
+    // This is the SINGLE SOURCE OF TRUTH for validation - used by both:
+    // 1. goToNextStep() - validates current step when clicking Continue
+    // 2. computeFirstInvalidStep() - validates all steps on mount/data change
+    // This ensures NO validation discrepancy between clicking Continue and refreshing the page
     const validateStepWrapper = useCallback(
         (stepId: ApplicationStep, data: ApplicationWizardData) => {
             const result = validateApplicationStep(stepId as ApplicationStepId, data as unknown as Record<string, unknown>, existingDocsContext);
@@ -931,14 +934,6 @@ export function useApplicationWizard({
                 success: result.success,
                 errors: result.errors,
             };
-        },
-        [existingDocsContext],
-    );
-
-    // Find first invalid step wrapper - passes existing docs context
-    const findFirstInvalidStepWrapper = useCallback(
-        (data: ApplicationWizardData): number => {
-            return findFirstInvalidApplicationStep(data as unknown as Record<string, unknown>, existingDocsContext);
         },
         [existingDocsContext],
     );
@@ -991,7 +986,6 @@ export function useApplicationWizard({
         initialStepIndex: Math.max(0, initialStepIndex),
         initialMaxStepReached: Math.max(0, initialMaxStepReached),
         validateStep: validateStepWrapper,
-        findFirstInvalidStep: findFirstInvalidStepWrapper,
         onSave: handleSave,
         enableAutosave: true,
         saveDebounceMs: 500,

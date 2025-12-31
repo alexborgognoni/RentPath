@@ -1,6 +1,6 @@
 import axios from '@/lib/axios';
 import { PROPERTY_MESSAGES } from '@/lib/validation/property-messages';
-import { findFirstInvalidStep, validateField, validateForPublish, validateStep, type StepId } from '@/lib/validation/property-schemas';
+import { validateField, validateForPublish, validateStep, type StepId } from '@/lib/validation/property-schemas';
 import type { SharedData } from '@/types';
 import type { Property, PropertyFormData } from '@/types/dashboard';
 import { translate } from '@/utils/translate-utils';
@@ -251,11 +251,6 @@ export function usePropertyWizard({
         };
     }, []);
 
-    // Property-specific find first invalid step wrapper
-    const findFirstInvalidStepWrapper = useCallback((data: PropertyWizardData): number => {
-        return findFirstInvalidStep(data);
-    }, []);
-
     // Property-specific save function
     const handleSave = useCallback(
         async (data: PropertyWizardData, wizardStep: number) => {
@@ -283,7 +278,6 @@ export function usePropertyWizard({
         initialStepIndex: Math.max(0, initialStepIndex),
         initialMaxStepReached: Math.max(0, initialMaxStepReached),
         validateStep: validateStepWrapper,
-        findFirstInvalidStep: findFirstInvalidStepWrapper,
         onSave: handleSave,
         enableAutosave: !isEditMode && isInitialized && !!propertyId,
     });

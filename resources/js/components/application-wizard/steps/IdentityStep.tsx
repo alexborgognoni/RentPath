@@ -412,13 +412,10 @@ export function IdentityStep({
                                     value={data.profile_id_expiry_date}
                                     onChange={(value) => handleFieldChange('profile_id_expiry_date', value)}
                                     onBlur={onBlur}
-                                    restriction="future"
-                                    min={new Date()}
+                                    restriction="strictFuture"
                                     aria-invalid={!!(touchedFields.profile_id_expiry_date && errors.profile_id_expiry_date)}
+                                    error={showError('profile_id_expiry_date') ? errors.profile_id_expiry_date : undefined}
                                 />
-                                {showError('profile_id_expiry_date') && (
-                                    <p className="mt-1 text-sm text-destructive">{errors.profile_id_expiry_date}</p>
-                                )}
                             </div>
                         </div>
 
@@ -571,13 +568,10 @@ export function IdentityStep({
                                             value={data.profile_visa_expiry_date}
                                             onChange={(value) => handleFieldChange('profile_visa_expiry_date', value)}
                                             onBlur={onBlur}
-                                            restriction="future"
-                                            min={new Date()}
+                                            restriction="strictFuture"
                                             aria-invalid={!!(touchedFields.profile_visa_expiry_date && errors.profile_visa_expiry_date)}
+                                            error={showError('profile_visa_expiry_date') ? errors.profile_visa_expiry_date : undefined}
                                         />
-                                        {showError('profile_visa_expiry_date') && (
-                                            <p className="mt-1 text-sm text-destructive">{errors.profile_visa_expiry_date}</p>
-                                        )}
                                     </div>
                                 </div>
 

@@ -645,12 +645,12 @@ export function createPersonalInfoStepSchema(existingDocs: ExistingDocumentsCont
             }
         }
 
-        // Validate ID expiry date is in the future
+        // Validate ID expiry date is in the future (must be AFTER today, not equal)
+        // Use string comparison (YYYY-MM-DD) to avoid timezone issues
+        // Backend uses Laravel's `after:today` which is also strictly greater than
         if (data.profile_id_expiry_date) {
-            const expiryDate = new Date(data.profile_id_expiry_date);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (expiryDate <= today) {
+            const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD in UTC
+            if (data.profile_id_expiry_date <= todayStr) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: APPLICATION_MESSAGES.profile_id_expiry_date.future,
@@ -1117,12 +1117,12 @@ export const employmentIncomeStepSchema = createEmploymentStepSchema();
 export const detailsStepSchema = z
     .object({
         desired_move_in_date: z.string().min(1, APPLICATION_MESSAGES.desired_move_in_date.required),
-        lease_duration_months: z
+        lease_duration_months: z.coerce
             .number()
             .min(1, APPLICATION_MESSAGES.lease_duration_months.min)
             .max(60, APPLICATION_MESSAGES.lease_duration_months.max),
         message_to_landlord: z.string().max(2000, APPLICATION_MESSAGES.message_to_landlord.maxLength),
-        additional_occupants: z.number().min(0).max(20, APPLICATION_MESSAGES.additional_occupants.max),
+        additional_occupants: z.coerce.number().min(0).max(20, APPLICATION_MESSAGES.additional_occupants.max),
         occupants_details: z.array(occupantSchema),
         pets_details: z.array(petSchema),
         // Emergency contact fields (optional until any field is filled)
@@ -1174,12 +1174,12 @@ export const detailsStepSchema = z
     })
     .refine(
         (data) => {
-            // Validate move-in date is in the future
+            // Validate move-in date is today or in the future
             if (data.desired_move_in_date) {
                 const selectedDate = new Date(data.desired_move_in_date);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                return selectedDate > today;
+                return selectedDate >= today;
             }
             return true;
         },
@@ -1526,24 +1526,6 @@ export function validateApplicationStep(
     }
 
     return { success: Object.keys(errors).length === 0, errors };
-}
-
-/**
- * Find the first invalid step (returns the index)
- * Returns steps.length if all steps are valid
- */
-export function findFirstInvalidApplicationStep(data: Record<string, unknown>, existingDocs?: ExistingDocumentsContext): number {
-    // 8-step order: identity, household, financial, support, history, additional, consent, review
-    const stepIds: ApplicationStepId[] = ['identity', 'household', 'financial', 'support', 'history', 'additional', 'consent', 'review'];
-
-    for (let i = 0; i < stepIds.length; i++) {
-        const result = validateApplicationStep(stepIds[i], data, existingDocs);
-        if (!result.success) {
-            return i;
-        }
-    }
-
-    return stepIds.length; // All steps valid
 }
 
 /**

@@ -293,9 +293,16 @@ export default function ApplicationCreate() {
 
     // Handle next step with validation feedback
     const handleNextStep = useCallback((): boolean => {
+        // Calculate the step that will be saved BEFORE calling goToNextStep
+        // because state updates are batched and won't be available immediately
+        const nextStepToSave = wizard.currentStepIndex + 2; // +1 for advancing, +1 for 1-indexed
+
         const success = wizard.goToNextStep();
         if (!success) {
             wizard.markAllCurrentStepFieldsTouched();
+        } else {
+            // Save immediately after advancing to persist the step
+            wizard.saveNow(nextStepToSave);
         }
         return success;
     }, [wizard]);

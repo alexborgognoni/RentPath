@@ -620,6 +620,73 @@ if (!data.profile_id_document_front && !existingDocs.id_document_front) {
 
 This prevents re-upload requirements when documents already exist in the profile.
 
+### Unified Validation Architecture
+
+**Critical Design Decision**: The wizard uses a **single validation function** for ALL validation scenarios to prevent discrepancies between:
+
+- Clicking "Continue" (validates current step)
+- Page refresh/mount (validates all steps to determine max valid step)
+
+```typescript
+// useWizard.ts - SINGLE SOURCE OF TRUTH
+// validateStepFn is passed in once and used everywhere
+const validateStepWrapper = (stepId, data) => {
+    return validateApplicationStep(stepId, data, existingDocsContext);
+};
+
+// This same function is used for:
+// 1. goToNextStep() - validates current step before advancing
+// 2. computeFirstInvalidStep() - iterates all steps to find first invalid
+
+// Internal: derives max valid step by calling the SAME validateStepFn
+const computeFirstInvalidStep = (): number => {
+    for (let i = 0; i < steps.length; i++) {
+        const result = validateStepFn(steps[i].id, data);
+        if (!result.success) return i;
+    }
+    return steps.length;
+};
+```
+
+**Why This Matters**:
+
+| Problem                                                      | Solution                                             |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| User advances to step 3, refreshes, gets sent back to step 2 | Same validation logic guarantees consistent behavior |
+| Validation rules change in one place, forgotten in another   | Only ONE validation function to maintain per step    |
+| Subtle discrepancies cause confusing UX                      | Single source of truth eliminates divergence         |
+
+**Rule**: When adding/modifying validation for a step, ONLY modify `validateApplicationStep()` in `application-schemas.ts`. The wizard will automatically use it everywhere.
+
+### Date Validation Pattern
+
+The `DatePicker` component has built-in validation that shows errors immediately for out-of-range values:
+
+| Restriction    | Description                 | Use Case             |
+| -------------- | --------------------------- | -------------------- |
+| `past`         | Today or earlier            | Date of birth        |
+| `future`       | Today or later              | Move-in date         |
+| `strictFuture` | After today (not including) | ID/visa expiry dates |
+
+```tsx
+// ID expiry - must be AFTER today (expired today = invalid)
+<DatePicker restriction="strictFuture" ... />
+
+// Move-in - can be today or later
+<DatePicker restriction="future" ... />
+
+// Date of birth - must be in the past
+<DatePicker restriction="past" ... />
+```
+
+The component automatically:
+
+1. Disables invalid dates in the calendar
+2. Shows red border if pre-populated value is out of range
+3. Displays error message explaining the constraint
+
+This prevents frontend/backend validation discrepancies caused by timezone issues.
+
 ### State Management
 
 | State              | Purpose            | When Updated                 |

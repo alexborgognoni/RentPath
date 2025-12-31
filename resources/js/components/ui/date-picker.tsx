@@ -25,7 +25,7 @@ import {
 } from 'react-aria-components';
 
 /** Date restriction presets */
-export type DateRestriction = 'past' | 'future' | 'any';
+export type DateRestriction = 'past' | 'future' | 'strictFuture' | 'any';
 
 export interface DatePickerProps {
     /** Current value (ISO date string: yyyy-MM-dd) */
@@ -34,7 +34,7 @@ export interface DatePickerProps {
     onChange: (value: string) => void;
     /** Placeholder text */
     placeholder?: string;
-    /** Date restriction preset: 'past' (up to today), 'future' (from today), 'any' (no restriction) */
+    /** Date restriction preset: 'past' (up to today), 'future' (from today), 'strictFuture' (after today, not including), 'any' (no restriction) */
     restriction?: DateRestriction;
     /** Minimum selectable date (overrides restriction if provided) */
     min?: Date | string;
@@ -176,6 +176,9 @@ export function DatePicker({
             effectiveMax = todayDate;
         } else if (restriction === 'future' && !min) {
             effectiveMin = todayDate;
+        } else if (restriction === 'strictFuture' && !min) {
+            // Tomorrow is the minimum (strictly after today)
+            effectiveMin = todayDate.add({ days: 1 });
         }
 
         return { minValue: effectiveMin, maxValue: effectiveMax };
@@ -189,13 +192,39 @@ export function DatePicker({
         wasOpenRef.current = isOpen;
     }, [isOpen, onBlur]);
 
+    // Check if current value is outside min/max constraints
+    const isValueOutOfRange = useMemo(() => {
+        if (!dateValue) return false;
+        if (minValue && dateValue.compare(minValue) < 0) return true;
+        if (maxValue && dateValue.compare(maxValue) > 0) return true;
+        return false;
+    }, [dateValue, minValue, maxValue]);
+
+    // Generate error message for out-of-range values
+    const outOfRangeError = useMemo(() => {
+        if (!isValueOutOfRange || !dateValue) return undefined;
+        if (minValue && dateValue.compare(minValue) < 0) {
+            if (restriction === 'future') {
+                return 'Date must be today or later';
+            } else if (restriction === 'strictFuture') {
+                return 'Date must be after today';
+            }
+            return `Date must be after ${minValue.toString()}`;
+        }
+        if (maxValue && dateValue.compare(maxValue) > 0) {
+            return `Date must be ${restriction === 'past' ? 'today or earlier' : `before ${maxValue.toString()}`}`;
+        }
+        return undefined;
+    }, [isValueOutOfRange, dateValue, minValue, maxValue, restriction]);
+
     const handleChange = (date: CalendarDate | null) => {
         if (date) {
             onChange(date.toString()); // Returns ISO format yyyy-MM-dd
         }
     };
 
-    const hasError = ariaInvalid || !!error;
+    const hasError = ariaInvalid || !!error || isValueOutOfRange;
+    const displayError = error || outOfRangeError;
 
     return (
         <AriaDatePicker
@@ -303,6 +332,11 @@ export function DatePicker({
                     </Calendar>
                 </Dialog>
             </Popover>
+
+            {/* Show error message if value is out of range */}
+            {displayError && (
+                <p className="mt-1.5 text-sm text-destructive">{displayError}</p>
+            )}
         </AriaDatePicker>
     );
 }

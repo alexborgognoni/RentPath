@@ -26,8 +26,9 @@ export interface UseWizardOptions<TData, TStepId extends string> {
     initialMaxStepReached?: number;
 
     // Validation - consumer provides the logic
+    // This single function is used EVERYWHERE: goToNextStep AND computing first invalid step on mount
+    // This ensures no validation discrepancy between clicking Continue and refreshing the page
     validateStep: (stepId: TStepId, data: TData) => ValidationResult;
-    findFirstInvalidStep: (data: TData) => number;
 
     // Autosave - consumer provides the save function
     onSave?: (data: TData, wizardStep: number) => Promise<SaveResult>;
@@ -71,7 +72,7 @@ export interface UseWizardReturn<TData, TStepId extends string> {
     // Autosave
     autosaveStatus: AutosaveStatus;
     lastSavedAt: Date | null;
-    saveNow: () => Promise<void>;
+    saveNow: (stepOverride?: number) => Promise<void>;
     hasUserInteracted: boolean;
     markAsInteracted: () => void;
 
@@ -85,7 +86,6 @@ export function useWizard<TData, TStepId extends string>({
     initialStepIndex = 0,
     initialMaxStepReached = 0,
     validateStep: validateStepFn,
-    findFirstInvalidStep,
     onSave,
     saveDebounceMs = 1000,
     enableAutosave = true,
@@ -104,9 +104,13 @@ export function useWizard<TData, TStepId extends string>({
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
     const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastSavedDataRef = useRef<string | null>(null);
+    const lastSavedStepRef = useRef<number | null>(null);
 
     // Track if we should skip the next step lock check (for forward navigation)
     const skipNextLockCheck = useRef(false);
+
+    // Track initial mount - don't re-validate all steps on mount, trust the saved step
+    const isInitialMount = useRef(true);
 
     // Derived values (with safety bounds check)
     const safeStepIndex = Math.max(0, Math.min(currentStepIndex, steps.length - 1));
@@ -120,14 +124,36 @@ export function useWizard<TData, TStepId extends string>({
     const dataString = useMemo(() => JSON.stringify(data), [data]);
 
     // Effect to lock steps when data changes make earlier steps invalid
+    // Only runs after user has interacted - prevents validation on prop updates from backend
     useEffect(() => {
+        // Skip lock check on initial mount - trust the saved step from backend
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
         // Skip lock check during forward navigation
         if (skipNextLockCheck.current) {
             skipNextLockCheck.current = false;
             return;
         }
 
-        const maxValid = findFirstInvalidStep(data);
+        // Skip lock check until user has interacted with the form
+        // This prevents prop updates from Inertia from triggering validation
+        if (!hasUserInteracted) {
+            return;
+        }
+
+        // Compute first invalid step inline - SINGLE SOURCE OF TRUTH
+        // Uses the same validateStepFn that goToNextStep uses
+        let maxValid = steps.length;
+        for (let i = 0; i < steps.length; i++) {
+            const result = validateStepFn(steps[i].id, data);
+            if (!result.success) {
+                maxValid = i;
+                break;
+            }
+        }
 
         // If current data invalidates a previous step, lock user to that step
         if (maxValid < maxStepReached) {
@@ -145,16 +171,18 @@ export function useWizard<TData, TStepId extends string>({
             }
             onStepChange?.(stepId, maxValid);
         }
-    }, [data, maxStepReached, currentStepIndex, findFirstInvalidStep, validateStepFn, steps, onStepChange]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dataString, maxStepReached, currentStepIndex, hasUserInteracted]);
 
-    // Autosave effect
+    // Autosave effect for data changes (debounced)
     useEffect(() => {
         if (!enableAutosave || !onSave || !hasUserInteracted) {
             return;
         }
 
-        // Skip if data hasn't changed from last save
-        if (lastSavedDataRef.current === dataString) {
+        // Skip if neither data nor step has changed from last save
+        const stepToSave = maxStepReached + 1;
+        if (lastSavedDataRef.current === dataString && lastSavedStepRef.current === stepToSave) {
             return;
         }
 
@@ -170,9 +198,11 @@ export function useWizard<TData, TStepId extends string>({
         debounceTimerRef.current = setTimeout(async () => {
             setAutosaveStatus('saving');
             try {
-                const result = await onSave(data, maxStepReached + 1);
+                const savedStep = maxStepReached + 1;
+                const result = await onSave(data, savedStep);
 
                 lastSavedDataRef.current = dataString;
+                lastSavedStepRef.current = savedStep;
                 setLastSavedAt(new Date());
                 setAutosaveStatus('saved');
 
@@ -207,25 +237,30 @@ export function useWizard<TData, TStepId extends string>({
         };
     }, [dataString, hasUserInteracted, enableAutosave, onSave, maxStepReached, currentStepIndex, saveDebounceMs, steps, onStepChange, data]);
 
-    // Manual save function
-    const saveNow = useCallback(async () => {
-        if (!onSave) return;
+    // Manual save function - optionally accepts a step override for immediate saves after state updates
+    const saveNow = useCallback(
+        async (stepOverride?: number) => {
+            if (!onSave) return;
 
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
 
-        setAutosaveStatus('saving');
-        try {
-            await onSave(data, maxStepReached + 1);
-            lastSavedDataRef.current = dataString;
-            setLastSavedAt(new Date());
-            setAutosaveStatus('saved');
-        } catch (error) {
-            console.error('Save failed:', error);
-            setAutosaveStatus('error');
-        }
-    }, [onSave, data, maxStepReached, dataString]);
+            setAutosaveStatus('saving');
+            try {
+                const savedStep = stepOverride ?? maxStepReached + 1;
+                await onSave(data, savedStep);
+                lastSavedDataRef.current = dataString;
+                lastSavedStepRef.current = savedStep;
+                setLastSavedAt(new Date());
+                setAutosaveStatus('saved');
+            } catch (error) {
+                console.error('Save failed:', error);
+                setAutosaveStatus('error');
+            }
+        },
+        [onSave, data, maxStepReached, dataString],
+    );
 
     // Data update functions
     const updateField = useCallback(
