@@ -363,7 +363,7 @@ return [
                 'title' => 'Financiële Capaciteit',
                 'shortTitle' => 'Financiën',
             ],
-            'risk' => [
+            'support' => [
                 'title' => 'Financiële Ondersteuning',
                 'shortTitle' => 'Ondersteuning',
             ],

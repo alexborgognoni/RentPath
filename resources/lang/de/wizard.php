@@ -363,7 +363,7 @@ return [
                 'title' => 'Finanzielle Leistungsfähigkeit',
                 'shortTitle' => 'Finanzen',
             ],
-            'risk' => [
+            'support' => [
                 'title' => 'Finanzielle Unterstützung',
                 'shortTitle' => 'Unterstützung',
             ],

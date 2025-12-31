@@ -6,7 +6,7 @@ import { router, usePage } from '@inertiajs/react';
 import { useCallback } from 'react';
 import { FinancialInfoSection } from '../shared';
 
-interface EmploymentIncomeStepProps {
+interface FinancialStepProps {
     data: ApplicationWizardData;
     errors: Record<string, string>;
     touchedFields: Record<string, boolean>;
@@ -50,15 +50,7 @@ interface EmploymentIncomeStepProps {
     };
 }
 
-export function EmploymentIncomeStep({
-    data,
-    errors,
-    touchedFields,
-    updateField,
-    markFieldTouched,
-    onBlur,
-    existingDocuments,
-}: EmploymentIncomeStepProps) {
+export function FinancialStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur, existingDocuments }: FinancialStepProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.employmentStep.${key}`);
 

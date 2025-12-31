@@ -12,7 +12,7 @@ import { usePage } from '@inertiajs/react';
 import { AlertCircle, Calendar, ChevronDown, ChevronUp, PawPrint, Phone, Plus, Trash2, Users } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-interface DetailsStepProps {
+interface HouseholdStepProps {
     data: ApplicationWizardData;
     errors: Record<string, string>;
     touchedFields: Record<string, boolean>;
@@ -28,7 +28,7 @@ interface DetailsStepProps {
     propertyCountry?: string;
 }
 
-export function DetailsStep({
+export function HouseholdStep({
     data,
     errors,
     touchedFields,
@@ -42,7 +42,7 @@ export function DetailsStep({
     updatePet,
     onBlur,
     propertyCountry,
-}: DetailsStepProps) {
+}: HouseholdStepProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.detailsStep.${key}`);
 

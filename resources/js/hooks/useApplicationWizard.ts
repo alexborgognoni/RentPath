@@ -14,13 +14,13 @@ import { useWizard, type AutosaveStatus, type WizardStepConfig } from './useWiza
 
 export type { AutosaveStatus } from './useWizard';
 
-export type ApplicationStep = 'identity' | 'household' | 'financial' | 'risk' | 'history' | 'additional' | 'consent' | 'review';
+export type ApplicationStep = 'identity' | 'household' | 'financial' | 'support' | 'history' | 'additional' | 'consent' | 'review';
 
 export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
     { id: 'identity', title: 'Identity & Legal Eligibility', shortTitle: 'Identity' },
     { id: 'household', title: 'Household Composition', shortTitle: 'Household' },
     { id: 'financial', title: 'Financial Capability', shortTitle: 'Financial' },
-    { id: 'risk', title: 'Financial Support', shortTitle: 'Support', optional: true },
+    { id: 'support', title: 'Financial Support', shortTitle: 'Support', optional: true },
     { id: 'history', title: 'Credit & Rental History', shortTitle: 'History' },
     { id: 'additional', title: 'Additional Information', shortTitle: 'Additional', optional: true },
     { id: 'consent', title: 'Declarations & Consent', shortTitle: 'Consent' },
@@ -1638,7 +1638,7 @@ export function useApplicationWizard({
     const submit = useCallback(() => {
         if (!validateForSubmit()) {
             // Find first step with errors and navigate to it
-            const stepIds: ApplicationStep[] = ['identity', 'household', 'financial', 'risk', 'history', 'additional', 'consent'];
+            const stepIds: ApplicationStep[] = ['identity', 'household', 'financial', 'support', 'history', 'additional', 'consent'];
             for (const stepId of stepIds) {
                 const result = validateApplicationStep(
                     stepId as ApplicationStepId,

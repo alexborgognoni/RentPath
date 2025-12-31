@@ -14,7 +14,7 @@ import { router, usePage } from '@inertiajs/react';
 import { ChevronDown, ChevronUp, FileText, Shield, User } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-interface PersonalInfoStepProps {
+interface IdentityStepProps {
     data: ApplicationWizardData;
     errors: Record<string, string>;
     touchedFields: Record<string, boolean>;
@@ -44,7 +44,7 @@ interface PersonalInfoStepProps {
     propertyCountry?: string;
 }
 
-export function PersonalInfoStep({
+export function IdentityStep({
     data,
     errors,
     touchedFields,
@@ -54,7 +54,7 @@ export function PersonalInfoStep({
     onFieldBlur,
     existingDocuments,
     propertyCountry,
-}: PersonalInfoStepProps) {
+}: IdentityStepProps) {
     const { translations, auth } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.personalStep.${key}`);
     const user = auth.user;

@@ -6,7 +6,7 @@ export type ApplicationStepId =
     | 'identity' // Step 1: Identity & Legal Eligibility
     | 'household' // Step 2: Household Composition
     | 'financial' // Step 3: Financial Capability (Tenant)
-    | 'risk' // Step 4: Risk Mitigation (Co-signers & Guarantors)
+    | 'support' // Step 4: Financial Support (Co-signers & Guarantors)
     | 'history' // Step 5: Credit & Rental History
     | 'additional' // Step 6: Additional Information & Documents
     | 'consent' // Step 7: Declarations & Consent
@@ -1369,8 +1369,8 @@ export function validateApplicationStep(
             // Step 3: Financial Capability (employment, income)
             schema = createEmploymentStepSchema(existingDocs);
             break;
-        case 'risk':
-            // Step 4: Risk Mitigation (co-signers, guarantors, insurance)
+        case 'support':
+            // Step 4: Financial Support (co-signers, guarantors, insurance)
             schema = riskMitigationStepSchema;
             break;
         case 'history':
@@ -1533,8 +1533,8 @@ export function validateApplicationStep(
  * Returns steps.length if all steps are valid
  */
 export function findFirstInvalidApplicationStep(data: Record<string, unknown>, existingDocs?: ExistingDocumentsContext): number {
-    // 8-step order: identity, household, financial, risk, history, additional, consent, review
-    const stepIds: ApplicationStepId[] = ['identity', 'household', 'financial', 'risk', 'history', 'additional', 'consent', 'review'];
+    // 8-step order: identity, household, financial, support, history, additional, consent, review
+    const stepIds: ApplicationStepId[] = ['identity', 'household', 'financial', 'support', 'history', 'additional', 'consent', 'review'];
 
     for (let i = 0; i < stepIds.length; i++) {
         const result = validateApplicationStep(stepIds[i], data, existingDocs);
@@ -1552,7 +1552,7 @@ export function findFirstInvalidApplicationStep(data: Record<string, unknown>, e
 export function validateApplicationForSubmit(data: Record<string, unknown>, existingDocs?: ExistingDocumentsContext): ValidationResult {
     const allErrors: Record<string, string> = {};
     // Validate all steps except review (which has no validation)
-    const stepIds: ApplicationStepId[] = ['identity', 'household', 'financial', 'risk', 'history', 'additional', 'consent'];
+    const stepIds: ApplicationStepId[] = ['identity', 'household', 'financial', 'support', 'history', 'additional', 'consent'];
 
     for (const stepId of stepIds) {
         const result = validateApplicationStep(stepId, data, existingDocs);

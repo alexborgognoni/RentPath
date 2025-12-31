@@ -363,7 +363,7 @@ return [
                 'title' => 'Capacité financière',
                 'shortTitle' => 'Finances',
             ],
-            'risk' => [
+            'support' => [
                 'title' => 'Soutien financier',
                 'shortTitle' => 'Soutien',
             ],

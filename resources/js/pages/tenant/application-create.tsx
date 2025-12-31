@@ -1,10 +1,10 @@
 import {
     AdditionalStep,
     ConsentStep,
-    DetailsStep,
-    EmploymentIncomeStep,
+    FinancialStep,
     HistoryStep,
-    PersonalInfoStep,
+    HouseholdStep,
+    IdentityStep,
     ReviewStep,
     SupportStep,
 } from '@/components/application-wizard/steps';
@@ -46,12 +46,12 @@ export default function ApplicationCreate() {
 
     // Build translated step configs
     const translatedSteps = useMemo(() => {
-        const stepIds: ApplicationStep[] = ['identity', 'household', 'financial', 'risk', 'history', 'additional', 'consent', 'review'];
+        const stepIds: ApplicationStep[] = ['identity', 'household', 'financial', 'support', 'history', 'additional', 'consent', 'review'];
         return stepIds.map((id) => ({
             id,
             title: translate(translations, `wizard.application.steps.${id}.title`),
             shortTitle: translate(translations, `wizard.application.steps.${id}.shortTitle`),
-            optional: id === 'risk' || id === 'additional',
+            optional: id === 'support' || id === 'additional',
         }));
     }, [translations]);
 
@@ -168,9 +168,9 @@ export default function ApplicationCreate() {
     const renderStep = () => {
         switch (wizard.currentStep) {
             case 'identity':
-                // Step 1: Identity & Legal Eligibility (uses PersonalInfoStep for now)
+                // Step 1: Identity & Legal Eligibility
                 return (
-                    <PersonalInfoStep
+                    <IdentityStep
                         data={wizard.data}
                         errors={wizard.errors}
                         touchedFields={wizard.touchedFields}
@@ -183,9 +183,9 @@ export default function ApplicationCreate() {
                     />
                 );
             case 'household':
-                // Step 2: Household Composition (uses DetailsStep for occupants, pets)
+                // Step 2: Household Composition
                 return (
-                    <DetailsStep
+                    <HouseholdStep
                         data={wizard.data}
                         errors={wizard.errors}
                         touchedFields={wizard.touchedFields}
@@ -201,9 +201,9 @@ export default function ApplicationCreate() {
                     />
                 );
             case 'financial':
-                // Step 3: Financial Capability (uses EmploymentIncomeStep)
+                // Step 3: Financial Capability
                 return (
-                    <EmploymentIncomeStep
+                    <FinancialStep
                         data={wizard.data}
                         errors={wizard.errors}
                         touchedFields={wizard.touchedFields}
@@ -213,7 +213,7 @@ export default function ApplicationCreate() {
                         existingDocuments={existingDocuments}
                     />
                 );
-            case 'risk':
+            case 'support':
                 // Step 4: Financial Support (co-signers, guarantors, insurance)
                 return (
                     <SupportStep
