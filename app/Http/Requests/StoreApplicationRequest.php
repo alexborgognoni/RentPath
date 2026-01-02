@@ -191,9 +191,6 @@ class StoreApplicationRequest extends FormRequest
             'co_signers.*.id_number' => 'required|string|max:100',
             'co_signers.*.id_issuing_country' => 'required|string|max:2',
             'co_signers.*.id_expiry_date' => 'required|date|after:today',
-            'co_signers.*.immigration_status' => 'nullable|in:citizen,permanent_resident,visa_holder,refugee,asylum_seeker,other',
-            'co_signers.*.visa_type' => 'nullable|string|max:100',
-            'co_signers.*.visa_expiry_date' => 'nullable|date|after:today',
             // Address
             'co_signers.*.street_name' => 'required|string|max:255',
             'co_signers.*.house_number' => 'required|string|max:50',

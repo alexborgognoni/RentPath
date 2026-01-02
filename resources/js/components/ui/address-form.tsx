@@ -214,9 +214,6 @@ export function AddressForm({
                             aria-invalid={hasError('state_province')}
                             error={getError('state_province')}
                         />
-                        {getError('state_province') && (
-                            <p className="mt-1 text-sm text-destructive">{getError('state_province')}</p>
-                        )}
                     </div>
                 )}
             </div>
@@ -251,9 +248,6 @@ export function AddressForm({
                         aria-invalid={hasError('country')}
                         error={getError('country')}
                     />
-                    {getError('country') && (
-                        <p className="mt-1 text-sm text-destructive">{getError('country')}</p>
-                    )}
                 </div>
             </div>
         </div>

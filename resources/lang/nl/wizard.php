@@ -1212,5 +1212,109 @@ return [
             'submitApplication' => 'Aanvraag versturen',
             'submitting' => 'Bezig met versturen...',
         ],
+
+        // ===== Shared Components =====
+        'shared' => [
+            // PersonalDetailsSection
+            'personalDetails' => [
+                'title' => 'Persoonlijke Gegevens',
+                'fields' => [
+                    'firstName' => 'Voornaam',
+                    'lastName' => 'Achternaam',
+                    'email' => 'E-mail',
+                    'dateOfBirth' => 'Geboortedatum',
+                    'nationality' => 'Nationaliteit',
+                    'phoneNumber' => 'Telefoonnummer',
+                ],
+                'placeholders' => [
+                    'phone' => '612345678',
+                ],
+            ],
+
+            // IdDocumentSection
+            'idDocument' => [
+                'title' => 'Identiteitsdocument',
+                'fields' => [
+                    'documentType' => 'Documenttype',
+                    'idNumber' => 'Documentnummer',
+                    'issuingCountry' => 'Land van afgifte',
+                    'expiryDate' => 'Vervaldatum',
+                    'documentFront' => 'Document voorkant',
+                    'documentBack' => 'Document achterkant',
+                ],
+                'placeholders' => [
+                    'selectDocumentType' => 'Selecteer documenttype...',
+                    'enterIdNumber' => 'Voer documentnummer in',
+                    'selectIssuingCountry' => 'Selecteer land...',
+                ],
+                'documentTypes' => [
+                    'passport' => 'Paspoort',
+                    'national_id' => 'Identiteitskaart',
+                    'drivers_license' => 'Rijbewijs',
+                    'residence_permit' => 'Verblijfsvergunning',
+                ],
+            ],
+
+            // ImmigrationStatusSection
+            'immigrationStatus' => [
+                'title' => 'Verblijfsstatus',
+                'notice' => 'Dit is uw wettelijke verblijfsstatus in het land waar het pand zich bevindt.',
+                'fields' => [
+                    'status' => 'Immigratie- / Verblijfsstatus',
+                    'statusOther' => 'Graag specificeren',
+                    'visaType' => 'Vergunnings- / Visumtype',
+                    'visaTypeOther' => 'Graag visum-/vergunningstype specificeren',
+                    'visaExpiryDate' => 'Vervaldatum',
+                    'residencePermit' => 'Verblijfsvergunning',
+                ],
+                'placeholders' => [
+                    'selectStatus' => 'Selecteer status...',
+                    'specifyStatus' => 'Specificeer uw status...',
+                    'selectVisaType' => 'Selecteer vergunningstype...',
+                    'specifyVisaType' => 'Voer uw visum-/vergunningstype in...',
+                ],
+                'statuses' => [
+                    'citizen' => 'Staatsburger',
+                    'permanent_resident' => 'Permanent verblijf',
+                    'temporary_resident' => 'Tijdelijk verblijf',
+                    'visa_holder' => 'Visumhouder',
+                    'student' => 'Student',
+                    'work_permit' => 'Werkvergunning',
+                    'family_reunification' => 'Gezinshereniging',
+                    'refugee_or_protected' => 'Vluchteling / Beschermde status',
+                    'other' => 'Anders',
+                ],
+                'visaTypes' => [
+                    'student_visa' => 'Studentenvisum',
+                    'work_visa' => 'Werkvisum',
+                    'skilled_worker' => 'Kennismigrantenvisum',
+                    'eu_blue_card' => 'EU Blue Card',
+                    'family_visa' => 'Gezinsherenigingsvisum',
+                    'entrepreneur_visa' => 'Ondernemers- / Zakenvisum',
+                    'temporary_residence' => 'Tijdelijke verblijfsvergunning',
+                    'long_term_residence' => 'Langdurige verblijfsvergunning',
+                    'schengen_visa' => 'Schengenvisum',
+                    'working_holiday' => 'Working Holiday Visum',
+                    'research_visa' => 'Onderzoeksvisum',
+                    'other' => 'Anders',
+                ],
+            ],
+
+            // RightToRentSection
+            'rightToRent' => [
+                'title' => 'Huurrecht',
+                'notice' => 'Als u een aanvraag doet voor een woning in het Verenigd Koninkrijk of Ierland, kunnen verhuurders bewijs van uw huurrecht vragen. Het verstrekken van deze documenten kan uw aanvraag versterken.',
+                'fields' => [
+                    'shareCode' => 'Right to Rent Share Code',
+                    'document' => 'Right to Rent Document',
+                ],
+                'placeholders' => [
+                    'shareCode' => 'Voer uw share code van gov.uk in',
+                ],
+                'help' => [
+                    'shareCodePrefix' => 'Verkrijg uw share code via',
+                ],
+            ],
+        ],
     ],
 ];

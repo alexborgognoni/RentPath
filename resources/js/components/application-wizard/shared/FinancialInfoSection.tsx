@@ -1,5 +1,6 @@
 import { CurrencySelect } from '@/components/ui/currency-select';
 import { DatePicker } from '@/components/ui/date-picker';
+import { FileUpload } from '@/components/ui/file-upload';
 import { OptionalBadge } from '@/components/ui/optional-badge';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { Translations } from '@/types/translations';
@@ -26,8 +27,43 @@ export type EntityType = 'tenant' | 'co_signer' | 'guarantor';
 const AVAILABLE_STATUSES: Record<EntityType, readonly string[]> = {
     tenant: ['employed', 'self_employed', 'student', 'retired', 'unemployed', 'other'],
     co_signer: ['employed', 'self_employed', 'student', 'retired', 'unemployed', 'other'],
-    guarantor: ['employed', 'self_employed', 'retired', 'other'],
+    guarantor: ['employed', 'self_employed', 'student', 'retired', 'unemployed', 'other'],
 } as const;
+
+export interface ExistingDocuments {
+    employment_contract?: string;
+    employment_contract_url?: string;
+    employment_contract_size?: number;
+    employment_contract_uploaded_at?: number;
+    payslip_1?: string;
+    payslip_1_url?: string;
+    payslip_1_size?: number;
+    payslip_1_uploaded_at?: number;
+    payslip_2?: string;
+    payslip_2_url?: string;
+    payslip_2_size?: number;
+    payslip_2_uploaded_at?: number;
+    payslip_3?: string;
+    payslip_3_url?: string;
+    payslip_3_size?: number;
+    payslip_3_uploaded_at?: number;
+    student_proof?: string;
+    student_proof_url?: string;
+    student_proof_size?: number;
+    student_proof_uploaded_at?: number;
+    pension_statement?: string;
+    pension_statement_url?: string;
+    pension_statement_size?: number;
+    pension_statement_uploaded_at?: number;
+    benefits_statement?: string;
+    benefits_statement_url?: string;
+    benefits_statement_size?: number;
+    benefits_statement_uploaded_at?: number;
+    other_income_proof?: string;
+    other_income_proof_url?: string;
+    other_income_proof_size?: number;
+    other_income_proof_uploaded_at?: number;
+}
 
 export interface FinancialInfoSectionProps {
     /** Entity type affects available employment statuses */
@@ -46,9 +82,25 @@ export interface FinancialInfoSectionProps {
     isTouched: (field: string) => boolean;
     /** Blur handler */
     onBlur: () => void;
-    /** Slot for document uploads (rendered after income fields per status) */
-    renderDocuments?: (status: string) => React.ReactNode;
+    /** Upload URL for documents */
+    uploadUrl: string;
+    /** Document type prefix (e.g., 'cosigner_0_' for co-signers) */
+    documentTypePrefix?: string;
+    /** Existing uploaded documents */
+    existingDocuments?: ExistingDocuments | null;
+    /** Called when document upload succeeds */
+    onUploadSuccess?: () => void;
 }
+
+const FILE_UPLOAD_ACCEPT = {
+    'image/*': ['.png', '.jpg', '.jpeg'],
+    'application/pdf': ['.pdf'],
+};
+
+const FILE_UPLOAD_DESCRIPTION = {
+    fileTypes: 'PDF, PNG, JPG',
+    maxFileSize: '20MB',
+};
 
 export function FinancialInfoSection({
     entityType,
@@ -59,12 +111,18 @@ export function FinancialInfoSection({
     getError,
     isTouched,
     onBlur,
-    renderDocuments,
+    uploadUrl,
+    documentTypePrefix = '',
+    existingDocuments,
+    onUploadSuccess,
 }: FinancialInfoSectionProps) {
     const t = (key: string) => translate(translations, `wizard.application.employmentStep.${key}`);
 
     // Helper to get prefixed field name
     const f = (field: string) => `${fieldPrefix}${field}`;
+
+    // Helper to get document type with prefix
+    const docType = (type: string) => (documentTypePrefix ? `${documentTypePrefix}${type}` : type);
 
     // Default employment_status to 'employed' if not set
     const hasSetDefault = useRef(false);
@@ -82,6 +140,27 @@ export function FinancialInfoSection({
         const hasError = isTouched(f(field)) && getError(f(field));
         return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
+
+    // Check if field has error and was touched (for document fields)
+    const hasDocError = (field: string) => !!(isTouched(f(field)) && getError(f(field)));
+    const getDocError = (field: string) => (hasDocError(field) ? getError(f(field)) : undefined);
+
+    // Build existing file object for FileUpload
+    const buildExistingFile = useMemo(
+        () => (docName: keyof ExistingDocuments) => {
+            if (!existingDocuments || !existingDocuments[docName]) return null;
+            const urlKey = `${docName}_url` as keyof ExistingDocuments;
+            const sizeKey = `${docName}_size` as keyof ExistingDocuments;
+            const uploadedAtKey = `${docName}_uploaded_at` as keyof ExistingDocuments;
+            return {
+                originalName: existingDocuments[docName] as string,
+                previewUrl: existingDocuments[urlKey] as string | undefined,
+                size: existingDocuments[sizeKey] as number | undefined,
+                uploadedAt: existingDocuments[uploadedAtKey] as number | undefined,
+            };
+        },
+        [existingDocuments],
+    );
 
     // Build options from translations
     const availableStatuses = AVAILABLE_STATUSES[entityType];
@@ -182,6 +261,173 @@ export function FinancialInfoSection({
     const isRetired = status === 'retired';
     const isUnemployed = status === 'unemployed';
     const isOther = status === 'other';
+
+    // Render document uploads for employed status
+    const renderEmployedDocuments = () => (
+        <div className="grid gap-4 md:grid-cols-2">
+            <FileUpload
+                label={t('documents.employmentContract') || 'Employment Contract'}
+                required
+                documentType={docType('employment_contract')}
+                uploadUrl={uploadUrl}
+                accept={FILE_UPLOAD_ACCEPT}
+                maxSize={20 * 1024 * 1024}
+                description={FILE_UPLOAD_DESCRIPTION}
+                existingFile={buildExistingFile('employment_contract')}
+                onUploadSuccess={onUploadSuccess}
+                error={getDocError('employment_contract')}
+            />
+            <FileUpload
+                label={t('documents.payslip1') || 'Payslip 1'}
+                required
+                documentType={docType('payslip_1')}
+                uploadUrl={uploadUrl}
+                accept={FILE_UPLOAD_ACCEPT}
+                maxSize={20 * 1024 * 1024}
+                description={FILE_UPLOAD_DESCRIPTION}
+                existingFile={buildExistingFile('payslip_1')}
+                onUploadSuccess={onUploadSuccess}
+                error={getDocError('payslip_1')}
+            />
+            <FileUpload
+                label={t('documents.payslip2') || 'Payslip 2'}
+                required
+                documentType={docType('payslip_2')}
+                uploadUrl={uploadUrl}
+                accept={FILE_UPLOAD_ACCEPT}
+                maxSize={20 * 1024 * 1024}
+                description={FILE_UPLOAD_DESCRIPTION}
+                existingFile={buildExistingFile('payslip_2')}
+                onUploadSuccess={onUploadSuccess}
+                error={getDocError('payslip_2')}
+            />
+            <FileUpload
+                label={t('documents.payslip3') || 'Payslip 3'}
+                required
+                documentType={docType('payslip_3')}
+                uploadUrl={uploadUrl}
+                accept={FILE_UPLOAD_ACCEPT}
+                maxSize={20 * 1024 * 1024}
+                description={FILE_UPLOAD_DESCRIPTION}
+                existingFile={buildExistingFile('payslip_3')}
+                onUploadSuccess={onUploadSuccess}
+                error={getDocError('payslip_3')}
+            />
+        </div>
+    );
+
+    // Render document uploads for self-employed status
+    const renderSelfEmployedDocuments = () => (
+        <FileUpload
+            label={t('documents.incomeProof') || 'Proof of Income'}
+            required
+            documentType={docType('income_proof')}
+            uploadUrl={uploadUrl}
+            accept={FILE_UPLOAD_ACCEPT}
+            maxSize={20 * 1024 * 1024}
+            description={{
+                ...FILE_UPLOAD_DESCRIPTION,
+                customText: t('documents.selfEmployedHint') || 'Tax returns, bank statements, or accountant letter',
+            }}
+            existingFile={buildExistingFile('other_income_proof')}
+            onUploadSuccess={onUploadSuccess}
+            error={getDocError('income_proof')}
+        />
+    );
+
+    // Render document uploads for student status
+    const renderStudentDocuments = () => (
+        <FileUpload
+            label={t('documents.studentProof') || 'Student Enrollment Proof'}
+            required
+            documentType={docType('student_proof')}
+            uploadUrl={uploadUrl}
+            accept={FILE_UPLOAD_ACCEPT}
+            maxSize={20 * 1024 * 1024}
+            description={FILE_UPLOAD_DESCRIPTION}
+            existingFile={buildExistingFile('student_proof')}
+            onUploadSuccess={onUploadSuccess}
+            error={getDocError('student_proof')}
+        />
+    );
+
+    // Render document uploads for retired status
+    const renderRetiredDocuments = () => (
+        <div className="space-y-4">
+            <FileUpload
+                label={t('documents.pensionStatement') || 'Pension Statement'}
+                required
+                documentType={docType('pension_statement')}
+                uploadUrl={uploadUrl}
+                accept={FILE_UPLOAD_ACCEPT}
+                maxSize={20 * 1024 * 1024}
+                description={FILE_UPLOAD_DESCRIPTION}
+                existingFile={buildExistingFile('pension_statement')}
+                onUploadSuccess={onUploadSuccess}
+                error={getDocError('pension_statement')}
+            />
+            <FileUpload
+                label={t('documents.otherIncomeProof') || 'Other Income Proof'}
+                optional
+                documentType={docType('other_income_proof')}
+                uploadUrl={uploadUrl}
+                accept={FILE_UPLOAD_ACCEPT}
+                maxSize={20 * 1024 * 1024}
+                description={FILE_UPLOAD_DESCRIPTION}
+                existingFile={buildExistingFile('other_income_proof')}
+                onUploadSuccess={onUploadSuccess}
+            />
+        </div>
+    );
+
+    // Render document uploads for unemployed status
+    const renderUnemployedDocuments = () => {
+        const incomeSource = getValue(f('unemployed_income_source'));
+        if (!incomeSource) return null;
+
+        return (
+            <FileUpload
+                label={
+                    incomeSource === 'unemployment_benefits'
+                        ? t('documents.benefitsStatement') || 'Benefits Statement'
+                        : t('documents.otherIncomeProof') || 'Proof of Income'
+                }
+                required
+                documentType={docType(incomeSource === 'unemployment_benefits' ? 'benefits_statement' : 'other_income_proof')}
+                uploadUrl={uploadUrl}
+                accept={FILE_UPLOAD_ACCEPT}
+                maxSize={20 * 1024 * 1024}
+                description={FILE_UPLOAD_DESCRIPTION}
+                existingFile={
+                    incomeSource === 'unemployment_benefits'
+                        ? buildExistingFile('benefits_statement')
+                        : buildExistingFile('other_income_proof')
+                }
+                onUploadSuccess={onUploadSuccess}
+                error={
+                    incomeSource === 'unemployment_benefits'
+                        ? getDocError('benefits_statement')
+                        : getDocError('other_income_proof')
+                }
+            />
+        );
+    };
+
+    // Render document uploads for other status
+    const renderOtherDocuments = () => (
+        <FileUpload
+            label={t('documents.otherIncomeProof') || 'Proof of Income'}
+            required
+            documentType={docType('other_income_proof')}
+            uploadUrl={uploadUrl}
+            accept={FILE_UPLOAD_ACCEPT}
+            maxSize={20 * 1024 * 1024}
+            description={FILE_UPLOAD_DESCRIPTION}
+            existingFile={buildExistingFile('other_income_proof')}
+            onUploadSuccess={onUploadSuccess}
+            error={getDocError('other_income_proof')}
+        />
+    );
 
     return (
         <div className="space-y-4">
@@ -335,8 +581,8 @@ export function FinancialInfoSection({
                         </div>
                     </div>
 
-                    {/* Document slot for employed */}
-                    {renderDocuments?.('employed')}
+                    {/* Document uploads for employed */}
+                    {renderEmployedDocuments()}
                 </div>
             )}
 
@@ -448,8 +694,8 @@ export function FinancialInfoSection({
                     {/* Self-Employed Documents Note */}
                     <p className="text-sm text-muted-foreground">{t('hints.selfEmployedDocs')}</p>
 
-                    {/* Document slot for self_employed */}
-                    {renderDocuments?.('self_employed')}
+                    {/* Document uploads for self-employed */}
+                    {renderSelfEmployedDocuments()}
                 </div>
             )}
 
@@ -567,8 +813,8 @@ export function FinancialInfoSection({
                         )}
                     </div>
 
-                    {/* Document slot for student */}
-                    {renderDocuments?.('student')}
+                    {/* Document uploads for student */}
+                    {renderStudentDocuments()}
                 </div>
             )}
 
@@ -661,8 +907,8 @@ export function FinancialInfoSection({
                         </div>
                     </div>
 
-                    {/* Document slot for retired */}
-                    {renderDocuments?.('retired')}
+                    {/* Document uploads for retired */}
+                    {renderRetiredDocuments()}
                 </div>
             )}
 
@@ -746,8 +992,8 @@ export function FinancialInfoSection({
                         </div>
                     )}
 
-                    {/* Document slot for unemployed */}
-                    {renderDocuments?.('unemployed')}
+                    {/* Document uploads for unemployed */}
+                    {renderUnemployedDocuments()}
                 </div>
             )}
 
@@ -847,8 +1093,8 @@ export function FinancialInfoSection({
                         </div>
                     </div>
 
-                    {/* Document slot for other */}
-                    {renderDocuments?.('other')}
+                    {/* Document uploads for other */}
+                    {renderOtherDocuments()}
                 </div>
             )}
         </div>

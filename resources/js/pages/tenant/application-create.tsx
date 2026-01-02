@@ -233,6 +233,7 @@ export default function ApplicationCreate() {
                         removeGuarantor={wizard.removeGuarantor}
                         updateGuarantor={wizard.updateGuarantor}
                         syncCoSignersFromOccupants={wizard.syncCoSignersFromOccupants}
+                        propertyCountry={property.country}
                     />
                 );
             case 'history':

@@ -24,6 +24,16 @@ export interface FinancialValidationErrors {
     other_employment_situation?: string;
     other_situation_monthly_income?: string;
     other_situation_income_source?: string;
+    // Document fields
+    employment_contract?: string;
+    payslip_1?: string;
+    payslip_2?: string;
+    payslip_3?: string;
+    income_proof?: string;
+    student_proof?: string;
+    pension_statement?: string;
+    benefits_statement?: string;
+    other_income_proof?: string;
 }
 
 export type FinancialEntityType = 'tenant' | 'co_signer' | 'guarantor';
@@ -152,6 +162,133 @@ export function validateFinancialFields(data: Record<string, string>, entityType
                 errors.net_monthly_income = 'Net monthly income is required';
             }
         }
+    }
+
+    return errors;
+}
+
+/**
+ * Document context for checking existing uploads
+ */
+export interface DocumentContext {
+    employment_contract?: string | null;
+    payslip_1?: string | null;
+    payslip_2?: string | null;
+    payslip_3?: string | null;
+    income_proof?: string | null;
+    student_proof?: string | null;
+    pension_statement?: string | null;
+    benefits_statement?: string | null;
+    other_income_proof?: string | null;
+    id_document_front?: string | null;
+    id_document_back?: string | null;
+}
+
+/**
+ * Validates financial documents based on employment status.
+ * This function can be used in both components and Zod schemas.
+ *
+ * @param data - Object with employment status
+ * @param existingDocs - Object with existing document filenames (from uploaded files)
+ * @param entityType - The type of entity (tenant, co_signer, guarantor)
+ * @returns Object with field names as keys and error messages as values
+ */
+export function validateFinancialDocuments(
+    data: Record<string, string>,
+    existingDocs: DocumentContext | null,
+    entityType: FinancialEntityType = 'tenant',
+): FinancialValidationErrors {
+    const errors: FinancialValidationErrors = {};
+    const status = data.employment_status;
+
+    // No documents required if no employment status
+    if (!status) {
+        return errors;
+    }
+
+    // Helper to check if document exists
+    const hasDoc = (field: keyof DocumentContext) => {
+        return existingDocs && existingDocs[field];
+    };
+
+    // EMPLOYED documents
+    if (status === 'employed') {
+        if (!hasDoc('employment_contract')) {
+            errors.employment_contract = 'Employment contract is required';
+        }
+        if (!hasDoc('payslip_1')) {
+            errors.payslip_1 = 'Recent payslip is required';
+        }
+        if (!hasDoc('payslip_2')) {
+            errors.payslip_2 = 'Second payslip is required';
+        }
+        if (!hasDoc('payslip_3')) {
+            errors.payslip_3 = 'Third payslip is required';
+        }
+    }
+
+    // SELF-EMPLOYED documents
+    if (status === 'self_employed') {
+        if (!hasDoc('income_proof') && !hasDoc('other_income_proof')) {
+            errors.income_proof = 'Proof of income is required (tax returns, bank statements, or accountant letter)';
+        }
+    }
+
+    // STUDENT documents
+    if (status === 'student') {
+        if (!hasDoc('student_proof')) {
+            errors.student_proof = 'Student enrollment proof is required';
+        }
+    }
+
+    // RETIRED documents
+    if (status === 'retired') {
+        if (!hasDoc('pension_statement')) {
+            errors.pension_statement = 'Pension statement is required';
+        }
+    }
+
+    // UNEMPLOYED documents
+    if (status === 'unemployed') {
+        const incomeSource = data.unemployed_income_source;
+        if (incomeSource === 'unemployment_benefits') {
+            if (!hasDoc('benefits_statement')) {
+                errors.benefits_statement = 'Benefits statement is required';
+            }
+        } else if (incomeSource) {
+            if (!hasDoc('other_income_proof')) {
+                errors.other_income_proof = 'Proof of income is required';
+            }
+        }
+    }
+
+    // OTHER documents
+    if (status === 'other') {
+        if (!hasDoc('other_income_proof')) {
+            errors.other_income_proof = 'Proof of income is required';
+        }
+    }
+
+    return errors;
+}
+
+/**
+ * Validates ID documents.
+ *
+ * @param existingDocs - Object with existing document filenames
+ * @returns Object with field names as keys and error messages as values
+ */
+export function validateIdDocuments(existingDocs: DocumentContext | null): Record<string, string> {
+    const errors: Record<string, string> = {};
+
+    // Front is always required
+    if (!existingDocs?.id_document_front) {
+        errors.id_document_front = 'ID document (front) is required';
+    }
+
+    // Back is always required
+    if (!existingDocs?.id_document_back) {
+        errors.id_document_back = 'ID document (back) is required';
     }
 
     return errors;

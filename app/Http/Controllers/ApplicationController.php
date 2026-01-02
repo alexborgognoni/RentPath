@@ -102,10 +102,11 @@ class ApplicationController extends Controller
                 ->with('message', 'You already have an application for this property');
         }
 
-        // Load existing draft if it exists
+        // Load existing draft if it exists (with co-signers and guarantors for document paths)
         $draftApplication = Application::where('tenant_profile_id', $tenantProfile->id)
             ->where('property_id', $property->id)
             ->where('status', 'draft')
+            ->with(['coSigners', 'guarantors'])
             ->first();
 
         // Re-validate max step based on current profile data
@@ -1752,6 +1753,178 @@ class ApplicationController extends Controller
         $application->update(['additional_documents' => $documents]);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Upload a document for a co-signer.
+     */
+    public function uploadCoSignerDocument(Request $request, Application $application, int $index)
+    {
+        $user = Auth::user();
+
+        // Verify user owns this application
+        if ($application->tenantProfile->user_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Verify application is still in draft
+        if ($application->status !== 'draft') {
+            return response()->json(['success' => false, 'message' => 'Application is not editable'], 400);
+        }
+
+        // Define allowed document types for co-signers
+        $documentTypes = [
+            // ID Documents
+            'id_document_front' => ['folder' => 'applications/co-signers/id-documents', 'path_field' => 'id_document_front_path', 'name_field' => 'id_document_front_original_name'],
+            'id_document_back' => ['folder' => 'applications/co-signers/id-documents', 'path_field' => 'id_document_back_path', 'name_field' => 'id_document_back_original_name'],
+            // Immigration
+            'residence_permit_document' => ['folder' => 'applications/co-signers/residence-permits', 'path_field' => 'residence_permit_document_path', 'name_field' => 'residence_permit_document_original_name'],
+            'right_to_rent_document' => ['folder' => 'applications/co-signers/right-to-rent', 'path_field' => 'right_to_rent_document_path', 'name_field' => 'right_to_rent_document_original_name'],
+            // Employment (employed)
+            'employment_contract' => ['folder' => 'applications/co-signers/employment-contracts', 'path_field' => 'employment_contract_path', 'name_field' => 'employment_contract_original_name'],
+            'payslip_1' => ['folder' => 'applications/co-signers/payslips', 'path_field' => 'payslip_1_path', 'name_field' => 'payslip_1_original_name'],
+            'payslip_2' => ['folder' => 'applications/co-signers/payslips', 'path_field' => 'payslip_2_path', 'name_field' => 'payslip_2_original_name'],
+            'payslip_3' => ['folder' => 'applications/co-signers/payslips', 'path_field' => 'payslip_3_path', 'name_field' => 'payslip_3_original_name'],
+            // Self-employed
+            'income_proof' => ['folder' => 'applications/co-signers/income-proofs', 'path_field' => 'income_proof_path', 'name_field' => 'income_proof_original_name'],
+            // Student
+            'enrollment_proof' => ['folder' => 'applications/co-signers/enrollment-proofs', 'path_field' => 'enrollment_proof_path', 'name_field' => 'enrollment_proof_original_name'],
+            'student_proof' => ['folder' => 'applications/co-signers/student-proofs', 'path_field' => 'student_proof_path', 'name_field' => 'student_proof_original_name'],
+            // Retired
+            'pension_statement' => ['folder' => 'applications/co-signers/pension-statements', 'path_field' => 'pension_statement_path', 'name_field' => 'pension_statement_original_name'],
+            // Unemployed
+            'benefits_statement' => ['folder' => 'applications/co-signers/benefits-statements', 'path_field' => 'benefits_statement_path', 'name_field' => 'benefits_statement_original_name'],
+            // Other income proof (for unemployed/other statuses)
+            'other_income_proof' => ['folder' => 'applications/co-signers/income-proofs', 'path_field' => 'income_proof_path', 'name_field' => 'income_proof_original_name'],
+        ];
+
+        // Handle prefixed document types (e.g., "cosigner_0_id_document_front")
+        $documentType = $request->input('document_type');
+        $actualType = preg_replace('/^cosigner_\d+_/', '', $documentType);
+
+        if (! isset($documentTypes[$actualType])) {
+            return response()->json(['success' => false, 'message' => 'Invalid document type'], 400);
+        }
+
+        $validated = $request->validate([
+            'file' => ['required', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:20480'],
+        ]);
+
+        $file = $request->file('file');
+        $config = $documentTypes[$actualType];
+
+        // Find or create the co-signer record
+        $coSigner = ApplicationCoSigner::firstOrCreate(
+            ['application_id' => $application->id, 'occupant_index' => $index],
+            ['first_name' => '', 'last_name' => '', 'date_of_birth' => now(), 'nationality' => '', 'email' => '', 'phone_country_code' => '', 'phone_number' => '', 'id_document_type' => 'passport', 'employment_status' => 'employed']
+        );
+
+        // Delete old file if exists
+        $oldPath = $coSigner->{$config['path_field']};
+        if ($oldPath) {
+            StorageHelper::delete($oldPath, 'private');
+        }
+
+        // Store new file
+        $path = StorageHelper::store($file, $config['folder'], 'private');
+
+        // Update co-signer record
+        $coSigner->update([
+            $config['path_field'] => $path,
+            $config['name_field'] => $file->getClientOriginalName(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'original_name' => $file->getClientOriginalName(),
+            'path' => $path,
+            'size' => $file->getSize(),
+            'uploaded_at' => time(),
+            'preview_url' => StorageHelper::url($path, 'private', 60),
+        ]);
+    }
+
+    /**
+     * Upload a document for a guarantor.
+     */
+    public function uploadGuarantorDocument(Request $request, Application $application, int $index)
+    {
+        $user = Auth::user();
+
+        // Verify user owns this application
+        if ($application->tenantProfile->user_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Verify application is still in draft
+        if ($application->status !== 'draft') {
+            return response()->json(['success' => false, 'message' => 'Application is not editable'], 400);
+        }
+
+        // Define allowed document types for guarantors
+        $documentTypes = [
+            'id_document_front' => ['folder' => 'applications/guarantors/id-documents', 'path_field' => 'id_document_front_path', 'name_field' => 'id_document_front_original_name'],
+            'id_document_back' => ['folder' => 'applications/guarantors/id-documents', 'path_field' => 'id_document_back_path', 'name_field' => 'id_document_back_original_name'],
+            'proof_of_income' => ['folder' => 'applications/guarantors/income-proofs', 'path_field' => 'proof_of_income_path', 'name_field' => 'proof_of_income_original_name'],
+            'credit_report' => ['folder' => 'applications/guarantors/credit-reports', 'path_field' => 'credit_report_path', 'name_field' => 'credit_report_original_name'],
+            'proof_of_residence' => ['folder' => 'applications/guarantors/residence-proofs', 'path_field' => 'proof_of_residence_path', 'name_field' => 'proof_of_residence_original_name'],
+        ];
+
+        // Handle prefixed document types (e.g., "guarantor_0_id_document_front")
+        $documentType = $request->input('document_type');
+        $actualType = preg_replace('/^guarantor_\d+_/', '', $documentType);
+
+        if (! isset($documentTypes[$actualType])) {
+            return response()->json(['success' => false, 'message' => 'Invalid document type'], 400);
+        }
+
+        $validated = $request->validate([
+            'file' => ['required', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:20480'],
+        ]);
+
+        $file = $request->file('file');
+        $config = $documentTypes[$actualType];
+
+        // Find or create the guarantor record
+        $guarantor = ApplicationGuarantor::firstOrCreate(
+            ['application_id' => $application->id, 'for_signer_type' => 'primary'],
+            ['first_name' => '', 'last_name' => '', 'date_of_birth' => now(), 'nationality' => '', 'email' => '', 'phone_country_code' => '', 'phone_number' => '', 'relationship' => 'parent', 'id_document_type' => 'passport', 'street_address' => '', 'city' => '', 'postal_code' => '', 'country' => '', 'employment_status' => 'employed', 'net_monthly_income' => 0, 'income_currency' => 'EUR']
+        );
+
+        // For indexed guarantors, we need a different approach - use index to find by order
+        if ($index > 0) {
+            $guarantors = ApplicationGuarantor::where('application_id', $application->id)
+                ->orderBy('id')
+                ->get();
+
+            if ($index < count($guarantors)) {
+                $guarantor = $guarantors[$index];
+            }
+        }
+
+        // Delete old file if exists
+        $oldPath = $guarantor->{$config['path_field']};
+        if ($oldPath) {
+            StorageHelper::delete($oldPath, 'private');
+        }
+
+        // Store new file
+        $path = StorageHelper::store($file, $config['folder'], 'private');
+
+        // Update guarantor record
+        $guarantor->update([
+            $config['path_field'] => $path,
+            $config['name_field'] => $file->getClientOriginalName(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'original_name' => $file->getClientOriginalName(),
+            'path' => $path,
+            'size' => $file->getSize(),
+            'uploaded_at' => time(),
+            'preview_url' => StorageHelper::url($path, 'private', 60),
+        ]);
     }
 
     /**

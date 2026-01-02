@@ -1212,5 +1212,109 @@ return [
             'submitApplication' => 'Soumettre la candidature',
             'submitting' => 'Envoi en cours...',
         ],
+
+        // ===== Shared Components =====
+        'shared' => [
+            // PersonalDetailsSection
+            'personalDetails' => [
+                'title' => 'Informations Personnelles',
+                'fields' => [
+                    'firstName' => 'Prénom',
+                    'lastName' => 'Nom',
+                    'email' => 'Email',
+                    'dateOfBirth' => 'Date de naissance',
+                    'nationality' => 'Nationalité',
+                    'phoneNumber' => 'Numéro de téléphone',
+                ],
+                'placeholders' => [
+                    'phone' => '612345678',
+                ],
+            ],
+
+            // IdDocumentSection
+            'idDocument' => [
+                'title' => 'Pièce d\'Identité',
+                'fields' => [
+                    'documentType' => 'Type de document',
+                    'idNumber' => 'Numéro du document',
+                    'issuingCountry' => 'Pays émetteur',
+                    'expiryDate' => 'Date d\'expiration',
+                    'documentFront' => 'Recto du document',
+                    'documentBack' => 'Verso du document',
+                ],
+                'placeholders' => [
+                    'selectDocumentType' => 'Sélectionnez le type de document...',
+                    'enterIdNumber' => 'Entrez le numéro du document',
+                    'selectIssuingCountry' => 'Sélectionnez le pays...',
+                ],
+                'documentTypes' => [
+                    'passport' => 'Passeport',
+                    'national_id' => 'Carte d\'identité nationale',
+                    'drivers_license' => 'Permis de conduire',
+                    'residence_permit' => 'Titre de séjour',
+                ],
+            ],
+
+            // ImmigrationStatusSection
+            'immigrationStatus' => [
+                'title' => 'Statut d\'Immigration',
+                'notice' => 'C\'est votre statut de résidence légale dans le pays où se trouve le bien.',
+                'fields' => [
+                    'status' => 'Statut d\'immigration / Résidence',
+                    'statusOther' => 'Veuillez préciser',
+                    'visaType' => 'Type de permis / visa',
+                    'visaTypeOther' => 'Veuillez préciser le type de visa/permis',
+                    'visaExpiryDate' => 'Date d\'expiration',
+                    'residencePermit' => 'Titre de séjour',
+                ],
+                'placeholders' => [
+                    'selectStatus' => 'Sélectionnez le statut...',
+                    'specifyStatus' => 'Précisez votre statut...',
+                    'selectVisaType' => 'Sélectionnez le type de permis...',
+                    'specifyVisaType' => 'Entrez votre type de visa/permis...',
+                ],
+                'statuses' => [
+                    'citizen' => 'Citoyen',
+                    'permanent_resident' => 'Résident permanent',
+                    'temporary_resident' => 'Résident temporaire',
+                    'visa_holder' => 'Titulaire de visa',
+                    'student' => 'Étudiant',
+                    'work_permit' => 'Permis de travail',
+                    'family_reunification' => 'Regroupement familial',
+                    'refugee_or_protected' => 'Réfugié / Statut protégé',
+                    'other' => 'Autre',
+                ],
+                'visaTypes' => [
+                    'student_visa' => 'Visa étudiant',
+                    'work_visa' => 'Visa de travail',
+                    'skilled_worker' => 'Visa travailleur qualifié',
+                    'eu_blue_card' => 'Carte bleue européenne',
+                    'family_visa' => 'Visa regroupement familial',
+                    'entrepreneur_visa' => 'Visa entrepreneur / affaires',
+                    'temporary_residence' => 'Titre de séjour temporaire',
+                    'long_term_residence' => 'Titre de séjour longue durée',
+                    'schengen_visa' => 'Visa Schengen',
+                    'working_holiday' => 'Visa vacances-travail',
+                    'research_visa' => 'Visa recherche',
+                    'other' => 'Autre',
+                ],
+            ],
+
+            // RightToRentSection
+            'rightToRent' => [
+                'title' => 'Droit de Louer',
+                'notice' => 'Si vous postulez pour un bien au Royaume-Uni ou en Irlande, les propriétaires peuvent demander une preuve de votre droit de louer. Fournir ces documents peut renforcer votre candidature.',
+                'fields' => [
+                    'shareCode' => 'Code de partage Right to Rent',
+                    'document' => 'Document Right to Rent',
+                ],
+                'placeholders' => [
+                    'shareCode' => 'Entrez votre code de partage de gov.uk',
+                ],
+                'help' => [
+                    'shareCodePrefix' => 'Obtenez votre code de partage sur',
+                ],
+            ],
+        ],
     ],
 ];

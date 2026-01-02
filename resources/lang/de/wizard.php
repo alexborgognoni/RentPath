@@ -1212,5 +1212,109 @@ return [
             'submitApplication' => 'Bewerbung absenden',
             'submitting' => 'Wird gesendet...',
         ],
+
+        // ===== Shared Components =====
+        'shared' => [
+            // PersonalDetailsSection
+            'personalDetails' => [
+                'title' => 'Persönliche Daten',
+                'fields' => [
+                    'firstName' => 'Vorname',
+                    'lastName' => 'Nachname',
+                    'email' => 'E-Mail',
+                    'dateOfBirth' => 'Geburtsdatum',
+                    'nationality' => 'Staatsangehörigkeit',
+                    'phoneNumber' => 'Telefonnummer',
+                ],
+                'placeholders' => [
+                    'phone' => '612345678',
+                ],
+            ],
+
+            // IdDocumentSection
+            'idDocument' => [
+                'title' => 'Ausweisdokument',
+                'fields' => [
+                    'documentType' => 'Dokumententyp',
+                    'idNumber' => 'Dokumentennummer',
+                    'issuingCountry' => 'Ausstellungsland',
+                    'expiryDate' => 'Ablaufdatum',
+                    'documentFront' => 'Dokument Vorderseite',
+                    'documentBack' => 'Dokument Rückseite',
+                ],
+                'placeholders' => [
+                    'selectDocumentType' => 'Dokumententyp auswählen...',
+                    'enterIdNumber' => 'Dokumentennummer eingeben',
+                    'selectIssuingCountry' => 'Land auswählen...',
+                ],
+                'documentTypes' => [
+                    'passport' => 'Reisepass',
+                    'national_id' => 'Personalausweis',
+                    'drivers_license' => 'Führerschein',
+                    'residence_permit' => 'Aufenthaltstitel',
+                ],
+            ],
+
+            // ImmigrationStatusSection
+            'immigrationStatus' => [
+                'title' => 'Aufenthaltsstatus',
+                'notice' => 'Dies ist Ihr legaler Aufenthaltsstatus im Land, in dem sich die Immobilie befindet.',
+                'fields' => [
+                    'status' => 'Einwanderungs- / Aufenthaltsstatus',
+                    'statusOther' => 'Bitte angeben',
+                    'visaType' => 'Erlaubnis- / Visumstyp',
+                    'visaTypeOther' => 'Bitte Visum-/Erlaubnistyp angeben',
+                    'visaExpiryDate' => 'Ablaufdatum',
+                    'residencePermit' => 'Aufenthaltstitel',
+                ],
+                'placeholders' => [
+                    'selectStatus' => 'Status auswählen...',
+                    'specifyStatus' => 'Ihren Status angeben...',
+                    'selectVisaType' => 'Erlaubnistyp auswählen...',
+                    'specifyVisaType' => 'Ihren Visum-/Erlaubnistyp eingeben...',
+                ],
+                'statuses' => [
+                    'citizen' => 'Staatsbürger',
+                    'permanent_resident' => 'Daueraufenthalt',
+                    'temporary_resident' => 'Vorübergehender Aufenthalt',
+                    'visa_holder' => 'Visuminhaber',
+                    'student' => 'Student',
+                    'work_permit' => 'Arbeitserlaubnis',
+                    'family_reunification' => 'Familienzusammenführung',
+                    'refugee_or_protected' => 'Flüchtling / Schutzstatus',
+                    'other' => 'Sonstiges',
+                ],
+                'visaTypes' => [
+                    'student_visa' => 'Studentenvisum',
+                    'work_visa' => 'Arbeitsvisum',
+                    'skilled_worker' => 'Fachkräftevisum',
+                    'eu_blue_card' => 'EU Blue Card',
+                    'family_visa' => 'Familienvisum',
+                    'entrepreneur_visa' => 'Unternehmer- / Geschäftsvisum',
+                    'temporary_residence' => 'Befristete Aufenthaltserlaubnis',
+                    'long_term_residence' => 'Daueraufenthaltserlaubnis',
+                    'schengen_visa' => 'Schengen-Visum',
+                    'working_holiday' => 'Working-Holiday-Visum',
+                    'research_visa' => 'Forschungsvisum',
+                    'other' => 'Sonstiges',
+                ],
+            ],
+
+            // RightToRentSection
+            'rightToRent' => [
+                'title' => 'Mietrecht',
+                'notice' => 'Wenn Sie sich für eine Immobilie im Vereinigten Königreich oder in Irland bewerben, können Vermieter einen Nachweis Ihres Mietrechts verlangen. Diese Dokumente können Ihre Bewerbung stärken.',
+                'fields' => [
+                    'shareCode' => 'Right to Rent Share Code',
+                    'document' => 'Right to Rent Dokument',
+                ],
+                'placeholders' => [
+                    'shareCode' => 'Geben Sie Ihren Share Code von gov.uk ein',
+                ],
+                'help' => [
+                    'shareCodePrefix' => 'Holen Sie sich Ihren Share Code von',
+                ],
+            ],
+        ],
     ],
 ];

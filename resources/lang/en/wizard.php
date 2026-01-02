@@ -1249,5 +1249,109 @@ return [
             'submitApplication' => 'Submit Application',
             'submitting' => 'Submitting...',
         ],
+
+        // ===== Shared Components =====
+        'shared' => [
+            // PersonalDetailsSection
+            'personalDetails' => [
+                'title' => 'Personal Details',
+                'fields' => [
+                    'firstName' => 'First Name',
+                    'lastName' => 'Last Name',
+                    'email' => 'Email',
+                    'dateOfBirth' => 'Date of Birth',
+                    'nationality' => 'Nationality',
+                    'phoneNumber' => 'Phone Number',
+                ],
+                'placeholders' => [
+                    'phone' => '612345678',
+                ],
+            ],
+
+            // IdDocumentSection
+            'idDocument' => [
+                'title' => 'ID Document',
+                'fields' => [
+                    'documentType' => 'Document Type',
+                    'idNumber' => 'Document Number',
+                    'issuingCountry' => 'Issuing Country',
+                    'expiryDate' => 'Expiry Date',
+                    'documentFront' => 'Document Front',
+                    'documentBack' => 'Document Back',
+                ],
+                'placeholders' => [
+                    'selectDocumentType' => 'Select document type...',
+                    'enterIdNumber' => 'Enter document number',
+                    'selectIssuingCountry' => 'Select country...',
+                ],
+                'documentTypes' => [
+                    'passport' => 'Passport',
+                    'national_id' => 'National ID Card',
+                    'drivers_license' => "Driver's License",
+                    'residence_permit' => 'Residence Permit',
+                ],
+            ],
+
+            // ImmigrationStatusSection
+            'immigrationStatus' => [
+                'title' => 'Immigration Status',
+                'notice' => 'This is your legal residency status in the country where the property is located.',
+                'fields' => [
+                    'status' => 'Immigration / Residency Status',
+                    'statusOther' => 'Please Specify',
+                    'visaType' => 'Permit / Visa Type',
+                    'visaTypeOther' => 'Please Specify Visa/Permit Type',
+                    'visaExpiryDate' => 'Expiry Date',
+                    'residencePermit' => 'Residence Permit',
+                ],
+                'placeholders' => [
+                    'selectStatus' => 'Select status...',
+                    'specifyStatus' => 'Specify your status...',
+                    'selectVisaType' => 'Select permit type...',
+                    'specifyVisaType' => 'Enter your visa/permit type...',
+                ],
+                'statuses' => [
+                    'citizen' => 'Citizen',
+                    'permanent_resident' => 'Permanent Resident',
+                    'temporary_resident' => 'Temporary Resident',
+                    'visa_holder' => 'Visa Holder',
+                    'student' => 'Student',
+                    'work_permit' => 'Work Permit',
+                    'family_reunification' => 'Family Reunification',
+                    'refugee_or_protected' => 'Refugee / Protected Status',
+                    'other' => 'Other',
+                ],
+                'visaTypes' => [
+                    'student_visa' => 'Student Visa',
+                    'work_visa' => 'Work Visa',
+                    'skilled_worker' => 'Skilled Worker Visa',
+                    'eu_blue_card' => 'EU Blue Card',
+                    'family_visa' => 'Family Reunification Visa',
+                    'entrepreneur_visa' => 'Entrepreneur / Business Visa',
+                    'temporary_residence' => 'Temporary Residence Permit',
+                    'long_term_residence' => 'Long-Term Residence Permit',
+                    'schengen_visa' => 'Schengen Visa',
+                    'working_holiday' => 'Working Holiday Visa',
+                    'research_visa' => 'Research Visa',
+                    'other' => 'Other',
+                ],
+            ],
+
+            // RightToRentSection
+            'rightToRent' => [
+                'title' => 'Right to Rent',
+                'notice' => 'If you are applying for a property in the UK or Ireland, landlords may request proof of your right to rent. Providing these documents can strengthen your application.',
+                'fields' => [
+                    'shareCode' => 'Right to Rent Share Code',
+                    'document' => 'Right to Rent Document',
+                ],
+                'placeholders' => [
+                    'shareCode' => 'Enter your share code from gov.uk',
+                ],
+                'help' => [
+                    'shareCodePrefix' => 'Get your share code from',
+                ],
+            ],
+        ],
     ],
 ];

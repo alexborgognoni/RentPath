@@ -1,4 +1,9 @@
-import { validateFinancialFields } from '@/lib/validation/financial-validation';
+import {
+    validateFinancialFields,
+    validateFinancialDocuments,
+    validateIdDocuments,
+    type DocumentContext,
+} from '@/lib/validation/financial-validation';
 import { validatePhoneNumber } from '@/utils/phone-validation';
 import { z } from 'zod';
 
@@ -1417,6 +1422,41 @@ export const riskMitigationStepSchema = riskMitigationBaseSchema.superRefine((da
                 path: [`cosigner_${index}_${field}`],
             });
         });
+
+        // === ID Document Upload Validation (using shared function) ===
+        const idDocContext: DocumentContext = {
+            id_document_front: coSigner.id_document_front_path || null,
+            id_document_back: coSigner.id_document_back_path || null,
+        };
+        const idDocErrors = validateIdDocuments(idDocContext);
+        Object.entries(idDocErrors).forEach(([field, message]) => {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message,
+                path: [`cosigner_${index}_${field}`],
+            });
+        });
+
+        // === Financial Document Validation (using shared function) ===
+        const finDocContext: DocumentContext = {
+            employment_contract: coSigner.employment_contract_path || null,
+            payslip_1: coSigner.payslip_1_path || null,
+            payslip_2: coSigner.payslip_2_path || null,
+            payslip_3: coSigner.payslip_3_path || null,
+            income_proof: coSigner.income_proof_path || null,
+            student_proof: coSigner.student_proof_path || coSigner.enrollment_proof_path || null,
+            pension_statement: coSigner.pension_statement_path || null,
+            benefits_statement: coSigner.benefits_statement_path || null,
+            other_income_proof: coSigner.income_proof_path || null,
+        };
+        const finDocErrors = validateFinancialDocuments(coSigner, finDocContext, 'co_signer');
+        Object.entries(finDocErrors).forEach(([field, message]) => {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message,
+                path: [`cosigner_${index}_${field}`],
+            });
+        });
     });
 
     // Validate each guarantor
@@ -1582,6 +1622,30 @@ export const riskMitigationStepSchema = riskMitigationBaseSchema.superRefine((da
                 path: [`guarantor_${index}_${field}`],
             });
         });
+
+        // === ID Document Upload Validation (using shared function) ===
+        const idDocContext: DocumentContext = {
+            id_document_front: guarantor.id_document_front_path || null,
+            id_document_back: guarantor.id_document_back_path || null,
+        };
+        const idDocErrors = validateIdDocuments(idDocContext);
+        Object.entries(idDocErrors).forEach(([field, message]) => {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message,
+                path: [`guarantor_${index}_${field}`],
+            });
+        });
+
+        // === Proof of Income Document ===
+        // Guarantors need proof of income regardless of employment status
+        if (!guarantor.proof_of_income_path && !guarantor.income_proof_path) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Proof of income is required',
+                path: [`guarantor_${index}_proof_of_income`],
+            });
+        }
     });
 });
 

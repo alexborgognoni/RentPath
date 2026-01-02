@@ -1,8 +1,5 @@
 import { AddressForm } from '@/components/ui/address-form';
-import { DatePicker } from '@/components/ui/date-picker';
-import { NationalitySelect } from '@/components/ui/nationality-select';
 import { OptionalBadge } from '@/components/ui/optional-badge';
-import { PhoneInput } from '@/components/ui/phone-input';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { ApplicationWizardData, CoSignerDetails, GuarantorDetails } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
@@ -10,7 +7,13 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { ChevronDown, ChevronUp, Link2, Plus, Shield, Trash2, UserPlus, Users } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { FinancialInfoSection } from '../shared';
+import {
+    FinancialInfoSection,
+    IdDocumentSection,
+    PersonalDetailsSection,
+    type IdDocumentData,
+    type PersonalDetailsData,
+} from '../shared';
 
 interface SupportStepProps {
     data: ApplicationWizardData;
@@ -27,6 +30,7 @@ interface SupportStepProps {
     removeGuarantor: (index: number) => void;
     updateGuarantor: (index: number, field: keyof GuarantorDetails, value: string | File | null | boolean) => void;
     syncCoSignersFromOccupants: () => void;
+    propertyCountry?: string;
 }
 
 const RELATIONSHIP_OPTIONS = [
@@ -38,13 +42,6 @@ const RELATIONSHIP_OPTIONS = [
     { value: 'friend', label: 'Friend' },
     { value: 'employer', label: 'Employer' },
     { value: 'other', label: 'Other' },
-];
-
-const ID_DOCUMENT_TYPE_OPTIONS = [
-    { value: 'passport', label: 'Passport' },
-    { value: 'national_id', label: 'National ID Card' },
-    { value: 'drivers_license', label: "Driver's License" },
-    { value: 'residence_permit', label: 'Residence Permit' },
 ];
 
 const INSURANCE_OPTIONS = [
@@ -68,9 +65,13 @@ export function SupportStep({
     removeGuarantor,
     updateGuarantor,
     syncCoSignersFromOccupants,
+    propertyCountry,
 }: SupportStepProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.supportStep.${key}`);
+
+    // Check if property is in UK or Ireland (requires right-to-rent verification)
+    const requiresRightToRent = propertyCountry === 'GB' || propertyCountry === 'IE';
 
     // Collapsible section state (like HouseholdStep)
     const [expandedSections, setExpandedSections] = useState({
@@ -192,13 +193,6 @@ export function SupportStep({
         return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
 
-    // Get field class with error styling for guarantor fields
-    const getGuarantorFieldClass = (index: number, field: keyof GuarantorDetails) => {
-        const fieldKey = `guarantor_${index}_${field}`;
-        const hasError = touchedFields[fieldKey] && errors[fieldKey];
-        return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
-    };
-
     // Check if field has error
     const hasCoSignerError = (index: number, field: keyof CoSignerDetails) => {
         const fieldKey = `cosigner_${index}_${field}`;
@@ -263,175 +257,127 @@ export function SupportStep({
         [data.guarantors, updateGuarantor, errors, touchedFields],
     );
 
-    // Check if ID document back is required based on type
-    const requiresIdDocumentBack = (docType: string) => {
-        return ['national_id', 'drivers_license'].includes(docType);
-    };
+    // Build existing documents for co-signers from their stored paths
+    const getCoSignerExistingDocs = useCallback(
+        (coSigner: CoSignerDetails) => ({
+            id_document_front: coSigner.id_document_front_path || undefined,
+            id_document_back: coSigner.id_document_back_path || undefined,
+            employment_contract: coSigner.employment_contract_path || undefined,
+            payslip_1: coSigner.payslip_1_path || undefined,
+            payslip_2: coSigner.payslip_2_path || undefined,
+            payslip_3: coSigner.payslip_3_path || undefined,
+            student_proof: coSigner.student_proof_path || coSigner.enrollment_proof_path || undefined,
+            pension_statement: coSigner.pension_statement_path || undefined,
+            benefits_statement: coSigner.benefits_statement_path || undefined,
+            other_income_proof: coSigner.income_proof_path || undefined,
+        }),
+        [],
+    );
 
-    // Render financial documents for co-signers based on employment status
-    const renderCoSignerDocuments = useCallback(
-        (index: number) => (status: string) => {
-            const coSigner = data.co_signers[index];
-            if (!coSigner) return null;
+    // Build existing documents for guarantors from their stored paths
+    const getGuarantorExistingDocs = useCallback(
+        (guarantor: GuarantorDetails) => ({
+            id_document_front: guarantor.id_document_front_path || undefined,
+            id_document_back: guarantor.id_document_back_path || undefined,
+            employment_contract: undefined,
+            payslip_1: undefined,
+            payslip_2: undefined,
+            payslip_3: undefined,
+            proof_of_income: guarantor.proof_of_income_path || undefined,
+            other_income_proof: guarantor.proof_of_income_path || guarantor.income_proof_path || undefined,
+        }),
+        [],
+    );
 
-            switch (status) {
-                case 'employed':
-                    return (
-                        <div className="mt-4 grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="mb-1 block text-sm">{t('documents.employmentContract') || 'Employment Contract'}</label>
-                                <input
-                                    type="file"
-                                    accept="image/*,.pdf"
-                                    onChange={(e) => updateCoSigner(index, 'employment_contract', e.target.files?.[0] || null)}
-                                    onBlur={handleCoSignerFieldBlur(index, 'employment_contract')}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                                />
-                                {coSigner.employment_contract && (
-                                    <p className="mt-1 text-xs text-muted-foreground">Selected: {coSigner.employment_contract.name}</p>
-                                )}
-                                {hasCoSignerError(index, 'employment_contract') && (
-                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'employment_contract')}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm">{t('documents.payslips') || 'Recent Payslips'}</label>
-                                <input
-                                    type="file"
-                                    accept="image/*,.pdf"
-                                    multiple
-                                    onChange={(e) => {
-                                        const files = e.target.files ? Array.from(e.target.files) : [];
-                                        updateCoSigner(index, 'payslips', files.length > 0 ? files : null);
-                                    }}
-                                    onBlur={handleCoSignerFieldBlur(index, 'payslips')}
-                                    className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                                />
-                                {coSigner.payslips && coSigner.payslips.length > 0 && (
-                                    <p className="mt-1 text-xs text-muted-foreground">Selected: {coSigner.payslips.length} file(s)</p>
-                                )}
-                                {hasCoSignerError(index, 'payslips') && (
-                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'payslips')}</p>
-                                )}
-                            </div>
-                        </div>
-                    );
+    // Handle upload success for co-signer documents - update wizard state with path
+    const handleCoSignerUploadSuccess = useCallback(
+        (index: number, documentType: string, path: string) => {
+            // Map document types to path field names
+            const pathFieldMap: Record<string, keyof CoSignerDetails> = {
+                id_document_front: 'id_document_front_path',
+                id_document_back: 'id_document_back_path',
+                employment_contract: 'employment_contract_path',
+                payslip_1: 'payslip_1_path',
+                payslip_2: 'payslip_2_path',
+                payslip_3: 'payslip_3_path',
+                student_proof: 'student_proof_path',
+                pension_statement: 'pension_statement_path',
+                benefits_statement: 'benefits_statement_path',
+                income_proof: 'income_proof_path',
+                other_income_proof: 'income_proof_path',
+            };
 
-                case 'self_employed':
-                    return (
-                        <div className="mt-4">
-                            <label className="mb-1 block text-sm">{t('documents.incomeProof') || 'Proof of Income'}</label>
-                            <input
-                                type="file"
-                                accept="image/*,.pdf"
-                                onChange={(e) => updateCoSigner(index, 'income_proof', e.target.files?.[0] || null)}
-                                onBlur={handleCoSignerFieldBlur(index, 'income_proof')}
-                                className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                            />
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                {t('documents.selfEmployedHint') || 'Tax returns, bank statements, or accountant letter'}
-                            </p>
-                            {coSigner.income_proof && <p className="mt-1 text-xs text-muted-foreground">Selected: {coSigner.income_proof.name}</p>}
-                            {hasCoSignerError(index, 'income_proof') && (
-                                <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'income_proof')}</p>
-                            )}
-                        </div>
-                    );
+            // Strip the cosigner_N_ prefix to get the document type
+            const cleanType = documentType.replace(/^cosigner_\d+_/, '');
+            const pathField = pathFieldMap[cleanType];
 
-                case 'student':
-                    return (
-                        <div className="mt-4">
-                            <label className="mb-1 block text-sm">{t('documents.enrollmentProof') || 'Enrollment Proof'}</label>
-                            <input
-                                type="file"
-                                accept="image/*,.pdf"
-                                onChange={(e) => updateCoSigner(index, 'enrollment_proof', e.target.files?.[0] || null)}
-                                onBlur={handleCoSignerFieldBlur(index, 'enrollment_proof')}
-                                className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                            />
-                            {coSigner.enrollment_proof && (
-                                <p className="mt-1 text-xs text-muted-foreground">Selected: {coSigner.enrollment_proof.name}</p>
-                            )}
-                            {hasCoSignerError(index, 'enrollment_proof') && (
-                                <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'enrollment_proof')}</p>
-                            )}
-                        </div>
-                    );
-
-                case 'retired':
-                case 'unemployed':
-                case 'other':
-                    return (
-                        <div className="mt-4">
-                            <label className="mb-1 block text-sm">{t('documents.incomeProof') || 'Proof of Income'}</label>
-                            <input
-                                type="file"
-                                accept="image/*,.pdf"
-                                onChange={(e) => updateCoSigner(index, 'income_proof', e.target.files?.[0] || null)}
-                                onBlur={handleCoSignerFieldBlur(index, 'income_proof')}
-                                className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                            />
-                            {coSigner.income_proof && <p className="mt-1 text-xs text-muted-foreground">Selected: {coSigner.income_proof.name}</p>}
-                            {hasCoSignerError(index, 'income_proof') && (
-                                <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'income_proof')}</p>
-                            )}
-                        </div>
-                    );
-
-                default:
-                    return null;
+            if (pathField) {
+                updateCoSigner(index, pathField, path);
             }
         },
-        [data.co_signers, updateCoSigner, handleCoSignerFieldBlur, hasCoSignerError, getCoSignerError, t],
+        [updateCoSigner],
     );
 
-    // Render financial documents for guarantors (same regardless of employment status)
-    const renderGuarantorDocuments = useCallback(
-        (index: number) =>
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            (_status: string) => {
-                const guarantor = data.guarantors[index];
-                if (!guarantor) return null;
+    // Handle upload success for guarantor documents - update wizard state with path
+    const handleGuarantorUploadSuccess = useCallback(
+        (index: number, documentType: string, path: string) => {
+            // Map document types to path field names
+            const pathFieldMap: Record<string, keyof GuarantorDetails> = {
+                id_document_front: 'id_document_front_path',
+                id_document_back: 'id_document_back_path',
+                proof_of_income: 'proof_of_income_path',
+                proof_of_residence: 'proof_of_residence_path',
+                credit_report: 'credit_report_path',
+            };
 
-                return (
-                    <div className="mt-4 grid gap-4 md:grid-cols-2">
-                        <div>
-                            <label className="mb-1 block text-sm">{t('documents.proofOfIncome') || 'Proof of Income'}</label>
-                            <input
-                                type="file"
-                                accept="image/*,.pdf"
-                                onChange={(e) => updateGuarantor(index, 'proof_of_income', e.target.files?.[0] || null)}
-                                onBlur={handleGuarantorFieldBlur(index, 'proof_of_income')}
-                                className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                            />
-                            {guarantor.proof_of_income && (
-                                <p className="mt-1 text-xs text-muted-foreground">Selected: {guarantor.proof_of_income.name}</p>
-                            )}
-                            {hasGuarantorError(index, 'proof_of_income') && (
-                                <p className="mt-1 text-sm text-destructive">{getGuarantorError(index, 'proof_of_income')}</p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="mb-1 flex items-center gap-2 text-sm">
-                                {t('documents.creditReport') || 'Credit Report'}
-                                <OptionalBadge />
-                            </label>
-                            <input
-                                type="file"
-                                accept="image/*,.pdf"
-                                onChange={(e) => updateGuarantor(index, 'credit_report', e.target.files?.[0] || null)}
-                                onBlur={handleGuarantorFieldBlur(index, 'credit_report')}
-                                className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                            />
-                            {guarantor.credit_report && (
-                                <p className="mt-1 text-xs text-muted-foreground">Selected: {guarantor.credit_report.name}</p>
-                            )}
-                        </div>
-                    </div>
-                );
-            },
-        [data.guarantors, updateGuarantor, handleGuarantorFieldBlur, hasGuarantorError, getGuarantorError, t],
+            // Strip the guarantor_N_ prefix to get the document type
+            const cleanType = documentType.replace(/^guarantor_\d+_/, '');
+            const pathField = pathFieldMap[cleanType];
+
+            if (pathField) {
+                updateGuarantor(index, pathField, path);
+            }
+        },
+        [updateGuarantor],
     );
+
+    // Build co-signer personal details data for PersonalDetailsSection
+    const getCoSignerPersonalData = (coSigner: CoSignerDetails): PersonalDetailsData => ({
+        first_name: coSigner.first_name,
+        last_name: coSigner.last_name,
+        email: coSigner.email,
+        date_of_birth: coSigner.date_of_birth,
+        nationality: coSigner.nationality,
+        phone_number: coSigner.phone_number,
+        phone_country_code: coSigner.phone_country_code,
+    });
+
+    // Build co-signer ID document data for IdDocumentSection
+    const getCoSignerIdDocData = (coSigner: CoSignerDetails): IdDocumentData => ({
+        id_document_type: coSigner.id_document_type,
+        id_number: coSigner.id_number,
+        id_issuing_country: coSigner.id_issuing_country,
+        id_expiry_date: coSigner.id_expiry_date,
+    });
+
+    // Build guarantor personal details data for PersonalDetailsSection
+    const getGuarantorPersonalData = (guarantor: GuarantorDetails): PersonalDetailsData => ({
+        first_name: guarantor.first_name,
+        last_name: guarantor.last_name,
+        email: guarantor.email,
+        date_of_birth: guarantor.date_of_birth,
+        nationality: guarantor.nationality,
+        phone_number: guarantor.phone_number,
+        phone_country_code: guarantor.phone_country_code,
+    });
+
+    // Build guarantor ID document data for IdDocumentSection
+    const getGuarantorIdDocData = (guarantor: GuarantorDetails): IdDocumentData => ({
+        id_document_type: guarantor.id_document_type,
+        id_number: guarantor.id_number,
+        id_issuing_country: guarantor.id_issuing_country,
+        id_expiry_date: guarantor.id_expiry_date,
+    });
 
     return (
         <div className="space-y-6">
@@ -476,6 +422,7 @@ export function SupportStep({
                         {data.co_signers.map((coSigner, index) => {
                             const isFromOccupant = coSigner.from_occupant_index !== null;
                             const handlers = createCoSignerHandlers(index);
+                            const fieldPrefix = `cosigner_${index}_`;
 
                             return (
                                 <div key={index} className="rounded-lg border border-border p-4">
@@ -508,101 +455,28 @@ export function SupportStep({
 
                                     {/* Personal Details Section */}
                                     <div className="space-y-4">
-                                        <h5 className="text-sm font-medium text-muted-foreground">Personal Details</h5>
+                                        <h5 className="text-sm font-medium text-muted-foreground">
+                                            {translate(translations, 'wizard.application.shared.personalDetails.title') || 'Personal Details'}
+                                        </h5>
+                                        <PersonalDetailsSection
+                                            data={getCoSignerPersonalData(coSigner)}
+                                            onChange={(field, value) => updateCoSigner(index, field as keyof CoSignerDetails, value)}
+                                            onBlur={onBlur}
+                                            errors={errors}
+                                            touchedFields={touchedFields}
+                                            fieldPrefix={fieldPrefix}
+                                            translations={translations}
+                                            disabledFields={{
+                                                first_name: isFromOccupant,
+                                                last_name: isFromOccupant,
+                                                date_of_birth: isFromOccupant,
+                                            }}
+                                        />
+
+                                        {/* Relationship - not in shared component */}
                                         <div className="grid gap-4 md:grid-cols-2">
-                                            {/* First Name, Last Name */}
                                             <div>
-                                                <label className="mb-1 block text-sm">{t('fields.firstName') || 'First Name'}</label>
-                                                <input
-                                                    type="text"
-                                                    value={coSigner.first_name}
-                                                    onChange={(e) => updateCoSigner(index, 'first_name', e.target.value)}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'first_name')}
-                                                    disabled={isFromOccupant}
-                                                    aria-invalid={!!hasCoSignerError(index, 'first_name')}
-                                                    className={getCoSignerFieldClass(index, 'first_name', isFromOccupant)}
-                                                />
-                                                {hasCoSignerError(index, 'first_name') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'first_name')}</p>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.lastName') || 'Last Name'}</label>
-                                                <input
-                                                    type="text"
-                                                    value={coSigner.last_name}
-                                                    onChange={(e) => updateCoSigner(index, 'last_name', e.target.value)}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'last_name')}
-                                                    disabled={isFromOccupant}
-                                                    aria-invalid={!!hasCoSignerError(index, 'last_name')}
-                                                    className={getCoSignerFieldClass(index, 'last_name', isFromOccupant)}
-                                                />
-                                                {hasCoSignerError(index, 'last_name') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'last_name')}</p>
-                                                )}
-                                            </div>
-
-                                            {/* Date of Birth, Nationality */}
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.dateOfBirth') || 'Date of Birth'}</label>
-                                                <DatePicker
-                                                    value={coSigner.date_of_birth}
-                                                    onChange={(value) => updateCoSigner(index, 'date_of_birth', value || '')}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'date_of_birth')}
-                                                    restriction="past"
-                                                    disabled={isFromOccupant}
-                                                    aria-invalid={!!hasCoSignerError(index, 'date_of_birth')}
-                                                    error={
-                                                        hasCoSignerError(index, 'date_of_birth')
-                                                            ? getCoSignerError(index, 'date_of_birth')
-                                                            : undefined
-                                                    }
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.nationality') || 'Nationality'}</label>
-                                                <NationalitySelect
-                                                    value={coSigner.nationality}
-                                                    onChange={(value) => updateCoSigner(index, 'nationality', value)}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'nationality')}
-                                                    aria-invalid={!!hasCoSignerError(index, 'nationality')}
-                                                    error={getCoSignerError(index, 'nationality')}
-                                                />
-                                            </div>
-
-                                            {/* Email, Phone */}
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.email') || 'Email'}</label>
-                                                <input
-                                                    type="email"
-                                                    value={coSigner.email}
-                                                    onChange={(e) => updateCoSigner(index, 'email', e.target.value)}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'email')}
-                                                    aria-invalid={!!hasCoSignerError(index, 'email')}
-                                                    className={getCoSignerFieldClass(index, 'email')}
-                                                />
-                                                {hasCoSignerError(index, 'email') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'email')}</p>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.phone') || 'Phone Number'}</label>
-                                                <PhoneInput
-                                                    value={coSigner.phone_number}
-                                                    countryCode={coSigner.phone_country_code}
-                                                    onChange={(phoneNumber, countryCode) => {
-                                                        updateCoSigner(index, 'phone_number', phoneNumber);
-                                                        updateCoSigner(index, 'phone_country_code', countryCode);
-                                                    }}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'phone_number')}
-                                                    aria-invalid={!!hasCoSignerError(index, 'phone_number')}
-                                                    error={getCoSignerError(index, 'phone_number')}
-                                                />
-                                            </div>
-
-                                            {/* Relationship */}
-                                            <div>
-                                                <label className="mb-1 block text-sm">
+                                                <label className="mb-1 block text-sm font-medium">
                                                     {t('fields.relationship') || 'Relationship to Applicant'}
                                                 </label>
                                                 <SimpleSelect
@@ -612,14 +486,15 @@ export function SupportStep({
                                                     placeholder={t('placeholders.selectRelationship') || 'Select relationship'}
                                                     onBlur={handleCoSignerFieldBlur(index, 'relationship')}
                                                     aria-invalid={!!hasCoSignerError(index, 'relationship')}
+                                                    error={getCoSignerError(index, 'relationship')}
+                                                    disabled={isFromOccupant}
                                                 />
-                                                {hasCoSignerError(index, 'relationship') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'relationship')}</p>
-                                                )}
                                             </div>
-                                            {coSigner.relationship === 'other' && (
+                                            {coSigner.relationship === 'other' && !isFromOccupant && (
                                                 <div>
-                                                    <label className="mb-1 block text-sm">{t('fields.relationshipOther') || 'Please Specify'}</label>
+                                                    <label className="mb-1 block text-sm font-medium">
+                                                        {t('fields.relationshipOther') || 'Please Specify'}
+                                                    </label>
                                                     <input
                                                         type="text"
                                                         value={coSigner.relationship_other}
@@ -641,92 +516,31 @@ export function SupportStep({
 
                                     {/* ID Document Section */}
                                     <div className="mt-6 border-t border-border pt-4">
-                                        <h5 className="mb-4 text-sm font-medium text-muted-foreground">ID Document</h5>
-                                        <div className="grid gap-4 md:grid-cols-2">
-                                            <div>
-                                                <label className="mb-1 block text-sm">Document Type</label>
-                                                <SimpleSelect
-                                                    value={coSigner.id_document_type}
-                                                    onChange={(value) => updateCoSigner(index, 'id_document_type', value)}
-                                                    options={ID_DOCUMENT_TYPE_OPTIONS}
-                                                    placeholder="Select document type"
-                                                    onBlur={handleCoSignerFieldBlur(index, 'id_document_type')}
-                                                    aria-invalid={!!hasCoSignerError(index, 'id_document_type')}
-                                                />
-                                                {hasCoSignerError(index, 'id_document_type') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'id_document_type')}</p>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">ID Number</label>
-                                                <input
-                                                    type="text"
-                                                    value={coSigner.id_number}
-                                                    onChange={(e) => updateCoSigner(index, 'id_number', e.target.value)}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'id_number')}
-                                                    placeholder="Enter ID number"
-                                                    aria-invalid={!!hasCoSignerError(index, 'id_number')}
-                                                    className={getCoSignerFieldClass(index, 'id_number')}
-                                                />
-                                                {hasCoSignerError(index, 'id_number') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'id_number')}</p>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">Issuing Country</label>
-                                                <NationalitySelect
-                                                    value={coSigner.id_issuing_country}
-                                                    onChange={(value) => updateCoSigner(index, 'id_issuing_country', value)}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'id_issuing_country')}
-                                                    aria-invalid={!!hasCoSignerError(index, 'id_issuing_country')}
-                                                    error={getCoSignerError(index, 'id_issuing_country')}
-                                                    placeholder="Select issuing country"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">Expiry Date</label>
-                                                <DatePicker
-                                                    value={coSigner.id_expiry_date}
-                                                    onChange={(value) => updateCoSigner(index, 'id_expiry_date', value || '')}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'id_expiry_date')}
-                                                    restriction="strictFuture"
-                                                    aria-invalid={!!hasCoSignerError(index, 'id_expiry_date')}
-                                                    error={
-                                                        hasCoSignerError(index, 'id_expiry_date')
-                                                            ? getCoSignerError(index, 'id_expiry_date')
-                                                            : undefined
-                                                    }
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">Document Front</label>
-                                                <input
-                                                    type="file"
-                                                    accept="image/*,.pdf"
-                                                    onChange={(e) => updateCoSigner(index, 'id_document_front', e.target.files?.[0] || null)}
-                                                    onBlur={handleCoSignerFieldBlur(index, 'id_document_front')}
-                                                    className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                                                />
-                                                {hasCoSignerError(index, 'id_document_front') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'id_document_front')}</p>
-                                                )}
-                                            </div>
-                                            {requiresIdDocumentBack(coSigner.id_document_type) && (
-                                                <div>
-                                                    <label className="mb-1 block text-sm">Document Back</label>
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*,.pdf"
-                                                        onChange={(e) => updateCoSigner(index, 'id_document_back', e.target.files?.[0] || null)}
-                                                        onBlur={handleCoSignerFieldBlur(index, 'id_document_back')}
-                                                        className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                                                    />
-                                                    {hasCoSignerError(index, 'id_document_back') && (
-                                                        <p className="mt-1 text-sm text-destructive">{getCoSignerError(index, 'id_document_back')}</p>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <h5 className="mb-4 text-sm font-medium text-muted-foreground">
+                                            {translate(translations, 'wizard.application.shared.idDocument.title') || 'ID Document'}
+                                        </h5>
+                                        <IdDocumentSection
+                                            data={getCoSignerIdDocData(coSigner)}
+                                            onChange={(field, value) => updateCoSigner(index, field as keyof CoSignerDetails, value)}
+                                            onBlur={onBlur}
+                                            errors={errors}
+                                            touchedFields={touchedFields}
+                                            fieldPrefix={fieldPrefix}
+                                            translations={translations}
+                                            uploadUrl={`/applications/${data.id}/co-signer/${index}/document/upload`}
+                                            documentTypePrefix={fieldPrefix}
+                                            existingDocuments={{
+                                                id_document_front: coSigner.id_document_front_path,
+                                                id_document_back: coSigner.id_document_back_path,
+                                            }}
+                                            onUploadSuccess={(file) => {
+                                                if (file.documentType?.includes('id_document_front')) {
+                                                    updateCoSigner(index, 'id_document_front_path', file.path);
+                                                } else if (file.documentType?.includes('id_document_back')) {
+                                                    updateCoSigner(index, 'id_document_back_path', file.path);
+                                                }
+                                            }}
+                                        />
                                     </div>
 
                                     {/* Address Section */}
@@ -775,7 +589,10 @@ export function SupportStep({
                                             getError={handlers.getError}
                                             isTouched={handlers.isTouched}
                                             onBlur={onBlur}
-                                            renderDocuments={renderCoSignerDocuments(index)}
+                                            uploadUrl={`/applications/${data.id}/co-signer/${index}/document/upload`}
+                                            documentTypePrefix={`cosigner_${index}_`}
+                                            existingDocuments={getCoSignerExistingDocs(coSigner)}
+                                            onUploadSuccess={(docType, path) => handleCoSignerUploadSuccess(index, docType, path)}
                                         />
                                     </div>
                                 </div>
@@ -823,6 +640,7 @@ export function SupportStep({
 
                         {data.guarantors.map((guarantor, index) => {
                             const handlers = createGuarantorHandlers(index);
+                            const fieldPrefix = `guarantor_${index}_`;
 
                             return (
                                 <div key={index} className="rounded-lg border border-border p-4">
@@ -844,98 +662,23 @@ export function SupportStep({
 
                                     {/* Personal Details Section */}
                                     <div className="space-y-4">
-                                        <h5 className="text-sm font-medium text-muted-foreground">Personal Details</h5>
+                                        <h5 className="text-sm font-medium text-muted-foreground">
+                                            {translate(translations, 'wizard.application.shared.personalDetails.title') || 'Personal Details'}
+                                        </h5>
+                                        <PersonalDetailsSection
+                                            data={getGuarantorPersonalData(guarantor)}
+                                            onChange={(field, value) => updateGuarantor(index, field as keyof GuarantorDetails, value)}
+                                            onBlur={onBlur}
+                                            errors={errors}
+                                            touchedFields={touchedFields}
+                                            fieldPrefix={fieldPrefix}
+                                            translations={translations}
+                                        />
+
+                                        {/* Relationship - not in shared component */}
                                         <div className="grid gap-4 md:grid-cols-2">
-                                            {/* First Name, Last Name */}
                                             <div>
-                                                <label className="mb-1 block text-sm">{t('fields.firstName') || 'First Name'}</label>
-                                                <input
-                                                    type="text"
-                                                    value={guarantor.first_name}
-                                                    onChange={(e) => updateGuarantor(index, 'first_name', e.target.value)}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'first_name')}
-                                                    aria-invalid={!!hasGuarantorError(index, 'first_name')}
-                                                    className={getGuarantorFieldClass(index, 'first_name')}
-                                                />
-                                                {hasGuarantorError(index, 'first_name') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getGuarantorError(index, 'first_name')}</p>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.lastName') || 'Last Name'}</label>
-                                                <input
-                                                    type="text"
-                                                    value={guarantor.last_name}
-                                                    onChange={(e) => updateGuarantor(index, 'last_name', e.target.value)}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'last_name')}
-                                                    aria-invalid={!!hasGuarantorError(index, 'last_name')}
-                                                    className={getGuarantorFieldClass(index, 'last_name')}
-                                                />
-                                                {hasGuarantorError(index, 'last_name') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getGuarantorError(index, 'last_name')}</p>
-                                                )}
-                                            </div>
-
-                                            {/* Date of Birth, Nationality */}
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.dateOfBirth') || 'Date of Birth'}</label>
-                                                <DatePicker
-                                                    value={guarantor.date_of_birth}
-                                                    onChange={(value) => updateGuarantor(index, 'date_of_birth', value || '')}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'date_of_birth')}
-                                                    restriction="past"
-                                                    aria-invalid={!!hasGuarantorError(index, 'date_of_birth')}
-                                                    error={
-                                                        hasGuarantorError(index, 'date_of_birth')
-                                                            ? getGuarantorError(index, 'date_of_birth')
-                                                            : undefined
-                                                    }
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.nationality') || 'Nationality'}</label>
-                                                <NationalitySelect
-                                                    value={guarantor.nationality}
-                                                    onChange={(value) => updateGuarantor(index, 'nationality', value)}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'nationality')}
-                                                    aria-invalid={!!hasGuarantorError(index, 'nationality')}
-                                                    error={getGuarantorError(index, 'nationality')}
-                                                />
-                                            </div>
-
-                                            {/* Email, Phone */}
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.email') || 'Email'}</label>
-                                                <input
-                                                    type="email"
-                                                    value={guarantor.email}
-                                                    onChange={(e) => updateGuarantor(index, 'email', e.target.value)}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'email')}
-                                                    aria-invalid={!!hasGuarantorError(index, 'email')}
-                                                    className={getGuarantorFieldClass(index, 'email')}
-                                                />
-                                                {hasGuarantorError(index, 'email') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getGuarantorError(index, 'email')}</p>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">{t('fields.phone') || 'Phone Number'}</label>
-                                                <PhoneInput
-                                                    value={guarantor.phone_number}
-                                                    countryCode={guarantor.phone_country_code}
-                                                    onChange={(phoneNumber, countryCode) => {
-                                                        updateGuarantor(index, 'phone_number', phoneNumber);
-                                                        updateGuarantor(index, 'phone_country_code', countryCode);
-                                                    }}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'phone_number')}
-                                                    aria-invalid={!!hasGuarantorError(index, 'phone_number')}
-                                                    error={getGuarantorError(index, 'phone_number')}
-                                                />
-                                            </div>
-
-                                            {/* Relationship */}
-                                            <div>
-                                                <label className="mb-1 block text-sm">
+                                                <label className="mb-1 block text-sm font-medium">
                                                     {t('fields.relationship') || 'Relationship to Applicant'}
                                                 </label>
                                                 <SimpleSelect
@@ -945,14 +688,14 @@ export function SupportStep({
                                                     placeholder={t('placeholders.selectRelationship') || 'Select relationship'}
                                                     onBlur={handleGuarantorFieldBlur(index, 'relationship')}
                                                     aria-invalid={!!hasGuarantorError(index, 'relationship')}
+                                                    error={getGuarantorError(index, 'relationship')}
                                                 />
-                                                {hasGuarantorError(index, 'relationship') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getGuarantorError(index, 'relationship')}</p>
-                                                )}
                                             </div>
                                             {guarantor.relationship === 'other' && (
                                                 <div>
-                                                    <label className="mb-1 block text-sm">{t('fields.relationshipOther') || 'Please Specify'}</label>
+                                                    <label className="mb-1 block text-sm font-medium">
+                                                        {t('fields.relationshipOther') || 'Please Specify'}
+                                                    </label>
                                                     <input
                                                         type="text"
                                                         value={guarantor.relationship_other}
@@ -960,7 +703,7 @@ export function SupportStep({
                                                         onBlur={handleGuarantorFieldBlur(index, 'relationship_other')}
                                                         placeholder={t('placeholders.specifyRelationship') || 'Specify relationship'}
                                                         aria-invalid={!!hasGuarantorError(index, 'relationship_other')}
-                                                        className={getGuarantorFieldClass(index, 'relationship_other')}
+                                                        className={`w-full rounded-lg border px-4 py-2 ${hasGuarantorError(index, 'relationship_other') ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                                     />
                                                     {hasGuarantorError(index, 'relationship_other') && (
                                                         <p className="mt-1 text-sm text-destructive">
@@ -974,95 +717,35 @@ export function SupportStep({
 
                                     {/* ID Document Section */}
                                     <div className="mt-6 border-t border-border pt-4">
-                                        <h5 className="mb-4 text-sm font-medium text-muted-foreground">ID Document</h5>
-                                        <div className="grid gap-4 md:grid-cols-2">
-                                            <div>
-                                                <label className="mb-1 block text-sm">Document Type</label>
-                                                <SimpleSelect
-                                                    value={guarantor.id_document_type}
-                                                    onChange={(value) => updateGuarantor(index, 'id_document_type', value)}
-                                                    options={ID_DOCUMENT_TYPE_OPTIONS}
-                                                    placeholder="Select document type"
-                                                    onBlur={handleGuarantorFieldBlur(index, 'id_document_type')}
-                                                    aria-invalid={!!hasGuarantorError(index, 'id_document_type')}
-                                                />
-                                                {hasGuarantorError(index, 'id_document_type') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getGuarantorError(index, 'id_document_type')}</p>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">ID Number</label>
-                                                <input
-                                                    type="text"
-                                                    value={guarantor.id_number}
-                                                    onChange={(e) => updateGuarantor(index, 'id_number', e.target.value)}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'id_number')}
-                                                    placeholder="Enter ID number"
-                                                    aria-invalid={!!hasGuarantorError(index, 'id_number')}
-                                                    className={getGuarantorFieldClass(index, 'id_number')}
-                                                />
-                                                {hasGuarantorError(index, 'id_number') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getGuarantorError(index, 'id_number')}</p>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">Issuing Country</label>
-                                                <NationalitySelect
-                                                    value={guarantor.id_issuing_country}
-                                                    onChange={(value) => updateGuarantor(index, 'id_issuing_country', value)}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'id_issuing_country')}
-                                                    aria-invalid={!!hasGuarantorError(index, 'id_issuing_country')}
-                                                    error={getGuarantorError(index, 'id_issuing_country')}
-                                                    placeholder="Select issuing country"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">Expiry Date</label>
-                                                <DatePicker
-                                                    value={guarantor.id_expiry_date}
-                                                    onChange={(value) => updateGuarantor(index, 'id_expiry_date', value || '')}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'id_expiry_date')}
-                                                    restriction="strictFuture"
-                                                    aria-invalid={!!hasGuarantorError(index, 'id_expiry_date')}
-                                                    error={
-                                                        hasGuarantorError(index, 'id_expiry_date')
-                                                            ? getGuarantorError(index, 'id_expiry_date')
-                                                            : undefined
-                                                    }
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm">Document Front</label>
-                                                <input
-                                                    type="file"
-                                                    accept="image/*,.pdf"
-                                                    onChange={(e) => updateGuarantor(index, 'id_document_front', e.target.files?.[0] || null)}
-                                                    onBlur={handleGuarantorFieldBlur(index, 'id_document_front')}
-                                                    className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                                                />
-                                                {hasGuarantorError(index, 'id_document_front') && (
-                                                    <p className="mt-1 text-sm text-destructive">{getGuarantorError(index, 'id_document_front')}</p>
-                                                )}
-                                            </div>
-                                            {requiresIdDocumentBack(guarantor.id_document_type) && (
-                                                <div>
-                                                    <label className="mb-1 block text-sm">Document Back</label>
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*,.pdf"
-                                                        onChange={(e) => updateGuarantor(index, 'id_document_back', e.target.files?.[0] || null)}
-                                                        onBlur={handleGuarantorFieldBlur(index, 'id_document_back')}
-                                                        className="w-full rounded-lg border border-border bg-background px-4 py-2 file:mr-4 file:rounded file:border-0 file:bg-primary/10 file:px-4 file:py-1 file:text-sm file:text-primary"
-                                                    />
-                                                    {hasGuarantorError(index, 'id_document_back') && (
-                                                        <p className="mt-1 text-sm text-destructive">
-                                                            {getGuarantorError(index, 'id_document_back')}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <h5 className="mb-4 text-sm font-medium text-muted-foreground">
+                                            {translate(translations, 'wizard.application.shared.idDocument.title') || 'ID Document'}
+                                        </h5>
+                                        <IdDocumentSection
+                                            data={getGuarantorIdDocData(guarantor)}
+                                            onChange={(field, value) => updateGuarantor(index, field as keyof GuarantorDetails, value)}
+                                            onBlur={onBlur}
+                                            errors={errors}
+                                            touchedFields={touchedFields}
+                                            fieldPrefix={fieldPrefix}
+                                            translations={translations}
+                                            uploadUrl={`/applications/${data.id}/guarantor/${index}/document/upload`}
+                                            documentTypePrefix={fieldPrefix}
+                                            existingDocuments={{
+                                                id_document_front: guarantor.id_document_front_path,
+                                                id_document_back: guarantor.id_document_back_path,
+                                            }}
+                                            onUploadSuccess={(file) => {
+                                                if (file.documentType?.includes('id_document_front')) {
+                                                    updateGuarantor(index, 'id_document_front_path', file.path);
+                                                } else if (file.documentType?.includes('id_document_back')) {
+                                                    updateGuarantor(index, 'id_document_back_path', file.path);
+                                                }
+                                            }}
+                                        />
                                     </div>
+
+                                    {/* NOTE: Guarantors do NOT get Immigration Status or Right to Rent sections
+                                        because they don't occupy the property */}
 
                                     {/* Address Section */}
                                     <div className="mt-6 border-t border-border pt-4">
@@ -1110,7 +793,10 @@ export function SupportStep({
                                             getError={handlers.getError}
                                             isTouched={handlers.isTouched}
                                             onBlur={onBlur}
-                                            renderDocuments={renderGuarantorDocuments(index)}
+                                            uploadUrl={`/applications/${data.id}/guarantor/${index}/document/upload`}
+                                            documentTypePrefix={`guarantor_${index}_`}
+                                            existingDocuments={getGuarantorExistingDocs(guarantor)}
+                                            onUploadSuccess={(docType, path) => handleGuarantorUploadSuccess(index, docType, path)}
                                         />
                                     </div>
                                 </div>

@@ -513,6 +513,13 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
     Route::delete('properties/{property}/apply/document', [\App\Http\Controllers\ApplicationController::class, 'removeDocument'])
         ->name('applications.remove-document');
 
+    // Co-signer and Guarantor document uploads
+    Route::post('applications/{application}/co-signer/{index}/document/upload', [\App\Http\Controllers\ApplicationController::class, 'uploadCoSignerDocument'])
+        ->name('applications.upload-cosigner-document');
+
+    Route::post('applications/{application}/guarantor/{index}/document/upload', [\App\Http\Controllers\ApplicationController::class, 'uploadGuarantorDocument'])
+        ->name('applications.upload-guarantor-document');
+
     Route::get('applications/{application}', [\App\Http\Controllers\ApplicationController::class, 'show'])
         ->name('applications.show');
 

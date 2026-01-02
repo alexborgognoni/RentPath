@@ -40,10 +40,6 @@ class ApplicationCoSigner extends Model
         'id_document_front_original_name',
         'id_document_back_path',
         'id_document_back_original_name',
-        // Immigration
-        'immigration_status',
-        'visa_type',
-        'visa_expiry_date',
         // Employment
         'employment_status',
         'employment_status_other',
@@ -55,20 +51,34 @@ class ApplicationCoSigner extends Model
         // Financial
         'net_monthly_income',
         'income_currency',
-        // Documents
+        // Documents - Employment
         'employment_contract_path',
         'employment_contract_original_name',
         'payslips_paths',
+        'payslip_1_path',
+        'payslip_1_original_name',
+        'payslip_2_path',
+        'payslip_2_original_name',
+        'payslip_3_path',
+        'payslip_3_original_name',
         // Student
         'university_name',
         'enrollment_proof_path',
         'enrollment_proof_original_name',
+        'student_proof_path',
+        'student_proof_original_name',
         'student_income_source',
         'student_monthly_income',
         // Other income
         'income_source',
         'income_proof_path',
         'income_proof_original_name',
+        // Pension (retired)
+        'pension_statement_path',
+        'pension_statement_original_name',
+        // Benefits (unemployed)
+        'benefits_statement_path',
+        'benefits_statement_original_name',
     ];
 
     /**
@@ -81,7 +91,6 @@ class ApplicationCoSigner extends Model
         return [
             'date_of_birth' => 'date',
             'id_expiry_date' => 'date',
-            'visa_expiry_date' => 'date',
             'employment_start_date' => 'date',
             'net_monthly_income' => 'decimal:2',
             'student_monthly_income' => 'decimal:2',

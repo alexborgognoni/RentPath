@@ -138,10 +138,9 @@ export interface CoSignerDetails {
     id_expiry_date: string;
     id_document_front: File | null;
     id_document_back: File | null;
-    // Immigration (optional)
-    immigration_status: string;
-    visa_type: string;
-    visa_expiry_date: string;
+    // Document paths (populated from server after upload or from existing data)
+    id_document_front_path?: string;
+    id_document_back_path?: string;
     // Financial
     employment_status: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired' | 'other' | '';
     employment_status_other: string;
@@ -153,14 +152,24 @@ export interface CoSignerDetails {
     income_currency: string;
     employment_contract: File | null;
     payslips: File[];
+    // Document paths (populated from server)
+    employment_contract_path?: string;
+    payslip_1_path?: string;
+    payslip_2_path?: string;
+    payslip_3_path?: string;
     // Student specific
     university_name: string;
     enrollment_proof: File | null;
+    enrollment_proof_path?: string;
+    student_proof_path?: string;
     student_income_source: string;
     student_monthly_income: string;
     // Unemployed/retired specific
     income_source: string;
     income_proof: File | null;
+    income_proof_path?: string;
+    pension_statement_path?: string;
+    benefits_statement_path?: string;
     // Address (matching AddressForm component)
     street_name: string;
     house_number: string;
@@ -192,6 +201,9 @@ export interface GuarantorDetails {
     id_expiry_date: string;
     id_document_front: File | null;
     id_document_back: File | null;
+    // Document paths (populated from server)
+    id_document_front_path?: string;
+    id_document_back_path?: string;
     // Address (matching AddressForm component)
     street_name: string;
     house_number: string;
@@ -202,6 +214,7 @@ export interface GuarantorDetails {
     country: string;
     years_at_address: string;
     proof_of_residence: File | null;
+    proof_of_residence_path?: string;
     // Financial (same options as tenant)
     employment_status: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired' | 'other' | '';
     employer_name: string;
@@ -209,7 +222,10 @@ export interface GuarantorDetails {
     net_monthly_income: string;
     income_currency: string;
     proof_of_income: File | null;
+    proof_of_income_path?: string;
+    income_proof_path?: string;
     credit_report: File | null;
+    credit_report_path?: string;
     // Consent & Legal
     consent_to_credit_check: boolean;
     consent_to_contact: boolean;
@@ -662,8 +678,105 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_additional_income_sources: tp?.additional_income_sources || [],
 
         // ===== Step 4: Risk Mitigation =====
-        co_signers: [],
-        guarantors: [],
+        // Load co-signers from draft with document paths
+        co_signers: (draft?.coSigners || []).map((cs: Record<string, unknown>) => ({
+            from_occupant_index: cs.from_occupant_index ?? null,
+            first_name: (cs.first_name as string) || '',
+            last_name: (cs.last_name as string) || '',
+            email: (cs.email as string) || '',
+            phone_country_code: (cs.phone_country_code as string) || '+31',
+            phone_number: (cs.phone_number as string) || '',
+            date_of_birth: cs.date_of_birth ? formatDateForInput(cs.date_of_birth) : '',
+            nationality: (cs.nationality as string) || '',
+            relationship: (cs.relationship as string) || '',
+            relationship_other: (cs.relationship_other as string) || '',
+            id_document_type: (cs.id_document_type as CoSignerDetails['id_document_type']) || '',
+            id_number: (cs.id_number as string) || '',
+            id_issuing_country: (cs.id_issuing_country as string) || '',
+            id_expiry_date: cs.id_expiry_date ? formatDateForInput(cs.id_expiry_date) : '',
+            id_document_front: null,
+            id_document_back: null,
+            id_document_front_path: cs.id_document_front_path as string | undefined,
+            id_document_back_path: cs.id_document_back_path as string | undefined,
+            employment_status: (cs.employment_status as CoSignerDetails['employment_status']) || 'employed',
+            employment_status_other: (cs.employment_status_other as string) || '',
+            employer_name: (cs.employer_name as string) || '',
+            job_title: (cs.job_title as string) || '',
+            employment_type: (cs.employment_type as CoSignerDetails['employment_type']) || '',
+            employment_start_date: cs.employment_start_date ? formatDateForInput(cs.employment_start_date) : '',
+            net_monthly_income: (cs.net_monthly_income as string) || '',
+            income_currency: (cs.income_currency as string) || 'eur',
+            employment_contract: null,
+            employment_contract_path: cs.employment_contract_path as string | undefined,
+            payslips: [],
+            payslip_1_path: cs.payslip_1_path as string | undefined,
+            payslip_2_path: cs.payslip_2_path as string | undefined,
+            payslip_3_path: cs.payslip_3_path as string | undefined,
+            university_name: (cs.university_name as string) || '',
+            enrollment_proof: null,
+            enrollment_proof_path: cs.enrollment_proof_path as string | undefined,
+            student_proof_path: cs.student_proof_path as string | undefined,
+            student_income_source: (cs.student_income_source as string) || '',
+            student_monthly_income: (cs.student_monthly_income as string) || '',
+            income_source: (cs.income_source as string) || '',
+            income_proof: null,
+            income_proof_path: cs.income_proof_path as string | undefined,
+            pension_statement_path: cs.pension_statement_path as string | undefined,
+            benefits_statement_path: cs.benefits_statement_path as string | undefined,
+            street_name: (cs.street_name as string) || '',
+            house_number: (cs.house_number as string) || '',
+            address_line_2: (cs.address_line_2 as string) || '',
+            city: (cs.city as string) || '',
+            state_province: (cs.state_province as string) || '',
+            postal_code: (cs.postal_code as string) || '',
+            country: (cs.country as string) || '',
+        } as CoSignerDetails)),
+        // Load guarantors from draft with document paths
+        guarantors: (draft?.guarantors || []).map((g: Record<string, unknown>) => ({
+            for_signer_type: (g.for_signer_type as GuarantorDetails['for_signer_type']) || 'primary',
+            for_co_signer_index: g.for_co_signer_index as number | null,
+            first_name: (g.first_name as string) || '',
+            last_name: (g.last_name as string) || '',
+            email: (g.email as string) || '',
+            phone_country_code: (g.phone_country_code as string) || '+31',
+            phone_number: (g.phone_number as string) || '',
+            date_of_birth: g.date_of_birth ? formatDateForInput(g.date_of_birth) : '',
+            nationality: (g.nationality as string) || '',
+            relationship: (g.relationship as string) || '',
+            relationship_other: (g.relationship_other as string) || '',
+            id_document_type: (g.id_document_type as GuarantorDetails['id_document_type']) || '',
+            id_number: (g.id_number as string) || '',
+            id_issuing_country: (g.id_issuing_country as string) || '',
+            id_expiry_date: g.id_expiry_date ? formatDateForInput(g.id_expiry_date) : '',
+            id_document_front: null,
+            id_document_back: null,
+            id_document_front_path: g.id_document_front_path as string | undefined,
+            id_document_back_path: g.id_document_back_path as string | undefined,
+            street_name: (g.street_name as string) || (g.street_address as string) || '',
+            house_number: (g.house_number as string) || '',
+            address_line_2: (g.address_line_2 as string) || '',
+            city: (g.city as string) || '',
+            state_province: (g.state_province as string) || '',
+            postal_code: (g.postal_code as string) || '',
+            country: (g.country as string) || '',
+            years_at_address: (g.years_at_address as string) || '',
+            proof_of_residence: null,
+            proof_of_residence_path: g.proof_of_residence_path as string | undefined,
+            employment_status: (g.employment_status as GuarantorDetails['employment_status']) || 'employed',
+            employer_name: (g.employer_name as string) || '',
+            job_title: (g.job_title as string) || '',
+            net_monthly_income: (g.net_monthly_income as string) || '',
+            income_currency: (g.income_currency as string) || 'eur',
+            proof_of_income: null,
+            proof_of_income_path: g.proof_of_income_path as string | undefined,
+            income_proof_path: g.income_proof_path as string | undefined,
+            credit_report: null,
+            credit_report_path: g.credit_report_path as string | undefined,
+            consent_to_credit_check: g.consent_to_credit_check as boolean || false,
+            consent_to_contact: g.consent_to_contact as boolean || false,
+            guarantee_consent_signed: g.guarantee_consent_signed as boolean || false,
+            signature_date: (g.signature_date as string) || '',
+        } as GuarantorDetails)),
         interested_in_rent_insurance: '',
         existing_insurance_provider: '',
         existing_insurance_policy_number: '',
@@ -1144,10 +1257,6 @@ export function useApplicationWizard({
             id_expiry_date: '',
             id_document_front: null,
             id_document_back: null,
-            // Immigration
-            immigration_status: '',
-            visa_type: '',
-            visa_expiry_date: '',
             // Financial
             employment_status: '',
             employment_status_other: '',
@@ -1260,10 +1369,6 @@ export function useApplicationWizard({
                     id_expiry_date: '',
                     id_document_front: null,
                     id_document_back: null,
-                    // Immigration
-                    immigration_status: '',
-                    visa_type: '',
-                    visa_expiry_date: '',
                     // Financial
                     employment_status: '',
                     employment_status_other: '',
@@ -1692,6 +1797,9 @@ export function useApplicationWizard({
                 newTouched[`cosigner_${index}_id_number`] = true;
                 newTouched[`cosigner_${index}_id_issuing_country`] = true;
                 newTouched[`cosigner_${index}_id_expiry_date`] = true;
+                // ID Document uploads
+                newTouched[`cosigner_${index}_id_document_front`] = true;
+                newTouched[`cosigner_${index}_id_document_back`] = true;
 
                 // Address
                 newTouched[`cosigner_${index}_street_name`] = true;
@@ -1710,6 +1818,11 @@ export function useApplicationWizard({
                     newTouched[`cosigner_${index}_employment_start_date`] = true;
                     newTouched[`cosigner_${index}_gross_annual_income`] = true;
                     newTouched[`cosigner_${index}_net_monthly_income`] = true;
+                    // Document uploads for employed
+                    newTouched[`cosigner_${index}_employment_contract`] = true;
+                    newTouched[`cosigner_${index}_payslip_1`] = true;
+                    newTouched[`cosigner_${index}_payslip_2`] = true;
+                    newTouched[`cosigner_${index}_payslip_3`] = true;
                 }
                 if (status === 'self_employed') {
                     newTouched[`cosigner_${index}_business_name`] = true;
@@ -1717,25 +1830,39 @@ export function useApplicationWizard({
                     newTouched[`cosigner_${index}_business_start_date`] = true;
                     newTouched[`cosigner_${index}_gross_annual_revenue`] = true;
                     newTouched[`cosigner_${index}_net_monthly_income`] = true;
+                    // Document uploads for self-employed
+                    newTouched[`cosigner_${index}_income_proof`] = true;
                 }
                 if (status === 'student') {
                     newTouched[`cosigner_${index}_university_name`] = true;
                     newTouched[`cosigner_${index}_program_of_study`] = true;
                     newTouched[`cosigner_${index}_student_income_source_type`] = true;
                     newTouched[`cosigner_${index}_student_monthly_income`] = true;
+                    // Document uploads for student
+                    newTouched[`cosigner_${index}_student_proof`] = true;
                 }
                 if (status === 'retired') {
                     newTouched[`cosigner_${index}_pension_type`] = true;
                     newTouched[`cosigner_${index}_pension_monthly_income`] = true;
+                    // Document uploads for retired
+                    newTouched[`cosigner_${index}_pension_statement`] = true;
                 }
                 if (status === 'unemployed') {
                     newTouched[`cosigner_${index}_unemployed_income_source`] = true;
                     newTouched[`cosigner_${index}_unemployment_benefits_amount`] = true;
+                    // Document uploads for unemployed
+                    if (coSigner.unemployed_income_source === 'unemployment_benefits') {
+                        newTouched[`cosigner_${index}_benefits_statement`] = true;
+                    } else {
+                        newTouched[`cosigner_${index}_other_income_proof`] = true;
+                    }
                 }
                 if (status === 'other') {
                     newTouched[`cosigner_${index}_other_employment_situation`] = true;
                     newTouched[`cosigner_${index}_other_situation_monthly_income`] = true;
                     newTouched[`cosigner_${index}_other_situation_income_source`] = true;
+                    // Document uploads for other
+                    newTouched[`cosigner_${index}_other_income_proof`] = true;
                 }
             });
 
@@ -1758,6 +1885,9 @@ export function useApplicationWizard({
                 newTouched[`guarantor_${index}_id_number`] = true;
                 newTouched[`guarantor_${index}_id_issuing_country`] = true;
                 newTouched[`guarantor_${index}_id_expiry_date`] = true;
+                // ID Document uploads
+                newTouched[`guarantor_${index}_id_document_front`] = true;
+                newTouched[`guarantor_${index}_id_document_back`] = true;
 
                 // Address
                 newTouched[`guarantor_${index}_street_name`] = true;
@@ -1783,6 +1913,8 @@ export function useApplicationWizard({
                 if (status === 'other') {
                     newTouched[`guarantor_${index}_net_monthly_income`] = true;
                 }
+                // Proof of income document (required for all guarantors)
+                newTouched[`guarantor_${index}_proof_of_income`] = true;
             });
         }
 
@@ -1935,7 +2067,15 @@ export function useApplicationWizard({
 
         // Navigation
         goToStep: wizard.goToStep,
-        goToNextStep: wizard.goToNextStep,
+        // Wrap goToNextStep to mark all fields as touched when validation fails
+        goToNextStep: () => {
+            const success = wizard.goToNextStep();
+            if (!success) {
+                // Validation failed - mark all fields as touched so errors show
+                markAllCurrentStepFieldsTouched();
+            }
+            return success;
+        },
         goToPreviousStep: wizard.goToPreviousStep,
         canGoToStep: wizard.canGoToStep,
 
