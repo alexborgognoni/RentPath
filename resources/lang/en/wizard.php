@@ -1034,10 +1034,6 @@ return [
         'supportStep' => [
             'title' => 'Financial Support',
             'description' => 'Strengthen your application with co-signers, guarantors, or rent insurance.',
-            'info' => [
-                'purpose' => 'This step is optional but can significantly strengthen your application, especially if you\'re a first-time renter or have limited rental history.',
-                'optional' => 'You can skip this step if you don\'t need additional financial support.',
-            ],
             'coSigners' => [
                 'title' => 'Co-signers',
                 'description' => 'Co-signers are additional people who will sign the lease with you and share responsibility for the rent.',

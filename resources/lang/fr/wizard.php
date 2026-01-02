@@ -985,10 +985,6 @@ return [
         'supportStep' => [
             'title' => 'Soutien financier',
             'description' => 'Renforcez votre candidature avec des co-signataires, garants ou assurance loyer.',
-            'info' => [
-                'purpose' => 'Cette étape est optionnelle mais peut considérablement renforcer votre candidature, surtout si vous êtes premier locataire ou avez un historique locatif limité.',
-                'optional' => 'Vous pouvez ignorer cette étape si vous n\'avez pas besoin de soutien financier supplémentaire.',
-            ],
             'coSigners' => [
                 'title' => 'Co-signataires',
                 'description' => 'Les co-signataires sont des personnes supplémentaires qui signeront le bail avec vous et partageront la responsabilité du loyer.',

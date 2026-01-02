@@ -985,10 +985,6 @@ return [
         'supportStep' => [
             'title' => 'Financiële Ondersteuning',
             'description' => 'Versterk uw aanvraag met mede-ondertekenaars, borgen of huurgarantieverzekering.',
-            'info' => [
-                'purpose' => 'Deze stap is optioneel maar kan uw aanvraag aanzienlijk versterken, vooral als u een eerste huurder bent of beperkte huurgeschiedenis heeft.',
-                'optional' => 'U kunt deze stap overslaan als u geen extra financiële ondersteuning nodig heeft.',
-            ],
             'coSigners' => [
                 'title' => 'Mede-ondertekenaars',
                 'description' => 'Mede-ondertekenaars zijn extra personen die het huurcontract met u ondertekenen en verantwoordelijkheid voor de huur delen.',

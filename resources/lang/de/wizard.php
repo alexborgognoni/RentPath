@@ -985,10 +985,6 @@ return [
         'supportStep' => [
             'title' => 'Finanzielle Unterstützung',
             'description' => 'Stärken Sie Ihre Bewerbung mit Mitunterzeichnern, Bürgen oder Mietversicherung.',
-            'info' => [
-                'purpose' => 'Dieser Schritt ist optional, kann aber Ihre Bewerbung erheblich stärken, besonders wenn Sie Erstmieter sind oder eine begrenzte Miethistorie haben.',
-                'optional' => 'Sie können diesen Schritt überspringen, wenn Sie keine zusätzliche finanzielle Unterstützung benötigen.',
-            ],
             'coSigners' => [
                 'title' => 'Mitunterzeichner',
                 'description' => 'Mitunterzeichner sind zusätzliche Personen, die den Mietvertrag mit Ihnen unterschreiben und die Verantwortung für die Miete teilen.',

@@ -8,7 +8,7 @@ import type { ApplicationWizardData, CoSignerDetails, GuarantorDetails } from '@
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { ChevronDown, ChevronUp, Info, Link2, Plus, Shield, Trash2, UserPlus, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, Link2, Plus, Shield, Trash2, UserPlus, Users } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { FinancialInfoSection } from '../shared';
 
@@ -439,20 +439,6 @@ export function SupportStep({
             <p className="text-muted-foreground">
                 {t('description') || 'Add co-signers, guarantors, or rent insurance to strengthen your application.'}
             </p>
-
-            {/* Info Card */}
-            <div className="rounded-lg border border-border bg-muted/30 p-4">
-                <div className="flex gap-3">
-                    <Info className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                    <div className="space-y-2 text-sm">
-                        <p>
-                            {t('info.purpose') ||
-                                'Co-signers and guarantors can help strengthen your application by providing additional financial assurance to the landlord.'}
-                        </p>
-                        <p className="text-muted-foreground">{t('info.optional') || 'All sections on this page are optional.'}</p>
-                    </div>
-                </div>
-            </div>
 
             {/* Co-signers Section - Collapsible */}
             <div className="rounded-lg border border-border bg-card">
