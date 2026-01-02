@@ -119,11 +119,9 @@ export function WizardProgress<TStepId extends string>({
                                         isCompleted && !isCurrent && 'text-foreground',
                                         isLocked && 'text-muted-foreground/50',
                                         !isCurrent && !isCompleted && !isLocked && 'text-muted-foreground',
-                                        step.optional && 'italic',
                                     )}
                                 >
                                     {step.shortTitle}
-                                    {step.optional && <span className="ml-1 text-muted-foreground">{t('wizard.progress.optional')}</span>}
                                 </span>
                             </button>
                         );
