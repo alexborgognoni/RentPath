@@ -51,7 +51,7 @@ export default function ApplicationCreate() {
             id,
             title: translate(translations, `wizard.application.steps.${id}.title`),
             shortTitle: translate(translations, `wizard.application.steps.${id}.shortTitle`),
-            optional: id === 'support' || id === 'additional',
+            optional: id === 'additional',
         }));
     }, [translations]);
 
@@ -225,6 +225,7 @@ export default function ApplicationCreate() {
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
                         onBlur={handleBlur}
+                        onFieldBlur={handleFieldBlur}
                         addCoSigner={wizard.addCoSigner}
                         removeCoSigner={wizard.removeCoSigner}
                         updateCoSigner={wizard.updateCoSigner}

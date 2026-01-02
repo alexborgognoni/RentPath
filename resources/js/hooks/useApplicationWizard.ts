@@ -19,7 +19,7 @@ export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
     { id: 'identity', title: 'Identity & Legal Eligibility', shortTitle: 'Identity' },
     { id: 'household', title: 'Household Composition', shortTitle: 'Household' },
     { id: 'financial', title: 'Financial Capability', shortTitle: 'Financial' },
-    { id: 'support', title: 'Financial Support', shortTitle: 'Support', optional: true },
+    { id: 'support', title: 'Financial Support', shortTitle: 'Support' },
     { id: 'history', title: 'Credit & Rental History', shortTitle: 'History' },
     { id: 'additional', title: 'Additional Information', shortTitle: 'Additional', optional: true },
     { id: 'consent', title: 'Declarations & Consent', shortTitle: 'Consent' },
@@ -154,6 +154,14 @@ export interface CoSignerDetails {
     // Unemployed/retired specific
     income_source: string;
     income_proof: File | null;
+    // Address (matching AddressForm component)
+    street_name: string;
+    house_number: string;
+    address_line_2: string;
+    city: string;
+    state_province: string;
+    postal_code: string;
+    country: string;
 }
 
 // Guarantor per PLAN.md - full identity, address, financial, consent
@@ -177,16 +185,18 @@ export interface GuarantorDetails {
     id_expiry_date: string;
     id_document_front: File | null;
     id_document_back: File | null;
-    // Address
-    street_address: string;
+    // Address (matching AddressForm component)
+    street_name: string;
+    house_number: string;
+    address_line_2: string;
     city: string;
     state_province: string;
     postal_code: string;
     country: string;
     years_at_address: string;
     proof_of_residence: File | null;
-    // Financial
-    employment_status: 'employed' | 'self_employed' | 'retired' | 'other' | '';
+    // Financial (same options as tenant)
+    employment_status: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired' | 'other' | '';
     employer_name: string;
     job_title: string;
     net_monthly_income: string;
@@ -1148,6 +1158,14 @@ export function useApplicationWizard({
             // Other
             income_source: '',
             income_proof: null,
+            // Address (matching AddressForm component)
+            street_name: '',
+            house_number: '',
+            address_line_2: '',
+            city: '',
+            state_province: '',
+            postal_code: '',
+            country: '',
         };
         wizard.updateField('co_signers', [...wizard.data.co_signers, newCoSigner]);
     }, [wizard]);
@@ -1256,6 +1274,14 @@ export function useApplicationWizard({
                     // Other
                     income_source: '',
                     income_proof: null,
+                    // Address (matching AddressForm component)
+                    street_name: '',
+                    house_number: '',
+                    address_line_2: '',
+                    city: '',
+                    state_province: '',
+                    postal_code: '',
+                    country: '',
                 });
             }
         });
@@ -1292,8 +1318,10 @@ export function useApplicationWizard({
                 id_expiry_date: '',
                 id_document_front: null,
                 id_document_back: null,
-                // Address
-                street_address: '',
+                // Address (matching AddressForm component)
+                street_name: '',
+                house_number: '',
+                address_line_2: '',
                 city: '',
                 state_province: '',
                 postal_code: '',
@@ -1621,6 +1649,126 @@ export function useApplicationWizard({
                     newTouched.emergency_contact_relationship_other = true;
                 }
             }
+        }
+
+        if (wizard.currentStep === 'support') {
+            // Insurance
+            newTouched.interested_in_rent_insurance = true;
+            if (wizard.data.interested_in_rent_insurance === 'already_have') {
+                newTouched.existing_insurance_provider = true;
+            }
+
+            // Co-signers
+            wizard.data.co_signers.forEach((coSigner, index) => {
+                // Personal details
+                newTouched[`cosigner_${index}_first_name`] = true;
+                newTouched[`cosigner_${index}_last_name`] = true;
+                newTouched[`cosigner_${index}_email`] = true;
+                newTouched[`cosigner_${index}_phone_number`] = true;
+                newTouched[`cosigner_${index}_date_of_birth`] = true;
+                newTouched[`cosigner_${index}_nationality`] = true;
+                newTouched[`cosigner_${index}_relationship`] = true;
+                if (coSigner.relationship === 'other') {
+                    newTouched[`cosigner_${index}_relationship_other`] = true;
+                }
+
+                // ID Document
+                newTouched[`cosigner_${index}_id_document_type`] = true;
+                newTouched[`cosigner_${index}_id_number`] = true;
+                newTouched[`cosigner_${index}_id_issuing_country`] = true;
+                newTouched[`cosigner_${index}_id_expiry_date`] = true;
+
+                // Address
+                newTouched[`cosigner_${index}_street_name`] = true;
+                newTouched[`cosigner_${index}_house_number`] = true;
+                newTouched[`cosigner_${index}_city`] = true;
+                newTouched[`cosigner_${index}_postal_code`] = true;
+                newTouched[`cosigner_${index}_country`] = true;
+
+                // Financial fields based on employment status
+                newTouched[`cosigner_${index}_employment_status`] = true;
+                const status = coSigner.employment_status;
+                if (status === 'employed') {
+                    newTouched[`cosigner_${index}_employer_name`] = true;
+                    newTouched[`cosigner_${index}_job_title`] = true;
+                    newTouched[`cosigner_${index}_employment_type`] = true;
+                    newTouched[`cosigner_${index}_employment_start_date`] = true;
+                    newTouched[`cosigner_${index}_gross_annual_income`] = true;
+                    newTouched[`cosigner_${index}_net_monthly_income`] = true;
+                }
+                if (status === 'self_employed') {
+                    newTouched[`cosigner_${index}_business_name`] = true;
+                    newTouched[`cosigner_${index}_business_type`] = true;
+                    newTouched[`cosigner_${index}_business_start_date`] = true;
+                    newTouched[`cosigner_${index}_gross_annual_revenue`] = true;
+                    newTouched[`cosigner_${index}_net_monthly_income`] = true;
+                }
+                if (status === 'student') {
+                    newTouched[`cosigner_${index}_university_name`] = true;
+                    newTouched[`cosigner_${index}_program_of_study`] = true;
+                    newTouched[`cosigner_${index}_student_income_source_type`] = true;
+                    newTouched[`cosigner_${index}_student_monthly_income`] = true;
+                }
+                if (status === 'retired') {
+                    newTouched[`cosigner_${index}_pension_type`] = true;
+                    newTouched[`cosigner_${index}_pension_monthly_income`] = true;
+                }
+                if (status === 'unemployed') {
+                    newTouched[`cosigner_${index}_unemployed_income_source`] = true;
+                    newTouched[`cosigner_${index}_unemployment_benefits_amount`] = true;
+                }
+                if (status === 'other') {
+                    newTouched[`cosigner_${index}_other_employment_situation`] = true;
+                    newTouched[`cosigner_${index}_other_situation_monthly_income`] = true;
+                    newTouched[`cosigner_${index}_other_situation_income_source`] = true;
+                }
+            });
+
+            // Guarantors
+            wizard.data.guarantors.forEach((guarantor, index) => {
+                // Personal details
+                newTouched[`guarantor_${index}_first_name`] = true;
+                newTouched[`guarantor_${index}_last_name`] = true;
+                newTouched[`guarantor_${index}_email`] = true;
+                newTouched[`guarantor_${index}_phone_number`] = true;
+                newTouched[`guarantor_${index}_date_of_birth`] = true;
+                newTouched[`guarantor_${index}_nationality`] = true;
+                newTouched[`guarantor_${index}_relationship`] = true;
+                if (guarantor.relationship === 'other') {
+                    newTouched[`guarantor_${index}_relationship_other`] = true;
+                }
+
+                // ID Document
+                newTouched[`guarantor_${index}_id_document_type`] = true;
+                newTouched[`guarantor_${index}_id_number`] = true;
+                newTouched[`guarantor_${index}_id_issuing_country`] = true;
+                newTouched[`guarantor_${index}_id_expiry_date`] = true;
+
+                // Address
+                newTouched[`guarantor_${index}_street_name`] = true;
+                newTouched[`guarantor_${index}_house_number`] = true;
+                newTouched[`guarantor_${index}_city`] = true;
+                newTouched[`guarantor_${index}_postal_code`] = true;
+                newTouched[`guarantor_${index}_country`] = true;
+
+                // Financial fields based on employment status
+                newTouched[`guarantor_${index}_employment_status`] = true;
+                const status = guarantor.employment_status;
+                if (status === 'employed') {
+                    newTouched[`guarantor_${index}_employer_name`] = true;
+                    newTouched[`guarantor_${index}_job_title`] = true;
+                    newTouched[`guarantor_${index}_net_monthly_income`] = true;
+                }
+                if (status === 'self_employed') {
+                    newTouched[`guarantor_${index}_net_monthly_income`] = true;
+                }
+                if (status === 'retired') {
+                    newTouched[`guarantor_${index}_net_monthly_income`] = true;
+                }
+                if (status === 'other') {
+                    newTouched[`guarantor_${index}_net_monthly_income`] = true;
+                }
+            });
         }
 
         if (wizard.currentStep === 'history') {

@@ -5,7 +5,11 @@ import { SimpleSelect } from '@/components/ui/simple-select';
 import type { Translations } from '@/types/translations';
 import { translate } from '@/utils/translate-utils';
 import { Briefcase, Building, GraduationCap, HeartHandshake, UserCheck } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+
+// Re-export validation utilities from the shared location
+export { validateFinancialFields } from '@/lib/validation/financial-validation';
+export type { FinancialEntityType, FinancialValidationErrors } from '@/lib/validation/financial-validation';
 
 const EMPLOYMENT_STATUS_ICONS = {
     employed: Briefcase,
@@ -61,6 +65,18 @@ export function FinancialInfoSection({
 
     // Helper to get prefixed field name
     const f = (field: string) => `${fieldPrefix}${field}`;
+
+    // Default employment_status to 'employed' if not set
+    const hasSetDefault = useRef(false);
+    useEffect(() => {
+        if (!hasSetDefault.current) {
+            hasSetDefault.current = true;
+            const currentStatus = getValue(f('employment_status'));
+            if (!currentStatus) {
+                setValue(f('employment_status'), 'employed');
+            }
+        }
+    }, [getValue, setValue, f]);
 
     const getFieldClass = (field: string) => {
         const hasError = isTouched(f(field)) && getError(f(field));

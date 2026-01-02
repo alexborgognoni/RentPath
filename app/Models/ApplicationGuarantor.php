@@ -31,8 +31,10 @@ class ApplicationGuarantor extends Model
         'id_document_front_original_name',
         'id_document_back_path',
         'id_document_back_original_name',
-        // Address
-        'street_address',
+        // Address (matching AddressForm component)
+        'street_name',
+        'house_number',
+        'address_line_2',
         'city',
         'state_province',
         'postal_code',
@@ -116,8 +118,10 @@ class ApplicationGuarantor extends Model
      */
     public function getFullAddressAttribute(): string
     {
+        $streetLine = trim("{$this->street_name} {$this->house_number}");
         $parts = array_filter([
-            $this->street_address,
+            $streetLine,
+            $this->address_line_2,
             $this->city,
             $this->state_province,
             $this->postal_code,

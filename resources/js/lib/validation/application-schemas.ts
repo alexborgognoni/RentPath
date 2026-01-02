@@ -1,3 +1,4 @@
+import { validateFinancialFields } from '@/lib/validation/financial-validation';
 import { validatePhoneNumber } from '@/utils/phone-validation';
 import { z } from 'zod';
 
@@ -1191,11 +1192,364 @@ export const detailsStepSchema = z
 
 // ===== NEW STEP SCHEMAS (8-step structure) =====
 
-// Step 4: Risk Mitigation - Support (all optional since co-signers/guarantors are "coming soon")
-export const riskMitigationStepSchema = z.object({
-    interested_in_rent_insurance: z.enum(['yes', 'no', 'already_have', '']).optional(),
-    existing_insurance_provider: z.string().max(200).optional(),
-    existing_insurance_policy_number: z.string().max(100).optional(),
+// Step 4: Risk Mitigation - Support (co-signers, guarantors, insurance)
+const riskMitigationBaseSchema = z.object({
+    co_signers: z.array(z.any()),
+    guarantors: z.array(z.any()),
+    interested_in_rent_insurance: z.string(),
+    existing_insurance_provider: z.string().optional(),
+    existing_insurance_policy_number: z.string().optional(),
+});
+
+export const riskMitigationStepSchema = riskMitigationBaseSchema.superRefine((data, ctx) => {
+    // Insurance is required - must be one of the valid options
+    const validInsuranceOptions = ['yes', 'no', 'already_have'];
+    if (!data.interested_in_rent_insurance || !validInsuranceOptions.includes(data.interested_in_rent_insurance)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Please select an option for rent guarantee insurance',
+            path: ['interested_in_rent_insurance'],
+        });
+    }
+
+    // If already_have insurance, provider is required
+    if (data.interested_in_rent_insurance === 'already_have' && !data.existing_insurance_provider?.trim()) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Please provide your insurance provider name',
+            path: ['existing_insurance_provider'],
+        });
+    }
+
+    // Validate each co-signer
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (data.co_signers as any[]).forEach((coSigner, index) => {
+        // === Personal Details ===
+        // First name required
+        if (!coSigner.first_name?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'First name is required',
+                path: [`cosigner_${index}_first_name`],
+            });
+        }
+
+        // Last name required
+        if (!coSigner.last_name?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Last name is required',
+                path: [`cosigner_${index}_last_name`],
+            });
+        }
+
+        // Email required
+        if (!coSigner.email?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Email is required',
+                path: [`cosigner_${index}_email`],
+            });
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coSigner.email)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Please enter a valid email address',
+                path: [`cosigner_${index}_email`],
+            });
+        }
+
+        // Phone required
+        if (!coSigner.phone_number?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Phone number is required',
+                path: [`cosigner_${index}_phone_number`],
+            });
+        }
+
+        // Date of birth required
+        if (!coSigner.date_of_birth) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Date of birth is required',
+                path: [`cosigner_${index}_date_of_birth`],
+            });
+        }
+
+        // Nationality required
+        if (!coSigner.nationality?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Nationality is required',
+                path: [`cosigner_${index}_nationality`],
+            });
+        }
+
+        // Relationship required
+        if (!coSigner.relationship?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Relationship is required',
+                path: [`cosigner_${index}_relationship`],
+            });
+        } else if (coSigner.relationship === 'other' && !coSigner.relationship_other?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Please specify the relationship',
+                path: [`cosigner_${index}_relationship_other`],
+            });
+        }
+
+        // === ID Document ===
+        if (!coSigner.id_document_type?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'ID document type is required',
+                path: [`cosigner_${index}_id_document_type`],
+            });
+        }
+
+        if (!coSigner.id_number?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'ID number is required',
+                path: [`cosigner_${index}_id_number`],
+            });
+        }
+
+        if (!coSigner.id_issuing_country?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Issuing country is required',
+                path: [`cosigner_${index}_id_issuing_country`],
+            });
+        }
+
+        if (!coSigner.id_expiry_date) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'ID expiry date is required',
+                path: [`cosigner_${index}_id_expiry_date`],
+            });
+        }
+
+        // === Address ===
+        if (!coSigner.street_name?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Street name is required',
+                path: [`cosigner_${index}_street_name`],
+            });
+        }
+
+        if (!coSigner.house_number?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'House number is required',
+                path: [`cosigner_${index}_house_number`],
+            });
+        }
+
+        if (!coSigner.city?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'City is required',
+                path: [`cosigner_${index}_city`],
+            });
+        }
+
+        if (!coSigner.postal_code?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Postal code is required',
+                path: [`cosigner_${index}_postal_code`],
+            });
+        }
+
+        if (!coSigner.country?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Country is required',
+                path: [`cosigner_${index}_country`],
+            });
+        }
+
+        // === Financial ===
+        // Validate financial fields using the shared helper
+        const financialErrors = validateFinancialFields(coSigner, 'co_signer');
+        Object.entries(financialErrors).forEach(([field, message]) => {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message,
+                path: [`cosigner_${index}_${field}`],
+            });
+        });
+    });
+
+    // Validate each guarantor
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (data.guarantors as any[]).forEach((guarantor, index) => {
+        // === Personal Details ===
+        // First name required
+        if (!guarantor.first_name?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'First name is required',
+                path: [`guarantor_${index}_first_name`],
+            });
+        }
+
+        // Last name required
+        if (!guarantor.last_name?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Last name is required',
+                path: [`guarantor_${index}_last_name`],
+            });
+        }
+
+        // Email required
+        if (!guarantor.email?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Email is required',
+                path: [`guarantor_${index}_email`],
+            });
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guarantor.email)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Please enter a valid email address',
+                path: [`guarantor_${index}_email`],
+            });
+        }
+
+        // Phone required
+        if (!guarantor.phone_number?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Phone number is required',
+                path: [`guarantor_${index}_phone_number`],
+            });
+        }
+
+        // Date of birth required
+        if (!guarantor.date_of_birth) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Date of birth is required',
+                path: [`guarantor_${index}_date_of_birth`],
+            });
+        }
+
+        // Nationality required
+        if (!guarantor.nationality?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Nationality is required',
+                path: [`guarantor_${index}_nationality`],
+            });
+        }
+
+        // Relationship required
+        if (!guarantor.relationship?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Relationship is required',
+                path: [`guarantor_${index}_relationship`],
+            });
+        } else if (guarantor.relationship === 'other' && !guarantor.relationship_other?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Please specify the relationship',
+                path: [`guarantor_${index}_relationship_other`],
+            });
+        }
+
+        // === ID Document ===
+        if (!guarantor.id_document_type?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'ID document type is required',
+                path: [`guarantor_${index}_id_document_type`],
+            });
+        }
+
+        if (!guarantor.id_number?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'ID number is required',
+                path: [`guarantor_${index}_id_number`],
+            });
+        }
+
+        if (!guarantor.id_issuing_country?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Issuing country is required',
+                path: [`guarantor_${index}_id_issuing_country`],
+            });
+        }
+
+        if (!guarantor.id_expiry_date) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'ID expiry date is required',
+                path: [`guarantor_${index}_id_expiry_date`],
+            });
+        }
+
+        // === Address ===
+        if (!guarantor.street_name?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Street name is required',
+                path: [`guarantor_${index}_street_name`],
+            });
+        }
+
+        if (!guarantor.house_number?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'House number is required',
+                path: [`guarantor_${index}_house_number`],
+            });
+        }
+
+        if (!guarantor.city?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'City is required',
+                path: [`guarantor_${index}_city`],
+            });
+        }
+
+        if (!guarantor.postal_code?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Postal code is required',
+                path: [`guarantor_${index}_postal_code`],
+            });
+        }
+
+        if (!guarantor.country?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Country is required',
+                path: [`guarantor_${index}_country`],
+            });
+        }
+
+        // === Financial ===
+        // Validate financial fields using the shared helper
+        const financialErrors = validateFinancialFields(guarantor, 'guarantor');
+        Object.entries(financialErrors).forEach(([field, message]) => {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message,
+                path: [`guarantor_${index}_${field}`],
+            });
+        });
+    });
 });
 
 // Step 5: Credit & Rental History (per PLAN.md)

@@ -123,25 +123,26 @@ export function useWizard<TData, TStepId extends string>({
     // Memoize data for autosave comparison
     const dataString = useMemo(() => JSON.stringify(data), [data]);
 
-    // Effect to lock steps when data changes make earlier steps invalid
-    // Only runs after user has interacted - prevents validation on prop updates from backend
+    // Effect to validate and lock steps - runs on mount AND when data changes
+    // This ensures the same validation is used everywhere:
+    // 1. On mount - validates all steps to compute correct max valid step
+    // 2. On data change (after interaction) - re-validates to lock steps if needed
     useEffect(() => {
-        // Skip lock check on initial mount - trust the saved step from backend
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        // Skip lock check during forward navigation
+        // Skip lock check during forward navigation (intentional advancement)
         if (skipNextLockCheck.current) {
             skipNextLockCheck.current = false;
             return;
         }
 
-        // Skip lock check until user has interacted with the form
-        // This prevents prop updates from Inertia from triggering validation
-        if (!hasUserInteracted) {
+        // After initial mount, only re-validate when user has interacted
+        // This prevents prop updates from Inertia from triggering unnecessary validation
+        if (!isInitialMount.current && !hasUserInteracted) {
             return;
+        }
+
+        // Mark initial mount as complete
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
         }
 
         // Compute first invalid step inline - SINGLE SOURCE OF TRUTH
@@ -163,13 +164,15 @@ export function useWizard<TData, TStepId extends string>({
         // If currently viewing a step beyond maxValid, navigate back
         if (currentStepIndex > maxValid) {
             setCurrentStepIndex(maxValid);
-            // Show errors for the step they're being locked to
-            const stepId = steps[maxValid].id;
-            const result = validateStepFn(stepId, data);
-            if (!result.success) {
-                setErrors(result.errors);
+            // Don't show errors on mount - only show when user interacts
+            if (hasUserInteracted) {
+                const stepId = steps[maxValid].id;
+                const result = validateStepFn(stepId, data);
+                if (!result.success) {
+                    setErrors(result.errors);
+                }
             }
-            onStepChange?.(stepId, maxValid);
+            onStepChange?.(steps[maxValid].id, maxValid);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dataString, maxStepReached, currentStepIndex, hasUserInteracted]);

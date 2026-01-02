@@ -242,7 +242,7 @@ export function DatePicker({
                 className={cn(
                     'flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-border bg-background px-4 py-2',
                     'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
-                    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+                    'data-[disabled]:cursor-not-allowed data-[disabled]:bg-muted data-[disabled]:text-muted-foreground',
                     hasError && 'border-destructive bg-destructive/5',
                 )}
             >

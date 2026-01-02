@@ -20,6 +20,17 @@ class ApplicationCoSigner extends Model
         'email',
         'phone_country_code',
         'phone_number',
+        // Relationship
+        'relationship',
+        'relationship_other',
+        // Address (matching AddressForm component)
+        'street_name',
+        'house_number',
+        'address_line_2',
+        'city',
+        'state_province',
+        'postal_code',
+        'country',
         // Identity - ID Document
         'id_document_type',
         'id_number',

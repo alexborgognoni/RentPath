@@ -184,7 +184,7 @@ export function SearchableSelect<T>({
                         className={cn(
                             'flex cursor-pointer items-center justify-between gap-1 border bg-background',
                             'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                            'disabled:cursor-not-allowed disabled:opacity-50',
+                            'disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
                             !currentOption && 'text-muted-foreground',
                             hasError ? 'border-destructive bg-destructive/5' : 'border-border',
                             compact ? 'rounded-l-lg rounded-r-none border-r-0 px-3 py-2' : 'w-full rounded-lg px-4 py-2 gap-2',
