@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { CountrySelect } from './country-select';
+import { OptionalBadge } from './optional-badge';
 import { StateProvinceSelect } from './state-province-select';
 import {
     getPostalCodeLabel,
@@ -165,8 +166,9 @@ export function AddressForm({
 
             {/* Address Line 2 (optional) */}
             <div className="mt-4">
-                <label className="mb-2 block text-sm font-medium">
-                    {t.apartment} <span className="text-muted-foreground">({t.optional})</span>
+                <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                    {t.apartment}
+                    <OptionalBadge />
                 </label>
                 <input
                     type="text"
@@ -200,9 +202,9 @@ export function AddressForm({
 
                 {showStateProvince && (
                     <div>
-                        <label className="mb-2 block text-sm font-medium">
+                        <label className="mb-2 flex items-center gap-2 text-sm font-medium">
                             {stateProvinceLabel}
-                            {!stateProvinceRequired && <span className="text-muted-foreground"> ({t.optional})</span>}
+                            {!stateProvinceRequired && <OptionalBadge />}
                         </label>
                         <StateProvinceSelect
                             value={data.state_province}

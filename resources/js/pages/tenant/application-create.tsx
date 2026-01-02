@@ -260,7 +260,10 @@ export default function ApplicationCreate() {
                         addReference={wizard.addReference}
                         removeReference={wizard.removeReference}
                         updateReference={wizard.updateReference}
+                        // Blur handlers
+                        createIndexedBlurHandler={wizard.createIndexedBlurHandler}
                         onBlur={handleBlur}
+                        onFieldBlur={handleFieldBlur}
                     />
                 );
             case 'additional':

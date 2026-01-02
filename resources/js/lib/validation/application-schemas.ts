@@ -377,6 +377,29 @@ export const APPLICATION_MESSAGES = {
     current_living_situation: {
         required: 'Please select your current living situation',
     },
+    // Current address fields (required)
+    current_address_street_name: {
+        required: 'Street name is required',
+    },
+    current_address_house_number: {
+        required: 'House number is required',
+    },
+    current_address_city: {
+        required: 'City is required',
+    },
+    current_address_postal_code: {
+        required: 'Postal code is required',
+    },
+    current_address_country: {
+        required: 'Country is required',
+    },
+    current_address_move_in_date: {
+        required: 'Move-in date is required',
+        past: 'Move-in date must be in the past or today',
+    },
+    current_monthly_rent: {
+        required: 'Monthly rent is required when renting',
+    },
     reason_for_moving: {
         required: 'Please select your reason for moving',
     },
@@ -388,6 +411,16 @@ export const APPLICATION_MESSAGES = {
     },
     eviction_details: {
         required: 'Please provide details about eviction history',
+    },
+    // Previous address fields
+    previous_address: {
+        street_name: { required: 'Street name is required' },
+        house_number: { required: 'House number is required' },
+        city: { required: 'City is required' },
+        postal_code: { required: 'Postal code is required' },
+        country: { required: 'Country is required' },
+        from_date: { required: 'From date is required' },
+        to_date: { required: 'To date is required', afterFrom: 'To date must be after from date' },
     },
 
     // Step 7: Declarations & Consent
@@ -1566,10 +1599,11 @@ export const historyStepSchema = z
         eviction_details: z.string().max(2000).optional(),
         self_reported_credit_score: z.string().optional(),
         credit_report_upload: z.any().nullable().optional(),
-        // Current Address
+        // Current Address (required - matching AddressForm structure)
         current_living_situation: z.string().optional(),
-        current_address_street: z.string().optional(),
-        current_address_unit: z.string().optional(),
+        current_address_street_name: z.string().optional(),
+        current_address_house_number: z.string().optional(),
+        current_address_address_line_2: z.string().optional(),
         current_address_city: z.string().optional(),
         current_address_state_province: z.string().optional(),
         current_address_postal_code: z.string().optional(),
@@ -1581,7 +1615,7 @@ export const historyStepSchema = z
         current_landlord_contact: z.string().optional(),
         reason_for_moving: z.string().optional(),
         reason_for_moving_other: z.string().max(500).optional(),
-        // Previous Addresses
+        // Previous Addresses (with AddressForm-compatible structure)
         previous_addresses: z.array(z.any()).optional(),
         // Landlord References
         landlord_references: z.array(z.any()).optional(),
@@ -1627,6 +1661,89 @@ export const historyStepSchema = z
                 path: ['eviction_details'],
             });
         }
+
+        // === Current Address validation (required) ===
+        // Living situation is required
+        if (!data.current_living_situation?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.current_living_situation.required,
+                path: ['current_living_situation'],
+            });
+        }
+
+        // Street name required
+        if (!data.current_address_street_name?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.current_address_street_name.required,
+                path: ['current_address_street_name'],
+            });
+        }
+
+        // House number required
+        if (!data.current_address_house_number?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.current_address_house_number.required,
+                path: ['current_address_house_number'],
+            });
+        }
+
+        // City required
+        if (!data.current_address_city?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.current_address_city.required,
+                path: ['current_address_city'],
+            });
+        }
+
+        // Postal code required
+        if (!data.current_address_postal_code?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.current_address_postal_code.required,
+                path: ['current_address_postal_code'],
+            });
+        }
+
+        // Country required
+        if (!data.current_address_country?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.current_address_country.required,
+                path: ['current_address_country'],
+            });
+        }
+
+        // Move-in date required
+        if (!data.current_address_move_in_date?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.current_address_move_in_date.required,
+                path: ['current_address_move_in_date'],
+            });
+        }
+
+        // Monthly rent required if renting
+        if (data.current_living_situation === 'renting' && !data.current_monthly_rent?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.current_monthly_rent.required,
+                path: ['current_monthly_rent'],
+            });
+        }
+
+        // Reason for moving required
+        if (!data.reason_for_moving?.trim()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: APPLICATION_MESSAGES.reason_for_moving.required,
+                path: ['reason_for_moving'],
+            });
+        }
+
         // If reason for moving is "other", require details
         if (data.reason_for_moving === 'other' && !data.reason_for_moving_other?.trim()) {
             ctx.addIssue({
@@ -1635,6 +1752,73 @@ export const historyStepSchema = z
                 path: ['reason_for_moving_other'],
             });
         }
+
+        // === Previous Addresses validation ===
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const previousAddresses = data.previous_addresses as any[];
+        previousAddresses?.forEach((addr, index) => {
+            if (!addr.street_name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.previous_address.street_name.required,
+                    path: [`prevaddr_${index}_street_name`],
+                });
+            }
+            if (!addr.house_number?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.previous_address.house_number.required,
+                    path: [`prevaddr_${index}_house_number`],
+                });
+            }
+            if (!addr.city?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.previous_address.city.required,
+                    path: [`prevaddr_${index}_city`],
+                });
+            }
+            if (!addr.postal_code?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.previous_address.postal_code.required,
+                    path: [`prevaddr_${index}_postal_code`],
+                });
+            }
+            if (!addr.country?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.previous_address.country.required,
+                    path: [`prevaddr_${index}_country`],
+                });
+            }
+            if (!addr.from_date?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.previous_address.from_date.required,
+                    path: [`prevaddr_${index}_from_date`],
+                });
+            }
+            if (!addr.to_date?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.previous_address.to_date.required,
+                    path: [`prevaddr_${index}_to_date`],
+                });
+            }
+            // Validate to_date is after from_date
+            if (addr.from_date && addr.to_date) {
+                const fromDate = new Date(addr.from_date);
+                const toDate = new Date(addr.to_date);
+                if (toDate <= fromDate) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: APPLICATION_MESSAGES.previous_address.to_date.afterFrom,
+                        path: [`prevaddr_${index}_to_date`],
+                    });
+                }
+            }
+        });
     });
 
 // Step 6: Additional Information & Documents (per PLAN.md)

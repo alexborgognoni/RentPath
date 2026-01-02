@@ -983,6 +983,7 @@ return [
             'previousAddresses' => [
                 'title' => 'Previous Addresses',
                 'subtitle' => 'Last 3 years recommended',
+                'description' => 'Add your previous addresses from the last 3 years (optional but recommended)',
                 'empty' => 'No previous addresses added',
                 'addressNumber' => 'Address',
                 'add' => 'Add Previous Address',

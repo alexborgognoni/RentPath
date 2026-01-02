@@ -398,6 +398,37 @@ class ApplicationController extends Controller
             'occupants_details',
             // Pets
             'pets_details',
+            // Credit Check & History
+            'authorize_credit_check',
+            'authorize_background_check',
+            'credit_check_provider_preference',
+            'has_ccjs_or_bankruptcies',
+            'ccj_bankruptcy_details',
+            'has_eviction_history',
+            'eviction_details',
+            'self_reported_credit_score',
+            // Current Address (matching AddressForm structure)
+            'current_living_situation',
+            'current_address_street_name',
+            'current_address_house_number',
+            'current_address_address_line_2',
+            'current_address_city',
+            'current_address_state_province',
+            'current_address_postal_code',
+            'current_address_country',
+            'current_address_move_in_date',
+            'current_monthly_rent',
+            'current_rent_currency',
+            'current_landlord_name',
+            'current_landlord_contact',
+            'reason_for_moving',
+            'reason_for_moving_other',
+            // Previous Addresses
+            'previous_addresses',
+            // Rent Insurance
+            'interested_in_rent_insurance',
+            'existing_insurance_provider',
+            'existing_insurance_policy_number',
             // References
             'references',
             'previous_landlord_name',
@@ -411,6 +442,8 @@ class ApplicationController extends Controller
             'emergency_contact_phone_country_code',
             'emergency_contact_phone_number',
             'emergency_contact_email',
+            // Additional Info & Consent
+            'additional_information',
             // Legacy fields (for backwards compatibility during migration)
             'emergency_contact_name',
             'emergency_contact_phone',

@@ -41,10 +41,15 @@ class Application extends Model
         'credit_report_path',
         'credit_report_original_name',
 
-        // Current Address - Living Situation
+        // Current Address (matching AddressForm structure)
         'current_living_situation',
-        'current_address_unit',
+        'current_address_street_name',
+        'current_address_house_number',
+        'current_address_address_line_2',
+        'current_address_city',
         'current_address_state_province',
+        'current_address_postal_code',
+        'current_address_country',
         'current_address_move_in_date',
         'current_monthly_rent',
         'current_rent_currency',

@@ -79,15 +79,21 @@ export interface OtherReferenceDetails {
 }
 
 export interface PreviousAddressDetails {
-    street: string;
+    // Address fields (matching AddressForm component)
+    street_name: string;
+    house_number: string;
+    address_line_2: string;
     city: string;
     state_province: string;
     postal_code: string;
     country: string;
+    // Date range
     from_date: string;
     to_date: string;
+    // Rental info
     living_situation: string;
     monthly_rent: string;
+    rent_currency: string;
     landlord_name: string;
     landlord_contact: string;
     can_contact_landlord: boolean;
@@ -368,10 +374,11 @@ export interface ApplicationWizardData {
     eviction_details: string;
     self_reported_credit_score: string;
     credit_report_upload: File | null;
-    // Current Address
+    // Current Address (matching AddressForm component structure)
     current_living_situation: 'renting' | 'owner' | 'living_with_family' | 'student_housing' | 'employer_provided' | 'other' | '';
-    current_address_street: string;
-    current_address_unit: string;
+    current_address_street_name: string;
+    current_address_house_number: string;
+    current_address_address_line_2: string;
     current_address_city: string;
     current_address_state_province: string;
     current_address_postal_code: string;
@@ -671,10 +678,11 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         eviction_details: '',
         self_reported_credit_score: '',
         credit_report_upload: null,
-        // Current Address
+        // Current Address (matching AddressForm component)
         current_living_situation: '',
-        current_address_street: tenantProfile?.current_street_name || '',
-        current_address_unit: tenantProfile?.current_address_line_2 || '',
+        current_address_street_name: tenantProfile?.current_street_name || '',
+        current_address_house_number: tenantProfile?.current_house_number || '',
+        current_address_address_line_2: tenantProfile?.current_address_line_2 || '',
         current_address_city: tenantProfile?.current_city || '',
         current_address_state_province: tenantProfile?.current_state_province || '',
         current_address_postal_code: tenantProfile?.current_postal_code || '',
@@ -1370,15 +1378,21 @@ export function useApplicationWizard({
     // ===== Previous Address Helpers =====
     const addPreviousAddress = useCallback(() => {
         const newAddress: PreviousAddressDetails = {
-            street: '',
+            // Address fields (matching AddressForm component)
+            street_name: '',
+            house_number: '',
+            address_line_2: '',
             city: '',
             state_province: '',
             postal_code: '',
             country: '',
+            // Date range
             from_date: '',
             to_date: '',
+            // Rental info
             living_situation: '',
             monthly_rent: '',
+            rent_currency: 'eur',
             landlord_name: '',
             landlord_contact: '',
             can_contact_landlord: true,
@@ -1772,6 +1786,64 @@ export function useApplicationWizard({
         }
 
         if (wizard.currentStep === 'history') {
+            // Credit check
+            newTouched.authorize_credit_check = true;
+
+            // CCJ/eviction details if applicable
+            if (wizard.data.has_ccjs_or_bankruptcies) {
+                newTouched.ccj_bankruptcy_details = true;
+            }
+            if (wizard.data.has_eviction_history) {
+                newTouched.eviction_details = true;
+            }
+
+            // Current address (required)
+            newTouched.current_living_situation = true;
+            newTouched.current_address_street_name = true;
+            newTouched.current_address_house_number = true;
+            newTouched.current_address_city = true;
+            newTouched.current_address_postal_code = true;
+            newTouched.current_address_country = true;
+            newTouched.current_address_move_in_date = true;
+
+            // Reason for moving
+            newTouched.reason_for_moving = true;
+            if (wizard.data.reason_for_moving === 'other') {
+                newTouched.reason_for_moving_other = true;
+            }
+
+            // Landlord info if renting
+            if (wizard.data.current_living_situation === 'renting') {
+                newTouched.current_monthly_rent = true;
+            }
+
+            // Previous addresses
+            wizard.data.previous_addresses.forEach((_, index) => {
+                newTouched[`prevaddr_${index}_street_name`] = true;
+                newTouched[`prevaddr_${index}_house_number`] = true;
+                newTouched[`prevaddr_${index}_city`] = true;
+                newTouched[`prevaddr_${index}_postal_code`] = true;
+                newTouched[`prevaddr_${index}_country`] = true;
+                newTouched[`prevaddr_${index}_from_date`] = true;
+                newTouched[`prevaddr_${index}_to_date`] = true;
+            });
+
+            // Landlord references
+            wizard.data.landlord_references.forEach((_, index) => {
+                newTouched[`landlordref_${index}_name`] = true;
+                newTouched[`landlordref_${index}_email`] = true;
+                newTouched[`landlordref_${index}_phone`] = true;
+            });
+
+            // Other references
+            wizard.data.other_references.forEach((_, index) => {
+                newTouched[`otherref_${index}_name`] = true;
+                newTouched[`otherref_${index}_email`] = true;
+                newTouched[`otherref_${index}_phone`] = true;
+                newTouched[`otherref_${index}_relationship`] = true;
+            });
+
+            // Legacy references
             wizard.data.references.forEach((_, index) => {
                 newTouched[`ref_${index}_name`] = true;
                 newTouched[`ref_${index}_phone`] = true;
