@@ -687,6 +687,74 @@ The component automatically:
 
 This prevents frontend/backend validation discrepancies caused by timezone issues.
 
+### Per-Field Blur Pattern
+
+Wizard steps implement a **per-field blur pattern** to show validation errors only after a user has interacted with a specific field. This prevents the confusing UX where touching one field causes validation errors to appear on other untouched fields.
+
+**Problem**: Calling `validateCurrentStep()` on any field's blur validates the ENTIRE step, setting errors for ALL fields. If we show errors based on these, users see red borders on fields they haven't touched yet.
+
+**Key Rules**:
+
+1. **Update functions** (`updateOccupant`, `updatePet`, etc.) must NEVER mark fields as touched - they only update data
+2. Fields are marked as touched **only on blur**, not on change
+3. Errors display only when BOTH `touchedFields[field]` AND `errors[field]` are true
+
+**Solution**: `useApplicationWizard` provides a single blur handler factory for all indexed field types:
+
+```tsx
+// createIndexedBlurHandler(prefix, index, field) → `${prefix}_${index}_${field}`
+createIndexedBlurHandler('occupant', 0, 'first_name'); // → 'occupant_0_first_name'
+createIndexedBlurHandler('pet', 1, 'type'); // → 'pet_1_type'
+createIndexedBlurHandler('cosigner', 0, 'email'); // → 'cosigner_0_email'
+```
+
+**Prefixes used**: `occupant`, `pet`, `ref`, `cosigner`, `guarantor`, `prevaddr`, `landlordref`, `otherref`
+
+**Usage in step components**:
+
+```tsx
+// For indexed fields - use the hook's blur handler factory
+<input
+    value={occupant.last_name}
+    onChange={(e) => updateOccupant(index, 'last_name', e.target.value)}
+    onBlur={createIndexedBlurHandler('occupant', index, 'last_name')}
+/>
+
+// For top-level fields - use onFieldBlur prop from parent
+<input
+    value={data.desired_move_in_date}
+    onChange={(e) => updateField('desired_move_in_date', e.target.value)}
+    onBlur={handleFieldBlur('desired_move_in_date')}
+/>
+```
+
+**How errors display**: Both conditions must be true:
+
+```tsx
+{
+    touchedFields[fieldKey] && errors[fieldKey] && <p className="text-destructive">{errors[fieldKey]}</p>;
+}
+```
+
+**Implementation in application-create.tsx**:
+
+```tsx
+const handleFieldBlur = useCallback((field: string) => {
+    wizard.markFieldTouched(field);
+    wizard.validateCurrentStep();
+    wizard.saveNow();
+}, [wizard]);
+
+// Pass to step components
+<HouseholdStep onFieldBlur={handleFieldBlur} ... />
+```
+
+**Rule**: All wizard step components should:
+
+1. Accept `onFieldBlur?: (field: string) => void` prop for top-level fields
+2. Use `createIndexedBlurHandler(prefix, index, field)` from the hook for indexed fields
+3. NEVER mark fields as touched in onChange handlers (update functions only update data)
+
 ### State Management
 
 | State              | Purpose            | When Updated                 |

@@ -25,6 +25,7 @@ interface HouseholdStepProps {
     removePet: (index: number) => void;
     updatePet: (index: number, field: keyof PetDetails, value: string | boolean | File | null) => void;
     onBlur: () => void;
+    onFieldBlur?: (field: string) => void;
     propertyCountry?: string;
 }
 
@@ -41,6 +42,7 @@ export function HouseholdStep({
     removePet,
     updatePet,
     onBlur,
+    onFieldBlur,
     propertyCountry,
 }: HouseholdStepProps) {
     const { translations } = usePage<SharedData>().props;
@@ -178,6 +180,38 @@ export function HouseholdStep({
         markFieldTouched('emergency_contact_phone_number');
     };
 
+    // Per-field blur handler - marks field as touched and triggers validation
+    const handleFieldBlur = (field: string) => () => {
+        if (onFieldBlur) {
+            onFieldBlur(field);
+        } else {
+            markFieldTouched(field);
+            onBlur();
+        }
+    };
+
+    // Helper to create blur handler for occupant fields
+    const handleOccupantFieldBlur = (index: number, field: keyof OccupantDetails) => () => {
+        const fieldKey = `occupant_${index}_${field}`;
+        if (onFieldBlur) {
+            onFieldBlur(fieldKey);
+        } else {
+            markFieldTouched(fieldKey);
+            onBlur();
+        }
+    };
+
+    // Helper to create blur handler for pet fields
+    const handlePetFieldBlur = (index: number, field: keyof PetDetails) => () => {
+        const fieldKey = `pet_${index}_${field}`;
+        if (onFieldBlur) {
+            onFieldBlur(fieldKey);
+        } else {
+            markFieldTouched(fieldKey);
+            onBlur();
+        }
+    };
+
     const getFieldClass = (field: string) => {
         const hasError = touchedFields[field] && errors[field];
         return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
@@ -215,7 +249,7 @@ export function HouseholdStep({
                                 <DatePicker
                                     value={data.desired_move_in_date}
                                     onChange={(value) => handleFieldChange('desired_move_in_date', value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleFieldBlur('desired_move_in_date')}
                                     min={new Date(Date.now() + 86400000)}
                                     aria-invalid={!!(touchedFields.desired_move_in_date && errors.desired_move_in_date)}
                                 />
@@ -243,7 +277,7 @@ export function HouseholdStep({
                                     type="number"
                                     value={data.lease_duration_months}
                                     onChange={(e) => handleFieldChange('lease_duration_months', parseInt(e.target.value) || 0)}
-                                    onBlur={onBlur}
+                                    onBlur={handleFieldBlur('lease_duration_months')}
                                     min={1}
                                     max={60}
                                     aria-invalid={!!(touchedFields.lease_duration_months && errors.lease_duration_months)}
@@ -275,7 +309,7 @@ export function HouseholdStep({
                             <textarea
                                 value={data.message_to_landlord}
                                 onChange={(e) => updateField('message_to_landlord', e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleFieldBlur('message_to_landlord')}
                                 rows={4}
                                 maxLength={2000}
                                 placeholder={t('placeholders.message') || "Introduce yourself and explain why you're interested in this property..."}
@@ -339,7 +373,7 @@ export function HouseholdStep({
                                             type="text"
                                             value={occupant.first_name}
                                             onChange={(e) => updateOccupant(index, 'first_name', e.target.value)}
-                                            onBlur={onBlur}
+                                            onBlur={handleOccupantFieldBlur(index, 'first_name')}
                                             aria-invalid={!!(touchedFields[`occupant_${index}_first_name`] && errors[`occupant_${index}_first_name`])}
                                             className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupant_${index}_first_name`] && errors[`occupant_${index}_first_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                         />
@@ -353,7 +387,7 @@ export function HouseholdStep({
                                             type="text"
                                             value={occupant.last_name}
                                             onChange={(e) => updateOccupant(index, 'last_name', e.target.value)}
-                                            onBlur={onBlur}
+                                            onBlur={handleOccupantFieldBlur(index, 'last_name')}
                                             aria-invalid={!!(touchedFields[`occupant_${index}_last_name`] && errors[`occupant_${index}_last_name`])}
                                             className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupant_${index}_last_name`] && errors[`occupant_${index}_last_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                         />
@@ -370,7 +404,7 @@ export function HouseholdStep({
                                         <DatePicker
                                             value={occupant.date_of_birth}
                                             onChange={(value) => updateOccupant(index, 'date_of_birth', value || '')}
-                                            onBlur={onBlur}
+                                            onBlur={handleOccupantFieldBlur(index, 'date_of_birth')}
                                             max={new Date()}
                                             aria-invalid={
                                                 !!(touchedFields[`occupant_${index}_date_of_birth`] && errors[`occupant_${index}_date_of_birth`])
@@ -387,7 +421,7 @@ export function HouseholdStep({
                                             onChange={(value) => updateOccupant(index, 'relationship', value)}
                                             options={OCCUPANT_RELATIONSHIPS}
                                             placeholder="Select..."
-                                            onBlur={onBlur}
+                                            onBlur={handleOccupantFieldBlur(index, 'relationship')}
                                             aria-invalid={
                                                 !!(touchedFields[`occupant_${index}_relationship`] && errors[`occupant_${index}_relationship`])
                                             }
@@ -405,7 +439,7 @@ export function HouseholdStep({
                                             type="text"
                                             value={occupant.relationship_other}
                                             onChange={(e) => updateOccupant(index, 'relationship_other', e.target.value)}
-                                            onBlur={onBlur}
+                                            onBlur={handleOccupantFieldBlur(index, 'relationship_other')}
                                             placeholder={t('occupants.placeholder') || 'Enter relationship...'}
                                             aria-invalid={
                                                 !!(
@@ -509,7 +543,7 @@ export function HouseholdStep({
                                             onChange={(value) => updatePet(index, 'type', value)}
                                             options={PET_TYPES}
                                             placeholder="Select..."
-                                            onBlur={onBlur}
+                                            onBlur={handlePetFieldBlur(index, 'type')}
                                             aria-invalid={!!(touchedFields[`pet_${index}_type`] && errors[`pet_${index}_type`])}
                                         />
                                         {touchedFields[`pet_${index}_type`] && errors[`pet_${index}_type`] && (
@@ -525,7 +559,7 @@ export function HouseholdStep({
                                             type="text"
                                             value={pet.breed}
                                             onChange={(e) => updatePet(index, 'breed', e.target.value)}
-                                            onBlur={onBlur}
+                                            onBlur={handlePetFieldBlur(index, 'breed')}
                                             className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
@@ -538,7 +572,7 @@ export function HouseholdStep({
                                             type="text"
                                             value={pet.name}
                                             onChange={(e) => updatePet(index, 'name', e.target.value)}
-                                            onBlur={onBlur}
+                                            onBlur={handlePetFieldBlur(index, 'name')}
                                             placeholder={t('pets.namePlaceholder') || "Pet's name"}
                                             className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
@@ -556,7 +590,7 @@ export function HouseholdStep({
                                             type="text"
                                             value={pet.age}
                                             onChange={(e) => updatePet(index, 'age', e.target.value)}
-                                            onBlur={onBlur}
+                                            onBlur={handlePetFieldBlur(index, 'age')}
                                             placeholder={t('pets.agePlaceholder') || 'e.g. 2 years'}
                                             className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
@@ -571,7 +605,7 @@ export function HouseholdStep({
                                             onChange={(value) => updatePet(index, 'size', value)}
                                             options={PET_SIZES}
                                             placeholder={t('pets.sizePlaceholder') || 'Select size...'}
-                                            onBlur={onBlur}
+                                            onBlur={handlePetFieldBlur(index, 'size')}
                                         />
                                     </div>
                                 </div>
@@ -583,7 +617,7 @@ export function HouseholdStep({
                                             type="text"
                                             value={pet.type_other}
                                             onChange={(e) => updatePet(index, 'type_other', e.target.value)}
-                                            onBlur={onBlur}
+                                            onBlur={handlePetFieldBlur(index, 'type_other')}
                                             placeholder={t('pets.placeholder') || 'Enter pet type...'}
                                             aria-invalid={!!(touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`])}
                                             className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
@@ -690,7 +724,7 @@ export function HouseholdStep({
                                     type="text"
                                     value={data.emergency_contact_first_name}
                                     onChange={(e) => handleFieldChange('emergency_contact_first_name', e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleFieldBlur('emergency_contact_first_name')}
                                     placeholder={t('emergencyContact.placeholders.firstName') || 'First name'}
                                     aria-invalid={!!(touchedFields.emergency_contact_first_name && errors.emergency_contact_first_name)}
                                     className={getFieldClass('emergency_contact_first_name')}
@@ -706,7 +740,7 @@ export function HouseholdStep({
                                     type="text"
                                     value={data.emergency_contact_last_name}
                                     onChange={(e) => handleFieldChange('emergency_contact_last_name', e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleFieldBlur('emergency_contact_last_name')}
                                     placeholder={t('emergencyContact.placeholders.lastName') || 'Last name'}
                                     aria-invalid={!!(touchedFields.emergency_contact_last_name && errors.emergency_contact_last_name)}
                                     className={getFieldClass('emergency_contact_last_name')}
@@ -728,7 +762,7 @@ export function HouseholdStep({
                                     onChange={(value) => handleFieldChange('emergency_contact_relationship', value)}
                                     options={EMERGENCY_CONTACT_RELATIONSHIPS}
                                     placeholder={t('emergencyContact.placeholders.relationship') || 'Select...'}
-                                    onBlur={onBlur}
+                                    onBlur={handleFieldBlur('emergency_contact_relationship')}
                                     aria-invalid={!!(touchedFields.emergency_contact_relationship && errors.emergency_contact_relationship)}
                                 />
                                 {touchedFields.emergency_contact_relationship && errors.emergency_contact_relationship && (
@@ -742,7 +776,7 @@ export function HouseholdStep({
                                     value={data.emergency_contact_phone_number}
                                     countryCode={data.emergency_contact_phone_country_code}
                                     onChange={handleEmergencyPhoneChange}
-                                    onBlur={onBlur}
+                                    onBlur={handleFieldBlur('emergency_contact_phone_number')}
                                     placeholder={t('emergencyContact.placeholders.phone') || 'Phone number'}
                                     error={touchedFields.emergency_contact_phone_number ? errors.emergency_contact_phone_number : undefined}
                                 />
@@ -759,7 +793,7 @@ export function HouseholdStep({
                                     type="text"
                                     value={data.emergency_contact_relationship_other}
                                     onChange={(e) => handleFieldChange('emergency_contact_relationship_other', e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleFieldBlur('emergency_contact_relationship_other')}
                                     placeholder={t('emergencyContact.placeholders.specifyRelationship') || 'e.g. Cousin, Colleague'}
                                     aria-invalid={
                                         !!(touchedFields.emergency_contact_relationship_other && errors.emergency_contact_relationship_other)
@@ -782,7 +816,7 @@ export function HouseholdStep({
                                 type="email"
                                 value={data.emergency_contact_email}
                                 onChange={(e) => handleFieldChange('emergency_contact_email', e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleFieldBlur('emergency_contact_email')}
                                 placeholder={t('emergencyContact.placeholders.email') || 'email@example.com'}
                                 aria-invalid={!!(touchedFields.emergency_contact_email && errors.emergency_contact_email)}
                                 className={getFieldClass('emergency_contact_email')}

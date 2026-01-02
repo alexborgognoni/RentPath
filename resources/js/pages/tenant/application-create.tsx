@@ -198,6 +198,8 @@ export default function ApplicationCreate() {
                         removePet={wizard.removePet}
                         updatePet={wizard.updatePet}
                         onBlur={handleBlur}
+                        onFieldBlur={handleFieldBlur}
+                        propertyCountry={property.country}
                     />
                 );
             case 'financial':

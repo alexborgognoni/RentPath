@@ -859,6 +859,7 @@ export interface UseApplicationWizardReturn {
     touchedFields: Record<string, boolean>;
     markFieldTouched: (field: string) => void;
     markAllCurrentStepFieldsTouched: () => void;
+    createIndexedBlurHandler: (prefix: string, index: number, field: string) => () => void;
 
     // Autosave
     autosaveStatus: AutosaveStatus;
@@ -1030,7 +1031,7 @@ export function useApplicationWizard({
             const updated = [...wizard.data.occupants_details];
             updated[index] = { ...updated[index], [field]: value };
             wizard.updateField('occupants_details', updated);
-            setTouchedFields((prev) => ({ ...prev, [`occupant_${index}_${field}`]: true }));
+            // Don't mark as touched here - that happens on blur via handleOccupantFieldBlur
         },
         [wizard],
     );
@@ -1066,7 +1067,7 @@ export function useApplicationWizard({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             updated[index] = { ...updated[index], [field]: value as any };
             wizard.updateField('pets_details', updated);
-            setTouchedFields((prev) => ({ ...prev, [`pet_${index}_${field}`]: true }));
+            // Don't mark as touched here - that happens on blur via handlePetFieldBlur
         },
         [wizard],
     );
@@ -1097,7 +1098,7 @@ export function useApplicationWizard({
             const updated = [...wizard.data.references];
             updated[index] = { ...updated[index], [field]: value };
             wizard.updateField('references', updated);
-            setTouchedFields((prev) => ({ ...prev, [`ref_${index}_${field}`]: true }));
+            // Don't mark as touched here - that happens on blur
         },
         [wizard],
     );
@@ -1173,7 +1174,7 @@ export function useApplicationWizard({
             const updated = [...wizard.data.co_signers];
             updated[index] = { ...updated[index], [field]: value };
             wizard.updateField('co_signers', updated);
-            setTouchedFields((prev) => ({ ...prev, [`cosigner_${index}_${field}`]: true }));
+            // Don't mark as touched here - that happens on blur
         },
         [wizard],
     );
@@ -1333,7 +1334,7 @@ export function useApplicationWizard({
             const updated = [...wizard.data.guarantors];
             updated[index] = { ...updated[index], [field]: value };
             wizard.updateField('guarantors', updated);
-            setTouchedFields((prev) => ({ ...prev, [`guarantor_${index}_${field}`]: true }));
+            // Don't mark as touched here - that happens on blur
         },
         [wizard],
     );
@@ -1373,7 +1374,7 @@ export function useApplicationWizard({
             const updated = [...wizard.data.previous_addresses];
             updated[index] = { ...updated[index], [field]: value };
             wizard.updateField('previous_addresses', updated);
-            setTouchedFields((prev) => ({ ...prev, [`prevaddr_${index}_${field}`]: true }));
+            // Don't mark as touched here - that happens on blur
         },
         [wizard],
     );
@@ -1410,7 +1411,7 @@ export function useApplicationWizard({
             const updated = [...wizard.data.landlord_references];
             updated[index] = { ...updated[index], [field]: value };
             wizard.updateField('landlord_references', updated);
-            setTouchedFields((prev) => ({ ...prev, [`landlordref_${index}_${field}`]: true }));
+            // Don't mark as touched here - that happens on blur
         },
         [wizard],
     );
@@ -1444,7 +1445,7 @@ export function useApplicationWizard({
             const updated = [...wizard.data.other_references];
             updated[index] = { ...updated[index], [field]: value };
             wizard.updateField('other_references', updated);
-            setTouchedFields((prev) => ({ ...prev, [`otherref_${index}_${field}`]: true }));
+            // Don't mark as touched here - that happens on blur
         },
         [wizard],
     );
@@ -1453,6 +1454,24 @@ export function useApplicationWizard({
     const markFieldTouched = useCallback((field: string) => {
         setTouchedFields((prev) => ({ ...prev, [field]: true }));
     }, []);
+
+    /**
+     * Creates a blur handler for indexed fields (occupants, pets, references, etc.)
+     * Returns a function that marks the specific field as touched when called.
+     *
+     * Usage in step components:
+     *   <input onBlur={createIndexedBlurHandler('occupant', index, 'first_name')} />
+     *   <input onBlur={createIndexedBlurHandler('pet', index, 'type')} />
+     *   <input onBlur={createIndexedBlurHandler('cosigner', index, 'email')} />
+     *
+     * The field key format is: `${prefix}_${index}_${field}`
+     */
+    const createIndexedBlurHandler = useCallback(
+        (prefix: string, index: number, field: string) => () => {
+            setTouchedFields((prev) => ({ ...prev, [`${prefix}_${index}_${field}`]: true }));
+        },
+        [],
+    );
 
     const markAllCurrentStepFieldsTouched = useCallback(() => {
         const newTouched: Record<string, boolean> = { ...touchedFields };
@@ -1756,6 +1775,10 @@ export function useApplicationWizard({
         touchedFields,
         markFieldTouched,
         markAllCurrentStepFieldsTouched,
+
+        // Blur handler factory (for per-field blur pattern)
+        // Usage: createIndexedBlurHandler('occupant', index, 'first_name')
+        createIndexedBlurHandler,
 
         // Autosave
         autosaveStatus: wizard.autosaveStatus,
