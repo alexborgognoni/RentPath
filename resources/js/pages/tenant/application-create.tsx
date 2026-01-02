@@ -276,6 +276,7 @@ export default function ApplicationCreate() {
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
                         onBlur={handleBlur}
+                        propertyId={property.id}
                     />
                 );
             case 'consent':

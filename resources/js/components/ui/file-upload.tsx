@@ -70,14 +70,18 @@ export interface FileUploadProps {
               maxFileSize?: string;
               maxFiles?: number;
           };
-    /** Existing uploaded file (shows as already uploaded) */
+    /** Existing uploaded file (shows as already uploaded) - single file mode */
     existingFile?: UploadedFile | null;
+    /** Existing uploaded files (shows as already uploaded) - multi file mode */
+    existingFiles?: UploadedFile[];
     /** Called when upload succeeds */
     onUploadSuccess?: (file: UploadedFile) => void;
     /** Called when upload fails */
     onUploadError?: (error: string) => void;
-    /** Called when file is removed/replaced */
+    /** Called when file is removed/replaced - single file mode */
     onRemove?: () => void;
+    /** Called when a specific file is removed - multi file mode (receives file path) */
+    onFileRemove?: (path: string) => void;
     /** Additional CSS classes */
     className?: string;
     /** Whether the upload is disabled */
@@ -103,9 +107,11 @@ export function FileUpload({
     maxFiles = 1,
     description,
     existingFile,
+    existingFiles,
     onUploadSuccess,
     onUploadError,
     onRemove,
+    onFileRemove,
     className,
     disabled = false,
     error,
@@ -114,6 +120,9 @@ export function FileUpload({
     optional = false,
     allowDelete,
 }: FileUploadProps) {
+    // Determine if we're in multi-file mode
+    const isMultiMode = multiple && (existingFiles !== undefined || maxFiles > 1);
+
     // Default allowDelete based on required prop if not explicitly set
     const showDeleteButton = allowDelete ?? !required;
     const id = useId();
@@ -121,6 +130,11 @@ export function FileUpload({
     const [progress, setProgress] = useState(0);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
+    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+
+    // Calculate total files for multi-mode
+    const allFiles = isMultiMode ? [...(existingFiles || []), ...uploadedFiles] : [];
+    const canAddMore = isMultiMode && allFiles.length < maxFiles;
 
     // Reset uploadedFile state when existingFile changes (e.g., after page reload)
     // This ensures we show the "existing file" UI with preview URL instead of "just uploaded" UI
@@ -133,8 +147,16 @@ export function FileUpload({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [existingFile?.originalName, existingFile?.previewUrl]);
 
+    // Reset uploadedFiles when existingFiles changes
+    useEffect(() => {
+        if (existingFiles && existingFiles.length > 0) {
+            setUploadedFiles([]);
+            setStatus('idle');
+        }
+    }, [existingFiles]);
+
     const uploadFile = useCallback(
-        async (file: File) => {
+        async (file: File, addToMulti = false) => {
             setStatus('uploading');
             setProgress(0);
             setUploadError(null);
@@ -210,7 +232,12 @@ export function FileUpload({
 
                 const result = await uploadPromise;
                 setStatus('success');
-                setUploadedFile(result);
+
+                if (addToMulti) {
+                    setUploadedFiles((prev) => [...prev, result]);
+                } else {
+                    setUploadedFile(result);
+                }
                 onUploadSuccess?.(result);
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : 'Upload failed';
@@ -225,14 +252,22 @@ export function FileUpload({
     const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
         onDrop: (acceptedFiles) => {
             if (acceptedFiles.length > 0 && !disabled && status !== 'uploading') {
-                uploadFile(acceptedFiles[0]);
+                if (isMultiMode) {
+                    // In multi-mode, upload each file sequentially
+                    // For now, upload one at a time (could be enhanced for parallel uploads)
+                    acceptedFiles.forEach((file) => {
+                        uploadFile(file, true);
+                    });
+                } else {
+                    uploadFile(acceptedFiles[0]);
+                }
             }
         },
         accept,
         maxSize,
-        multiple,
-        maxFiles,
-        disabled: disabled || status === 'uploading',
+        multiple: isMultiMode,
+        maxFiles: isMultiMode ? maxFiles - allFiles.length : 1,
+        disabled: disabled || status === 'uploading' || (isMultiMode && !canAddMore),
         noClick: false,
     });
 
@@ -244,17 +279,32 @@ export function FileUpload({
         onRemove?.();
     }, [onRemove]);
 
+    const handleMultiFileRemove = useCallback(
+        (filePath: string, isExisting: boolean) => {
+            if (isExisting) {
+                // For existing files, call the parent callback
+                onFileRemove?.(filePath);
+            } else {
+                // For newly uploaded files, remove from local state
+                setUploadedFiles((prev) => prev.filter((f) => f.path !== filePath));
+            }
+        },
+        [onFileRemove],
+    );
+
     // Determine what to show
     const hasExistingFile = existingFile && !uploadedFile;
     const hasUploadedFile = !!uploadedFile;
-    const showDropzone = !hasExistingFile && !hasUploadedFile && status !== 'uploading';
+    const showDropzone = isMultiMode
+        ? canAddMore && status !== 'uploading'
+        : !hasExistingFile && !hasUploadedFile && status !== 'uploading';
     const isUploading = status === 'uploading';
     const hasError = status === 'error' || !!error || fileRejections.length > 0;
 
     // Get file rejection error message
     const rejectionError = fileRejections[0]?.errors[0]?.message;
     // Don't show external validation error if file was just uploaded successfully or already exists
-    const shouldHideValidationError = hasExistingFile || hasUploadedFile || status === 'success';
+    const shouldHideValidationError = hasExistingFile || hasUploadedFile || status === 'success' || (isMultiMode && allFiles.length > 0);
     const displayError = shouldHideValidationError ? (uploadError || rejectionError) : (error || uploadError || rejectionError);
 
     return (
@@ -266,8 +316,63 @@ export function FileUpload({
                 </label>
             )}
 
-            {/* Existing file display */}
-            {hasExistingFile && (
+            {/* Multi-file list display */}
+            {isMultiMode && allFiles.length > 0 && (
+                <div className="space-y-2">
+                    {allFiles.map((file, index) => {
+                        const isExisting = index < (existingFiles?.length || 0);
+                        return (
+                            <div
+                                key={file.path || `file-${index}`}
+                                className="overflow-hidden rounded-lg border border-border bg-card"
+                            >
+                                <div className="flex items-center gap-3 p-3">
+                                    <div className="shrink-0">
+                                        <FileIcon type={getFileExtension(file.originalName)} size={32} />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-medium">{file.originalName}</p>
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            {file.size && <span>{formatFileSize(file.size)}</span>}
+                                            {file.size && <span>•</span>}
+                                            <span className="flex items-center gap-1 text-green-600">
+                                                <CheckCircle2 className="h-3 w-3" />
+                                                {file.uploadedAt ? formatUploadDate(file.uploadedAt) : 'Uploaded'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex shrink-0 items-center gap-1">
+                                        {file.previewUrl && (
+                                            <a
+                                                href={file.previewUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                                title="Preview"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </a>
+                                        )}
+                                        {showDeleteButton && file.path && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleMultiFileRemove(file.path!, isExisting)}
+                                                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Existing file display (single mode) */}
+            {!isMultiMode && hasExistingFile && (
                 <div className="overflow-hidden rounded-lg border border-border bg-card">
                     <div className="flex items-center gap-3 p-3">
                         {/* File icon */}
@@ -350,8 +455,8 @@ export function FileUpload({
                 </div>
             )}
 
-            {/* Newly uploaded file display */}
-            {hasUploadedFile && (
+            {/* Newly uploaded file display (single mode) */}
+            {!isMultiMode && hasUploadedFile && (
                 <div className="overflow-hidden rounded-lg border border-border bg-card">
                     <div className="flex items-center gap-3 p-3">
                         {/* File icon */}
@@ -446,7 +551,13 @@ export function FileUpload({
                         </div>
 
                         <p className="text-sm font-medium">
-                            {isDragActive ? 'Drop file here' : 'Drag and drop or click to upload'}
+                            {isDragActive
+                                ? isMultiMode
+                                    ? 'Drop files here'
+                                    : 'Drop file here'
+                                : isMultiMode
+                                  ? 'Drag and drop files or click to upload'
+                                  : 'Drag and drop or click to upload'}
                         </p>
 
                         <p className="mt-1 text-center text-xs text-muted-foreground">

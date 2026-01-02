@@ -1,10 +1,11 @@
-import { FileUpload } from '@/components/ui/file-upload';
+import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
 import { OptionalBadge } from '@/components/ui/optional-badge';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { FileText, Info, Upload } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileText, Info, Upload } from 'lucide-react';
+import { useState } from 'react';
 
 interface AdditionalStepProps {
     data: ApplicationWizardData;
@@ -13,16 +14,29 @@ interface AdditionalStepProps {
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
     markFieldTouched: (field: string) => void;
     onBlur: () => void;
+    propertyId: number;
 }
 
-export function AdditionalStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur }: AdditionalStepProps) {
+export function AdditionalStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur, propertyId }: AdditionalStepProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.additionalStep.${key}`);
+
+    const [expandedSections, setExpandedSections] = useState({
+        documents: true,
+        notes: false,
+    });
+
+    const toggleSection = (section: keyof typeof expandedSections) => {
+        setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+    };
 
     const handleFieldChange = (field: keyof ApplicationWizardData, value: unknown) => {
         updateField(field, value as ApplicationWizardData[typeof field]);
         markFieldTouched(field);
     };
+
+    // Get existing additional documents from data (if any)
+    const existingDocuments: UploadedFile[] = data.additional_documents || [];
 
     return (
         <div className="space-y-6">
@@ -47,123 +61,99 @@ export function AdditionalStep({ data, errors, touchedFields, updateField, markF
                 </div>
             </div>
 
-            {/* Additional Documents Section */}
-            <div className="rounded-lg border border-border p-4">
-                <div className="mb-4 flex items-center gap-2">
-                    <Upload className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold">{t('documents.title') || 'Supporting Documents'}</h3>
-                    <OptionalBadge />
-                </div>
-                <p className="mb-4 text-sm text-muted-foreground">
-                    {t('documents.description') || 'Upload additional documents that may support your application.'}
-                </p>
+            {/* Supporting Documents Section - Collapsible */}
+            <div className="rounded-lg border border-border bg-card">
+                <button
+                    type="button"
+                    onClick={() => toggleSection('documents')}
+                    className="flex w-full cursor-pointer items-center justify-between p-4"
+                >
+                    <div className="flex items-center gap-3">
+                        <Upload size={20} className="text-primary" />
+                        <h3 className="font-semibold">{t('documents.title') || 'Supporting Documents'}</h3>
+                        <OptionalBadge />
+                        {existingDocuments.length > 0 && (
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                                {existingDocuments.length}
+                            </span>
+                        )}
+                    </div>
+                    {expandedSections.documents ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </button>
 
-                <div className="space-y-4">
-                    {/* Bank Statements */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            {t('documents.bankStatements') || 'Bank Statements'}{' '}
-                            <span className="text-muted-foreground">({t('optional') || 'Optional'})</span>
-                        </label>
-                        <p className="mb-2 text-xs text-muted-foreground">
-                            {t('documents.bankStatementsDesc') || 'Last 3 months of bank statements showing income deposits'}
-                        </p>
+                {expandedSections.documents && (
+                    <div className="space-y-4 border-t border-border p-4">
                         <FileUpload
-                            documentType="additional_bank_statements"
-                            uploadUrl="/tenant-profile/document/upload"
+                            documentType="additional_documents"
+                            uploadUrl={`/properties/${propertyId}/apply/document`}
                             accept={{
                                 'application/pdf': ['.pdf'],
                                 'image/*': ['.png', '.jpg', '.jpeg'],
                             }}
                             maxSize={20 * 1024 * 1024}
+                            multiple={true}
+                            maxFiles={10}
+                            existingFiles={existingDocuments}
                             description={{
                                 fileTypes: 'PDF, PNG, JPG',
                                 maxFileSize: '20MB',
+                                maxFiles: 10,
                             }}
-                            onUploadSuccess={() => markFieldTouched('additional_bank_statements')}
-                            error={touchedFields.additional_bank_statements ? errors.additional_bank_statements : undefined}
+                            onUploadSuccess={(file) => {
+                                markFieldTouched('additional_documents');
+                                // Add the new file to the data
+                                const updated = [...existingDocuments, file];
+                                updateField('additional_documents', updated);
+                            }}
+                            onFileRemove={(path) => {
+                                // Remove the file from the data
+                                const updated = existingDocuments.filter((f) => f.path !== path);
+                                updateField('additional_documents', updated);
+                                // Also call the backend to remove
+                                fetch(`/properties/${propertyId}/apply/document`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                                    },
+                                    body: JSON.stringify({ path }),
+                                });
+                            }}
+                            error={touchedFields.additional_documents ? errors.additional_documents : undefined}
                         />
                     </div>
-
-                    {/* Tax Returns */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            {t('documents.taxReturns') || 'Tax Returns'}{' '}
-                            <span className="text-muted-foreground">({t('optional') || 'Optional'})</span>
-                        </label>
-                        <p className="mb-2 text-xs text-muted-foreground">
-                            {t('documents.taxReturnsDesc') || 'Most recent tax return or tax assessment'}
-                        </p>
-                        <FileUpload
-                            documentType="additional_tax_returns"
-                            uploadUrl="/tenant-profile/document/upload"
-                            accept={{
-                                'application/pdf': ['.pdf'],
-                                'image/*': ['.png', '.jpg', '.jpeg'],
-                            }}
-                            maxSize={20 * 1024 * 1024}
-                            description={{
-                                fileTypes: 'PDF, PNG, JPG',
-                                maxFileSize: '20MB',
-                            }}
-                            onUploadSuccess={() => markFieldTouched('additional_tax_returns')}
-                            error={touchedFields.additional_tax_returns ? errors.additional_tax_returns : undefined}
-                        />
-                    </div>
-
-                    {/* Other Supporting Documents */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            {t('documents.otherDocuments') || 'Other Documents'}{' '}
-                            <span className="text-muted-foreground">({t('optional') || 'Optional'})</span>
-                        </label>
-                        <p className="mb-2 text-xs text-muted-foreground">
-                            {t('documents.otherDocumentsDesc') || 'Any other relevant documents (recommendation letters, proof of savings, etc.)'}
-                        </p>
-                        <FileUpload
-                            documentType="additional_other_documents"
-                            uploadUrl="/tenant-profile/document/upload"
-                            accept={{
-                                'application/pdf': ['.pdf'],
-                                'image/*': ['.png', '.jpg', '.jpeg'],
-                            }}
-                            maxSize={20 * 1024 * 1024}
-                            description={{
-                                fileTypes: 'PDF, PNG, JPG',
-                                maxFileSize: '20MB',
-                            }}
-                            onUploadSuccess={() => markFieldTouched('additional_other_documents')}
-                            error={touchedFields.additional_other_documents ? errors.additional_other_documents : undefined}
-                        />
-                    </div>
-                </div>
+                )}
             </div>
 
-            {/* Additional Notes Section */}
-            <div className="rounded-lg border border-border p-4">
-                <div className="mb-4 flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold">{t('notes.title')}</h3>
-                    <OptionalBadge />
-                </div>
-                <p className="mb-4 text-sm text-muted-foreground">{t('notes.description')}</p>
+            {/* Additional Notes Section - Collapsible */}
+            <div className="rounded-lg border border-border bg-card">
+                <button type="button" onClick={() => toggleSection('notes')} className="flex w-full cursor-pointer items-center justify-between p-4">
+                    <div className="flex items-center gap-3">
+                        <FileText size={20} className="text-primary" />
+                        <h3 className="font-semibold">{t('notes.title') || 'Additional Notes'}</h3>
+                        <OptionalBadge />
+                    </div>
+                    {expandedSections.notes ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </button>
 
-                <div>
-                    <textarea
-                        value={data.additional_notes || ''}
-                        onChange={(e) => handleFieldChange('additional_notes', e.target.value)}
-                        onBlur={onBlur}
-                        rows={4}
-                        maxLength={2000}
-                        placeholder={t('notes.placeholder')}
-                        className="w-full rounded-lg border border-border bg-background px-4 py-2"
-                    />
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        {t('notes.characters')
-                            .replace(':count', (data.additional_notes?.length || 0).toString())
-                            .replace(':max', '2000')}
-                    </p>
-                </div>
+                {expandedSections.notes && (
+                    <div className="space-y-4 border-t border-border p-4">
+                        <textarea
+                            value={data.additional_information || ''}
+                            onChange={(e) => handleFieldChange('additional_information', e.target.value)}
+                            onBlur={onBlur}
+                            rows={4}
+                            maxLength={2000}
+                            placeholder={t('notes.placeholder') || 'Add any additional information you would like to share...'}
+                            className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            {t('notes.characters')
+                                .replace(':count', (data.additional_information?.length || 0).toString())
+                                .replace(':max', '2000') || `${data.additional_information?.length || 0} / 2000 characters`}
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );

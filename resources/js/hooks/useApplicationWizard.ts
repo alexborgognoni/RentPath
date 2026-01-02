@@ -1,3 +1,4 @@
+import type { UploadedFile } from '@/components/ui/file-upload';
 import {
     validateApplicationForSubmit,
     validateApplicationStep,
@@ -418,7 +419,7 @@ export interface ApplicationWizardData {
 
     // ===== Step 6: Additional Information & Documents =====
     additional_information: string;
-    additional_documents: { file: File; description: string }[];
+    additional_documents: UploadedFile[];
 
     // ===== Step 7: Declarations & Consent =====
     declaration_accuracy: boolean;

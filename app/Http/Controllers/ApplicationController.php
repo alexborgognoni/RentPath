@@ -1668,6 +1668,93 @@ class ApplicationController extends Controller
     }
 
     /**
+     * Upload additional document for an application.
+     */
+    public function uploadDocument(Request $request, Property $property)
+    {
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        if (! $tenantProfile) {
+            return response()->json(['success' => false, 'message' => 'Tenant profile not found'], 404);
+        }
+
+        // Find or create draft application
+        $application = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->where('status', 'draft')
+            ->first();
+
+        if (! $application) {
+            $application = Application::create([
+                'tenant_profile_id' => $tenantProfile->id,
+                'property_id' => $property->id,
+                'status' => 'draft',
+                'current_step' => 1,
+            ]);
+        }
+
+        $validated = $request->validate([
+            'file' => ['required', 'file', 'mimes:pdf,jpeg,jpg,png', 'max:20480'],
+        ]);
+
+        $file = $request->file('file');
+        $path = StorageHelper::store($file, 'applications/additional-documents', 'private');
+
+        // Add to existing documents
+        $documents = $application->additional_documents ?? [];
+        $documents[] = [
+            'path' => $path,
+            'originalName' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'uploadedAt' => time(),
+        ];
+        $application->update(['additional_documents' => $documents]);
+
+        return response()->json([
+            'success' => true,
+            'original_name' => $file->getClientOriginalName(),
+            'path' => $path,
+        ]);
+    }
+
+    /**
+     * Remove additional document from an application.
+     */
+    public function removeDocument(Request $request, Property $property)
+    {
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        if (! $tenantProfile) {
+            return response()->json(['success' => false, 'message' => 'Tenant profile not found'], 404);
+        }
+
+        $application = Application::where('tenant_profile_id', $tenantProfile->id)
+            ->where('property_id', $property->id)
+            ->where('status', 'draft')
+            ->first();
+
+        if (! $application) {
+            return response()->json(['success' => false, 'message' => 'Application not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'path' => ['required', 'string'],
+        ]);
+
+        $documents = $application->additional_documents ?? [];
+        $documents = array_values(array_filter($documents, fn ($doc) => $doc['path'] !== $validated['path']));
+
+        // Delete the file from storage
+        StorageHelper::delete($validated['path'], 'private');
+
+        $application->update(['additional_documents' => $documents]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Update lead status to 'drafting' when user starts an application draft.
      */
     private function updateLeadOnDraft($user, Property $property): void

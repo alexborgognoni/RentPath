@@ -507,6 +507,12 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
     Route::post('properties/{property}/apply/draft', [\App\Http\Controllers\ApplicationController::class, 'saveDraft'])
         ->name('applications.save-draft');
 
+    Route::post('properties/{property}/apply/document', [\App\Http\Controllers\ApplicationController::class, 'uploadDocument'])
+        ->name('applications.upload-document');
+
+    Route::delete('properties/{property}/apply/document', [\App\Http\Controllers\ApplicationController::class, 'removeDocument'])
+        ->name('applications.remove-document');
+
     Route::get('applications/{application}', [\App\Http\Controllers\ApplicationController::class, 'show'])
         ->name('applications.show');
 
