@@ -24,7 +24,7 @@ interface IdentityStepProps {
     touchedFields: Record<string, boolean>;
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
     markFieldTouched: (field: string) => void;
-    onBlur: () => void;
+    /** Per-field blur handler - called with prefixed field name (e.g., 'profile_date_of_birth') */
     onFieldBlur?: (field: string) => void;
     existingDocuments?: {
         id_document_front?: string;
@@ -54,7 +54,7 @@ export function IdentityStep({
     touchedFields,
     updateField,
     markFieldTouched,
-    onBlur,
+    onFieldBlur,
     existingDocuments,
     propertyCountry,
 }: IdentityStepProps) {
@@ -153,27 +153,39 @@ export function IdentityStep({
         [user, data.profile_date_of_birth, data.profile_nationality, data.profile_phone_number, data.profile_phone_country_code, data.profile_bio],
     );
 
+    // Field map for personal details - maps shared component field names to profile_ prefixed fields
+    const personalDetailsFieldMap: Record<keyof PersonalDetailsData, keyof ApplicationWizardData> = {
+        first_name: 'profile_date_of_birth', // Not used - disabled
+        last_name: 'profile_date_of_birth', // Not used - disabled
+        email: 'profile_date_of_birth', // Not used - disabled
+        date_of_birth: 'profile_date_of_birth',
+        nationality: 'profile_nationality',
+        phone_number: 'profile_phone_number',
+        phone_country_code: 'profile_phone_country_code',
+        bio: 'profile_bio',
+    };
+
     const handlePersonalDetailsChange = useCallback(
         (field: keyof PersonalDetailsData, value: string) => {
-            // Map field names back to profile_ prefixed fields
-            const fieldMap: Record<keyof PersonalDetailsData, keyof ApplicationWizardData> = {
-                first_name: 'profile_date_of_birth', // Not used - disabled
-                last_name: 'profile_date_of_birth', // Not used - disabled
-                email: 'profile_date_of_birth', // Not used - disabled
-                date_of_birth: 'profile_date_of_birth',
-                nationality: 'profile_nationality',
-                phone_number: 'profile_phone_number',
-                phone_country_code: 'profile_phone_country_code',
-                bio: 'profile_bio',
-            };
-
-            const targetField = fieldMap[field];
+            const targetField = personalDetailsFieldMap[field];
             if (targetField && field !== 'first_name' && field !== 'last_name' && field !== 'email') {
                 updateField(targetField, value);
-                markFieldTouched(targetField);
+                // Note: markFieldTouched is called on blur, not on change (per DESIGN.md)
             }
         },
-        [updateField, markFieldTouched],
+        [updateField],
+    );
+
+    // Per-field blur handler for personal details section
+    const handlePersonalDetailsBlur = useCallback(
+        (field: keyof PersonalDetailsData) => {
+            const targetField = personalDetailsFieldMap[field];
+            if (targetField && field !== 'first_name' && field !== 'last_name' && field !== 'email') {
+                markFieldTouched(targetField);
+                onFieldBlur?.(targetField);
+            }
+        },
+        [markFieldTouched, onFieldBlur],
     );
 
     // Map ApplicationWizardData to IdDocumentData
@@ -187,22 +199,35 @@ export function IdentityStep({
         [data.profile_id_document_type, data.profile_id_number, data.profile_id_issuing_country, data.profile_id_expiry_date],
     );
 
+    // Field map for ID document - maps shared component field names to profile_ prefixed fields
+    const idDocumentFieldMap: Record<keyof IdDocumentData, keyof ApplicationWizardData> = {
+        id_document_type: 'profile_id_document_type',
+        id_number: 'profile_id_number',
+        id_issuing_country: 'profile_id_issuing_country',
+        id_expiry_date: 'profile_id_expiry_date',
+    };
+
     const handleIdDocumentChange = useCallback(
         (field: keyof IdDocumentData, value: string) => {
-            const fieldMap: Record<keyof IdDocumentData, keyof ApplicationWizardData> = {
-                id_document_type: 'profile_id_document_type',
-                id_number: 'profile_id_number',
-                id_issuing_country: 'profile_id_issuing_country',
-                id_expiry_date: 'profile_id_expiry_date',
-            };
-
-            const targetField = fieldMap[field];
+            const targetField = idDocumentFieldMap[field];
             if (targetField) {
                 updateField(targetField, value);
-                markFieldTouched(targetField);
+                // Note: markFieldTouched is called on blur, not on change (per DESIGN.md)
             }
         },
-        [updateField, markFieldTouched],
+        [updateField],
+    );
+
+    // Per-field blur handler for ID document section
+    const handleIdDocumentBlur = useCallback(
+        (field: keyof IdDocumentData) => {
+            const targetField = idDocumentFieldMap[field];
+            if (targetField) {
+                markFieldTouched(targetField);
+                onFieldBlur?.(targetField);
+            }
+        },
+        [markFieldTouched, onFieldBlur],
     );
 
     // Map ApplicationWizardData to ImmigrationStatusData
@@ -223,23 +248,36 @@ export function IdentityStep({
         ],
     );
 
+    // Field map for immigration status - maps shared component field names to profile_ prefixed fields
+    const immigrationStatusFieldMap: Record<keyof ImmigrationStatusData, keyof ApplicationWizardData> = {
+        immigration_status: 'profile_immigration_status',
+        immigration_status_other: 'profile_immigration_status_other',
+        visa_type: 'profile_visa_type',
+        visa_type_other: 'profile_visa_type_other',
+        visa_expiry_date: 'profile_visa_expiry_date',
+    };
+
     const handleImmigrationStatusChange = useCallback(
         (field: keyof ImmigrationStatusData, value: string) => {
-            const fieldMap: Record<keyof ImmigrationStatusData, keyof ApplicationWizardData> = {
-                immigration_status: 'profile_immigration_status',
-                immigration_status_other: 'profile_immigration_status_other',
-                visa_type: 'profile_visa_type',
-                visa_type_other: 'profile_visa_type_other',
-                visa_expiry_date: 'profile_visa_expiry_date',
-            };
-
-            const targetField = fieldMap[field];
+            const targetField = immigrationStatusFieldMap[field];
             if (targetField) {
                 updateField(targetField, value);
-                markFieldTouched(targetField);
+                // Note: markFieldTouched is called on blur, not on change (per DESIGN.md)
             }
         },
-        [updateField, markFieldTouched],
+        [updateField],
+    );
+
+    // Per-field blur handler for immigration status section
+    const handleImmigrationStatusBlur = useCallback(
+        (field: keyof ImmigrationStatusData) => {
+            const targetField = immigrationStatusFieldMap[field];
+            if (targetField) {
+                markFieldTouched(targetField);
+                onFieldBlur?.(targetField);
+            }
+        },
+        [markFieldTouched, onFieldBlur],
     );
 
     // Map ApplicationWizardData to RightToRentData
@@ -250,19 +288,32 @@ export function IdentityStep({
         [data.profile_right_to_rent_share_code],
     );
 
+    // Field map for right to rent - maps shared component field names to profile_ prefixed fields
+    const rightToRentFieldMap: Record<keyof RightToRentData, keyof ApplicationWizardData> = {
+        right_to_rent_share_code: 'profile_right_to_rent_share_code',
+    };
+
     const handleRightToRentChange = useCallback(
         (field: keyof RightToRentData, value: string) => {
-            const fieldMap: Record<keyof RightToRentData, keyof ApplicationWizardData> = {
-                right_to_rent_share_code: 'profile_right_to_rent_share_code',
-            };
-
-            const targetField = fieldMap[field];
+            const targetField = rightToRentFieldMap[field];
             if (targetField) {
                 updateField(targetField, value);
-                markFieldTouched(targetField);
+                // Note: markFieldTouched is called on blur, not on change (per DESIGN.md)
             }
         },
-        [updateField, markFieldTouched],
+        [updateField],
+    );
+
+    // Per-field blur handler for right to rent section
+    const handleRightToRentBlur = useCallback(
+        (field: keyof RightToRentData) => {
+            const targetField = rightToRentFieldMap[field];
+            if (targetField) {
+                markFieldTouched(targetField);
+                onFieldBlur?.(targetField);
+            }
+        },
+        [markFieldTouched, onFieldBlur],
     );
 
     // ===== Error/Touched Mapping =====
@@ -296,7 +347,7 @@ export function IdentityStep({
                         <PersonalDetailsSection
                             data={personalDetailsData}
                             onChange={handlePersonalDetailsChange}
-                            onBlur={onBlur}
+                            onFieldBlur={handlePersonalDetailsBlur}
                             errors={errors}
                             touchedFields={touchedFields}
                             fieldPrefix="profile_"
@@ -306,7 +357,6 @@ export function IdentityStep({
                                 last_name: true,
                                 email: true,
                             }}
-                            defaultCountryCode={detectedCountry}
                             defaultPhoneCountryCode={detectedCountry}
                         />
                     </div>
@@ -332,7 +382,7 @@ export function IdentityStep({
                         <IdDocumentSection
                             data={idDocumentData}
                             onChange={handleIdDocumentChange}
-                            onBlur={onBlur}
+                            onFieldBlur={handleIdDocumentBlur}
                             errors={errors}
                             touchedFields={touchedFields}
                             fieldPrefix="profile_"
@@ -374,7 +424,7 @@ export function IdentityStep({
                         <ImmigrationStatusSection
                             data={immigrationStatusData}
                             onChange={handleImmigrationStatusChange}
-                            onBlur={onBlur}
+                            onFieldBlur={handleImmigrationStatusBlur}
                             errors={errors}
                             touchedFields={touchedFields}
                             fieldPrefix="profile_"
@@ -420,7 +470,7 @@ export function IdentityStep({
                         <RightToRentSection
                             data={rightToRentData}
                             onChange={handleRightToRentChange}
-                            onBlur={onBlur}
+                            onFieldBlur={handleRightToRentBlur}
                             errors={errors}
                             touchedFields={touchedFields}
                             fieldPrefix="profile_"

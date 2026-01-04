@@ -16,7 +16,8 @@ export interface IdDocumentData {
 export interface IdDocumentSectionProps {
     data: IdDocumentData;
     onChange: (field: keyof IdDocumentData, value: string) => void;
-    onBlur?: () => void;
+    /** Per-field blur handler - called with field name for per-field validation */
+    onFieldBlur?: (field: keyof IdDocumentData) => void;
     /** Error messages keyed by field name (with prefix if applicable) */
     errors?: Record<string, string | undefined>;
     /** Touched state keyed by field name (with prefix if applicable) */
@@ -49,13 +50,12 @@ const ID_DOCUMENT_TYPE_OPTIONS = [
     { value: 'passport', label: 'Passport' },
     { value: 'national_id', label: 'National ID Card' },
     { value: 'drivers_license', label: "Driver's License" },
-    { value: 'residence_permit', label: 'Residence Permit' },
 ];
 
 export function IdDocumentSection({
     data,
     onChange,
-    onBlur,
+    onFieldBlur,
     errors = {},
     touchedFields = {},
     fieldPrefix = '',
@@ -105,7 +105,7 @@ export function IdDocumentSection({
                         onChange={(value) => onChange('id_document_type', value)}
                         options={documentTypeOptions}
                         placeholder={t('placeholders.selectDocumentType') || 'Select document type...'}
-                        onBlur={onBlur}
+                        onBlur={() => onFieldBlur?.('id_document_type')}
                         aria-invalid={hasError('id_document_type')}
                         error={getError('id_document_type')}
                     />
@@ -117,7 +117,7 @@ export function IdDocumentSection({
                         type="text"
                         value={data.id_number}
                         onChange={(e) => onChange('id_number', e.target.value)}
-                        onBlur={onBlur}
+                        onBlur={() => onFieldBlur?.('id_number')}
                         placeholder={t('placeholders.enterIdNumber') || 'Enter document number'}
                         aria-invalid={hasError('id_number')}
                         className={getFieldClass('id_number')}
@@ -133,7 +133,7 @@ export function IdDocumentSection({
                     <CountrySelect
                         value={data.id_issuing_country}
                         onChange={(value) => onChange('id_issuing_country', value)}
-                        onBlur={onBlur}
+                        onBlur={() => onFieldBlur?.('id_issuing_country')}
                         defaultCountry={defaultCountry}
                         placeholder={t('placeholders.selectIssuingCountry') || 'Select country...'}
                         aria-invalid={hasError('id_issuing_country')}
@@ -146,7 +146,7 @@ export function IdDocumentSection({
                     <DatePicker
                         value={data.id_expiry_date}
                         onChange={(value) => onChange('id_expiry_date', value || '')}
-                        onBlur={onBlur}
+                        onBlur={() => onFieldBlur?.('id_expiry_date')}
                         restriction="strictFuture"
                         aria-invalid={hasError('id_expiry_date')}
                         error={hasError('id_expiry_date') ? getError('id_expiry_date') : undefined}

@@ -17,7 +17,8 @@ export interface ImmigrationStatusData {
 export interface ImmigrationStatusSectionProps {
     data: ImmigrationStatusData;
     onChange: (field: keyof ImmigrationStatusData, value: string) => void;
-    onBlur?: () => void;
+    /** Per-field blur handler - called with field name for per-field validation */
+    onFieldBlur?: (field: keyof ImmigrationStatusData) => void;
     /** Error messages keyed by field name (with prefix if applicable) */
     errors?: Record<string, string | undefined>;
     /** Touched state keyed by field name (with prefix if applicable) */
@@ -82,7 +83,7 @@ const STATUSES_REQUIRING_PERMIT_DETAILS = [
 export function ImmigrationStatusSection({
     data,
     onChange,
-    onBlur,
+    onFieldBlur,
     errors = {},
     touchedFields = {},
     fieldPrefix = '',
@@ -163,7 +164,7 @@ export function ImmigrationStatusSection({
                     onChange={(value) => onChange('immigration_status', value)}
                     options={immigrationStatusOptions}
                     placeholder={t('placeholders.selectStatus') || 'Select status...'}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('immigration_status')}
                     aria-invalid={hasError('immigration_status')}
                     error={getError('immigration_status')}
                 />
@@ -177,14 +178,12 @@ export function ImmigrationStatusSection({
                         type="text"
                         value={data.immigration_status_other}
                         onChange={(e) => onChange('immigration_status_other', e.target.value)}
-                        onBlur={onBlur}
+                        onBlur={() => onFieldBlur?.('immigration_status_other')}
                         placeholder={t('placeholders.specifyStatus') || 'Specify your status...'}
                         aria-invalid={hasError('immigration_status_other')}
                         className={getFieldClass('immigration_status_other')}
                     />
-                    {hasError('immigration_status_other') && (
-                        <p className="mt-1 text-sm text-destructive">{getError('immigration_status_other')}</p>
-                    )}
+                    {hasError('immigration_status_other') && <p className="mt-1 text-sm text-destructive">{getError('immigration_status_other')}</p>}
                 </div>
             )}
 
@@ -199,7 +198,7 @@ export function ImmigrationStatusSection({
                                 onChange={(value) => onChange('visa_type', value)}
                                 options={visaTypeOptions}
                                 placeholder={t('placeholders.selectVisaType') || 'Select permit type...'}
-                                onBlur={onBlur}
+                                onBlur={() => onFieldBlur?.('visa_type')}
                                 aria-invalid={hasError('visa_type')}
                                 error={getError('visa_type')}
                             />
@@ -210,7 +209,7 @@ export function ImmigrationStatusSection({
                             <DatePicker
                                 value={data.visa_expiry_date}
                                 onChange={(value) => onChange('visa_expiry_date', value || '')}
-                                onBlur={onBlur}
+                                onBlur={() => onFieldBlur?.('visa_expiry_date')}
                                 restriction="strictFuture"
                                 aria-invalid={hasError('visa_expiry_date')}
                                 error={hasError('visa_expiry_date') ? getError('visa_expiry_date') : undefined}
@@ -221,21 +220,17 @@ export function ImmigrationStatusSection({
                     {/* Show text input when "Other" is selected */}
                     {isVisaTypeOther && (
                         <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                {t('fields.visaTypeOther') || 'Please Specify Visa/Permit Type'}
-                            </label>
+                            <label className="mb-2 block text-sm font-medium">{t('fields.visaTypeOther') || 'Please Specify Visa/Permit Type'}</label>
                             <input
                                 type="text"
                                 value={data.visa_type_other || ''}
                                 onChange={(e) => onChange('visa_type_other', e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={() => onFieldBlur?.('visa_type_other')}
                                 placeholder={t('placeholders.specifyVisaType') || 'Enter your visa/permit type...'}
                                 aria-invalid={hasError('visa_type_other')}
                                 className={getFieldClass('visa_type_other')}
                             />
-                            {hasError('visa_type_other') && (
-                                <p className="mt-1 text-sm text-destructive">{getError('visa_type_other')}</p>
-                            )}
+                            {hasError('visa_type_other') && <p className="mt-1 text-sm text-destructive">{getError('visa_type_other')}</p>}
                         </div>
                     )}
 

@@ -67,6 +67,7 @@ export interface UseWizardReturn<TData, TStepId extends string> {
     setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
     validateCurrentStep: () => boolean;
     validateStep: (stepId: TStepId) => boolean;
+    validateField: (field: string) => void;
     clearFieldError: (field: string) => void;
 
     // Autosave
@@ -306,6 +307,40 @@ export function useWizard<TData, TStepId extends string>({
         });
     }, []);
 
+    // Per-field validation - validates full step but only sets/clears error for specific field
+    // This follows the DESIGN.md per-field blur pattern
+    const validateField = useCallback(
+        (field: string) => {
+            const result = validateStepFn(currentStep, data);
+            if (result.success) {
+                // Clear error for this field since step is valid
+                setErrors((prev) => {
+                    if (!prev[field]) return prev;
+                    const newErrors = { ...prev };
+                    delete newErrors[field];
+                    return newErrors;
+                });
+            } else {
+                // Set or clear error for just this field
+                const fieldError = result.errors[field];
+                setErrors((prev) => {
+                    if (fieldError) {
+                        // Set error for this field
+                        if (prev[field] === fieldError) return prev;
+                        return { ...prev, [field]: fieldError };
+                    } else {
+                        // Clear error for this field (it's valid even though step has other errors)
+                        if (!prev[field]) return prev;
+                        const newErrors = { ...prev };
+                        delete newErrors[field];
+                        return newErrors;
+                    }
+                });
+            }
+        },
+        [currentStep, data, validateStepFn],
+    );
+
     // Validation functions
     const validateCurrentStep = useCallback((): boolean => {
         const result = validateStepFn(currentStep, data);
@@ -426,6 +461,7 @@ export function useWizard<TData, TStepId extends string>({
         setErrors,
         validateCurrentStep,
         validateStep: validateStepById,
+        validateField,
         clearFieldError,
 
         // Autosave

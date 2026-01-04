@@ -9,7 +9,8 @@ export interface RightToRentData {
 export interface RightToRentSectionProps {
     data: RightToRentData;
     onChange: (field: keyof RightToRentData, value: string) => void;
-    onBlur?: () => void;
+    /** Per-field blur handler - called with field name for per-field validation */
+    onFieldBlur?: (field: keyof RightToRentData) => void;
     /** Error messages keyed by field name (with prefix if applicable) */
     errors?: Record<string, string | undefined>;
     /** Touched state keyed by field name (with prefix if applicable) */
@@ -35,7 +36,7 @@ export interface RightToRentSectionProps {
 export function RightToRentSection({
     data,
     onChange,
-    onBlur,
+    onFieldBlur,
     errors = {},
     touchedFields = {},
     fieldPrefix = '',
@@ -80,14 +81,12 @@ export function RightToRentSection({
                     type="text"
                     value={data.right_to_rent_share_code}
                     onChange={(e) => onChange('right_to_rent_share_code', e.target.value)}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('right_to_rent_share_code')}
                     placeholder={t('placeholders.shareCode') || 'Enter your share code from gov.uk'}
                     aria-invalid={hasError('right_to_rent_share_code')}
                     className={getFieldClass('right_to_rent_share_code')}
                 />
-                {hasError('right_to_rent_share_code') && (
-                    <p className="mt-1 text-sm text-destructive">{getError('right_to_rent_share_code')}</p>
-                )}
+                {hasError('right_to_rent_share_code') && <p className="mt-1 text-sm text-destructive">{getError('right_to_rent_share_code')}</p>}
                 <p className="mt-1 text-xs text-muted-foreground">
                     {t('help.shareCodePrefix') || 'Get your share code from'}{' '}
                     <a

@@ -173,6 +173,51 @@ export function SupportStep({
         }
     };
 
+    // Factory to create per-field blur handler for co-signer PersonalDetailsSection
+    // Maps shared section field names to prefixed field names (e.g., 'date_of_birth' -> 'cosigner_0_date_of_birth')
+    const createCoSignerPersonalDetailsBlur = (index: number) => (field: string) => {
+        const fieldKey = `cosigner_${index}_${field}`;
+        if (onFieldBlur) {
+            onFieldBlur(fieldKey);
+        } else {
+            markFieldTouched(fieldKey);
+            onBlur();
+        }
+    };
+
+    // Factory to create per-field blur handler for co-signer IdDocumentSection
+    const createCoSignerIdDocBlur = (index: number) => (field: string) => {
+        const fieldKey = `cosigner_${index}_${field}`;
+        if (onFieldBlur) {
+            onFieldBlur(fieldKey);
+        } else {
+            markFieldTouched(fieldKey);
+            onBlur();
+        }
+    };
+
+    // Factory to create per-field blur handler for guarantor PersonalDetailsSection
+    const createGuarantorPersonalDetailsBlur = (index: number) => (field: string) => {
+        const fieldKey = `guarantor_${index}_${field}`;
+        if (onFieldBlur) {
+            onFieldBlur(fieldKey);
+        } else {
+            markFieldTouched(fieldKey);
+            onBlur();
+        }
+    };
+
+    // Factory to create per-field blur handler for guarantor IdDocumentSection
+    const createGuarantorIdDocBlur = (index: number) => (field: string) => {
+        const fieldKey = `guarantor_${index}_${field}`;
+        if (onFieldBlur) {
+            onFieldBlur(fieldKey);
+        } else {
+            markFieldTouched(fieldKey);
+            onBlur();
+        }
+    };
+
     // Get field class with error styling for co-signer fields
     const getCoSignerFieldClass = (index: number, field: keyof CoSignerDetails, isDisabled = false) => {
         if (isDisabled) {
@@ -453,7 +498,7 @@ export function SupportStep({
                                         <PersonalDetailsSection
                                             data={getCoSignerPersonalData(coSigner)}
                                             onChange={(field, value) => updateCoSigner(index, field as keyof CoSignerDetails, value)}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createCoSignerPersonalDetailsBlur(index)}
                                             errors={errors}
                                             touchedFields={touchedFields}
                                             fieldPrefix={fieldPrefix}
@@ -514,7 +559,7 @@ export function SupportStep({
                                         <IdDocumentSection
                                             data={getCoSignerIdDocData(coSigner)}
                                             onChange={(field, value) => updateCoSigner(index, field as keyof CoSignerDetails, value)}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createCoSignerIdDocBlur(index)}
                                             errors={errors}
                                             touchedFields={touchedFields}
                                             fieldPrefix={fieldPrefix}
@@ -660,7 +705,7 @@ export function SupportStep({
                                         <PersonalDetailsSection
                                             data={getGuarantorPersonalData(guarantor)}
                                             onChange={(field, value) => updateGuarantor(index, field as keyof GuarantorDetails, value)}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createGuarantorPersonalDetailsBlur(index)}
                                             errors={errors}
                                             touchedFields={touchedFields}
                                             fieldPrefix={fieldPrefix}
@@ -715,7 +760,7 @@ export function SupportStep({
                                         <IdDocumentSection
                                             data={getGuarantorIdDocData(guarantor)}
                                             onChange={(field, value) => updateGuarantor(index, field as keyof GuarantorDetails, value)}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createGuarantorIdDocBlur(index)}
                                             errors={errors}
                                             touchedFields={touchedFields}
                                             fieldPrefix={fieldPrefix}

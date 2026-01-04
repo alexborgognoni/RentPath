@@ -63,17 +63,18 @@ export default function ApplicationCreate() {
         steps: translatedSteps,
     });
 
-    // Handle blur to trigger validation and autosave
+    // Generic blur handler - just triggers autosave, no validation
+    // Used by legacy components that don't have field-specific blur handlers
     const handleBlur = useCallback(() => {
-        wizard.validateCurrentStep();
         wizard.saveNow();
     }, [wizard]);
 
-    // Handle blur for a specific field - marks as touched and validates
+    // Handle blur for a specific field - marks as touched and validates just that field
+    // This follows the DESIGN.md per-field blur pattern to prevent cascade errors
     const handleFieldBlur = useCallback(
         (field: string) => {
             wizard.markFieldTouched(field);
-            wizard.validateCurrentStep();
+            wizard.validateField(field);
             wizard.saveNow();
         },
         [wizard],
@@ -176,7 +177,6 @@ export default function ApplicationCreate() {
                         touchedFields={wizard.touchedFields}
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
-                        onBlur={handleBlur}
                         onFieldBlur={handleFieldBlur}
                         existingDocuments={existingDocuments}
                         propertyCountry={property.country}

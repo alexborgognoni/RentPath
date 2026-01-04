@@ -687,11 +687,30 @@ The component automatically:
 
 This prevents frontend/backend validation discrepancies caused by timezone issues.
 
-### Per-Field Blur Pattern
+### Per-Field Blur Pattern (Unified Validation Approach)
 
 Wizard steps implement a **per-field blur pattern** to show validation errors only after a user has interacted with a specific field. This prevents the confusing UX where touching one field causes validation errors to appear on other untouched fields.
 
-**Problem**: Calling `validateCurrentStep()` on any field's blur validates the ENTIRE step, setting errors for ALL fields. If we show errors based on these, users see red borders on fields they haven't touched yet.
+**UX Research Summary** (based on industry best practices):
+
+- **Blur-first validation** is recommended for most fields - validate only after the user leaves the field
+- **On-change validation** should only be used for password strength indicators or complex format fields
+- **Required/empty field validation** should happen on submit, not on blur
+- Real-time validation on blur leads to 25% higher completion rates and 22% fewer errors
+- **No errors on page load** - even for pre-populated data that may be invalid
+
+**Pre-populated Data**: When form fields are pre-filled from a user's profile (e.g., date of birth, nationality), do NOT show validation errors on initial load. This applies even if the pre-loaded data is now invalid (e.g., user is now under 18 due to date constraints). Showing errors before user interaction feels like the form is "yelling" at users for something they didn't do in this session. Users discover errors naturally when they:
+
+1. Click/tab into a field and leave it (blur), OR
+2. Click "Continue" to proceed (full step validation)
+
+**The Problem**: Calling `validateCurrentStep()` on any field's blur validates the ENTIRE step, setting errors for ALL fields. Users see red borders on fields they haven't touched yet.
+
+**The Solution**: Per-field validation using `validateField(field)`:
+
+1. `onChange` handlers update data only (NEVER mark fields as touched)
+2. `onBlur` handlers mark the field as touched AND validate just that field
+3. "Continue" button validates ALL fields and shows ALL errors
 
 **Key Rules**:
 
@@ -699,34 +718,104 @@ Wizard steps implement a **per-field blur pattern** to show validation errors on
 2. Fields are marked as touched **only on blur**, not on change
 3. Errors display only when BOTH `touchedFields[field]` AND `errors[field]` are true
 
-**Solution**: `useApplicationWizard` provides a single blur handler factory for all indexed field types:
+**Validation Functions in useWizard**:
 
 ```tsx
-// createIndexedBlurHandler(prefix, index, field) → `${prefix}_${index}_${field}`
-createIndexedBlurHandler('occupant', 0, 'first_name'); // → 'occupant_0_first_name'
-createIndexedBlurHandler('pet', 1, 'type'); // → 'pet_1_type'
-createIndexedBlurHandler('cosigner', 0, 'email'); // → 'cosigner_0_email'
+// Per-field validation - validates step but only sets/clears error for specific field
+validateField(field: string): void
+
+// Full step validation - sets ALL errors (used by "Continue" button)
+validateCurrentStep(): boolean
 ```
 
-**Prefixes used**: `occupant`, `pet`, `ref`, `cosigner`, `guarantor`, `prevaddr`, `landlordref`, `otherref`
-
-**Usage in step components**:
+**Implementation in application-create.tsx**:
 
 ```tsx
-// For indexed fields - use the hook's blur handler factory
-<input
-    value={occupant.last_name}
-    onChange={(e) => updateOccupant(index, 'last_name', e.target.value)}
-    onBlur={createIndexedBlurHandler('occupant', index, 'last_name')}
-/>
+// Per-field blur handler - marks touched and validates just that field
+const handleFieldBlur = useCallback(
+    (field: string) => {
+        wizard.markFieldTouched(field);
+        wizard.validateField(field);  // Only this field's error is set/cleared
+        wizard.saveNow();
+    },
+    [wizard],
+);
 
-// For top-level fields - use onFieldBlur prop from parent
-<input
-    value={data.desired_move_in_date}
-    onChange={(e) => updateField('desired_move_in_date', e.target.value)}
-    onBlur={handleFieldBlur('desired_move_in_date')}
-/>
+// Pass to step components
+<IdentityStep onFieldBlur={handleFieldBlur} ... />
 ```
+
+**Shared Section Pattern**:
+
+Shared sections (PersonalDetailsSection, IdDocumentSection, etc.) use `onFieldBlur` prop:
+
+```tsx
+export interface PersonalDetailsSectionProps {
+    data: PersonalDetailsData;
+    onChange: (field: keyof PersonalDetailsData, value: string) => void;
+    onFieldBlur?: (field: keyof PersonalDetailsData) => void; // Called with field name
+    // ...
+}
+
+// In the component - each field calls onFieldBlur with its name
+<input value={data.date_of_birth} onChange={(e) => onChange('date_of_birth', e.target.value)} onBlur={() => onFieldBlur?.('date_of_birth')} />;
+```
+
+**Step Component Pattern**:
+
+Step components create field-specific blur handlers that map shared section field names to prefixed field names:
+
+```tsx
+// In IdentityStep - maps 'date_of_birth' to 'profile_date_of_birth'
+const handlePersonalDetailsBlur = useCallback(
+    (field: keyof PersonalDetailsData) => {
+        const targetField = personalDetailsFieldMap[field];
+        if (targetField) {
+            markFieldTouched(targetField);
+            onFieldBlur?.(targetField);
+        }
+    },
+    [markFieldTouched, onFieldBlur],
+);
+
+<PersonalDetailsSection
+    data={personalDetailsData}
+    onChange={handlePersonalDetailsChange}
+    onFieldBlur={handlePersonalDetailsBlur}
+    // ...
+/>;
+```
+
+**Indexed Fields Pattern**:
+
+For indexed entities (co-signers, guarantors, occupants), create blur handler factories:
+
+```tsx
+// Factory that maps shared section field names to indexed prefixes
+const createCoSignerPersonalDetailsBlur = (index: number) => (field: string) => {
+    const fieldKey = `cosigner_${index}_${field}`; // e.g., 'cosigner_0_date_of_birth'
+    if (onFieldBlur) {
+        onFieldBlur(fieldKey);
+    } else {
+        markFieldTouched(fieldKey);
+        onBlur();
+    }
+};
+
+// Legacy handler for individual fields
+const handleCoSignerFieldBlur = (index: number, field: keyof CoSignerDetails) => () => {
+    const fieldKey = `cosigner_${index}_${field}`;
+    // ...
+};
+
+// Usage
+<PersonalDetailsSection
+    onFieldBlur={createCoSignerPersonalDetailsBlur(index)}
+    // ...
+/>;
+```
+
+**Prefixes used**: `profile_`, `cosigner_${i}_`, `guarantor_${i}_`, `occupant_${i}_`, `pet_${i}_`, `prevaddr_${i}_`, `landlordref_${i}_`, `otherref_${i}_`
 
 **How errors display**: Both conditions must be true:
 
@@ -736,24 +825,13 @@ createIndexedBlurHandler('cosigner', 0, 'email'); // → 'cosigner_0_email'
 }
 ```
 
-**Implementation in application-create.tsx**:
-
-```tsx
-const handleFieldBlur = useCallback((field: string) => {
-    wizard.markFieldTouched(field);
-    wizard.validateCurrentStep();
-    wizard.saveNow();
-}, [wizard]);
-
-// Pass to step components
-<HouseholdStep onFieldBlur={handleFieldBlur} ... />
-```
-
 **Rule**: All wizard step components should:
 
-1. Accept `onFieldBlur?: (field: string) => void` prop for top-level fields
-2. Use `createIndexedBlurHandler(prefix, index, field)` from the hook for indexed fields
-3. NEVER mark fields as touched in onChange handlers (update functions only update data)
+1. Accept `onFieldBlur?: (field: string) => void` prop
+2. Create field mapping handlers for shared sections
+3. Use `createIndexedBlurHandler(prefix, index, field)` from the hook for legacy indexed fields
+4. NEVER mark fields as touched in onChange handlers (update functions only update data)
+5. NEVER call `validateCurrentStep()` on blur - use `validateField()` instead
 
 ### State Management
 
@@ -771,6 +849,94 @@ const handleFieldBlur = useCallback((field: string) => {
 | Go to next step     | Current step valid       |
 | Skip to step N      | All steps 1..(N-1) valid |
 | Publish/Submit      | All steps valid          |
+
+### Adding/Updating/Removing Wizard Fields Checklist
+
+When adding, updating, or removing a field in the application wizard, follow this checklist to ensure consistency across all layers:
+
+#### 1. Database Migration
+
+```bash
+php artisan make:migration add_field_to_table --no-interaction
+```
+
+- For new fields: Add column with appropriate type, nullable if optional
+- For enum changes: Create new migration with `DB::statement()` to ALTER the enum
+- For removals: Migrate existing data to safe default before removing
+
+#### 2. Backend Model
+
+- **File**: `app/Models/TenantProfile.php`, `app/Models/Application.php`, etc.
+- Add field to `$fillable` array
+- Add to `$casts` if needed (dates, booleans, encrypted fields)
+- Add accessor if field needs URL generation (e.g., `getFieldUrlAttribute()`)
+
+#### 3. Backend Validation
+
+- **Form Request**: `app/Http/Requests/StoreApplicationRequest.php`
+    - Add validation rules for the field
+    - Include in co_signers/guarantors arrays if applicable
+- **Controller**: `app/Http/Controllers/ApplicationController.php`
+    - Update any inline validation rules
+    - Update data mapping if field is passed to/from tenant profile
+
+#### 4. Frontend Types
+
+- **File**: `resources/js/types/index.d.ts`
+    - Add field to relevant interface (TenantProfile, Application, etc.)
+- **File**: `resources/js/hooks/useApplicationWizard.ts`
+    - Add to `ApplicationWizardData` type
+    - Add to initial state in `useState`
+    - Add to data mapping functions
+
+#### 5. Frontend Validation (Zod)
+
+- **File**: `resources/js/lib/validation/application-schemas.ts`
+    - Add error message to `APPLICATION_MESSAGES`
+    - Add validation rule to relevant schema (`personalInfoBaseSchema`, etc.)
+    - Update `existingDocumentsShape` if it's a document field
+
+#### 6. Frontend Components
+
+- **Shared Section**: `resources/js/components/application-wizard/shared/`
+    - Add to section's data interface
+    - Add to section's props interface if configurable
+    - Add UI element with proper `onChange` and `onFieldBlur` handlers
+- **Step Component**: `resources/js/components/application-wizard/steps/`
+    - Add to field mapping (e.g., `personalDetailsFieldMap`)
+    - Add to data transformation (e.g., `getCoSignerPersonalData`)
+    - Add to blur handler if using shared sections
+
+#### 7. Translations (All Languages)
+
+- **Files**: `resources/lang/{en,fr,de,nl}/wizard.php`
+    - Add field label under `fields`
+    - Add placeholder under `placeholders`
+    - Add error messages if custom
+    - Add enum options under relevant section (e.g., `documentTypes`)
+
+#### 8. UI Options (Dropdowns/Enums)
+
+- **Frontend**: Component file with options array (e.g., `ID_DOCUMENT_TYPE_OPTIONS`)
+- **Backend**: Validation `in:` rule with allowed values
+- **Database**: ENUM column or string with validation
+- **Translations**: Labels for each option value
+
+#### Example: Removing an Enum Option
+
+```bash
+# 1. Create migration to update enum
+php artisan make:migration remove_option_from_field_enum
+
+# 2. In migration: Update existing records, then alter enum
+DB::table('table')->where('field', 'old_value')->update(['field' => 'safe_default']);
+DB::statement("ALTER TABLE table MODIFY COLUMN field ENUM('val1', 'val2') NULL");
+
+# 3. Update backend validation rules (remove from 'in:' list)
+# 4. Update frontend options array (remove from array)
+# 5. Update TypeScript types (remove from union type)
+# 6. Update translations (remove the key)
+```
 
 ### Database Persistence
 

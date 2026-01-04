@@ -132,7 +132,7 @@ export interface CoSignerDetails {
     relationship: string;
     relationship_other: string;
     // ID Document
-    id_document_type: 'passport' | 'national_id' | 'drivers_license' | 'residence_permit' | '';
+    id_document_type: 'passport' | 'national_id' | 'drivers_license' | '';
     id_number: string;
     id_issuing_country: string;
     id_expiry_date: string;
@@ -246,7 +246,7 @@ export interface ApplicationWizardData {
     profile_phone_number: string;
     profile_bio: string;
     // ID Document
-    profile_id_document_type: 'passport' | 'national_id' | 'drivers_license' | 'residence_permit' | '';
+    profile_id_document_type: 'passport' | 'national_id' | 'drivers_license' | '';
     profile_id_number: string;
     profile_id_issuing_country: string;
     profile_id_expiry_date: string;
@@ -1011,6 +1011,7 @@ export interface UseApplicationWizardReturn {
     setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
     validateCurrentStep: () => boolean;
     validateForSubmit: () => boolean;
+    validateField: (field: string) => void;
     clearFieldError: (field: string) => void;
 
     // Touched fields (for showing errors)
@@ -2156,6 +2157,7 @@ export function useApplicationWizard({
         setErrors: wizard.setErrors,
         validateCurrentStep: wizard.validateCurrentStep,
         validateForSubmit,
+        validateField: wizard.validateField,
         clearFieldError: wizard.clearFieldError,
 
         // Touched fields

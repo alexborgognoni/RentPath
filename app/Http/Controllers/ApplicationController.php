@@ -633,7 +633,7 @@ class ApplicationController extends Controller
                     'profile_phone_country_code' => 'required|string|max:10',
                     'profile_phone_number' => 'required|string|max:20',
                     // ID Document
-                    'profile_id_document_type' => 'required|in:passport,national_id,drivers_license,residence_permit',
+                    'profile_id_document_type' => 'required|in:passport,national_id,drivers_license',
                     'profile_id_number' => 'required|string|max:100',
                     'profile_id_issuing_country' => 'required|string|max:2',
                     'profile_id_expiry_date' => 'required|date|after:today',

@@ -1254,7 +1254,6 @@ return [
                     'passport' => 'Paspoort',
                     'national_id' => 'Identiteitskaart',
                     'drivers_license' => 'Rijbewijs',
-                    'residence_permit' => 'Verblijfsvergunning',
                 ],
             ],
 

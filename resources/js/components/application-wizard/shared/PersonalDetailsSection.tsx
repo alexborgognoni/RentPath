@@ -19,7 +19,8 @@ export interface PersonalDetailsData {
 export interface PersonalDetailsSectionProps {
     data: PersonalDetailsData;
     onChange: (field: keyof PersonalDetailsData, value: string) => void;
-    onBlur?: () => void;
+    /** Per-field blur handler - called with field name for per-field validation */
+    onFieldBlur?: (field: keyof PersonalDetailsData) => void;
     /** Error messages keyed by field name (with prefix if applicable) */
     errors?: Record<string, string | undefined>;
     /** Touched state keyed by field name (with prefix if applicable) */
@@ -34,8 +35,6 @@ export interface PersonalDetailsSectionProps {
         email?: boolean;
         date_of_birth?: boolean;
     };
-    /** Default country code for nationality (ISO-2) */
-    defaultCountryCode?: string;
     /** Default country code for phone input (ISO-2) */
     defaultPhoneCountryCode?: string;
 }
@@ -43,13 +42,12 @@ export interface PersonalDetailsSectionProps {
 export function PersonalDetailsSection({
     data,
     onChange,
-    onBlur,
+    onFieldBlur,
     errors = {},
     touchedFields = {},
     fieldPrefix = '',
     translations,
     disabledFields = {},
-    defaultCountryCode,
     defaultPhoneCountryCode,
 }: PersonalDetailsSectionProps) {
     const t = (key: string) => translate(translations, `wizard.application.shared.personalDetails.${key}`);
@@ -84,7 +82,7 @@ export function PersonalDetailsSection({
                     type="text"
                     value={data.first_name}
                     onChange={(e) => onChange('first_name', e.target.value)}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('first_name')}
                     disabled={disabledFields.first_name}
                     aria-invalid={hasError('first_name')}
                     className={getFieldClass('first_name', disabledFields.first_name)}
@@ -99,7 +97,7 @@ export function PersonalDetailsSection({
                     type="text"
                     value={data.last_name}
                     onChange={(e) => onChange('last_name', e.target.value)}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('last_name')}
                     disabled={disabledFields.last_name}
                     aria-invalid={hasError('last_name')}
                     className={getFieldClass('last_name', disabledFields.last_name)}
@@ -114,7 +112,7 @@ export function PersonalDetailsSection({
                     type="email"
                     value={data.email}
                     onChange={(e) => onChange('email', e.target.value)}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('email')}
                     disabled={disabledFields.email}
                     aria-invalid={hasError('email')}
                     className={getFieldClass('email', disabledFields.email)}
@@ -128,7 +126,7 @@ export function PersonalDetailsSection({
                 <DatePicker
                     value={data.date_of_birth}
                     onChange={(value) => onChange('date_of_birth', value || '')}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('date_of_birth')}
                     restriction="past"
                     disabled={disabledFields.date_of_birth}
                     aria-invalid={hasError('date_of_birth')}
@@ -140,9 +138,9 @@ export function PersonalDetailsSection({
             <div>
                 <label className="mb-1 block text-sm font-medium">{t('fields.nationality') || 'Nationality'}</label>
                 <NationalitySelect
-                    value={data.nationality || defaultCountryCode || ''}
+                    value={data.nationality}
                     onChange={(value) => onChange('nationality', value)}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('nationality')}
                     aria-invalid={hasError('nationality')}
                     error={getError('nationality')}
                 />
@@ -155,7 +153,7 @@ export function PersonalDetailsSection({
                     value={data.phone_number}
                     countryCode={data.phone_country_code}
                     onChange={handlePhoneChange}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('phone_number')}
                     defaultCountry={defaultPhoneCountryCode}
                     aria-invalid={hasError('phone_number')}
                     error={getError('phone_number')}
@@ -172,7 +170,7 @@ export function PersonalDetailsSection({
                 <textarea
                     value={data.bio}
                     onChange={(e) => onChange('bio', e.target.value)}
-                    onBlur={onBlur}
+                    onBlur={() => onFieldBlur?.('bio')}
                     rows={4}
                     maxLength={1000}
                     placeholder={t('placeholders.bio') || 'Tell us a bit about yourself...'}

@@ -41,7 +41,7 @@ class StoreApplicationRequest extends FormRequest
             'profile_bio' => 'nullable|string|max:1000',
 
             // ID Document
-            'profile_id_document_type' => 'required|in:passport,national_id,drivers_license,residence_permit',
+            'profile_id_document_type' => 'required|in:passport,national_id,drivers_license',
             'profile_id_number' => 'required|string|max:100',
             'profile_id_issuing_country' => ['required', 'string', 'max:2', new ValidCountryCode],
             'profile_id_expiry_date' => 'required|date|after:today',
@@ -188,7 +188,7 @@ class StoreApplicationRequest extends FormRequest
             'co_signers.*.relationship' => 'required|in:spouse,partner,parent,sibling,child,friend,employer,other',
             'co_signers.*.relationship_other' => 'nullable|string|max:100',
             // ID Document
-            'co_signers.*.id_document_type' => 'required|in:passport,national_id,drivers_license,residence_permit',
+            'co_signers.*.id_document_type' => 'required|in:passport,national_id,drivers_license',
             'co_signers.*.id_number' => 'required|string|max:100',
             'co_signers.*.id_issuing_country' => 'required|string|max:2',
             'co_signers.*.id_expiry_date' => 'required|date|after:today',
@@ -223,7 +223,7 @@ class StoreApplicationRequest extends FormRequest
             'guarantors.*.relationship' => 'required|in:spouse,partner,parent,sibling,child,friend,employer,other',
             'guarantors.*.relationship_other' => 'nullable|string|max:100',
             // ID Document
-            'guarantors.*.id_document_type' => 'required|in:passport,national_id,drivers_license,residence_permit',
+            'guarantors.*.id_document_type' => 'required|in:passport,national_id,drivers_license',
             'guarantors.*.id_number' => 'required|string|max:100',
             'guarantors.*.id_issuing_country' => 'required|string|max:2',
             'guarantors.*.id_expiry_date' => 'required|date|after:today',

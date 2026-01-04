@@ -1254,7 +1254,6 @@ return [
                     'passport' => 'Reisepass',
                     'national_id' => 'Personalausweis',
                     'drivers_license' => 'Führerschein',
-                    'residence_permit' => 'Aufenthaltstitel',
                 ],
             ],
 

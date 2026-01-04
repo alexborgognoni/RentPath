@@ -1291,7 +1291,6 @@ return [
                     'passport' => 'Passport',
                     'national_id' => 'National ID Card',
                     'drivers_license' => "Driver's License",
-                    'residence_permit' => 'Residence Permit',
                 ],
             ],
 
