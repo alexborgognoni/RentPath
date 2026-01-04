@@ -33,6 +33,7 @@ export interface UseWizardOptions<TData, TStepId extends string> {
     onSave?: (data: TData, wizardStep: number) => Promise<SaveResult>;
     saveDebounceMs?: number;
     enableAutosave?: boolean;
+    autosaveExcludeSteps?: TStepId[]; // Steps where autosave should be skipped
 
     // Callbacks
     onStepChange?: (step: TStepId, index: number) => void;
@@ -88,6 +89,7 @@ export function useWizard<TData, TStepId extends string>({
     onSave,
     saveDebounceMs = 1000,
     enableAutosave = true,
+    autosaveExcludeSteps = [],
     onStepChange,
     onDataChange,
 }: UseWizardOptions<TData, TStepId>): UseWizardReturn<TData, TStepId> {
@@ -166,6 +168,11 @@ export function useWizard<TData, TStepId extends string>({
             return;
         }
 
+        // Skip autosave on excluded steps (e.g., consent step)
+        if (autosaveExcludeSteps.includes(currentStep)) {
+            return;
+        }
+
         // Skip if neither data nor step has changed from last save
         const stepToSave = firstInvalidStepIndex + 1; // 1-indexed for backend
         if (lastSavedDataRef.current === dataString && lastSavedStepRef.current === stepToSave) {
@@ -201,7 +208,7 @@ export function useWizard<TData, TStepId extends string>({
                 clearTimeout(debounceTimerRef.current);
             }
         };
-    }, [dataString, hasUserInteracted, enableAutosave, onSave, firstInvalidStepIndex, saveDebounceMs, data]);
+    }, [dataString, hasUserInteracted, enableAutosave, onSave, firstInvalidStepIndex, saveDebounceMs, data, autosaveExcludeSteps, currentStep]);
 
     // Manual save function - optionally accepts a step override for immediate saves after state updates
     const saveNow = useCallback(

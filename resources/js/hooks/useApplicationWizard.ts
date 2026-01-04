@@ -1179,6 +1179,7 @@ export function useApplicationWizard({
         validateStep: validateStepWrapper,
         onSave: handleSave,
         enableAutosave: true,
+        autosaveExcludeSteps: ['consent'], // Consent step data is saved on submit only
         saveDebounceMs: 500,
     });
 
@@ -2040,6 +2041,16 @@ export function useApplicationWizard({
                 newTouched[`ref_${index}_relationship`] = true;
                 newTouched[`ref_${index}_years_known`] = true;
             });
+        }
+
+        if (wizard.currentStep === 'consent') {
+            // Required declarations
+            newTouched.declaration_accuracy = true;
+            newTouched.consent_screening = true;
+            newTouched.consent_data_processing = true;
+            newTouched.consent_reference_contact = true;
+            // Signature
+            newTouched.digital_signature = true;
         }
 
         setTouchedFields(newTouched);

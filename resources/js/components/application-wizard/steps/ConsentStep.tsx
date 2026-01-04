@@ -3,8 +3,8 @@ import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { CheckCircle2, Shield } from 'lucide-react';
-import { useEffect } from 'react';
+import { Shield } from 'lucide-react';
+import { useCallback, useEffect } from 'react';
 
 interface ConsentStepProps {
     data: ApplicationWizardData;
@@ -12,31 +12,28 @@ interface ConsentStepProps {
     touchedFields: Record<string, boolean>;
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
     markFieldTouched: (field: string) => void;
-    onBlur: () => void;
 }
 
-export function ConsentStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur }: ConsentStepProps) {
+export function ConsentStep({ data, errors, touchedFields, updateField, markFieldTouched }: ConsentStepProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.consentStep.${key}`);
 
-    // Auto-capture signature date and IP when component mounts
+    // Auto-capture signature date when component mounts
     useEffect(() => {
         if (!data.signature_date) {
             updateField('signature_date', new Date().toISOString());
         }
-        // Note: IP address should be captured on the server side for security
     }, []);
 
-    const handleCheckboxChange = (field: keyof ApplicationWizardData, checked: boolean) => {
-        updateField(field, checked);
-        markFieldTouched(field);
-        onBlur();
-    };
-
-    const handleFieldChange = (field: keyof ApplicationWizardData, value: unknown) => {
-        updateField(field, value as ApplicationWizardData[typeof field]);
-        markFieldTouched(field);
-    };
+    // Checkbox change handler - just update value and mark touched
+    // Don't trigger validation here - updateField already clears errors, and Continue button handles validation
+    const handleCheckboxChange = useCallback(
+        (field: keyof ApplicationWizardData, checked: boolean) => {
+            updateField(field, checked);
+            markFieldTouched(field);
+        },
+        [updateField, markFieldTouched],
+    );
 
     const showError = (field: string) => touchedFields[field] && errors[field];
 
@@ -50,7 +47,11 @@ export function ConsentStep({ data, errors, touchedFields, updateField, markFiel
             {/* Required Declarations */}
             <div className="space-y-4">
                 {/* Declaration of Accuracy */}
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50">
+                <label
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 ${
+                        showError('declaration_accuracy') ? 'border-destructive bg-destructive/5' : 'border-border'
+                    }`}
+                >
                     <input
                         type="checkbox"
                         checked={data.declaration_accuracy || false}
@@ -66,12 +67,15 @@ export function ConsentStep({ data, errors, touchedFields, updateField, markFiel
                                 'I declare that all information provided in this application is complete, true, and accurate to the best of my knowledge. I understand that providing false information may result in the rejection of my application or termination of any resulting tenancy.'}
                         </p>
                     </div>
-                    {data.declaration_accuracy && <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />}
                 </label>
-                {showError('declaration_accuracy') && <p className="text-sm text-destructive">{errors.declaration_accuracy}</p>}
+                {showError('declaration_accuracy') && <p className="-mt-2 text-sm text-destructive">{errors.declaration_accuracy}</p>}
 
                 {/* Consent to Screening */}
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50">
+                <label
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 ${
+                        showError('consent_screening') ? 'border-destructive bg-destructive/5' : 'border-border'
+                    }`}
+                >
                     <input
                         type="checkbox"
                         checked={data.consent_screening || false}
@@ -85,12 +89,15 @@ export function ConsentStep({ data, errors, touchedFields, updateField, markFiel
                                 'I authorize the landlord/property manager and their agents to conduct credit checks, background checks, and verification of my employment and rental history as part of this application.'}
                         </p>
                     </div>
-                    {data.consent_screening && <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />}
                 </label>
-                {showError('consent_screening') && <p className="text-sm text-destructive">{errors.consent_screening}</p>}
+                {showError('consent_screening') && <p className="-mt-2 text-sm text-destructive">{errors.consent_screening}</p>}
 
                 {/* Consent to Data Processing (GDPR) */}
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50">
+                <label
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 ${
+                        showError('consent_data_processing') ? 'border-destructive bg-destructive/5' : 'border-border'
+                    }`}
+                >
                     <input
                         type="checkbox"
                         checked={data.consent_data_processing || false}
@@ -104,12 +111,15 @@ export function ConsentStep({ data, errors, touchedFields, updateField, markFiel
                                 'I consent to the collection, processing, and storage of my personal data as described in the Privacy Policy for the purpose of evaluating my rental application.'}
                         </p>
                     </div>
-                    {data.consent_data_processing && <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />}
                 </label>
-                {showError('consent_data_processing') && <p className="text-sm text-destructive">{errors.consent_data_processing}</p>}
+                {showError('consent_data_processing') && <p className="-mt-2 text-sm text-destructive">{errors.consent_data_processing}</p>}
 
                 {/* Consent to Contact References */}
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50">
+                <label
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 ${
+                        showError('consent_reference_contact') ? 'border-destructive bg-destructive/5' : 'border-border'
+                    }`}
+                >
                     <input
                         type="checkbox"
                         checked={data.consent_reference_contact || false}
@@ -125,9 +135,8 @@ export function ConsentStep({ data, errors, touchedFields, updateField, markFiel
                                 'I authorize the landlord/property manager to contact the references I have provided, including previous landlords and employers, to verify the information in my application.'}
                         </p>
                     </div>
-                    {data.consent_reference_contact && <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />}
                 </label>
-                {showError('consent_reference_contact') && <p className="text-sm text-destructive">{errors.consent_reference_contact}</p>}
+                {showError('consent_reference_contact') && <p className="-mt-2 text-sm text-destructive">{errors.consent_reference_contact}</p>}
 
                 {/* Consent to Data Sharing - Optional */}
                 <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50">
@@ -147,7 +156,6 @@ export function ConsentStep({ data, errors, touchedFields, updateField, markFiel
                                 'If this application is not successful, I consent to my application being shared with other landlords who may have suitable properties available.'}
                         </p>
                     </div>
-                    {data.consent_data_sharing && <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />}
                 </label>
 
                 {/* Consent to Marketing - Optional */}
@@ -168,7 +176,6 @@ export function ConsentStep({ data, errors, touchedFields, updateField, markFiel
                                 'I consent to receive emails about new properties and rental opportunities that may be of interest to me.'}
                         </p>
                     </div>
-                    {data.consent_marketing && <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />}
                 </label>
             </div>
 
@@ -188,9 +195,9 @@ export function ConsentStep({ data, errors, touchedFields, updateField, markFiel
                         <input
                             type="text"
                             value={data.digital_signature || ''}
-                            onChange={(e) => handleFieldChange('digital_signature', e.target.value)}
-                            onBlur={onBlur}
+                            onChange={(e) => updateField('digital_signature', e.target.value)}
                             placeholder={t('signature.fullNamePlaceholder') || 'Type your full legal name'}
+                            aria-invalid={!!(touchedFields.digital_signature && errors.digital_signature)}
                             className={`w-full rounded-lg border px-4 py-2 ${
                                 showError('digital_signature') ? 'border-destructive bg-destructive/5' : 'border-border bg-background'
                             }`}

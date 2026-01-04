@@ -280,7 +280,7 @@ export default function ApplicationCreate() {
                     />
                 );
             case 'consent':
-                // Step 7: Declarations & Consent
+                // Step 7: Declarations & Consent (no autosave - data saved on submit only)
                 return (
                     <ConsentStep
                         data={wizard.data}
@@ -288,7 +288,6 @@ export default function ApplicationCreate() {
                         touchedFields={wizard.touchedFields}
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
-                        onBlur={handleBlur}
                     />
                 );
             case 'review':
