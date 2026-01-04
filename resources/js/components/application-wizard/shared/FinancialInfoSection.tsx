@@ -82,6 +82,8 @@ export interface FinancialInfoSectionProps {
     isTouched: (field: string) => boolean;
     /** Per-field blur handler - called with prefixed field name (e.g., 'profile_employer_name') */
     onFieldBlur?: (field: string) => void;
+    /** Clears all touched fields - called when employment status changes */
+    clearTouchedFields?: () => void;
     /** Upload URL for documents */
     uploadUrl: string;
     /** Document type prefix (e.g., 'cosigner_0_' for co-signers) */
@@ -111,6 +113,7 @@ export function FinancialInfoSection({
     getError,
     isTouched,
     onFieldBlur,
+    clearTouchedFields,
     uploadUrl,
     documentTypePrefix = '',
     existingDocuments,
@@ -433,7 +436,12 @@ export function FinancialInfoSection({
                             <button
                                 key={statusOption.value}
                                 type="button"
-                                onClick={() => setValue(f('employment_status'), statusOption.value)}
+                                onClick={() => {
+                                    if (!isSelected) {
+                                        clearTouchedFields?.();
+                                    }
+                                    setValue(f('employment_status'), statusOption.value);
+                                }}
                                 className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-colors ${
                                     isSelected
                                         ? 'border-primary bg-primary/5 text-primary'

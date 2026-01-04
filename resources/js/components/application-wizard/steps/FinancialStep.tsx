@@ -10,12 +10,22 @@ interface FinancialStepProps {
     touchedFields: Record<string, boolean>;
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
     markFieldTouched: (field: string) => void;
+    clearTouchedFields: () => void;
     /** Per-field blur handler - called with prefixed field name (e.g., 'profile_employment_status') */
     onFieldBlur?: (field: string) => void;
     existingDocuments?: ExistingDocuments;
 }
 
-export function FinancialStep({ data, errors, touchedFields, updateField, markFieldTouched, onFieldBlur, existingDocuments }: FinancialStepProps) {
+export function FinancialStep({
+    data,
+    errors,
+    touchedFields,
+    updateField,
+    markFieldTouched,
+    clearTouchedFields,
+    onFieldBlur,
+    existingDocuments,
+}: FinancialStepProps) {
     const { translations } = usePage<SharedData>().props;
 
     // Reload tenant profile data after successful upload
@@ -74,6 +84,7 @@ export function FinancialStep({ data, errors, touchedFields, updateField, markFi
                 getError={getError}
                 isTouched={isTouched}
                 onFieldBlur={handleFieldBlur}
+                clearTouchedFields={clearTouchedFields}
                 uploadUrl="/tenant-profile/document/upload"
                 existingDocuments={existingDocuments}
                 onUploadSuccess={handleUploadSuccess}

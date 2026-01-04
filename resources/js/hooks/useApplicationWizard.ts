@@ -1017,6 +1017,7 @@ export interface UseApplicationWizardReturn {
     // Touched fields (for showing errors)
     touchedFields: Record<string, boolean>;
     markFieldTouched: (field: string) => void;
+    clearTouchedFields: () => void;
     markAllCurrentStepFieldsTouched: () => void;
     createIndexedBlurHandler: (prefix: string, index: number, field: string) => () => void;
 
@@ -1630,6 +1631,10 @@ export function useApplicationWizard({
         setTouchedFields((prev) => ({ ...prev, [field]: true }));
     }, []);
 
+    const clearTouchedFields = useCallback(() => {
+        setTouchedFields({});
+    }, []);
+
     /**
      * Creates a blur handler for indexed fields (occupants, pets, references, etc.)
      * Returns a function that marks the specific field as touched when called.
@@ -2157,6 +2162,7 @@ export function useApplicationWizard({
         // Touched fields
         touchedFields,
         markFieldTouched,
+        clearTouchedFields,
         markAllCurrentStepFieldsTouched,
 
         // Blur handler factory (for per-field blur pattern)
