@@ -553,6 +553,34 @@ export interface DraftApplication {
     // Risk mitigation (Step 4)
     coSigners?: Record<string, unknown>[];
     guarantors?: Record<string, unknown>[];
+    interested_in_rent_insurance?: string;
+    existing_insurance_provider?: string;
+    existing_insurance_policy_number?: string;
+    // Credit & Rental History (Step 5)
+    authorize_credit_check?: boolean;
+    credit_check_provider_preference?: string;
+    authorize_background_check?: boolean;
+    has_ccjs_or_bankruptcies?: boolean;
+    ccj_bankruptcy_details?: string;
+    has_eviction_history?: boolean;
+    eviction_details?: string;
+    self_reported_credit_score?: string;
+    current_living_situation?: string;
+    current_address_street_name?: string;
+    current_address_house_number?: string;
+    current_address_address_line_2?: string;
+    current_address_city?: string;
+    current_address_state_province?: string;
+    current_address_postal_code?: string;
+    current_address_country?: string;
+    current_address_move_in_date?: string;
+    current_monthly_rent?: string;
+    current_rent_currency?: string;
+    current_landlord_name?: string;
+    current_landlord_contact?: string;
+    reason_for_moving?: string;
+    reason_for_moving_other?: string;
+    previous_addresses?: PreviousAddressDetails[];
 }
 
 // ===== Initial Data =====
@@ -803,39 +831,40 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
                     signature_date: (g.signature_date as string) || '',
                 }) as GuarantorDetails,
         ),
-        interested_in_rent_insurance: '',
-        existing_insurance_provider: '',
-        existing_insurance_policy_number: '',
+        interested_in_rent_insurance: (draft?.interested_in_rent_insurance as ApplicationWizardData['interested_in_rent_insurance']) || '',
+        existing_insurance_provider: (draft?.existing_insurance_provider as string) || '',
+        existing_insurance_policy_number: (draft?.existing_insurance_policy_number as string) || '',
 
         // ===== Step 5: Credit & Rental History =====
         // Credit Check
-        authorize_credit_check: false,
-        credit_check_provider_preference: '',
-        authorize_background_check: false,
-        has_ccjs_or_bankruptcies: false,
-        ccj_bankruptcy_details: '',
-        has_eviction_history: false,
-        eviction_details: '',
-        self_reported_credit_score: '',
+        authorize_credit_check: draft?.authorize_credit_check || false,
+        credit_check_provider_preference:
+            (draft?.credit_check_provider_preference as ApplicationWizardData['credit_check_provider_preference']) || '',
+        authorize_background_check: draft?.authorize_background_check || false,
+        has_ccjs_or_bankruptcies: draft?.has_ccjs_or_bankruptcies || false,
+        ccj_bankruptcy_details: (draft?.ccj_bankruptcy_details as string) || '',
+        has_eviction_history: draft?.has_eviction_history || false,
+        eviction_details: (draft?.eviction_details as string) || '',
+        self_reported_credit_score: (draft?.self_reported_credit_score as string) || '',
         credit_report_upload: null,
         // Current Address (matching AddressForm component)
-        current_living_situation: '',
-        current_address_street_name: tenantProfile?.current_street_name || '',
-        current_address_house_number: tenantProfile?.current_house_number || '',
-        current_address_address_line_2: tenantProfile?.current_address_line_2 || '',
-        current_address_city: tenantProfile?.current_city || '',
-        current_address_state_province: tenantProfile?.current_state_province || '',
-        current_address_postal_code: tenantProfile?.current_postal_code || '',
-        current_address_country: tenantProfile?.current_country || '',
-        current_address_move_in_date: '',
-        current_monthly_rent: '',
-        current_rent_currency: 'eur',
-        current_landlord_name: '',
-        current_landlord_contact: '',
-        reason_for_moving: '',
-        reason_for_moving_other: '',
+        current_living_situation: (draft?.current_living_situation as ApplicationWizardData['current_living_situation']) || '',
+        current_address_street_name: (draft?.current_address_street_name as string) || tenantProfile?.current_street_name || '',
+        current_address_house_number: (draft?.current_address_house_number as string) || tenantProfile?.current_house_number || '',
+        current_address_address_line_2: (draft?.current_address_address_line_2 as string) || tenantProfile?.current_address_line_2 || '',
+        current_address_city: (draft?.current_address_city as string) || tenantProfile?.current_city || '',
+        current_address_state_province: (draft?.current_address_state_province as string) || tenantProfile?.current_state_province || '',
+        current_address_postal_code: (draft?.current_address_postal_code as string) || tenantProfile?.current_postal_code || '',
+        current_address_country: (draft?.current_address_country as string) || tenantProfile?.current_country || '',
+        current_address_move_in_date: draft?.current_address_move_in_date ? formatDateForInput(draft.current_address_move_in_date) : '',
+        current_monthly_rent: (draft?.current_monthly_rent as string) || '',
+        current_rent_currency: (draft?.current_rent_currency as string) || 'eur',
+        current_landlord_name: (draft?.current_landlord_name as string) || '',
+        current_landlord_contact: (draft?.current_landlord_contact as string) || '',
+        reason_for_moving: (draft?.reason_for_moving as ApplicationWizardData['reason_for_moving']) || '',
+        reason_for_moving_other: (draft?.reason_for_moving_other as string) || '',
         // Previous Addresses
-        previous_addresses: [],
+        previous_addresses: (draft?.previous_addresses as PreviousAddressDetails[]) || [],
         // References
         landlord_references: [],
         employer_reference_name: '',

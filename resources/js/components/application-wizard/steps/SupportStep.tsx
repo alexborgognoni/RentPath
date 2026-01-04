@@ -934,9 +934,9 @@ export function SupportStep({
                                     )}
                                 </div>
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium">
-                                        {t('insurance.policyNumberLabel') || 'Policy Number'}{' '}
-                                        <span className="text-muted-foreground">({t('optional') || 'optional'})</span>
+                                    <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                                        {t('insurance.policyNumberLabel') || 'Policy Number'}
+                                        <OptionalBadge />
                                     </label>
                                     <input
                                         type="text"

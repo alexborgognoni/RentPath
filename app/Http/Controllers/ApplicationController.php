@@ -818,8 +818,175 @@ class ApplicationController extends Controller
                 return $rules;
 
             case 4:
-                // Step 4: Risk Mitigation (optional)
-                return [];
+                // Step 4: Financial Support (co-signers, guarantors, insurance)
+                $rules = [
+                    'interested_in_rent_insurance' => 'required|in:yes,no,already_have',
+                ];
+
+                // If already has insurance, provider is required
+                $insuranceStatus = $data['interested_in_rent_insurance'] ?? '';
+                if ($insuranceStatus === 'already_have') {
+                    $rules['existing_insurance_provider'] = 'required|string|max:200';
+                }
+
+                // Validate co-signers if any provided
+                $coSigners = $data['co_signers'] ?? [];
+                if (is_array($coSigners) && count($coSigners) > 0) {
+                    foreach ($coSigners as $index => $coSigner) {
+                        $prefix = "co_signers.{$index}";
+
+                        // === Identity ===
+                        $rules["{$prefix}.first_name"] = 'required|string|max:100';
+                        $rules["{$prefix}.last_name"] = 'required|string|max:100';
+                        $rules["{$prefix}.email"] = 'required|email|max:255';
+                        $rules["{$prefix}.phone_number"] = 'required|string|max:30';
+                        $rules["{$prefix}.date_of_birth"] = 'required|date|before:-18 years';
+                        $rules["{$prefix}.nationality"] = 'required|string|max:100';
+                        $rules["{$prefix}.relationship"] = 'required|string|max:100';
+
+                        if (($coSigner['relationship'] ?? '') === 'other') {
+                            $rules["{$prefix}.relationship_other"] = 'required|string|max:100';
+                        }
+
+                        // === ID Document ===
+                        $rules["{$prefix}.id_document_type"] = 'required|in:passport,national_id,drivers_license';
+                        $rules["{$prefix}.id_number"] = 'required|string|max:100';
+                        $rules["{$prefix}.id_issuing_country"] = 'required|string|max:2';
+                        $rules["{$prefix}.id_expiry_date"] = 'required|date|after:today';
+
+                        // ID documents required unless already uploaded
+                        if (empty($coSigner['id_document_front_path'])) {
+                            $rules["{$prefix}.id_document_front"] = 'required';
+                        }
+                        if (empty($coSigner['id_document_back_path'])) {
+                            $rules["{$prefix}.id_document_back"] = 'required';
+                        }
+
+                        // === Address ===
+                        $rules["{$prefix}.street_name"] = 'required|string|max:200';
+                        $rules["{$prefix}.house_number"] = 'required|string|max:20';
+                        $rules["{$prefix}.city"] = 'required|string|max:100';
+                        $rules["{$prefix}.postal_code"] = 'required|string|max:20';
+                        $rules["{$prefix}.country"] = 'required|string|max:2';
+
+                        // === Employment-based validation ===
+                        $rules["{$prefix}.employment_status"] = 'required|in:employed,self_employed,student,unemployed,retired,other';
+                        $empStatus = $coSigner['employment_status'] ?? '';
+
+                        if ($empStatus === 'employed') {
+                            $rules["{$prefix}.employer_name"] = 'required|string|max:255';
+                            $rules["{$prefix}.job_title"] = 'required|string|max:255';
+                            $rules["{$prefix}.employment_type"] = 'required|in:full_time,part_time,contract,temporary';
+                            $rules["{$prefix}.employment_start_date"] = 'required|date';
+                            $rules["{$prefix}.net_monthly_income"] = 'required|numeric|min:0';
+                            // Documents
+                            if (empty($coSigner['employment_contract_path'])) {
+                                $rules["{$prefix}.employment_contract"] = 'required';
+                            }
+                            if (empty($coSigner['payslip_1_path'])) {
+                                $rules["{$prefix}.payslip_1"] = 'required';
+                            }
+                            if (empty($coSigner['payslip_2_path'])) {
+                                $rules["{$prefix}.payslip_2"] = 'required';
+                            }
+                            if (empty($coSigner['payslip_3_path'])) {
+                                $rules["{$prefix}.payslip_3"] = 'required';
+                            }
+                        }
+
+                        if ($empStatus === 'self_employed') {
+                            $rules["{$prefix}.net_monthly_income"] = 'required|numeric|min:0';
+                            if (empty($coSigner['income_proof_path'])) {
+                                $rules["{$prefix}.income_proof"] = 'required';
+                            }
+                        }
+
+                        if ($empStatus === 'student') {
+                            $rules["{$prefix}.university_name"] = 'required|string|max:255';
+                            $rules["{$prefix}.student_income_source"] = 'required|string|max:100';
+                            $rules["{$prefix}.student_monthly_income"] = 'required|numeric|min:0';
+                            if (empty($coSigner['student_proof_path']) && empty($coSigner['enrollment_proof_path'])) {
+                                $rules["{$prefix}.student_proof"] = 'required';
+                            }
+                        }
+
+                        if ($empStatus === 'retired') {
+                            $rules["{$prefix}.net_monthly_income"] = 'required|numeric|min:0';
+                            if (empty($coSigner['pension_statement_path'])) {
+                                $rules["{$prefix}.pension_statement"] = 'required';
+                            }
+                        }
+
+                        if ($empStatus === 'unemployed') {
+                            $rules["{$prefix}.income_source"] = 'required|string|max:200';
+                            $rules["{$prefix}.net_monthly_income"] = 'required|numeric|min:0';
+                            if (empty($coSigner['income_proof_path']) && empty($coSigner['benefits_statement_path'])) {
+                                $rules["{$prefix}.income_proof"] = 'required';
+                            }
+                        }
+
+                        if ($empStatus === 'other') {
+                            $rules["{$prefix}.income_source"] = 'required|string|max:200';
+                            $rules["{$prefix}.net_monthly_income"] = 'required|numeric|min:0';
+                            if (empty($coSigner['income_proof_path'])) {
+                                $rules["{$prefix}.income_proof"] = 'required';
+                            }
+                        }
+                    }
+                }
+
+                // Validate guarantors if any provided
+                $guarantors = $data['guarantors'] ?? [];
+                if (is_array($guarantors) && count($guarantors) > 0) {
+                    foreach ($guarantors as $index => $guarantor) {
+                        $prefix = "guarantors.{$index}";
+
+                        // === Identity ===
+                        $rules["{$prefix}.first_name"] = 'required|string|max:100';
+                        $rules["{$prefix}.last_name"] = 'required|string|max:100';
+                        $rules["{$prefix}.email"] = 'required|email|max:255';
+                        $rules["{$prefix}.phone_number"] = 'required|string|max:30';
+                        $rules["{$prefix}.date_of_birth"] = 'required|date|before:-18 years';
+                        $rules["{$prefix}.nationality"] = 'required|string|max:100';
+                        $rules["{$prefix}.relationship"] = 'required|string|max:100';
+
+                        if (($guarantor['relationship'] ?? '') === 'other') {
+                            $rules["{$prefix}.relationship_other"] = 'required|string|max:100';
+                        }
+
+                        // === ID Document ===
+                        $rules["{$prefix}.id_document_type"] = 'required|in:passport,national_id,drivers_license';
+                        $rules["{$prefix}.id_number"] = 'required|string|max:100';
+                        $rules["{$prefix}.id_issuing_country"] = 'required|string|max:2';
+                        $rules["{$prefix}.id_expiry_date"] = 'required|date|after:today';
+
+                        // ID documents required unless already uploaded
+                        if (empty($guarantor['id_document_front_path'])) {
+                            $rules["{$prefix}.id_document_front"] = 'required';
+                        }
+                        if (empty($guarantor['id_document_back_path'])) {
+                            $rules["{$prefix}.id_document_back"] = 'required';
+                        }
+
+                        // === Address ===
+                        $rules["{$prefix}.street_name"] = 'required|string|max:200';
+                        $rules["{$prefix}.house_number"] = 'required|string|max:20';
+                        $rules["{$prefix}.city"] = 'required|string|max:100';
+                        $rules["{$prefix}.postal_code"] = 'required|string|max:20';
+                        $rules["{$prefix}.country"] = 'required|string|max:2';
+
+                        // === Employment (simpler for guarantors) ===
+                        $rules["{$prefix}.employment_status"] = 'required|in:employed,self_employed,student,unemployed,retired,other';
+                        $rules["{$prefix}.net_monthly_income"] = 'required|numeric|min:0';
+
+                        // Proof of income required for guarantors
+                        if (empty($guarantor['proof_of_income_path'])) {
+                            $rules["{$prefix}.proof_of_income"] = 'required';
+                        }
+                    }
+                }
+
+                return $rules;
 
             case 5:
                 // Step 5: Credit & Rental History
@@ -1331,38 +1498,44 @@ class ApplicationController extends Controller
                 'application_id' => $application->id,
                 'occupant_index' => $coSignerData['occupant_index'] ?? $index,
                 'from_occupant_index' => $fromOccupantIndex,
-                // Identity - Basic (all nullable now)
-                'first_name' => $coSignerData['first_name'] ?: null,
-                'last_name' => $coSignerData['last_name'] ?: null,
-                'email' => $coSignerData['email'] ?: null,
-                'phone_country_code' => $coSignerData['phone_country_code'] ?: null,
-                'phone_number' => $coSignerData['phone_number'] ?: null,
-                'date_of_birth' => $coSignerData['date_of_birth'] ?: null,
-                'nationality' => $coSignerData['nationality'] ?: null,
-                // ID Document (all nullable)
-                'id_document_type' => $coSignerData['id_document_type'] ?: null,
-                'id_number' => $coSignerData['id_number'] ?: null,
-                'id_issuing_country' => $coSignerData['id_issuing_country'] ?: null,
-                'id_expiry_date' => $coSignerData['id_expiry_date'] ?: null,
-                // Immigration
-                'immigration_status' => $coSignerData['immigration_status'] ?: null,
-                'visa_type' => $coSignerData['visa_type'] ?: null,
-                'visa_expiry_date' => $coSignerData['visa_expiry_date'] ?: null,
+                // Identity
+                'first_name' => $coSignerData['first_name'] ?? null,
+                'last_name' => $coSignerData['last_name'] ?? null,
+                'email' => $coSignerData['email'] ?? null,
+                'phone_country_code' => $coSignerData['phone_country_code'] ?? null,
+                'phone_number' => $coSignerData['phone_number'] ?? null,
+                'date_of_birth' => $coSignerData['date_of_birth'] ?? null,
+                'nationality' => $coSignerData['nationality'] ?? null,
+                'relationship' => $coSignerData['relationship'] ?? null,
+                'relationship_other' => $coSignerData['relationship_other'] ?? null,
+                // Address
+                'street_name' => $coSignerData['street_name'] ?? null,
+                'house_number' => $coSignerData['house_number'] ?? null,
+                'address_line_2' => $coSignerData['address_line_2'] ?? null,
+                'city' => $coSignerData['city'] ?? null,
+                'state_province' => $coSignerData['state_province'] ?? null,
+                'postal_code' => $coSignerData['postal_code'] ?? null,
+                'country' => $coSignerData['country'] ?? null,
+                // ID Document
+                'id_document_type' => $coSignerData['id_document_type'] ?? null,
+                'id_number' => $coSignerData['id_number'] ?? null,
+                'id_issuing_country' => $coSignerData['id_issuing_country'] ?? null,
+                'id_expiry_date' => $coSignerData['id_expiry_date'] ?? null,
                 // Employment
-                'employment_status' => $coSignerData['employment_status'] ?: null,
-                'employment_status_other' => $coSignerData['employment_status_other'] ?: null,
-                'employer_name' => $coSignerData['employer_name'] ?: null,
-                'job_title' => $coSignerData['job_title'] ?: null,
-                'employment_type' => $coSignerData['employment_type'] ?: null,
-                'employment_start_date' => $coSignerData['employment_start_date'] ?: null,
-                'net_monthly_income' => $coSignerData['net_monthly_income'] ?: null,
-                'income_currency' => $coSignerData['income_currency'] ?: null,
+                'employment_status' => $coSignerData['employment_status'] ?? null,
+                'employment_status_other' => $coSignerData['employment_status_other'] ?? null,
+                'employer_name' => $coSignerData['employer_name'] ?? null,
+                'job_title' => $coSignerData['job_title'] ?? null,
+                'employment_type' => $coSignerData['employment_type'] ?? null,
+                'employment_start_date' => $coSignerData['employment_start_date'] ?? null,
+                'net_monthly_income' => $coSignerData['net_monthly_income'] ?? null,
+                'income_currency' => $coSignerData['income_currency'] ?? null,
                 // Student
-                'university_name' => $coSignerData['university_name'] ?: null,
-                'student_income_source' => $coSignerData['student_income_source'] ?: null,
-                'student_monthly_income' => $coSignerData['student_monthly_income'] ?: null,
-                // Other
-                'income_source' => $coSignerData['income_source'] ?: null,
+                'university_name' => $coSignerData['university_name'] ?? null,
+                'student_income_source' => $coSignerData['student_income_source'] ?? null,
+                'student_monthly_income' => $coSignerData['student_monthly_income'] ?? null,
+                // Other income
+                'income_source' => $coSignerData['income_source'] ?? null,
             ];
 
             if ($coSigner) {
@@ -1404,36 +1577,38 @@ class ApplicationController extends Controller
 
             $data = [
                 'application_id' => $application->id,
-                'for_signer_type' => $guarantorData['for_signer_type'] ?: 'primary',
-                'for_co_signer_index' => $guarantorData['for_co_signer_index'] ?: null,
-                // Identity - Basic (all nullable now)
-                'first_name' => $guarantorData['first_name'] ?: null,
-                'last_name' => $guarantorData['last_name'] ?: null,
-                'email' => $guarantorData['email'] ?: null,
-                'phone_country_code' => $guarantorData['phone_country_code'] ?: null,
-                'phone_number' => $guarantorData['phone_number'] ?: null,
-                'date_of_birth' => $guarantorData['date_of_birth'] ?: null,
-                'nationality' => $guarantorData['nationality'] ?: null,
-                'relationship' => $guarantorData['relationship'] ?: null,
-                'relationship_other' => $guarantorData['relationship_other'] ?: null,
-                // ID Document (all nullable)
-                'id_document_type' => $guarantorData['id_document_type'] ?: null,
-                'id_number' => $guarantorData['id_number'] ?: null,
-                'id_issuing_country' => $guarantorData['id_issuing_country'] ?: null,
-                'id_expiry_date' => $guarantorData['id_expiry_date'] ?: null,
-                // Address (all nullable)
-                'street_address' => $guarantorData['street_address'] ?: null,
-                'city' => $guarantorData['city'] ?: null,
-                'state_province' => $guarantorData['state_province'] ?: null,
-                'postal_code' => $guarantorData['postal_code'] ?: null,
-                'country' => $guarantorData['country'] ?: null,
-                'years_at_address' => $guarantorData['years_at_address'] ?: null,
-                // Employment (all nullable)
-                'employment_status' => $guarantorData['employment_status'] ?: null,
-                'employer_name' => $guarantorData['employer_name'] ?: null,
-                'job_title' => $guarantorData['job_title'] ?: null,
-                'net_monthly_income' => $guarantorData['net_monthly_income'] ?: null,
-                'income_currency' => $guarantorData['income_currency'] ?: null,
+                'for_signer_type' => $guarantorData['for_signer_type'] ?? 'primary',
+                'for_co_signer_id' => $guarantorData['for_co_signer_id'] ?? null,
+                // Identity
+                'first_name' => $guarantorData['first_name'] ?? null,
+                'last_name' => $guarantorData['last_name'] ?? null,
+                'email' => $guarantorData['email'] ?? null,
+                'phone_country_code' => $guarantorData['phone_country_code'] ?? null,
+                'phone_number' => $guarantorData['phone_number'] ?? null,
+                'date_of_birth' => $guarantorData['date_of_birth'] ?? null,
+                'nationality' => $guarantorData['nationality'] ?? null,
+                'relationship' => $guarantorData['relationship'] ?? null,
+                'relationship_other' => $guarantorData['relationship_other'] ?? null,
+                // ID Document
+                'id_document_type' => $guarantorData['id_document_type'] ?? null,
+                'id_number' => $guarantorData['id_number'] ?? null,
+                'id_issuing_country' => $guarantorData['id_issuing_country'] ?? null,
+                'id_expiry_date' => $guarantorData['id_expiry_date'] ?? null,
+                // Address
+                'street_name' => $guarantorData['street_name'] ?? null,
+                'house_number' => $guarantorData['house_number'] ?? null,
+                'address_line_2' => $guarantorData['address_line_2'] ?? null,
+                'city' => $guarantorData['city'] ?? null,
+                'state_province' => $guarantorData['state_province'] ?? null,
+                'postal_code' => $guarantorData['postal_code'] ?? null,
+                'country' => $guarantorData['country'] ?? null,
+                'years_at_address' => $guarantorData['years_at_address'] ?? null,
+                // Employment
+                'employment_status' => $guarantorData['employment_status'] ?? null,
+                'employer_name' => $guarantorData['employer_name'] ?? null,
+                'job_title' => $guarantorData['job_title'] ?? null,
+                'net_monthly_income' => $guarantorData['net_monthly_income'] ?? null,
+                'income_currency' => $guarantorData['income_currency'] ?? null,
                 // Consent
                 'consent_to_credit_check' => $guarantorData['consent_to_credit_check'] ?? false,
                 'consent_to_contact' => $guarantorData['consent_to_contact'] ?? false,
