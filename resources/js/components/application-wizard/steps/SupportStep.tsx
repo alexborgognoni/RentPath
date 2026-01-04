@@ -1,6 +1,6 @@
 import { AddressForm } from '@/components/ui/address-form';
 import { OptionalBadge } from '@/components/ui/optional-badge';
-import { SimpleSelect } from '@/components/ui/simple-select';
+import { Select } from '@/components/ui/select';
 import type { ApplicationWizardData, CoSignerDetails, GuarantorDetails } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
@@ -516,7 +516,7 @@ export function SupportStep({
                                                 <label className="mb-1 block text-sm font-medium">
                                                     {t('fields.relationship') || 'Relationship to Applicant'}
                                                 </label>
-                                                <SimpleSelect
+                                                <Select
                                                     value={coSigner.relationship}
                                                     onChange={(value) => updateCoSigner(index, 'relationship', value)}
                                                     options={RELATIONSHIP_OPTIONS}
@@ -718,7 +718,7 @@ export function SupportStep({
                                                 <label className="mb-1 block text-sm font-medium">
                                                     {t('fields.relationship') || 'Relationship to Applicant'}
                                                 </label>
-                                                <SimpleSelect
+                                                <Select
                                                     value={guarantor.relationship}
                                                     onChange={(value) => updateGuarantor(index, 'relationship', value)}
                                                     options={RELATIONSHIP_OPTIONS}
@@ -877,7 +877,7 @@ export function SupportStep({
                             <label className="mb-2 block text-sm font-medium">
                                 {t('insurance.interestedLabel') || 'Are you interested in rent guarantee insurance?'}
                             </label>
-                            <SimpleSelect
+                            <Select
                                 value={data.interested_in_rent_insurance}
                                 onChange={(value) => handleFieldChange('interested_in_rent_insurance', value as 'yes' | 'no' | 'already_have' | '')}
                                 onBlur={handleFieldBlur('interested_in_rent_insurance')}

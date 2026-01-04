@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
 import { TenantLayout } from '@/layouts/tenant-layout';
 import type { SharedData } from '@/types';
 import type { Application } from '@/types/dashboard';
@@ -133,18 +133,16 @@ export default function ApplicationsPage({ applications, filters }: Applications
                             className="pl-10"
                         />
                     </div>
-                    <Select value={filters.status || 'all'} onValueChange={(value) => handleFilterChange('status', value)}>
-                        <SelectTrigger className="w-full sm:w-[200px]">
-                            <SelectValue placeholder={t('tenant.applications.filter.all') || 'All Statuses'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {statusOptions.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                    {t(option.labelKey) || option.fallback}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <Select
+                        value={filters.status || 'all'}
+                        onChange={(value) => handleFilterChange('status', value)}
+                        options={statusOptions.map((opt) => ({
+                            value: opt.value,
+                            label: t(opt.labelKey) || opt.fallback,
+                        }))}
+                        placeholder={t('tenant.applications.filter.all') || 'All Statuses'}
+                        className="w-full sm:w-[200px]"
+                    />
                 </div>
 
                 {/* Applications Grid or Empty State */}

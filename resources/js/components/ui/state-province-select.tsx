@@ -6,7 +6,7 @@ import {
     type StateProvinceOption,
 } from '@/utils/address-validation';
 import { useEffect, useMemo, useRef } from 'react';
-import { SearchableSelect } from './searchable-select';
+import { Select } from './select';
 
 export interface StateProvinceSelectProps {
     /** Current value (state/province code or name) */
@@ -99,7 +99,7 @@ export function StateProvinceSelect({
     }
 
     return (
-        <SearchableSelect
+        <Select
             value={value}
             onChange={onChange}
             options={options}

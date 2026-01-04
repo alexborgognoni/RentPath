@@ -1,7 +1,7 @@
 import { CountrySelect } from '@/components/ui/country-select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
-import { SimpleSelect } from '@/components/ui/simple-select';
+import { Select } from '@/components/ui/select';
 import type { Translations } from '@/types/translations';
 import { translate } from '@/utils/translate-utils';
 import { useMemo } from 'react';
@@ -97,7 +97,7 @@ export function IdDocumentSection({
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
                     <label className="mb-2 block text-sm font-medium">{t('fields.documentType') || 'Document Type'}</label>
-                    <SimpleSelect
+                    <Select
                         value={data.id_document_type}
                         onChange={(value) => onChange('id_document_type', value)}
                         options={documentTypeOptions}

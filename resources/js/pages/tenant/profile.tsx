@@ -6,7 +6,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { NationalitySelect } from '@/components/ui/nationality-select';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { SaveStatus } from '@/components/ui/save-status';
-import { SimpleSelect } from '@/components/ui/simple-select';
+import { Select } from '@/components/ui/select';
 import { StateProvinceSelect } from '@/components/ui/state-province-select';
 import type { AutosaveStatus } from '@/hooks/usePropertyWizard';
 import { TenantLayout } from '@/layouts/tenant-layout';
@@ -792,7 +792,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                                                     <label className="mb-2 block text-sm font-medium">
                                                         {tEdit('fields.employment_type') || 'Employment Type'}
                                                     </label>
-                                                    <SimpleSelect
+                                                    <Select
                                                         value={formData.employment_type}
                                                         onChange={(value) => updateField('employment_type', value)}
                                                         options={EMPLOYMENT_TYPES}
@@ -1157,7 +1157,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                                                     <label className="mb-2 block text-sm font-medium">
                                                         {tEdit('guarantor.relationship') || 'Relationship'}
                                                     </label>
-                                                    <SimpleSelect
+                                                    <Select
                                                         value={formData.guarantor_relationship}
                                                         onChange={(value) => updateField('guarantor_relationship', value)}
                                                         options={GUARANTOR_RELATIONSHIPS}

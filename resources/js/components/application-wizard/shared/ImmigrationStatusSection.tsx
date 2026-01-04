@@ -1,6 +1,6 @@
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
-import { SimpleSelect } from '@/components/ui/simple-select';
+import { Select } from '@/components/ui/select';
 import type { Translations } from '@/types/translations';
 import { getCountryByIso2 } from '@/utils/country-data';
 import { translate } from '@/utils/translate-utils';
@@ -159,7 +159,7 @@ export function ImmigrationStatusSection({
             {/* Immigration / Residency Status */}
             <div>
                 <label className="mb-2 block text-sm font-medium">{t('fields.status') || 'Immigration / Residency Status'}</label>
-                <SimpleSelect
+                <Select
                     value={data.immigration_status}
                     onChange={(value) => onChange('immigration_status', value)}
                     options={immigrationStatusOptions}
@@ -193,7 +193,7 @@ export function ImmigrationStatusSection({
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
                             <label className="mb-2 block text-sm font-medium">{t('fields.visaType') || 'Permit / Visa Type'}</label>
-                            <SimpleSelect
+                            <Select
                                 value={data.visa_type}
                                 onChange={(value) => onChange('visa_type', value)}
                                 options={visaTypeOptions}

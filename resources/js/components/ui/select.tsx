@@ -1,179 +1,342 @@
-import * as React from "react"
-import * as SelectPrimitive from "@radix-ui/react-select"
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { cn } from '@/lib/utils';
+import * as Popover from '@radix-ui/react-popover';
+import { ChevronDown, Search } from 'lucide-react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { cn } from "@/lib/utils"
-
-function Select({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+/** Standard option shape for simple selects */
+export interface SelectOption {
+    value: string;
+    label: string;
 }
 
-function SelectGroup({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Group>) {
-  return <SelectPrimitive.Group data-slot="select-group" {...props} />
+/** Check if options are standard SelectOption shape */
+function isSelectOptionArray(options: unknown[]): options is SelectOption[] {
+    return options.length === 0 || (typeof options[0] === 'object' && options[0] !== null && 'value' in options[0] && 'label' in options[0]);
 }
 
-function SelectValue({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Value>) {
-  return <SelectPrimitive.Value data-slot="select-value" {...props} />
+/** Default filter for simple text search on label */
+function defaultFilter(options: SelectOption[], query: string): SelectOption[] {
+    const q = query.toLowerCase();
+    return options.filter((opt) => opt.label.toLowerCase().includes(q));
 }
 
-function SelectTrigger({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
-  return (
-    <SelectPrimitive.Trigger
-      data-slot="select-trigger"
-      className={cn(
-        "cursor-pointer border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive flex h-9 w-full items-center justify-between rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&>span]:line-clamp-1",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
-      </SelectPrimitive.Icon>
-    </SelectPrimitive.Trigger>
-  )
+export interface SelectProps<T> {
+    /** Current value */
+    value: string;
+    /** Called when value changes */
+    onChange: (value: string) => void;
+    /** Array of options */
+    options: T[];
+    /**
+     * Get the value from an option.
+     * Optional for {value, label} options - defaults to (opt) => opt.value
+     */
+    getOptionValue?: (option: T) => string;
+    /**
+     * Render the trigger content.
+     * Optional for {value, label} options - defaults to showing label
+     */
+    renderTrigger?: (option: T | null, placeholder: string) => ReactNode;
+    /**
+     * Render an option in the list.
+     * Optional for {value, label} options - defaults to showing label
+     */
+    renderOption?: (option: T) => ReactNode;
+    /**
+     * Enable search with custom filter function.
+     * For simple label-based search, use `searchable={true}` instead.
+     */
+    filterOptions?: (options: T[], query: string) => T[];
+    /**
+     * Enable simple label-based search (for {value, label} options).
+     * For custom filtering, use `filterOptions` instead.
+     */
+    searchable?: boolean;
+    /**
+     * Default selection value to display when value is empty.
+     * NOTE: This is only for visual display fallback - it does NOT set form data.
+     * Use sparingly (e.g., phone dial code from geolocation). Avoid for sensitive fields.
+     */
+    defaultSelection?: string;
+    /** Placeholder text when no value selected */
+    placeholder?: string;
+    /** Search input placeholder */
+    searchPlaceholder?: string;
+    /** Empty state text */
+    emptyText?: string;
+    /** Called when select loses focus */
+    onBlur?: () => void;
+    /** Disable the select */
+    disabled?: boolean;
+    /** Additional class names for trigger */
+    className?: string;
+    /** Name attribute for form identification and focus */
+    name?: string;
+    /** Show validation error state */
+    'aria-invalid'?: boolean;
+    /** Error message */
+    error?: string;
+    /** Close on scroll (default: true) */
+    closeOnScroll?: boolean;
+    /** Compact mode - for inline use */
+    compact?: boolean;
+    /** Min width for dropdown */
+    minWidth?: string;
+    /** Hide native scrollbar (default: true) */
+    hideScrollbar?: boolean;
 }
 
-function SelectContent({
-  className,
-  children,
-  position = "popper",
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>) {
-  return (
-    <SelectPrimitive.Portal>
-      <SelectPrimitive.Content
-        data-slot="select-content"
-        className={cn(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border shadow-md",
-          position === "popper" &&
-            "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-          className
-        )}
-        position={position}
-        {...props}
-      >
-        <SelectScrollUpButton />
-        <SelectPrimitive.Viewport
-          className={cn(
-            "p-1",
-            position === "popper" &&
-              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
-          )}
-        >
-          {children}
-        </SelectPrimitive.Viewport>
-        <SelectScrollDownButton />
-      </SelectPrimitive.Content>
-    </SelectPrimitive.Portal>
-  )
-}
+export function Select<T>({
+    value,
+    onChange,
+    options,
+    getOptionValue: getOptionValueProp,
+    renderTrigger: renderTriggerProp,
+    renderOption: renderOptionProp,
+    filterOptions: filterOptionsProp,
+    searchable = false,
+    defaultSelection,
+    placeholder = 'Select...',
+    searchPlaceholder = 'Search...',
+    emptyText = 'No results found',
+    onBlur,
+    disabled = false,
+    className,
+    name,
+    'aria-invalid': ariaInvalid,
+    error,
+    closeOnScroll = true,
+    compact = false,
+    minWidth = '200px',
+    hideScrollbar = true,
+}: SelectProps<T>) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [search, setSearch] = useState('');
+    const [highlightedIndex, setHighlightedIndex] = useState(0);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const wasOpenRef = useRef(false);
+    const itemRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
-function SelectLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Label>) {
-  return (
-    <SelectPrimitive.Label
-      data-slot="select-label"
-      className={cn("px-2 py-1.5 text-sm font-medium", className)}
-      {...props}
-    />
-  )
-}
+    // Determine if options are simple {value, label} shape
+    const isSimpleOptions = useMemo(() => isSelectOptionArray(options), [options]);
 
-function SelectItem({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>) {
-  return (
-    <SelectPrimitive.Item
-      data-slot="select-item"
-      className={cn(
-        "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-pointer items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
-        className
-      )}
-      {...props}
-    >
-      <span className="absolute right-2 flex size-3.5 items-center justify-center">
-        <SelectPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
-        </SelectPrimitive.ItemIndicator>
-      </span>
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-    </SelectPrimitive.Item>
-  )
-}
+    // Smart defaults for {value, label} options
+    const getOptionValue = useMemo(() => {
+        if (getOptionValueProp) return getOptionValueProp;
+        if (isSimpleOptions) return (opt: T) => (opt as SelectOption).value;
+        throw new Error('Select: getOptionValue is required for custom option types');
+    }, [getOptionValueProp, isSimpleOptions]);
 
-function SelectSeparator({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Separator>) {
-  return (
-    <SelectPrimitive.Separator
-      data-slot="select-separator"
-      className={cn("bg-border pointer-events-none -mx-1 my-1 h-px", className)}
-      {...props}
-    />
-  )
-}
+    const renderTrigger = useMemo(() => {
+        if (renderTriggerProp) return renderTriggerProp;
+        if (isSimpleOptions) {
+            return (opt: T | null, ph: string) => <span className="truncate">{opt ? (opt as unknown as SelectOption).label : ph}</span>;
+        }
+        throw new Error('Select: renderTrigger is required for custom option types');
+    }, [renderTriggerProp, isSimpleOptions]);
 
-function SelectScrollUpButton({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
-  return (
-    <SelectPrimitive.ScrollUpButton
-      data-slot="select-scroll-up-button"
-      className={cn(
-        "flex cursor-default items-center justify-center py-1",
-        className
-      )}
-      {...props}
-    >
-      <ChevronUpIcon className="size-4" />
-    </SelectPrimitive.ScrollUpButton>
-  )
-}
+    const renderOption = useMemo(() => {
+        if (renderOptionProp) return renderOptionProp;
+        if (isSimpleOptions) {
+            return (opt: T) => <span className="flex-1 truncate text-left">{(opt as SelectOption).label}</span>;
+        }
+        throw new Error('Select: renderOption is required for custom option types');
+    }, [renderOptionProp, isSimpleOptions]);
 
-function SelectScrollDownButton({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
-  return (
-    <SelectPrimitive.ScrollDownButton
-      data-slot="select-scroll-down-button"
-      className={cn(
-        "flex cursor-default items-center justify-center py-1",
-        className
-      )}
-      {...props}
-    >
-      <ChevronDownIcon className="size-4" />
-    </SelectPrimitive.ScrollDownButton>
-  )
-}
+    // Determine filter function
+    const filterOptions = useMemo(() => {
+        if (filterOptionsProp) return filterOptionsProp;
+        if (searchable && isSimpleOptions) return defaultFilter as unknown as (options: T[], query: string) => T[];
+        return undefined;
+    }, [filterOptionsProp, searchable, isSimpleOptions]);
 
-export {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectScrollDownButton,
-  SelectScrollUpButton,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
+    const hasSearch = !!filterOptions;
+
+    // Get current option (use defaultSelection for display fallback only)
+    const displayValue = value || defaultSelection || '';
+    const currentOption = options.find((opt) => getOptionValue(opt) === displayValue) ?? null;
+
+    // Filter options based on search
+    const filteredOptions = hasSearch && search && filterOptions ? filterOptions(options, search) : options;
+
+    // Reset state when popover opens/closes
+    useEffect(() => {
+        if (isOpen) {
+            setHighlightedIndex(0);
+            setSearch('');
+            if (hasSearch) {
+                setTimeout(() => searchInputRef.current?.focus(), 0);
+            }
+        } else if (wasOpenRef.current && onBlur) {
+            onBlur();
+        }
+        wasOpenRef.current = isOpen;
+    }, [isOpen, onBlur, hasSearch]);
+
+    // Reset highlighted index when search changes
+    useEffect(() => {
+        setHighlightedIndex(0);
+    }, [search]);
+
+    // Scroll highlighted item into view
+    useEffect(() => {
+        if (isOpen && filteredOptions.length > 0) {
+            const item = itemRefs.current.get(highlightedIndex);
+            item?.scrollIntoView({ block: 'nearest' });
+        }
+    }, [highlightedIndex, isOpen, filteredOptions.length]);
+
+    // Close on scroll (but not when scrolling inside the dropdown)
+    useEffect(() => {
+        if (!isOpen || !closeOnScroll) return;
+
+        const handleScroll = (e: Event) => {
+            // Don't close if scrolling inside the popover content
+            if (contentRef.current?.contains(e.target as Node)) return;
+            setIsOpen(false);
+        };
+        window.addEventListener('scroll', handleScroll, true);
+        return () => window.removeEventListener('scroll', handleScroll, true);
+    }, [isOpen, closeOnScroll]);
+
+    const handleSelect = useCallback(
+        (option: T) => {
+            onChange(getOptionValue(option));
+            setIsOpen(false);
+            setSearch('');
+            triggerRef.current?.focus();
+        },
+        [onChange, getOptionValue],
+    );
+
+    // Keyboard navigation
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent) => {
+            if (!isOpen) {
+                if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsOpen(true);
+                }
+                return;
+            }
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    setHighlightedIndex((prev) => (prev < filteredOptions.length - 1 ? prev + 1 : prev));
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (filteredOptions[highlightedIndex]) {
+                        handleSelect(filteredOptions[highlightedIndex]);
+                    }
+                    break;
+                case 'Escape':
+                    setIsOpen(false);
+                    break;
+            }
+        },
+        [isOpen, filteredOptions, highlightedIndex, handleSelect],
+    );
+
+    const hasError = ariaInvalid || !!error;
+
+    return (
+        <div className={cn(!compact && 'w-full')}>
+            <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+                <Popover.Trigger asChild>
+                    <button
+                        ref={triggerRef}
+                        type="button"
+                        name={name}
+                        disabled={disabled}
+                        onKeyDown={handleKeyDown}
+                        className={cn(
+                            'flex cursor-pointer items-center justify-between gap-1 border bg-background',
+                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                            'disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
+                            !currentOption && 'text-muted-foreground',
+                            hasError ? 'border-destructive bg-destructive/5' : 'border-border',
+                            compact ? 'rounded-l-lg rounded-r-none border-r-0 px-3 py-2' : 'w-full rounded-lg px-4 py-2 gap-2',
+                            className,
+                        )}
+                    >
+                        {renderTrigger(currentOption, placeholder)}
+                        <ChevronDown className={cn('shrink-0 opacity-50', compact ? 'size-3' : 'size-4')} />
+                    </button>
+                </Popover.Trigger>
+
+                <Popover.Portal>
+                    <Popover.Content
+                        ref={contentRef}
+                        className={cn(
+                            'bg-background text-foreground z-50 rounded-lg border border-border shadow-md',
+                            compact ? '' : 'w-[var(--radix-popover-trigger-width)]',
+                            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+                            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+                            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+                            'data-[side=bottom]:slide-in-from-top-2',
+                        )}
+                        style={{ minWidth }}
+                        side="bottom"
+                        align="start"
+                        sideOffset={4}
+                        onKeyDown={hasSearch ? undefined : handleKeyDown}
+                    >
+                        {/* Search Input (optional) */}
+                        {hasSearch && (
+                            <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+                                <Search className="size-4 text-muted-foreground" />
+                                <input
+                                    ref={searchInputRef}
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder={searchPlaceholder}
+                                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                                />
+                            </div>
+                        )}
+
+                        {/* Options List */}
+                        <div
+                            className={cn('max-h-64 overflow-y-auto p-1', hideScrollbar && 'scrollbar-hide')}
+                            style={hideScrollbar ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : undefined}
+                        >
+                            {filteredOptions.length === 0 ? (
+                                <div className="px-2 py-4 text-center text-sm text-muted-foreground">{emptyText}</div>
+                            ) : (
+                                filteredOptions.map((option, index) => (
+                                    <button
+                                        key={getOptionValue(option)}
+                                        ref={(el) => {
+                                            if (el) itemRefs.current.set(index, el);
+                                            else itemRefs.current.delete(index);
+                                        }}
+                                        type="button"
+                                        onClick={() => handleSelect(option)}
+                                        onMouseMove={() => setHighlightedIndex(index)}
+                                        className={cn(
+                                            'flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none',
+                                            index === highlightedIndex && 'bg-muted',
+                                        )}
+                                    >
+                                        {renderOption(option)}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </Popover.Content>
+                </Popover.Portal>
+            </Popover.Root>
+            {error && !compact && <p className="mt-1 text-sm text-destructive">{error}</p>}
+        </div>
+    );
 }

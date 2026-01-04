@@ -1,5 +1,5 @@
 import { type CountryInfo, getCountryByIso2, iso2ToFlagEmoji, searchCountries, COUNTRIES } from '@/utils/country-data';
-import { SearchableSelect } from './searchable-select';
+import { Select } from './select';
 
 export interface CountrySelectProps {
     /** Current value (ISO 3166-1 alpha-2 code, e.g., "NL") */
@@ -41,7 +41,7 @@ export function CountrySelect({
     closeOnScroll = true,
 }: CountrySelectProps) {
     return (
-        <SearchableSelect
+        <Select
             value={value}
             onChange={onChange}
             options={COUNTRIES}

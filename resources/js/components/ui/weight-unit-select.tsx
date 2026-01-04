@@ -1,4 +1,4 @@
-import { SearchableSelect } from './searchable-select';
+import { Select } from './select';
 
 export interface WeightUnitInfo {
     code: string;
@@ -69,7 +69,7 @@ export function WeightUnitSelect({
     };
 
     return (
-        <SearchableSelect
+        <Select
             value={value.toLowerCase()}
             onChange={handleChange}
             options={WEIGHT_UNITS}

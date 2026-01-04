@@ -2,7 +2,7 @@ import { CurrencySelect } from '@/components/ui/currency-select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
 import { OptionalBadge } from '@/components/ui/optional-badge';
-import { SimpleSelect } from '@/components/ui/simple-select';
+import { Select } from '@/components/ui/select';
 import type { Translations } from '@/types/translations';
 import { translate } from '@/utils/translate-utils';
 import { Briefcase, Building, GraduationCap, HeartHandshake, UserCheck } from 'lucide-react';
@@ -399,16 +399,10 @@ export function FinancialInfoSection({
                 maxSize={20 * 1024 * 1024}
                 description={FILE_UPLOAD_DESCRIPTION}
                 existingFile={
-                    incomeSource === 'unemployment_benefits'
-                        ? buildExistingFile('benefits_statement')
-                        : buildExistingFile('other_income_proof')
+                    incomeSource === 'unemployment_benefits' ? buildExistingFile('benefits_statement') : buildExistingFile('other_income_proof')
                 }
                 onUploadSuccess={onUploadSuccess}
-                error={
-                    incomeSource === 'unemployment_benefits'
-                        ? getDocError('benefits_statement')
-                        : getDocError('other_income_proof')
-                }
+                error={incomeSource === 'unemployment_benefits' ? getDocError('benefits_statement') : getDocError('other_income_proof')}
             />
         );
     };
@@ -498,7 +492,7 @@ export function FinancialInfoSection({
 
                         <div>
                             <label className="mb-2 block text-sm font-medium">{t('fields.employmentType')}</label>
-                            <SimpleSelect
+                            <Select
                                 value={getValue(f('employment_type'))}
                                 onChange={(value) => setValue(f('employment_type'), value)}
                                 options={EMPLOYMENT_TYPES}
@@ -608,7 +602,7 @@ export function FinancialInfoSection({
 
                         <div>
                             <label className="mb-2 block text-sm font-medium">{t('fields.businessType')}</label>
-                            <SimpleSelect
+                            <Select
                                 value={getValue(f('business_type'))}
                                 onChange={(value) => setValue(f('business_type'), value)}
                                 options={BUSINESS_TYPES}
@@ -750,7 +744,7 @@ export function FinancialInfoSection({
 
                         <div>
                             <label className="mb-2 block text-sm font-medium">{t('fields.studentIncomeSource')}</label>
-                            <SimpleSelect
+                            <Select
                                 value={getValue(f('student_income_source_type'))}
                                 onChange={(value) => setValue(f('student_income_source_type'), value)}
                                 options={STUDENT_INCOME_SOURCES}
@@ -824,7 +818,7 @@ export function FinancialInfoSection({
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
                             <label className="mb-2 block text-sm font-medium">{t('fields.pensionType')}</label>
-                            <SimpleSelect
+                            <Select
                                 value={getValue(f('pension_type'))}
                                 onChange={(value) => setValue(f('pension_type'), value)}
                                 options={PENSION_TYPES}
@@ -918,7 +912,7 @@ export function FinancialInfoSection({
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
                             <label className="mb-2 block text-sm font-medium">{t('fields.incomeSource')}</label>
-                            <SimpleSelect
+                            <Select
                                 value={getValue(f('unemployed_income_source'))}
                                 onChange={(value) => {
                                     setValue(f('unemployed_income_source'), value);
@@ -1003,7 +997,7 @@ export function FinancialInfoSection({
                     <div className="grid gap-4 md:grid-cols-2">
                         <div>
                             <label className="mb-2 block text-sm font-medium">{t('fields.situationType')}</label>
-                            <SimpleSelect
+                            <Select
                                 value={getValue(f('other_employment_situation'))}
                                 onChange={(value) => setValue(f('other_employment_situation'), value)}
                                 options={OTHER_SITUATIONS}

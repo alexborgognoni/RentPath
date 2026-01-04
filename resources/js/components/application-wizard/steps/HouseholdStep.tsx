@@ -2,7 +2,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
 import { OptionalBadge } from '@/components/ui/optional-badge';
 import { PhoneInput } from '@/components/ui/phone-input';
-import { SimpleSelect } from '@/components/ui/simple-select';
+import { Select } from '@/components/ui/select';
 import type { ApplicationWizardData, OccupantDetails, PetDetails } from '@/hooks/useApplicationWizard';
 import { useGeoLocation } from '@/hooks/useGeoLocation';
 import type { SharedData } from '@/types';
@@ -416,7 +416,7 @@ export function HouseholdStep({
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm">{t('occupants.relationship') || 'Relationship'}</label>
-                                        <SimpleSelect
+                                        <Select
                                             value={occupant.relationship}
                                             onChange={(value) => updateOccupant(index, 'relationship', value)}
                                             options={OCCUPANT_RELATIONSHIPS}
@@ -538,7 +538,7 @@ export function HouseholdStep({
                                 <div className="grid gap-4 md:grid-cols-3">
                                     <div>
                                         <label className="mb-1 block text-sm">{t('pets.type') || 'Type'}</label>
-                                        <SimpleSelect
+                                        <Select
                                             value={pet.type}
                                             onChange={(value) => updatePet(index, 'type', value)}
                                             options={PET_TYPES}
@@ -600,7 +600,7 @@ export function HouseholdStep({
                                             {t('pets.size') || 'Size'}
                                             <OptionalBadge />
                                         </label>
-                                        <SimpleSelect
+                                        <Select
                                             value={pet.size}
                                             onChange={(value) => updatePet(index, 'size', value)}
                                             options={PET_SIZES}
@@ -757,7 +757,7 @@ export function HouseholdStep({
                                 <label className="mb-2 block text-sm font-medium">
                                     {t('emergencyContact.fields.relationship') || 'Relationship'}
                                 </label>
-                                <SimpleSelect
+                                <Select
                                     value={data.emergency_contact_relationship}
                                     onChange={(value) => handleFieldChange('emergency_contact_relationship', value)}
                                     options={EMERGENCY_CONTACT_RELATIONSHIPS}

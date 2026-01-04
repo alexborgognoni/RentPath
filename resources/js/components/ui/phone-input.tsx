@@ -9,7 +9,7 @@ import {
     searchCountries,
 } from '@/utils/country-data';
 import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { SearchableSelect } from './searchable-select';
+import { Select } from './select';
 
 export interface PhoneInputProps {
     /** Current phone number value (national format without country code) */
@@ -99,7 +99,7 @@ export function PhoneInput({
         <div className={cn('w-full', className)}>
             <div className="flex">
                 {/* Country Selector - never shows error state since it always has a default */}
-                <SearchableSelect
+                <Select
                     value={internalCountryIso}
                     onChange={handleCountryChange}
                     options={COUNTRIES_WITH_DIAL_CODES}

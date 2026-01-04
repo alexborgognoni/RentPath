@@ -1,4 +1,4 @@
-import { SearchableSelect } from './searchable-select';
+import { Select } from './select';
 
 export interface AreaUnitInfo {
     code: string;
@@ -69,7 +69,7 @@ export function AreaUnitSelect({
     };
 
     return (
-        <SearchableSelect
+        <Select
             value={value.toLowerCase()}
             onChange={handleChange}
             options={AREA_UNITS}

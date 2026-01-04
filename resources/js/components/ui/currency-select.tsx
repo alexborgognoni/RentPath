@@ -1,4 +1,4 @@
-import { SearchableSelect } from './searchable-select';
+import { Select } from './select';
 
 export interface CurrencyInfo {
     code: string;
@@ -121,7 +121,7 @@ export function CurrencySelect({
     };
 
     return (
-        <SearchableSelect
+        <Select
             value={value.toLowerCase()}
             onChange={handleChange}
             options={CURRENCIES}

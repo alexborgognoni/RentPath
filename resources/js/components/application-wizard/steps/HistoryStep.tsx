@@ -1,7 +1,7 @@
 import { AddressForm, type AddressData } from '@/components/ui/address-form';
 import { DatePicker } from '@/components/ui/date-picker';
 import { OptionalBadge } from '@/components/ui/optional-badge';
-import { SimpleSelect, type SelectOption } from '@/components/ui/simple-select';
+import { Select, type SelectOption } from '@/components/ui/select';
 import type {
     ApplicationWizardData,
     LandlordReferenceDetails,
@@ -325,7 +325,7 @@ export function HistoryStep({
                                 {t('creditCheck.providerLabel') || 'Credit Check Provider Preference'}
                                 <OptionalBadge />
                             </label>
-                            <SimpleSelect
+                            <Select
                                 value={data.credit_check_provider_preference}
                                 onChange={(value) =>
                                     updateField('credit_check_provider_preference', value as typeof data.credit_check_provider_preference)
@@ -437,7 +437,7 @@ export function HistoryStep({
                             <label className="mb-2 block text-sm font-medium">
                                 {t('currentAddress.livingSituation') || 'Current Living Situation'}
                             </label>
-                            <SimpleSelect
+                            <Select
                                 value={data.current_living_situation}
                                 onChange={(value) => updateField('current_living_situation', value as typeof data.current_living_situation)}
                                 onBlur={handleFieldBlur('current_living_situation')}
@@ -526,7 +526,7 @@ export function HistoryStep({
                         {/* Reason for Moving */}
                         <div className="mt-4 border-t border-border pt-4">
                             <label className="mb-2 block text-sm font-medium">{t('currentAddress.reasonForMoving') || 'Reason for Moving'}</label>
-                            <SimpleSelect
+                            <Select
                                 value={data.reason_for_moving}
                                 onChange={(value) => updateField('reason_for_moving', value as typeof data.reason_for_moving)}
                                 onBlur={handleFieldBlur('reason_for_moving')}
@@ -917,7 +917,7 @@ export function HistoryStep({
                                             </div>
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium">{t('fields.relationship') || 'Relationship'}</label>
-                                                <SimpleSelect
+                                                <Select
                                                     value={ref.relationship}
                                                     onChange={(value) =>
                                                         updateOtherReference(index, 'relationship', value as 'professional' | 'personal' | '')
