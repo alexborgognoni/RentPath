@@ -399,7 +399,6 @@ export function IdentityStep({
                             }}
                             uploadUrl="/tenant-profile/document/upload"
                             onUploadSuccess={handleUploadSuccess}
-                            defaultCountry={detectedCountry}
                         />
                     </div>
                 )}

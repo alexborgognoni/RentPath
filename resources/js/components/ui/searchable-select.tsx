@@ -18,6 +18,12 @@ export interface SearchableSelectProps<T> {
     renderOption: (option: T) => ReactNode;
     /** Filter options based on search query (if not provided, search is disabled) */
     filterOptions?: (options: T[], query: string) => T[];
+    /**
+     * Default selection value to display when value is empty.
+     * NOTE: This is only for visual display fallback - it does NOT set form data.
+     * Use sparingly (e.g., phone dial code from geolocation). Avoid for sensitive fields like nationality/country.
+     */
+    defaultSelection?: string;
     /** Placeholder text when no value selected */
     placeholder?: string;
     /** Search input placeholder */
@@ -54,6 +60,7 @@ export function SearchableSelect<T>({
     renderTrigger,
     renderOption,
     filterOptions,
+    defaultSelection,
     placeholder = 'Select...',
     searchPlaceholder = 'Search...',
     emptyText = 'No results found',
@@ -79,8 +86,9 @@ export function SearchableSelect<T>({
 
     const hasSearch = !!filterOptions;
 
-    // Get current option
-    const currentOption = options.find((opt) => getOptionValue(opt) === value) ?? null;
+    // Get current option (use defaultSelection for display fallback only)
+    const displayValue = value || defaultSelection || '';
+    const currentOption = options.find((opt) => getOptionValue(opt) === displayValue) ?? null;
 
     // Filter options based on search
     const filteredOptions = hasSearch && search ? filterOptions(options, search) : options;

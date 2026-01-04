@@ -42,8 +42,6 @@ export interface IdDocumentSectionProps {
     documentTypePrefix?: string;
     /** Called when upload succeeds */
     onUploadSuccess?: (file: UploadedFile) => void;
-    /** Default country for issuing country select (ISO-2) */
-    defaultCountry?: string;
 }
 
 const ID_DOCUMENT_TYPE_OPTIONS = [
@@ -64,7 +62,6 @@ export function IdDocumentSection({
     uploadUrl,
     documentTypePrefix = '',
     onUploadSuccess,
-    defaultCountry,
 }: IdDocumentSectionProps) {
     const t = (key: string) => translate(translations, `wizard.application.shared.idDocument.${key}`);
 
@@ -134,7 +131,6 @@ export function IdDocumentSection({
                         value={data.id_issuing_country}
                         onChange={(value) => onChange('id_issuing_country', value)}
                         onBlur={() => onFieldBlur?.('id_issuing_country')}
-                        defaultCountry={defaultCountry}
                         placeholder={t('placeholders.selectIssuingCountry') || 'Select country...'}
                         aria-invalid={hasError('id_issuing_country')}
                         error={getError('id_issuing_country')}

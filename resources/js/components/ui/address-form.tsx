@@ -51,8 +51,6 @@ interface AddressFormProps {
     fieldPrefix?: string;
     /** Translations for field labels and placeholders */
     translations?: AddressFormTranslations;
-    /** Default country for country select */
-    defaultCountry?: string;
     /** Whether all fields are required (default: true) */
     required?: boolean;
     /** Custom class for the container */
@@ -83,7 +81,6 @@ export function AddressForm({
     touchedFields = {},
     fieldPrefix = '',
     translations: providedTranslations,
-    defaultCountry,
     required = true,
     className,
 }: AddressFormProps) {
@@ -112,8 +109,7 @@ export function AddressForm({
     };
 
     // Country-specific address field info
-    // Only use defaults for labels/placeholders, not for showing state province
-    const countryForLabels = data.country || defaultCountry || 'NL';
+    const countryForLabels = data.country;
     const postalCodeLabel = useMemo(() => getPostalCodeLabel(countryForLabels), [countryForLabels]);
     const postalCodePlaceholder = useMemo(() => getPostalCodePlaceholder(countryForLabels), [countryForLabels]);
     const stateProvinceLabel = useMemo(() => getStateProvinceLabel(countryForLabels), [countryForLabels]);
@@ -243,7 +239,6 @@ export function AddressForm({
                         value={data.country}
                         onChange={(value) => onChange('country', value)}
                         onBlur={onBlur}
-                        defaultCountry={defaultCountry}
                         placeholder={t.placeholders?.country}
                         aria-invalid={hasError('country')}
                         error={getError('country')}

@@ -458,7 +458,6 @@ export function HistoryStep({
                             errors={currentAddressErrors}
                             touchedFields={currentAddressTouched}
                             fieldPrefix="current_address"
-                            defaultCountry="NL"
                             required={true}
                         />
 
@@ -613,7 +612,6 @@ export function HistoryStep({
                                             errors={getPreviousAddressErrors(index)}
                                             touchedFields={getPreviousAddressTouched(index)}
                                             fieldPrefix={`prevaddr_${index}`}
-                                            defaultCountry="NL"
                                             required={true}
                                         />
 

@@ -6,8 +6,6 @@ export interface CountrySelectProps {
     value: string;
     /** Called when country changes */
     onChange: (value: string) => void;
-    /** Default country ISO code for initial selection if value is empty */
-    defaultCountry?: string;
     /** Error message to display */
     error?: string;
     /** Called when input loses focus */
@@ -33,7 +31,6 @@ function filterCountries(countries: CountryInfo[], query: string): CountryInfo[]
 export function CountrySelect({
     value,
     onChange,
-    // defaultCountry - reserved for future use
     error,
     onBlur,
     disabled = false,

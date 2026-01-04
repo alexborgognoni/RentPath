@@ -99,7 +99,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
         current_city: profile?.current_city || '',
         current_state_province: profile?.current_state_province || '',
         current_postal_code: profile?.current_postal_code || '',
-        current_country: profile?.current_country || 'NL',
+        current_country: profile?.current_country || '',
         // Employment
         employment_status: profile?.employment_status || '',
         employer_name: profile?.employer_name || '',
@@ -262,7 +262,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
     );
 
     // Address field helpers
-    const currentCountry = formData.current_country || 'NL';
+    const currentCountry = formData.current_country;
     const postalCodeLabel = useMemo(() => getPostalCodeLabel(currentCountry), [currentCountry]);
     const postalCodePlaceholder = useMemo(() => getPostalCodePlaceholder(currentCountry), [currentCountry]);
     const stateProvinceLabel = useMemo(() => getStateProvinceLabel(currentCountry), [currentCountry]);
