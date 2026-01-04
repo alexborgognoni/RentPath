@@ -248,17 +248,10 @@ export function validateFinancialDocuments(
         }
     }
 
-    // UNEMPLOYED documents
+    // UNEMPLOYED documents - always require proof of income
     if (status === 'unemployed') {
-        const incomeSource = data.unemployed_income_source;
-        if (incomeSource === 'unemployment_benefits') {
-            if (!hasDoc('benefits_statement')) {
-                errors.benefits_statement = 'Benefits statement is required';
-            }
-        } else if (incomeSource) {
-            if (!hasDoc('other_income_proof')) {
-                errors.other_income_proof = 'Proof of income is required';
-            }
+        if (!hasDoc('other_income_proof')) {
+            errors.other_income_proof = 'Proof of income is required';
         }
     }
 

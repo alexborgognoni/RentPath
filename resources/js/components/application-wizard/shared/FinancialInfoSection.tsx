@@ -380,32 +380,21 @@ export function FinancialInfoSection({
         </div>
     );
 
-    // Render document uploads for unemployed status
-    const renderUnemployedDocuments = () => {
-        const incomeSource = getValue(f('unemployed_income_source'));
-        if (!incomeSource) return null;
-
-        return (
-            <FileUpload
-                label={
-                    incomeSource === 'unemployment_benefits'
-                        ? t('documents.benefitsStatement') || 'Benefits Statement'
-                        : t('documents.otherIncomeProof') || 'Proof of Income'
-                }
-                required
-                documentType={docType(incomeSource === 'unemployment_benefits' ? 'benefits_statement' : 'other_income_proof')}
-                uploadUrl={uploadUrl}
-                accept={FILE_UPLOAD_ACCEPT}
-                maxSize={20 * 1024 * 1024}
-                description={FILE_UPLOAD_DESCRIPTION}
-                existingFile={
-                    incomeSource === 'unemployment_benefits' ? buildExistingFile('benefits_statement') : buildExistingFile('other_income_proof')
-                }
-                onUploadSuccess={onUploadSuccess}
-                error={incomeSource === 'unemployment_benefits' ? getDocError('benefits_statement') : getDocError('other_income_proof')}
-            />
-        );
-    };
+    // Render document uploads for unemployed status (always shown)
+    const renderUnemployedDocuments = () => (
+        <FileUpload
+            label={t('documents.otherIncomeProof') || 'Proof of Income'}
+            required
+            documentType={docType('other_income_proof')}
+            uploadUrl={uploadUrl}
+            accept={FILE_UPLOAD_ACCEPT}
+            maxSize={20 * 1024 * 1024}
+            description={FILE_UPLOAD_DESCRIPTION}
+            existingFile={buildExistingFile('other_income_proof')}
+            onUploadSuccess={onUploadSuccess}
+            error={getDocError('other_income_proof')}
+        />
+    );
 
     // Render document uploads for other status
     const renderOtherDocuments = () => (
@@ -949,44 +938,34 @@ export function FinancialInfoSection({
                         )}
                     </div>
 
-                    {/* Income Amount - shown based on income source */}
-                    {getValue(f('unemployed_income_source')) && (
-                        <div>
-                            <label className="mb-2 block text-sm font-medium">
-                                {getValue(f('unemployed_income_source')) === 'unemployment_benefits'
-                                    ? t('fields.benefitsAmount')
-                                    : t('fields.monthlyIncome')}
-                            </label>
-                            <div className="flex">
-                                <CurrencySelect
-                                    value={getValue(f('income_currency')) || 'eur'}
-                                    onChange={(value) => setValue(f('income_currency'), value)}
-                                    onBlur={onBlur}
-                                    compact
-                                />
-                                <input
-                                    type="number"
-                                    value={getValue(f('unemployment_benefits_amount'))}
-                                    onChange={(e) => setValue(f('unemployment_benefits_amount'), e.target.value)}
-                                    onBlur={onBlur}
-                                    placeholder={
-                                        getValue(f('unemployed_income_source')) === 'unemployment_benefits'
-                                            ? t('placeholders.benefitsAmount')
-                                            : t('placeholders.monthlyIncome')
-                                    }
-                                    min="0"
-                                    step="100"
-                                    className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('unemployment_benefits_amount')}`}
-                                    required
-                                />
-                            </div>
-                            {isTouched(f('unemployment_benefits_amount')) && getError(f('unemployment_benefits_amount')) && (
-                                <p className="mt-1 text-sm text-destructive">{getError(f('unemployment_benefits_amount'))}</p>
-                            )}
+                    {/* Monthly Income - always shown */}
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">{t('fields.monthlyIncome')}</label>
+                        <div className="flex">
+                            <CurrencySelect
+                                value={getValue(f('income_currency')) || 'eur'}
+                                onChange={(value) => setValue(f('income_currency'), value)}
+                                onBlur={onBlur}
+                                compact
+                            />
+                            <input
+                                type="number"
+                                value={getValue(f('unemployment_benefits_amount'))}
+                                onChange={(e) => setValue(f('unemployment_benefits_amount'), e.target.value)}
+                                onBlur={onBlur}
+                                placeholder={t('placeholders.monthlyIncome')}
+                                min="0"
+                                step="100"
+                                className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('unemployment_benefits_amount')}`}
+                                required
+                            />
                         </div>
-                    )}
+                        {isTouched(f('unemployment_benefits_amount')) && getError(f('unemployment_benefits_amount')) && (
+                            <p className="mt-1 text-sm text-destructive">{getError(f('unemployment_benefits_amount'))}</p>
+                        )}
+                    </div>
 
-                    {/* Document uploads for unemployed */}
+                    {/* Document uploads for unemployed - always shown */}
                     {renderUnemployedDocuments()}
                 </div>
             )}

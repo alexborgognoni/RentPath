@@ -1060,6 +1060,7 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
 
         // UNEMPLOYED validations
         if (status === 'unemployed') {
+            // Income source is required
             if (!data.profile_unemployed_income_source?.trim()) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -1075,33 +1076,16 @@ export function createEmploymentStepSchema(existingDocs: ExistingDocumentsContex
                     path: ['profile_unemployed_income_source_other'],
                 });
             }
-            // Always require income/benefits amount when income source is selected
-            if (data.profile_unemployed_income_source && !data.profile_unemployment_benefits_amount) {
+            // Monthly income is always required
+            if (!data.profile_unemployment_benefits_amount) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: APPLICATION_MESSAGES.profile_unemployment_benefits_amount.required,
                     path: ['profile_unemployment_benefits_amount'],
                 });
             }
-            // If income source is unemployment_benefits, require benefits statement
-            if (
-                data.profile_unemployed_income_source === 'unemployment_benefits' &&
-                !data.profile_benefits_statement &&
-                !existingDocs.benefits_statement
-            ) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: APPLICATION_MESSAGES.profile_benefits_statement.required,
-                    path: ['profile_benefits_statement'],
-                });
-            }
-            // If income source is NOT unemployment_benefits, require other income proof
-            if (
-                data.profile_unemployed_income_source &&
-                data.profile_unemployed_income_source !== 'unemployment_benefits' &&
-                !data.profile_other_income_proof &&
-                !existingDocs.other_income_proof
-            ) {
+            // Proof of income document is always required
+            if (!data.profile_other_income_proof && !existingDocs.other_income_proof) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: APPLICATION_MESSAGES.profile_other_income_proof.required,
