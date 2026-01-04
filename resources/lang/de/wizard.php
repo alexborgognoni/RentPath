@@ -1078,12 +1078,8 @@ return [
         'consentStep' => [
             'title' => 'Erklärungen & Einwilligung',
             'description' => 'Bitte überprüfen und stimmen Sie den folgenden Erklärungen zu, bevor Sie Ihre Bewerbung absenden.',
-            'notice' => [
-                'title' => 'Wichtig',
-                'description' => 'Mit dem Absenden dieser Bewerbung geben Sie eine rechtliche Erklärung ab, dass alle angegebenen Informationen wahr und korrekt sind.',
-            ],
+            'optional' => 'Optional',
             'declarations' => [
-                'title' => 'Erforderliche Erklärungen',
                 'accuracy' => [
                     'label' => 'Ich bestätige, dass alle angegebenen Informationen wahr und korrekt sind',
                     'description' => 'Ich erkläre, dass alle in dieser Bewerbung angegebenen Informationen vollständig, wahr und nach bestem Wissen und Gewissen korrekt sind. Ich verstehe, dass falsche Angaben zur Ablehnung meiner Bewerbung oder zur Kündigung eines daraus resultierenden Mietverhältnisses führen können.',
@@ -1102,7 +1098,6 @@ return [
                 ],
             ],
             'optionalConsents' => [
-                'title' => 'Optionale Einwilligungen',
                 'dataSharing' => [
                     'label' => 'Ich stimme zu, dass meine Bewerbung mit anderen Immobilien geteilt werden darf',
                     'description' => 'Falls diese Bewerbung nicht erfolgreich ist, stimme ich zu, dass meine Bewerbung mit anderen Vermietern geteilt werden darf, die möglicherweise passende Immobilien haben.',
@@ -1118,14 +1113,7 @@ return [
                 'fullName' => 'Vollständiger Name',
                 'fullNamePlaceholder' => 'Geben Sie Ihren vollständigen Namen ein',
                 'date' => 'Datum',
-                'dateNote' => 'Automatisch für Ihre Unterlagen ausgefüllt',
             ],
-            'status' => [
-                'complete' => 'Alle erforderlichen Erklärungen abgeschlossen. Sie können fortfahren.',
-                'incomplete' => 'Bitte vervollständigen Sie alle oben genannten erforderlichen Erklärungen, um fortzufahren.',
-            ],
-            'required' => 'Erforderlich',
-            'optional' => 'Optional',
         ],
 
         // Emergency Step

@@ -1078,12 +1078,8 @@ return [
         'consentStep' => [
             'title' => 'Déclarations & Consentement',
             'description' => 'Veuillez examiner et accepter les déclarations suivantes avant de soumettre votre candidature.',
-            'notice' => [
-                'title' => 'Important',
-                'description' => 'En soumettant cette candidature, vous faites une déclaration légale que toutes les informations fournies sont vraies et exactes.',
-            ],
+            'optional' => 'Optionnel',
             'declarations' => [
-                'title' => 'Déclarations requises',
                 'accuracy' => [
                     'label' => 'Je confirme que toutes les informations fournies sont vraies et exactes',
                     'description' => 'Je déclare que toutes les informations fournies dans cette candidature sont complètes, vraies et exactes au meilleur de ma connaissance. Je comprends que fournir de fausses informations peut entraîner le rejet de ma candidature ou la résiliation de toute location en résultant.',
@@ -1102,7 +1098,6 @@ return [
                 ],
             ],
             'optionalConsents' => [
-                'title' => 'Consentements optionnels',
                 'dataSharing' => [
                     'label' => 'Je consens au partage de ma candidature avec d\'autres propriétés',
                     'description' => 'Si cette candidature n\'est pas retenue, je consens à ce qu\'elle soit partagée avec d\'autres propriétaires qui pourraient avoir des biens disponibles.',
@@ -1118,14 +1113,7 @@ return [
                 'fullName' => 'Nom complet légal',
                 'fullNamePlaceholder' => 'Saisissez votre nom complet',
                 'date' => 'Date',
-                'dateNote' => 'Rempli automatiquement pour vos dossiers',
             ],
-            'status' => [
-                'complete' => 'Toutes les déclarations requises sont complétées. Vous pouvez continuer.',
-                'incomplete' => 'Veuillez compléter toutes les déclarations requises ci-dessus pour continuer.',
-            ],
-            'required' => 'Requis',
-            'optional' => 'Optionnel',
         ],
 
         // Emergency Step

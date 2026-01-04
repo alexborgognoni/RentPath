@@ -1078,12 +1078,8 @@ return [
         'consentStep' => [
             'title' => 'Verklaringen & Toestemming',
             'description' => 'Bekijk en ga akkoord met de volgende verklaringen voordat u uw aanvraag indient.',
-            'notice' => [
-                'title' => 'Belangrijk',
-                'description' => 'Door deze aanvraag in te dienen, verklaart u juridisch dat alle verstrekte informatie waar en correct is.',
-            ],
+            'optional' => 'Optioneel',
             'declarations' => [
-                'title' => 'Vereiste Verklaringen',
                 'accuracy' => [
                     'label' => 'Ik bevestig dat alle verstrekte informatie waar en correct is',
                     'description' => 'Ik verklaar dat alle informatie in deze aanvraag volledig, waar en correct is naar mijn beste weten. Ik begrijp dat het verstrekken van valse informatie kan leiden tot afwijzing van mijn aanvraag of beëindiging van een eventuele huurovereenkomst.',
@@ -1102,7 +1098,6 @@ return [
                 ],
             ],
             'optionalConsents' => [
-                'title' => 'Optionele Toestemmingen',
                 'dataSharing' => [
                     'label' => 'Ik stem in met het delen van mijn aanvraag met andere woningen',
                     'description' => 'Als deze aanvraag niet succesvol is, stem ik ermee in dat mijn aanvraag gedeeld wordt met andere verhuurders die mogelijk geschikte woningen hebben.',
@@ -1118,14 +1113,7 @@ return [
                 'fullName' => 'Volledige Wettelijke Naam',
                 'fullNamePlaceholder' => 'Typ uw volledige naam',
                 'date' => 'Datum',
-                'dateNote' => 'Automatisch ingevuld voor uw administratie',
             ],
-            'status' => [
-                'complete' => 'Alle vereiste verklaringen voltooid. U kunt doorgaan.',
-                'incomplete' => 'Voltooi alle vereiste verklaringen hierboven om door te gaan.',
-            ],
-            'required' => 'Vereist',
-            'optional' => 'Optioneel',
         ],
 
         // Emergency Step

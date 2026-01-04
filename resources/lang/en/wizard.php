@@ -1145,23 +1145,33 @@ return [
         'consentStep' => [
             'title' => 'Declarations & Consent',
             'description' => 'Please review and agree to the following declarations before submitting your application.',
-            'notice' => [
-                'title' => 'Important',
-                'description' => 'By submitting this application, you are making a legal declaration that all information provided is true and accurate.',
-            ],
+            'optional' => 'Optional',
             'declarations' => [
-                'title' => 'Required Declarations',
-                'accurateInfo' => [
-                    'label' => 'Accuracy of Information',
-                    'description' => 'I confirm that all information provided in this application is true, complete, and accurate to the best of my knowledge. I understand that providing false information may result in rejection of my application or termination of any resulting tenancy.',
+                'accuracy' => [
+                    'label' => 'I confirm that all information provided is true and accurate',
+                    'description' => 'I declare that all information provided in this application is complete, true, and accurate to the best of my knowledge. I understand that providing false information may result in the rejection of my application or termination of any resulting tenancy.',
                 ],
-                'backgroundCheck' => [
-                    'label' => 'Background & Reference Checks',
-                    'description' => 'I consent to the landlord or their agents conducting background checks, credit checks, and contacting the references I have provided. I understand this is a standard part of the tenant screening process.',
+                'screening' => [
+                    'label' => 'I consent to background and credit screening',
+                    'description' => 'I authorize the landlord/property manager and their agents to conduct credit checks, background checks, and verification of my employment and rental history as part of this application.',
                 ],
-                'terms' => [
-                    'label' => 'Terms & Privacy Policy',
-                    'description' => 'I have read and agree to the Terms of Service and Privacy Policy. I understand how my personal data will be processed and stored.',
+                'dataProcessing' => [
+                    'label' => 'I consent to processing of my personal data',
+                    'description' => 'I consent to the collection, processing, and storage of my personal data as described in the Privacy Policy for the purpose of evaluating my rental application.',
+                ],
+                'referenceContact' => [
+                    'label' => 'I consent to contacting the references I have provided',
+                    'description' => 'I authorize the landlord/property manager to contact the references I have provided, including previous landlords and employers, to verify the information in my application.',
+                ],
+            ],
+            'optionalConsents' => [
+                'dataSharing' => [
+                    'label' => 'I consent to sharing my application with other properties',
+                    'description' => 'If this application is not successful, I consent to my application being shared with other landlords who may have suitable properties available.',
+                ],
+                'marketing' => [
+                    'label' => 'I consent to receive marketing communications',
+                    'description' => 'I consent to receive emails about new properties and rental opportunities that may be of interest to me.',
                 ],
             ],
             'signature' => [
@@ -1170,11 +1180,6 @@ return [
                 'fullName' => 'Full Legal Name',
                 'fullNamePlaceholder' => 'Type your full name as it appears on your ID',
                 'date' => 'Date',
-                'dateNote' => 'Today\'s date will be recorded automatically',
-            ],
-            'status' => [
-                'complete' => 'All declarations confirmed. You\'re ready to submit!',
-                'incomplete' => 'Please confirm all declarations above to continue.',
             ],
         ],
 
