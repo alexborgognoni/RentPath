@@ -34,6 +34,7 @@ export interface SharedData {
     appPort: string | null; // Optional port (e.g., '8000' for local, null for production)
     locale: string;
     translations: Translations;
+    unreadMessages: number; // Count of unread conversations for tenant users
     [key: string]: unknown;
 }
 

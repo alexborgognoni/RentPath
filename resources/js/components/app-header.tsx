@@ -4,21 +4,16 @@ import { LogoHomeButton } from '@/components/logo-home-button';
 import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
 import { MobileMenu } from '@/components/mobile-menu';
 import { TenantNav } from '@/components/tenant-nav';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type SharedData } from '@/types';
 import { isManagerSubdomain, route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-interface AppHeaderProps {
-    title?: string;
-    breadcrumbs?: BreadcrumbItem[];
-}
-
-export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
+export function AppHeader() {
     const page = usePage<SharedData>();
-    const { auth, translations, subdomain, managerSubdomain } = page.props;
+    const { auth, translations, subdomain, managerSubdomain, unreadMessages } = page.props;
     const isTenantPortal = !isManagerSubdomain(subdomain, managerSubdomain);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
@@ -107,40 +102,16 @@ export function AppHeader({ title, breadcrumbs }: AppHeaderProps) {
             }`}
         >
             <div ref={containerRef} className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                {/* Left: Logo + Title/Breadcrumbs */}
-                <div className="flex items-center space-x-3">
+                {/* Left: Logo + Tenant Navigation */}
+                <div className="flex items-center gap-3">
                     <LogoHomeButton />
-
-                    {(breadcrumbs?.length || title) && (
-                        <>
-                            <div className="hidden h-6 w-px bg-border sm:block dark:bg-border" />
-                            {breadcrumbs?.length ? (
-                                <nav className="hidden items-center space-x-2 text-sm sm:flex">
-                                    {breadcrumbs.map((crumb, index) => (
-                                        <div key={crumb.href} className="flex items-center space-x-2">
-                                            {index > 0 && <span className="text-muted-foreground">/</span>}
-                                            {index === breadcrumbs.length - 1 ? (
-                                                <span className="font-semibold text-foreground">{crumb.title}</span>
-                                            ) : (
-                                                <a href={crumb.href} className="text-muted-foreground transition-colors hover:text-foreground">
-                                                    {crumb.title}
-                                                </a>
-                                            )}
-                                        </div>
-                                    ))}
-                                </nav>
-                            ) : (
-                                <h1 className="hidden text-xl font-semibold text-foreground sm:block">{title}</h1>
-                            )}
-                        </>
-                    )}
 
                     {/* Tenant Navigation - shown on tenant portal when authenticated (desktop only) */}
                     {isTenantPortal && auth?.user && (
                         <>
                             <div className="hidden h-6 w-px bg-border md:block dark:bg-border" />
                             <div className="hidden md:block">
-                                <TenantNav />
+                                <TenantNav unreadMessages={unreadMessages} />
                             </div>
                         </>
                     )}

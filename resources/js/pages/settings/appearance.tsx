@@ -1,5 +1,10 @@
+import { ManagerLayout } from '@/layouts/manager-layout';
 import Settings from '@/pages/settings';
 
 export default function Appearance() {
-    return <Settings />;
+    return (
+        <ManagerLayout>
+            <Settings />
+        </ManagerLayout>
+    );
 }

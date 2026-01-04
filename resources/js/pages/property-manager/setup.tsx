@@ -1,5 +1,5 @@
-import { AppLayout } from '@/layouts/app-layout';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { ManagerLayout } from '@/layouts/manager-layout';
+import { type SharedData } from '@/types';
 import type { PropertyManagerFormData, User } from '@/types/dashboard';
 import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
@@ -23,11 +23,6 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: translate(translations, 'properties.title'), href: route('manager.properties.index') },
-        { title: 'Setup Property Manager Profile', href: route('profile.setup') },
-    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -85,7 +80,7 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <ManagerLayout>
             <Head title="Setup Property Manager Profile" />
             <div className="min-h-screen bg-background">
                 <div className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -329,6 +324,6 @@ export default function SetupPropertyManagerPage({ user }: SetupPropertyManagerP
                     </motion.div>
                 </div>
             </div>
-        </AppLayout>
+        </ManagerLayout>
     );
 }

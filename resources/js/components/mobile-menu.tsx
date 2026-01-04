@@ -24,7 +24,7 @@ interface MobileMenuProps {
 
 export function MobileMenu({ getUserInitials }: MobileMenuProps) {
     const page = usePage<SharedData>();
-    const { auth, translations, locale, subdomain, managerSubdomain } = page.props;
+    const { auth, translations, locale, subdomain, managerSubdomain, unreadMessages } = page.props;
     const isTenantPortal = !isManagerSubdomain(subdomain, managerSubdomain);
     const [isOpen, setIsOpen] = useState(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
@@ -382,7 +382,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                             <label className="mb-2 block text-xs font-medium text-muted-foreground">
                                                 {t(translations.header, 'nav.navigation') || 'Navigation'}
                                             </label>
-                                            <TenantNavMobile onNavigate={() => setIsOpen(false)} />
+                                            <TenantNavMobile unreadMessages={unreadMessages} onNavigate={() => setIsOpen(false)} />
                                         </div>
                                         <div className="border-t border-border" />
                                     </>

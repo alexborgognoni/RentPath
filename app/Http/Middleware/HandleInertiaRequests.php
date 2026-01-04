@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Conversation;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -81,6 +82,16 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+            'unreadMessages' => fn () => $request->user()
+                ? Conversation::where('participant_type', 'tenant')
+                    ->where('participant_id', $request->user()->id)
+                    ->whereNotNull('last_message_at')
+                    ->where(function ($q) {
+                        $q->whereNull('participant_last_read_at')
+                            ->orWhereColumn('last_message_at', '>', 'participant_last_read_at');
+                    })
+                    ->count()
+                : 0,
         ];
     }
 }

@@ -1,5 +1,4 @@
 import { SettingsNavigation } from '@/components/settings-navigation';
-import { AppLayout } from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { JSX, useEffect, useState } from 'react';
@@ -11,7 +10,18 @@ import ProfileContent from '@/pages/settings/profile-content';
 
 type SettingsPage = 'account' | 'password' | 'appearance';
 
-export default function Settings({ mustVerifyEmail = false, status }: { mustVerifyEmail?: boolean; status?: string }) {
+interface SettingsProps {
+    mustVerifyEmail?: boolean;
+    status?: string;
+}
+
+/**
+ * Settings - Pure settings component without layout wrapper
+ *
+ * This component should be wrapped by the appropriate layout
+ * (TenantLayout or ManagerLayout) in the page files.
+ */
+export default function Settings({ mustVerifyEmail = false, status }: SettingsProps) {
     const getInitialPage = (): SettingsPage => {
         const urlParams = new URLSearchParams(window.location.search);
         const pageFromUrl = urlParams.get('initialPage') as SettingsPage | null;
@@ -48,7 +58,6 @@ export default function Settings({ mustVerifyEmail = false, status }: { mustVeri
 
         // Moving to higher page index slides content up, lower slides down
         const yOffset = currentOrder > prevPageOrder ? 40 : -40;
-        console.log(yOffset);
 
         const pageVariants = {
             initial: { opacity: 0, y: yOffset },
@@ -80,19 +89,15 @@ export default function Settings({ mustVerifyEmail = false, status }: { mustVeri
     };
 
     return (
-        <AppLayout title="Settings">
+        <>
             <Head title="Settings" />
-            <div className="min-h-screen">
-                <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                    {/* Responsive layout: stack menu above content on small screens */}
-                    <div className="flex flex-col gap-8 lg:flex-row">
-                        <SettingsNavigation currentPage={currentPage} onNavigate={handleNavigate} />
-                        <div className="flex-1 lg:max-w-4xl">
-                            <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
-                        </div>
-                    </div>
+            {/* Responsive layout: stack menu above content on small screens */}
+            <div className="flex flex-col gap-8 lg:flex-row">
+                <SettingsNavigation currentPage={currentPage} onNavigate={handleNavigate} />
+                <div className="flex-1 lg:max-w-4xl">
+                    <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }

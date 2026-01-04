@@ -1,5 +1,10 @@
+import { ManagerLayout } from '@/layouts/manager-layout';
 import Settings from '@/pages/settings';
 
 export default function Password() {
-    return <Settings />;
+    return (
+        <ManagerLayout>
+            <Settings />
+        </ManagerLayout>
+    );
 }

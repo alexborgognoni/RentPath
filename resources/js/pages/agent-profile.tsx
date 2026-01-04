@@ -1,8 +1,8 @@
 import { AgentProfile } from '@/components/dashboard/agent-profile';
 import { PropertiesSection } from '@/components/dashboard/properties-section';
 import { PropertyForm } from '@/components/property/property-form';
-import { AppLayout } from '@/layouts/app-layout';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { ManagerLayout } from '@/layouts/manager-layout';
+import { type SharedData } from '@/types';
 import type { Property, PropertyManager } from '@/types/dashboard';
 import { route } from '@/utils/route';
 import { translate } from '@/utils/translate-utils';
@@ -21,11 +21,6 @@ export default function AgentProfilePage({ initialManager }: Props) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showPropertyForm, setShowPropertyForm] = useState(false);
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: translate(translations, 'properties.title'), href: route('manager.properties.index') },
-        { title: translate(translations, 'profile.title'), href: route('profile.setup') },
-    ];
 
     const fetchProfileData = async () => {
         try {
@@ -85,13 +80,13 @@ export default function AgentProfilePage({ initialManager }: Props) {
 
     if (loading)
         return (
-            <AppLayout breadcrumbs={breadcrumbs}>
+            <ManagerLayout>
                 <Head title={translate(translations, 'profile.title')} />
-            </AppLayout>
+            </ManagerLayout>
         );
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <ManagerLayout>
             <Head title={translate(translations, 'profile.title')} />
             <div className="min-h-screen">
                 {error && <div className="p-4 text-destructive">{error}</div>}
@@ -113,6 +108,6 @@ export default function AgentProfilePage({ initialManager }: Props) {
 
                 {showPropertyForm && <PropertyForm onClose={() => setShowPropertyForm(false)} />}
             </div>
-        </AppLayout>
+        </ManagerLayout>
     );
 }

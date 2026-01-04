@@ -170,6 +170,10 @@
         @apply border-border;
     }
 
+    html {
+        scrollbar-gutter: stable;
+    }
+
     html,
     body {
         @apply bg-background text-foreground;

@@ -1,3 +1,4 @@
+import { ManagerLayout } from '@/layouts/manager-layout';
 import Settings from '@/pages/settings';
 
 interface ProfileProps {
@@ -6,5 +7,9 @@ interface ProfileProps {
 }
 
 export default function Profile({ mustVerifyEmail, status }: ProfileProps) {
-    return <Settings mustVerifyEmail={mustVerifyEmail} status={status} />;
+    return (
+        <ManagerLayout>
+            <Settings mustVerifyEmail={mustVerifyEmail} status={status} />
+        </ManagerLayout>
+    );
 }
