@@ -166,6 +166,7 @@ export interface CoSignerDetails {
     student_monthly_income: string;
     // Unemployed/retired specific
     income_source: string;
+    unemployed_income_source?: string;
     income_proof: File | null;
     income_proof_path?: string;
     pension_statement_path?: string;
@@ -233,6 +234,9 @@ export interface GuarantorDetails {
 }
 
 export interface ApplicationWizardData {
+    // Application ID (set after draft is created/loaded)
+    id?: number;
+
     // ===== Step 1: Identity & Legal Eligibility =====
     // Personal Details
     profile_date_of_birth: string;
@@ -545,14 +549,26 @@ export interface DraftApplication {
     emergency_contact_phone_number: string;
     emergency_contact_email: string;
     references: ReferenceDetails[];
+    // Risk mitigation (Step 4)
+    coSigners?: Record<string, unknown>[];
+    guarantors?: Record<string, unknown>[];
 }
 
 // ===== Initial Data =====
 
-function formatDateForInput(date: string | Date | null | undefined): string {
+function formatDateForInput(date: unknown): string {
     if (!date) return '';
-    const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toISOString().split('T')[0];
+    // Handle empty objects from JSON parsing
+    if (typeof date === 'object' && !(date instanceof Date) && Object.keys(date as object).length === 0) {
+        return '';
+    }
+    if (typeof date === 'string') {
+        return new Date(date).toISOString().split('T')[0];
+    }
+    if (date instanceof Date) {
+        return date.toISOString().split('T')[0];
+    }
+    return '';
 }
 
 /**
@@ -679,8 +695,9 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
 
         // ===== Step 4: Risk Mitigation =====
         // Load co-signers from draft with document paths
-        co_signers: (draft?.coSigners || []).map((cs: Record<string, unknown>) => ({
-            from_occupant_index: cs.from_occupant_index ?? null,
+        co_signers: (draft?.coSigners || []).map((cs: Record<string, unknown>, index: number) => ({
+            occupant_index: typeof cs.occupant_index === 'number' ? cs.occupant_index : index,
+            from_occupant_index: typeof cs.from_occupant_index === 'number' ? cs.from_occupant_index : null,
             first_name: (cs.first_name as string) || '',
             last_name: (cs.last_name as string) || '',
             email: (cs.email as string) || '',
@@ -719,6 +736,7 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
             student_income_source: (cs.student_income_source as string) || '',
             student_monthly_income: (cs.student_monthly_income as string) || '',
             income_source: (cs.income_source as string) || '',
+            unemployed_income_source: (cs.unemployed_income_source as string) || undefined,
             income_proof: null,
             income_proof_path: cs.income_proof_path as string | undefined,
             pension_statement_path: cs.pension_statement_path as string | undefined,

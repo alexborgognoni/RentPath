@@ -68,7 +68,7 @@ export function ApplicationsTable({ applications, onRowClick }: ApplicationsTabl
     const t = (key: string) => translate(translations.applications, key);
 
     const columns = useMemo(
-        (): ColumnDef<Application, unknown>[] => [
+        () => [
             // Property column
             columnHelper.accessor('property', {
                 header: () => t('columnProperty'),

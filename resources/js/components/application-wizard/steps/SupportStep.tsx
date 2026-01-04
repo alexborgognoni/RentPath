@@ -534,9 +534,9 @@ export function SupportStep({
                                                 id_document_back: coSigner.id_document_back_path,
                                             }}
                                             onUploadSuccess={(file) => {
-                                                if (file.documentType?.includes('id_document_front')) {
+                                                if (file.documentType?.includes('id_document_front') && file.path) {
                                                     updateCoSigner(index, 'id_document_front_path', file.path);
-                                                } else if (file.documentType?.includes('id_document_back')) {
+                                                } else if (file.documentType?.includes('id_document_back') && file.path) {
                                                     updateCoSigner(index, 'id_document_back_path', file.path);
                                                 }
                                             }}
@@ -592,7 +592,7 @@ export function SupportStep({
                                             uploadUrl={`/applications/${data.id}/co-signer/${index}/document/upload`}
                                             documentTypePrefix={`cosigner_${index}_`}
                                             existingDocuments={getCoSignerExistingDocs(coSigner)}
-                                            onUploadSuccess={(docType, path) => handleCoSignerUploadSuccess(index, docType, path)}
+                                            onUploadSuccess={(file) => handleCoSignerUploadSuccess(index, file.documentType || '', file.path || '')}
                                         />
                                     </div>
                                 </div>
@@ -735,9 +735,9 @@ export function SupportStep({
                                                 id_document_back: guarantor.id_document_back_path,
                                             }}
                                             onUploadSuccess={(file) => {
-                                                if (file.documentType?.includes('id_document_front')) {
+                                                if (file.documentType?.includes('id_document_front') && file.path) {
                                                     updateGuarantor(index, 'id_document_front_path', file.path);
-                                                } else if (file.documentType?.includes('id_document_back')) {
+                                                } else if (file.documentType?.includes('id_document_back') && file.path) {
                                                     updateGuarantor(index, 'id_document_back_path', file.path);
                                                 }
                                             }}
@@ -796,7 +796,7 @@ export function SupportStep({
                                             uploadUrl={`/applications/${data.id}/guarantor/${index}/document/upload`}
                                             documentTypePrefix={`guarantor_${index}_`}
                                             existingDocuments={getGuarantorExistingDocs(guarantor)}
-                                            onUploadSuccess={(docType, path) => handleGuarantorUploadSuccess(index, docType, path)}
+                                            onUploadSuccess={(file) => handleGuarantorUploadSuccess(index, file.documentType || '', file.path || '')}
                                         />
                                     </div>
                                 </div>

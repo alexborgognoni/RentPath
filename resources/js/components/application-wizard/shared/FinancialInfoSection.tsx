@@ -1,6 +1,6 @@
 import { CurrencySelect } from '@/components/ui/currency-select';
 import { DatePicker } from '@/components/ui/date-picker';
-import { FileUpload } from '@/components/ui/file-upload';
+import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
 import { OptionalBadge } from '@/components/ui/optional-badge';
 import { SimpleSelect } from '@/components/ui/simple-select';
 import type { Translations } from '@/types/translations';
@@ -89,7 +89,7 @@ export interface FinancialInfoSectionProps {
     /** Existing uploaded documents */
     existingDocuments?: ExistingDocuments | null;
     /** Called when document upload succeeds */
-    onUploadSuccess?: () => void;
+    onUploadSuccess?: (file: UploadedFile) => void;
 }
 
 const FILE_UPLOAD_ACCEPT = {

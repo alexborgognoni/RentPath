@@ -15,6 +15,8 @@ export interface UploadedFile {
     size?: number;
     /** Upload timestamp (Unix timestamp in seconds) */
     uploadedAt?: number;
+    /** Document type identifier returned from upload endpoint */
+    documentType?: string;
 }
 
 /** Get file extension from filename */
@@ -69,6 +71,7 @@ export interface FileUploadProps {
               fileTypes?: string;
               maxFileSize?: string;
               maxFiles?: number;
+              customText?: string;
           };
     /** Existing uploaded file (shows as already uploaded) - single file mode */
     existingFile?: UploadedFile | null;

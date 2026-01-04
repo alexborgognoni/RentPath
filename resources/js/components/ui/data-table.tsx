@@ -10,14 +10,15 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { useState } from 'react';
 
-interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<TData> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    columns: ColumnDef<TData, any>[];
     data: TData[];
     onRowClick?: (row: TData) => void;
     className?: string;
 }
 
-export function DataTable<TData, TValue>({ columns, data, onRowClick, className }: DataTableProps<TData, TValue>) {
+export function DataTable<TData>({ columns, data, onRowClick, className }: DataTableProps<TData>) {
     const [sorting, setSorting] = useState<SortingState>([]);
 
     const table = useReactTable({

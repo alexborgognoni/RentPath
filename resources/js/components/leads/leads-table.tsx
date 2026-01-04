@@ -69,7 +69,7 @@ export function LeadsTable({ leads, onRowClick }: LeadsTableProps) {
     const t = (key: string) => translate(translations.leads, key);
 
     const columns = useMemo(
-        (): ColumnDef<Lead, unknown>[] => [
+        () => [
             // Name column
             columnHelper.display({
                 id: 'name',
