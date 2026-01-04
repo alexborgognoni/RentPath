@@ -714,7 +714,7 @@ return [
                 'messageToLandlord' => 'Nachricht an den Vermieter',
             ],
             'placeholders' => [
-                'message' => 'Stellen Sie sich vor und erklären Sie, warum Sie an dieser Immobilie interessiert sind...',
+                'message' => 'Erklären Sie, warum Sie an dieser Immobilie interessiert sind und warum Sie ein guter Mieter wären...',
             ],
             'occupants' => [
                 'title' => 'Bewohner',
@@ -1225,10 +1225,13 @@ return [
                     'dateOfBirth' => 'Geburtsdatum',
                     'nationality' => 'Staatsangehörigkeit',
                     'phoneNumber' => 'Telefonnummer',
+                    'bio' => 'Über mich',
                 ],
                 'placeholders' => [
                     'phone' => '612345678',
+                    'bio' => 'Erzählen Sie uns etwas über sich...',
                 ],
+                'bioCharacters' => ':count/:max Zeichen',
             ],
 
             // IdDocumentSection

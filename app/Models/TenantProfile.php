@@ -23,6 +23,7 @@ class TenantProfile extends Model
         'nationality',
         'phone_country_code',
         'phone_number',
+        'bio',
 
         // Identity - ID Document
         'id_document_type',

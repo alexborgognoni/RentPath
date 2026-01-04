@@ -714,7 +714,7 @@ return [
                 'messageToLandlord' => 'Bericht aan verhuurder',
             ],
             'placeholders' => [
-                'message' => 'Stel uzelf voor en leg uit waarom u geïnteresseerd bent in deze woning...',
+                'message' => 'Leg uit waarom u geïnteresseerd bent in deze woning en waarom u een goede huurder zou zijn...',
             ],
             'occupants' => [
                 'title' => 'Bewoners',
@@ -1225,10 +1225,13 @@ return [
                     'dateOfBirth' => 'Geboortedatum',
                     'nationality' => 'Nationaliteit',
                     'phoneNumber' => 'Telefoonnummer',
+                    'bio' => 'Over mij',
                 ],
                 'placeholders' => [
                     'phone' => '612345678',
+                    'bio' => 'Vertel ons iets over uzelf...',
                 ],
+                'bioCharacters' => ':count/:max tekens',
             ],
 
             // IdDocumentSection

@@ -11,6 +11,7 @@ const PROFILE_FIELDS = new Set([
     'profile_nationality',
     'profile_phone_country_code',
     'profile_phone_number',
+    'profile_bio',
     // ID Document
     'profile_id_document_type',
     'profile_id_number',

@@ -38,6 +38,7 @@ class StoreApplicationRequest extends FormRequest
             'profile_nationality' => ['required', 'string', 'max:2', new ValidCountryCode],
             'profile_phone_country_code' => 'required|string|max:5',
             'profile_phone_number' => ['required', 'string', 'max:20', new ValidPhoneNumber('profile_phone_country_code')],
+            'profile_bio' => 'nullable|string|max:1000',
 
             // ID Document
             'profile_id_document_type' => 'required|in:passport,national_id,drivers_license,residence_permit',

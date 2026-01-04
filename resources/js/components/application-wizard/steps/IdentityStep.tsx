@@ -55,7 +55,6 @@ export function IdentityStep({
     updateField,
     markFieldTouched,
     onBlur,
-    onFieldBlur,
     existingDocuments,
     propertyCountry,
 }: IdentityStepProps) {
@@ -149,8 +148,9 @@ export function IdentityStep({
             nationality: data.profile_nationality,
             phone_number: data.profile_phone_number,
             phone_country_code: data.profile_phone_country_code,
+            bio: data.profile_bio,
         }),
-        [user, data.profile_date_of_birth, data.profile_nationality, data.profile_phone_number, data.profile_phone_country_code],
+        [user, data.profile_date_of_birth, data.profile_nationality, data.profile_phone_number, data.profile_phone_country_code, data.profile_bio],
     );
 
     const handlePersonalDetailsChange = useCallback(
@@ -164,6 +164,7 @@ export function IdentityStep({
                 nationality: 'profile_nationality',
                 phone_number: 'profile_phone_number',
                 phone_country_code: 'profile_phone_country_code',
+                bio: 'profile_bio',
             };
 
             const targetField = fieldMap[field];

@@ -1,5 +1,6 @@
 import { DatePicker } from '@/components/ui/date-picker';
 import { NationalitySelect } from '@/components/ui/nationality-select';
+import { OptionalBadge } from '@/components/ui/optional-badge';
 import { PhoneInput } from '@/components/ui/phone-input';
 import type { Translations } from '@/types/translations';
 import { translate } from '@/utils/translate-utils';
@@ -12,6 +13,7 @@ export interface PersonalDetailsData {
     nationality: string;
     phone_number: string;
     phone_country_code: string;
+    bio: string;
 }
 
 export interface PersonalDetailsSectionProps {
@@ -159,6 +161,26 @@ export function PersonalDetailsSection({
                     error={getError('phone_number')}
                     placeholder={t('placeholders.phone') || '612345678'}
                 />
+            </div>
+
+            {/* Bio - spans full width */}
+            <div className="md:col-span-2">
+                <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+                    {t('fields.bio') || 'About Me'}
+                    <OptionalBadge />
+                </label>
+                <textarea
+                    value={data.bio}
+                    onChange={(e) => onChange('bio', e.target.value)}
+                    onBlur={onBlur}
+                    rows={4}
+                    maxLength={1000}
+                    placeholder={t('placeholders.bio') || 'Tell us a bit about yourself...'}
+                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                    {(t('bioCharacters') || ':count/:max characters').replace(':count', data.bio.length.toString()).replace(':max', '1000')}
+                </p>
             </div>
         </div>
     );

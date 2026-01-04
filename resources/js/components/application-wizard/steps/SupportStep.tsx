@@ -7,13 +7,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { ChevronDown, ChevronUp, Link2, Plus, Shield, Trash2, UserPlus, Users } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import {
-    FinancialInfoSection,
-    IdDocumentSection,
-    PersonalDetailsSection,
-    type IdDocumentData,
-    type PersonalDetailsData,
-} from '../shared';
+import { FinancialInfoSection, IdDocumentSection, PersonalDetailsSection, type IdDocumentData, type PersonalDetailsData } from '../shared';
 
 interface SupportStepProps {
     data: ApplicationWizardData;
@@ -65,13 +59,9 @@ export function SupportStep({
     removeGuarantor,
     updateGuarantor,
     syncCoSignersFromOccupants,
-    propertyCountry,
 }: SupportStepProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.supportStep.${key}`);
-
-    // Check if property is in UK or Ireland (requires right-to-rent verification)
-    const requiresRightToRent = propertyCountry === 'GB' || propertyCountry === 'IE';
 
     // Collapsible section state (like HouseholdStep)
     const [expandedSections, setExpandedSections] = useState({
@@ -350,6 +340,7 @@ export function SupportStep({
         nationality: coSigner.nationality,
         phone_number: coSigner.phone_number,
         phone_country_code: coSigner.phone_country_code,
+        bio: '',
     });
 
     // Build co-signer ID document data for IdDocumentSection
@@ -369,6 +360,7 @@ export function SupportStep({
         nationality: guarantor.nationality,
         phone_number: guarantor.phone_number,
         phone_country_code: guarantor.phone_country_code,
+        bio: '',
     });
 
     // Build guarantor ID document data for IdDocumentSection

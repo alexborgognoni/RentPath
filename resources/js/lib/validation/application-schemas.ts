@@ -1,6 +1,6 @@
 import {
-    validateFinancialFields,
     validateFinancialDocuments,
+    validateFinancialFields,
     validateIdDocuments,
     type DocumentContext,
 } from '@/lib/validation/financial-validation';
@@ -34,6 +34,9 @@ export const APPLICATION_MESSAGES = {
     profile_phone_number: {
         required: 'Phone number is required',
         invalid: 'Please enter a valid phone number',
+    },
+    profile_bio: {
+        maxLength: 'Bio cannot exceed 1000 characters',
     },
     profile_id_document_type: {
         required: 'Please select an ID document type',
@@ -635,6 +638,7 @@ const personalInfoBaseSchema = z.object({
     profile_nationality: z.string().min(1, APPLICATION_MESSAGES.profile_nationality.required),
     profile_phone_country_code: z.string(),
     profile_phone_number: z.string().min(1, APPLICATION_MESSAGES.profile_phone_number.required),
+    profile_bio: z.string().max(1000, APPLICATION_MESSAGES.profile_bio.maxLength).optional(),
     // ID Document
     profile_id_document_type: z.string().min(1, APPLICATION_MESSAGES.profile_id_document_type.required),
     profile_id_number: z.string().min(1, APPLICATION_MESSAGES.profile_id_number.required),

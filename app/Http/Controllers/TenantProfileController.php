@@ -601,6 +601,7 @@ class TenantProfileController extends Controller
             'nationality',
             'phone_country_code',
             'phone_number',
+            'bio',
             // ID Document
             'id_document_type',
             'id_number',

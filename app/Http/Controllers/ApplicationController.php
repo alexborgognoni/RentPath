@@ -350,7 +350,7 @@ class ApplicationController extends Controller
         // Note: Emergency contact fields are now application-specific, NOT stored in profile
         // Only include fields that actually exist in tenant_profiles table
         $profileFields = [
-            'date_of_birth', 'middle_name', 'nationality', 'phone_country_code', 'phone_number',
+            'date_of_birth', 'middle_name', 'nationality', 'phone_country_code', 'phone_number', 'bio',
             'id_document_type', 'id_number', 'id_issuing_country', 'id_expiry_date',
             'immigration_status', 'immigration_status_other', 'visa_type', 'visa_type_other', 'visa_expiry_date',
             'right_to_rent_share_code',
@@ -524,6 +524,7 @@ class ApplicationController extends Controller
             'profile_nationality' => $tenantProfile->nationality,
             'profile_phone_country_code' => $tenantProfile->phone_country_code,
             'profile_phone_number' => $tenantProfile->phone_number,
+            'profile_bio' => $tenantProfile->bio,
             // ID Document
             'profile_id_document_type' => $tenantProfile->id_document_type,
             'profile_id_number' => $tenantProfile->id_number,
