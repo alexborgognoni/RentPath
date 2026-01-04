@@ -1609,7 +1609,7 @@ class ApplicationController extends Controller
     }
 
     /**
-     * Transform draft application for frontend by extracting references.
+     * Transform draft application for frontend by extracting references and adding signed URLs.
      */
     private function transformDraftForFrontend(?Application $draft): ?Application
     {
@@ -1623,6 +1623,17 @@ class ApplicationController extends Controller
         // Add virtual attributes to the model
         $draft->landlord_references = $extractedRefs['landlord_references'];
         $draft->other_references = $extractedRefs['other_references'];
+
+        // Add signed URLs for additional documents
+        if (! empty($draft->additional_documents)) {
+            $docs = $draft->additional_documents;
+            foreach ($docs as $index => $doc) {
+                if (! empty($doc['path'])) {
+                    $docs[$index]['previewUrl'] = StorageHelper::url($doc['path'], 'private');
+                }
+            }
+            $draft->additional_documents = $docs;
+        }
 
         return $draft;
     }

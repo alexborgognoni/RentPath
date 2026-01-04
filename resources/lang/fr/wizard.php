@@ -1059,19 +1059,14 @@ return [
         'additionalStep' => [
             'title' => 'Informations supplémentaires',
             'description' => 'Téléchargez des documents supplémentaires ou fournissez des informations complémentaires pour renforcer votre candidature.',
-            'info' => [
-                'purpose' => 'Cette étape est optionnelle. Vous pouvez télécharger des documents supplémentaires comme des relevés bancaires, déclarations fiscales ou autres pièces justificatives.',
-                'optional' => 'Ignorez cette étape si vous n\'avez pas de documents supplémentaires à télécharger.',
-            ],
             'documents' => [
-                'title' => 'Documents supplémentaires',
+                'title' => 'Documents justificatifs',
             ],
             'notes' => [
                 'title' => 'Notes supplémentaires',
                 'placeholder' => 'Partagez toute information supplémentaire qui pourrait être pertinente pour votre candidature...',
                 'characters' => ':count/:max caractères',
             ],
-            'optional' => 'optionnel',
         ],
 
         // Consent Step

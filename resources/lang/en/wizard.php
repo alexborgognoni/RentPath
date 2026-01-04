@@ -1126,19 +1126,14 @@ return [
         'additionalStep' => [
             'title' => 'Additional Information',
             'description' => 'Upload any additional documents or provide extra information to strengthen your application.',
-            'info' => [
-                'purpose' => 'This step is optional. You can upload additional documents like bank statements, tax returns, or any other supporting documentation that may help your application.',
-                'optional' => 'Skip this step if you don\'t have any additional documents to upload.',
-            ],
             'documents' => [
-                'title' => 'Additional Documents',
+                'title' => 'Supporting Documents',
             ],
             'notes' => [
                 'title' => 'Additional Notes',
                 'placeholder' => 'Share any additional information that might be relevant to your application...',
                 'characters' => ':count/:max characters',
             ],
-            'optional' => 'Optional',
         ],
 
         // Consent Step

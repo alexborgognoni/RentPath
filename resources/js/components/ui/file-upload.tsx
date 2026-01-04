@@ -346,21 +346,31 @@ export function FileUpload({
                                     </div>
                                     <div className="flex shrink-0 items-center gap-1">
                                         {file.previewUrl && (
-                                            <a
-                                                href={file.previewUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                                                title="Preview"
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                            </a>
+                                            <>
+                                                <a
+                                                    href={file.previewUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                                    title="Preview"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </a>
+                                                <a
+                                                    href={file.previewUrl}
+                                                    download={file.originalName}
+                                                    className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                                    title="Download"
+                                                >
+                                                    <Download className="h-4 w-4" />
+                                                </a>
+                                            </>
                                         )}
                                         {showDeleteButton && file.path && (
                                             <button
                                                 type="button"
                                                 onClick={() => handleMultiFileRemove(file.path!, isExisting)}
-                                                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                                className="cursor-pointer rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                                                 title="Delete"
                                             >
                                                 <Trash2 className="h-4 w-4" />

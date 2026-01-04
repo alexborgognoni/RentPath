@@ -1059,19 +1059,14 @@ return [
         'additionalStep' => [
             'title' => 'Aanvullende Informatie',
             'description' => 'Upload aanvullende documenten of geef extra informatie om uw aanvraag te versterken.',
-            'info' => [
-                'purpose' => 'Deze stap is optioneel. U kunt aanvullende documenten uploaden zoals bankafschriften, belastingaangiften of andere ondersteunende documentatie.',
-                'optional' => 'Sla deze stap over als u geen aanvullende documenten heeft om te uploaden.',
-            ],
             'documents' => [
-                'title' => 'Aanvullende Documenten',
+                'title' => 'Ondersteunende Documenten',
             ],
             'notes' => [
                 'title' => 'Aanvullende Opmerkingen',
                 'placeholder' => 'Deel aanvullende informatie die relevant kan zijn voor uw aanvraag...',
                 'characters' => ':count/:max tekens',
             ],
-            'optional' => 'optioneel',
         ],
 
         // Consent Step

@@ -584,6 +584,9 @@ export interface DraftApplication {
     // References (extracted from combined 'references' column by backend)
     landlord_references?: LandlordReferenceDetails[];
     other_references?: OtherReferenceDetails[];
+    // Additional Information (Step 6)
+    additional_information?: string;
+    additional_documents?: UploadedFile[];
 }
 
 // ===== Initial Data =====
@@ -878,8 +881,8 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         other_references: (draft?.other_references as OtherReferenceDetails[]) || [],
 
         // ===== Step 6: Additional Information =====
-        additional_information: '',
-        additional_documents: [],
+        additional_information: draft?.additional_information || '',
+        additional_documents: draft?.additional_documents || [],
 
         // ===== Step 7: Declarations & Consent =====
         declaration_accuracy: false,
@@ -2041,6 +2044,12 @@ export function useApplicationWizard({
                 newTouched[`ref_${index}_relationship`] = true;
                 newTouched[`ref_${index}_years_known`] = true;
             });
+        }
+
+        if (wizard.currentStep === 'additional') {
+            // Additional step fields are optional, but mark them as touched for validation
+            newTouched.additional_information = true;
+            newTouched.additional_documents = true;
         }
 
         if (wizard.currentStep === 'consent') {

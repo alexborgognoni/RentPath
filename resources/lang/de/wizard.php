@@ -1059,19 +1059,14 @@ return [
         'additionalStep' => [
             'title' => 'Zusätzliche Informationen',
             'description' => 'Laden Sie zusätzliche Dokumente hoch oder geben Sie weitere Informationen an, um Ihre Bewerbung zu stärken.',
-            'info' => [
-                'purpose' => 'Dieser Schritt ist optional. Sie können zusätzliche Dokumente wie Kontoauszüge, Steuererklärungen oder andere unterstützende Unterlagen hochladen.',
-                'optional' => 'Überspringen Sie diesen Schritt, wenn Sie keine zusätzlichen Dokumente hochladen möchten.',
-            ],
             'documents' => [
-                'title' => 'Zusätzliche Dokumente',
+                'title' => 'Unterstützende Dokumente',
             ],
             'notes' => [
                 'title' => 'Zusätzliche Anmerkungen',
                 'placeholder' => 'Teilen Sie zusätzliche Informationen mit, die für Ihre Bewerbung relevant sein könnten...',
                 'characters' => ':count/:max Zeichen',
             ],
-            'optional' => 'optional',
         ],
 
         // Consent Step

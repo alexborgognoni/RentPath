@@ -4,8 +4,8 @@ import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { ChevronDown, ChevronUp, FileText, Info, Upload } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronDown, ChevronUp, FileText, Upload } from 'lucide-react';
+import { useCallback, useState } from 'react';
 
 interface AdditionalStepProps {
     data: ApplicationWizardData;
@@ -13,11 +13,12 @@ interface AdditionalStepProps {
     touchedFields: Record<string, boolean>;
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
     markFieldTouched: (field: string) => void;
-    onBlur: () => void;
+    /** Per-field blur handler - called with field name for per-field validation */
+    onFieldBlur?: (field: string) => void;
     propertyId: number;
 }
 
-export function AdditionalStep({ data, errors, touchedFields, updateField, markFieldTouched, onBlur, propertyId }: AdditionalStepProps) {
+export function AdditionalStep({ data, errors, touchedFields, updateField, markFieldTouched, onFieldBlur, propertyId }: AdditionalStepProps) {
     const { translations } = usePage<SharedData>().props;
     const t = (key: string) => translate(translations, `wizard.application.additionalStep.${key}`);
 
@@ -30,10 +31,14 @@ export function AdditionalStep({ data, errors, touchedFields, updateField, markF
         setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
     };
 
-    const handleFieldChange = (field: keyof ApplicationWizardData, value: unknown) => {
-        updateField(field, value as ApplicationWizardData[typeof field]);
-        markFieldTouched(field);
-    };
+    // Per-field blur handler (marks touched + triggers per-field validation)
+    const handleFieldBlur = useCallback(
+        (field: string) => () => {
+            markFieldTouched(field);
+            onFieldBlur?.(field);
+        },
+        [markFieldTouched, onFieldBlur],
+    );
 
     // Get existing additional documents from data (if any)
     const existingDocuments: UploadedFile[] = data.additional_documents || [];
@@ -44,22 +49,6 @@ export function AdditionalStep({ data, errors, touchedFields, updateField, markF
             <p className="text-muted-foreground">
                 {t('description') || 'Upload any additional documents or provide extra information to strengthen your application.'}
             </p>
-
-            {/* Information Card */}
-            <div className="rounded-lg border border-border bg-muted/30 p-4">
-                <div className="flex gap-3">
-                    <Info className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                    <div className="space-y-2 text-sm">
-                        <p>
-                            {t('info.purpose') ||
-                                'This step is optional. You can upload additional documents like bank statements, tax returns, or any other supporting documentation that may help your application.'}
-                        </p>
-                        <p className="text-muted-foreground">
-                            {t('info.optional') || "Skip this step if you don't have any additional documents to upload."}
-                        </p>
-                    </div>
-                </div>
-            </div>
 
             {/* Supporting Documents Section - Collapsible */}
             <div className="rounded-lg border border-border bg-card">
@@ -94,6 +83,7 @@ export function AdditionalStep({ data, errors, touchedFields, updateField, markF
                             multiple={true}
                             maxFiles={10}
                             existingFiles={existingDocuments}
+                            allowDelete={true}
                             description={{
                                 fileTypes: 'PDF, PNG, JPG',
                                 maxFileSize: '20MB',
@@ -140,8 +130,8 @@ export function AdditionalStep({ data, errors, touchedFields, updateField, markF
                     <div className="space-y-4 border-t border-border p-4">
                         <textarea
                             value={data.additional_information || ''}
-                            onChange={(e) => handleFieldChange('additional_information', e.target.value)}
-                            onBlur={onBlur}
+                            onChange={(e) => updateField('additional_information', e.target.value)}
+                            onBlur={handleFieldBlur('additional_information')}
                             rows={4}
                             maxLength={2000}
                             placeholder={t('notes.placeholder') || 'Add any additional information you would like to share...'}
@@ -149,8 +139,8 @@ export function AdditionalStep({ data, errors, touchedFields, updateField, markF
                         />
                         <p className="text-xs text-muted-foreground">
                             {t('notes.characters')
-                                .replace(':count', (data.additional_information?.length || 0).toString())
-                                .replace(':max', '2000') || `${data.additional_information?.length || 0} / 2000 characters`}
+                                ?.replace(':count', (data.additional_information?.length || 0).toString())
+                                ?.replace(':max', '2000') || `${data.additional_information?.length || 0} / 2000 characters`}
                         </p>
                     </div>
                 )}
