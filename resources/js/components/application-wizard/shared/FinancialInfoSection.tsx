@@ -6,7 +6,7 @@ import { Select } from '@/components/ui/select';
 import type { Translations } from '@/types/translations';
 import { translate } from '@/utils/translate-utils';
 import { Briefcase, Building, GraduationCap, HeartHandshake, UserCheck } from 'lucide-react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 // Re-export validation utilities from the shared location
 export { validateFinancialFields } from '@/lib/validation/financial-validation';
@@ -80,8 +80,8 @@ export interface FinancialInfoSectionProps {
     getError: (field: string) => string | undefined;
     /** Check if field was touched */
     isTouched: (field: string) => boolean;
-    /** Blur handler */
-    onBlur: () => void;
+    /** Per-field blur handler - called with prefixed field name (e.g., 'profile_employer_name') */
+    onFieldBlur?: (field: string) => void;
     /** Upload URL for documents */
     uploadUrl: string;
     /** Document type prefix (e.g., 'cosigner_0_' for co-signers) */
@@ -110,7 +110,7 @@ export function FinancialInfoSection({
     setValue,
     getError,
     isTouched,
-    onBlur,
+    onFieldBlur,
     uploadUrl,
     documentTypePrefix = '',
     existingDocuments,
@@ -120,6 +120,14 @@ export function FinancialInfoSection({
 
     // Helper to get prefixed field name
     const f = (field: string) => `${fieldPrefix}${field}`;
+
+    // Per-field blur handler - calls onFieldBlur with the prefixed field name
+    const handleBlur = useCallback(
+        (field: string) => () => {
+            onFieldBlur?.(f(field));
+        },
+        [onFieldBlur, fieldPrefix],
+    );
 
     // Helper to get document type with prefix
     const docType = (type: string) => (documentTypePrefix ? `${documentTypePrefix}${type}` : type);
@@ -453,9 +461,10 @@ export function FinancialInfoSection({
                                 type="text"
                                 value={getValue(f('employer_name'))}
                                 onChange={(e) => setValue(f('employer_name'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('employer_name')}
                                 placeholder={t('placeholders.employerName')}
                                 className={getFieldClass('employer_name')}
+                                aria-invalid={!!(isTouched(f('employer_name')) && getError(f('employer_name')))}
                                 required
                             />
                             {isTouched(f('employer_name')) && getError(f('employer_name')) && (
@@ -469,9 +478,10 @@ export function FinancialInfoSection({
                                 type="text"
                                 value={getValue(f('job_title'))}
                                 onChange={(e) => setValue(f('job_title'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('job_title')}
                                 placeholder={t('placeholders.jobTitle')}
                                 className={getFieldClass('job_title')}
+                                aria-invalid={!!(isTouched(f('job_title')) && getError(f('job_title')))}
                                 required
                             />
                             {isTouched(f('job_title')) && getError(f('job_title')) && (
@@ -486,7 +496,7 @@ export function FinancialInfoSection({
                                 onChange={(value) => setValue(f('employment_type'), value)}
                                 options={EMPLOYMENT_TYPES}
                                 placeholder={t('placeholders.selectType')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('employment_type')}
                                 aria-invalid={!!(isTouched(f('employment_type')) && getError(f('employment_type')))}
                             />
                             {isTouched(f('employment_type')) && getError(f('employment_type')) && (
@@ -499,7 +509,7 @@ export function FinancialInfoSection({
                             <DatePicker
                                 value={getValue(f('employment_start_date'))}
                                 onChange={(value) => setValue(f('employment_start_date'), value || '')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('employment_start_date')}
                                 max={new Date()}
                                 aria-invalid={!!(isTouched(f('employment_start_date')) && getError(f('employment_start_date')))}
                             />
@@ -517,18 +527,19 @@ export function FinancialInfoSection({
                                 <CurrencySelect
                                     value={getValue(f('income_currency')) || 'eur'}
                                     onChange={(value) => setValue(f('income_currency'), value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('income_currency')}
                                     compact
                                 />
                                 <input
                                     type="number"
                                     value={getValue(f('gross_annual_income'))}
                                     onChange={(e) => setValue(f('gross_annual_income'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('gross_annual_income')}
                                     placeholder={t('placeholders.grossAnnual')}
                                     min="0"
                                     step="1000"
                                     className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('gross_annual_income')}`}
+                                    aria-invalid={!!(isTouched(f('gross_annual_income')) && getError(f('gross_annual_income')))}
                                     required
                                 />
                             </div>
@@ -543,18 +554,19 @@ export function FinancialInfoSection({
                                 <CurrencySelect
                                     value={getValue(f('income_currency')) || 'eur'}
                                     onChange={(value) => setValue(f('income_currency'), value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('income_currency')}
                                     compact
                                 />
                                 <input
                                     type="number"
                                     value={getValue(f('net_monthly_income'))}
                                     onChange={(e) => setValue(f('net_monthly_income'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('net_monthly_income')}
                                     placeholder={t('placeholders.netMonthly')}
                                     min="0"
                                     step="100"
                                     className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('net_monthly_income')}`}
+                                    aria-invalid={!!(isTouched(f('net_monthly_income')) && getError(f('net_monthly_income')))}
                                     required
                                 />
                             </div>
@@ -579,9 +591,10 @@ export function FinancialInfoSection({
                                 type="text"
                                 value={getValue(f('business_name'))}
                                 onChange={(e) => setValue(f('business_name'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('business_name')}
                                 placeholder={t('placeholders.businessName')}
                                 className={getFieldClass('business_name')}
+                                aria-invalid={!!(isTouched(f('business_name')) && getError(f('business_name')))}
                                 required
                             />
                             {isTouched(f('business_name')) && getError(f('business_name')) && (
@@ -596,7 +609,7 @@ export function FinancialInfoSection({
                                 onChange={(value) => setValue(f('business_type'), value)}
                                 options={BUSINESS_TYPES}
                                 placeholder={t('placeholders.selectBusinessType')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('business_type')}
                                 aria-invalid={!!(isTouched(f('business_type')) && getError(f('business_type')))}
                             />
                             {isTouched(f('business_type')) && getError(f('business_type')) && (
@@ -609,7 +622,7 @@ export function FinancialInfoSection({
                             <DatePicker
                                 value={getValue(f('business_start_date'))}
                                 onChange={(value) => setValue(f('business_start_date'), value || '')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('business_start_date')}
                                 max={new Date()}
                                 aria-invalid={!!(isTouched(f('business_start_date')) && getError(f('business_start_date')))}
                             />
@@ -627,18 +640,19 @@ export function FinancialInfoSection({
                                 <CurrencySelect
                                     value={getValue(f('income_currency')) || 'eur'}
                                     onChange={(value) => setValue(f('income_currency'), value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('income_currency')}
                                     compact
                                 />
                                 <input
                                     type="number"
                                     value={getValue(f('gross_annual_revenue'))}
                                     onChange={(e) => setValue(f('gross_annual_revenue'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('gross_annual_revenue')}
                                     placeholder={t('placeholders.grossRevenue')}
                                     min="0"
                                     step="1000"
                                     className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('gross_annual_revenue')}`}
+                                    aria-invalid={!!(isTouched(f('gross_annual_revenue')) && getError(f('gross_annual_revenue')))}
                                     required
                                 />
                             </div>
@@ -653,18 +667,19 @@ export function FinancialInfoSection({
                                 <CurrencySelect
                                     value={getValue(f('income_currency')) || 'eur'}
                                     onChange={(value) => setValue(f('income_currency'), value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('income_currency')}
                                     compact
                                 />
                                 <input
                                     type="number"
                                     value={getValue(f('net_monthly_income'))}
                                     onChange={(e) => setValue(f('net_monthly_income'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('net_monthly_income')}
                                     placeholder={t('placeholders.netMonthly')}
                                     min="0"
                                     step="100"
                                     className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('net_monthly_income')}`}
+                                    aria-invalid={!!(isTouched(f('net_monthly_income')) && getError(f('net_monthly_income')))}
                                     required
                                 />
                             </div>
@@ -692,9 +707,10 @@ export function FinancialInfoSection({
                                 type="text"
                                 value={getValue(f('university_name'))}
                                 onChange={(e) => setValue(f('university_name'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('university_name')}
                                 placeholder={t('placeholders.universityName')}
                                 className={getFieldClass('university_name')}
+                                aria-invalid={!!(isTouched(f('university_name')) && getError(f('university_name')))}
                                 required
                             />
                             {isTouched(f('university_name')) && getError(f('university_name')) && (
@@ -708,9 +724,10 @@ export function FinancialInfoSection({
                                 type="text"
                                 value={getValue(f('program_of_study'))}
                                 onChange={(e) => setValue(f('program_of_study'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('program_of_study')}
                                 placeholder={t('placeholders.programOfStudy')}
                                 className={getFieldClass('program_of_study')}
+                                aria-invalid={!!(isTouched(f('program_of_study')) && getError(f('program_of_study')))}
                                 required
                             />
                             {isTouched(f('program_of_study')) && getError(f('program_of_study')) && (
@@ -726,7 +743,7 @@ export function FinancialInfoSection({
                             <DatePicker
                                 value={getValue(f('expected_graduation_date'))}
                                 onChange={(value) => setValue(f('expected_graduation_date'), value || '')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('expected_graduation_date')}
                                 min={new Date()}
                             />
                         </div>
@@ -738,7 +755,7 @@ export function FinancialInfoSection({
                                 onChange={(value) => setValue(f('student_income_source_type'), value)}
                                 options={STUDENT_INCOME_SOURCES}
                                 placeholder={t('placeholders.selectIncomeSource')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('student_income_source_type')}
                                 aria-invalid={!!(isTouched(f('student_income_source_type')) && getError(f('student_income_source_type')))}
                             />
                             {isTouched(f('student_income_source_type')) && getError(f('student_income_source_type')) && (
@@ -754,9 +771,10 @@ export function FinancialInfoSection({
                                     type="text"
                                     value={getValue(f('student_income_source_other'))}
                                     onChange={(e) => setValue(f('student_income_source_other'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('student_income_source_other')}
                                     placeholder={t('placeholders.specifyIncomeSource')}
                                     className={getFieldClass('student_income_source_other')}
+                                    aria-invalid={!!(isTouched(f('student_income_source_other')) && getError(f('student_income_source_other')))}
                                     required
                                 />
                                 {isTouched(f('student_income_source_other')) && getError(f('student_income_source_other')) && (
@@ -773,18 +791,19 @@ export function FinancialInfoSection({
                             <CurrencySelect
                                 value={getValue(f('income_currency')) || 'eur'}
                                 onChange={(value) => setValue(f('income_currency'), value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('income_currency')}
                                 compact
                             />
                             <input
                                 type="number"
                                 value={getValue(f('student_monthly_income'))}
                                 onChange={(e) => setValue(f('student_monthly_income'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('student_monthly_income')}
                                 placeholder={t('placeholders.monthlyIncome')}
                                 min="0"
                                 step="100"
                                 className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('student_monthly_income')}`}
+                                aria-invalid={!!(isTouched(f('student_monthly_income')) && getError(f('student_monthly_income')))}
                                 required
                             />
                         </div>
@@ -812,7 +831,7 @@ export function FinancialInfoSection({
                                 onChange={(value) => setValue(f('pension_type'), value)}
                                 options={PENSION_TYPES}
                                 placeholder={t('placeholders.selectPensionType')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('pension_type')}
                                 aria-invalid={!!(isTouched(f('pension_type')) && getError(f('pension_type')))}
                             />
                             {isTouched(f('pension_type')) && getError(f('pension_type')) && (
@@ -829,7 +848,7 @@ export function FinancialInfoSection({
                                 type="text"
                                 value={getValue(f('pension_provider'))}
                                 onChange={(e) => setValue(f('pension_provider'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('pension_provider')}
                                 placeholder={t('placeholders.pensionProvider')}
                                 className={getFieldClass('pension_provider')}
                             />
@@ -844,18 +863,19 @@ export function FinancialInfoSection({
                                 <CurrencySelect
                                     value={getValue(f('income_currency')) || 'eur'}
                                     onChange={(value) => setValue(f('income_currency'), value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('income_currency')}
                                     compact
                                 />
                                 <input
                                     type="number"
                                     value={getValue(f('pension_monthly_income'))}
                                     onChange={(e) => setValue(f('pension_monthly_income'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('pension_monthly_income')}
                                     placeholder={t('placeholders.monthlyPension')}
                                     min="0"
                                     step="100"
                                     className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('pension_monthly_income')}`}
+                                    aria-invalid={!!(isTouched(f('pension_monthly_income')) && getError(f('pension_monthly_income')))}
                                     required
                                 />
                             </div>
@@ -873,14 +893,14 @@ export function FinancialInfoSection({
                                 <CurrencySelect
                                     value={getValue(f('income_currency')) || 'eur'}
                                     onChange={(value) => setValue(f('income_currency'), value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('income_currency')}
                                     compact
                                 />
                                 <input
                                     type="number"
                                     value={getValue(f('retirement_other_income'))}
                                     onChange={(e) => setValue(f('retirement_other_income'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('retirement_other_income')}
                                     placeholder={t('placeholders.otherIncome')}
                                     min="0"
                                     step="100"
@@ -903,14 +923,10 @@ export function FinancialInfoSection({
                             <label className="mb-2 block text-sm font-medium">{t('fields.incomeSource')}</label>
                             <Select
                                 value={getValue(f('unemployed_income_source'))}
-                                onChange={(value) => {
-                                    setValue(f('unemployed_income_source'), value);
-                                    // Auto-set receiving_unemployment_benefits based on selection
-                                    setValue(f('receiving_unemployment_benefits'), value === 'unemployment_benefits' ? 'true' : 'false');
-                                }}
+                                onChange={(value) => setValue(f('unemployed_income_source'), value)}
                                 options={UNEMPLOYED_INCOME_SOURCES}
                                 placeholder={t('placeholders.selectIncomeSource')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('unemployed_income_source')}
                                 aria-invalid={!!(isTouched(f('unemployed_income_source')) && getError(f('unemployed_income_source')))}
                             />
                             {isTouched(f('unemployed_income_source')) && getError(f('unemployed_income_source')) && (
@@ -926,9 +942,10 @@ export function FinancialInfoSection({
                                     type="text"
                                     value={getValue(f('unemployed_income_source_other'))}
                                     onChange={(e) => setValue(f('unemployed_income_source_other'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('unemployed_income_source_other')}
                                     placeholder={t('placeholders.specifyIncomeSource')}
                                     className={getFieldClass('unemployed_income_source_other')}
+                                    aria-invalid={!!(isTouched(f('unemployed_income_source_other')) && getError(f('unemployed_income_source_other')))}
                                     required
                                 />
                                 {isTouched(f('unemployed_income_source_other')) && getError(f('unemployed_income_source_other')) && (
@@ -945,18 +962,19 @@ export function FinancialInfoSection({
                             <CurrencySelect
                                 value={getValue(f('income_currency')) || 'eur'}
                                 onChange={(value) => setValue(f('income_currency'), value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('income_currency')}
                                 compact
                             />
                             <input
                                 type="number"
                                 value={getValue(f('unemployment_benefits_amount'))}
                                 onChange={(e) => setValue(f('unemployment_benefits_amount'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('unemployment_benefits_amount')}
                                 placeholder={t('placeholders.monthlyIncome')}
                                 min="0"
                                 step="100"
                                 className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('unemployment_benefits_amount')}`}
+                                aria-invalid={!!(isTouched(f('unemployment_benefits_amount')) && getError(f('unemployment_benefits_amount')))}
                                 required
                             />
                         </div>
@@ -981,7 +999,7 @@ export function FinancialInfoSection({
                                 onChange={(value) => setValue(f('other_employment_situation'), value)}
                                 options={OTHER_SITUATIONS}
                                 placeholder={t('placeholders.selectSituation')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('other_employment_situation')}
                                 aria-invalid={!!(isTouched(f('other_employment_situation')) && getError(f('other_employment_situation')))}
                             />
                             {isTouched(f('other_employment_situation')) && getError(f('other_employment_situation')) && (
@@ -996,9 +1014,12 @@ export function FinancialInfoSection({
                                     type="text"
                                     value={getValue(f('other_employment_situation_details'))}
                                     onChange={(e) => setValue(f('other_employment_situation_details'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('other_employment_situation_details')}
                                     placeholder={t('placeholders.situationDetails')}
                                     className={getFieldClass('other_employment_situation_details')}
+                                    aria-invalid={
+                                        !!(isTouched(f('other_employment_situation_details')) && getError(f('other_employment_situation_details')))
+                                    }
                                     required
                                 />
                                 {isTouched(f('other_employment_situation_details')) && getError(f('other_employment_situation_details')) && (
@@ -1015,7 +1036,7 @@ export function FinancialInfoSection({
                             <DatePicker
                                 value={getValue(f('expected_return_to_work'))}
                                 onChange={(value) => setValue(f('expected_return_to_work'), value || '')}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('expected_return_to_work')}
                                 min={new Date()}
                             />
                         </div>
@@ -1029,18 +1050,19 @@ export function FinancialInfoSection({
                                 <CurrencySelect
                                     value={getValue(f('income_currency')) || 'eur'}
                                     onChange={(value) => setValue(f('income_currency'), value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('income_currency')}
                                     compact
                                 />
                                 <input
                                     type="number"
                                     value={getValue(f('other_situation_monthly_income'))}
                                     onChange={(e) => setValue(f('other_situation_monthly_income'), e.target.value)}
-                                    onBlur={onBlur}
+                                    onBlur={handleBlur('other_situation_monthly_income')}
                                     placeholder={t('placeholders.monthlyIncome')}
                                     min="0"
                                     step="100"
                                     className={`w-full rounded-l-none rounded-r-lg ${getFieldClass('other_situation_monthly_income')}`}
+                                    aria-invalid={!!(isTouched(f('other_situation_monthly_income')) && getError(f('other_situation_monthly_income')))}
                                     required
                                 />
                             </div>
@@ -1055,9 +1077,10 @@ export function FinancialInfoSection({
                                 type="text"
                                 value={getValue(f('other_situation_income_source'))}
                                 onChange={(e) => setValue(f('other_situation_income_source'), e.target.value)}
-                                onBlur={onBlur}
+                                onBlur={handleBlur('other_situation_income_source')}
                                 placeholder={t('placeholders.incomeSource')}
                                 className={getFieldClass('other_situation_income_source')}
+                                aria-invalid={!!(isTouched(f('other_situation_income_source')) && getError(f('other_situation_income_source')))}
                                 required
                             />
                             {isTouched(f('other_situation_income_source')) && getError(f('other_situation_income_source')) && (

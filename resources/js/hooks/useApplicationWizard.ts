@@ -1733,18 +1733,12 @@ export function useApplicationWizard({
                 newTouched.profile_pension_statement = true;
             }
 
-            // UNEMPLOYED
+            // UNEMPLOYED - always mark all fields (no conditional logic based on income source)
             if (status === 'unemployed') {
                 newTouched.profile_unemployed_income_source = true;
+                newTouched.profile_unemployed_income_source_other = true;
                 newTouched.profile_unemployment_benefits_amount = true;
-                if (wizard.data.profile_unemployed_income_source === 'other') {
-                    newTouched.profile_unemployed_income_source_other = true;
-                }
-                if (wizard.data.profile_unemployed_income_source === 'unemployment_benefits') {
-                    newTouched.profile_benefits_statement = true;
-                } else if (wizard.data.profile_unemployed_income_source) {
-                    newTouched.profile_other_income_proof = true;
-                }
+                newTouched.profile_other_income_proof = true;
             }
 
             // OTHER

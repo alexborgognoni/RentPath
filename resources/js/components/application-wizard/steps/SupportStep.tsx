@@ -218,6 +218,28 @@ export function SupportStep({
         }
     };
 
+    // Factory to create per-field blur handler for co-signer FinancialInfoSection
+    const createCoSignerFinancialBlur = (index: number) => (field: string) => {
+        const fieldKey = `cosigner_${index}_${field}`;
+        if (onFieldBlur) {
+            onFieldBlur(fieldKey);
+        } else {
+            markFieldTouched(fieldKey);
+            onBlur();
+        }
+    };
+
+    // Factory to create per-field blur handler for guarantor FinancialInfoSection
+    const createGuarantorFinancialBlur = (index: number) => (field: string) => {
+        const fieldKey = `guarantor_${index}_${field}`;
+        if (onFieldBlur) {
+            onFieldBlur(fieldKey);
+        } else {
+            markFieldTouched(fieldKey);
+            onBlur();
+        }
+    };
+
     // Get field class with error styling for co-signer fields
     const getCoSignerFieldClass = (index: number, field: keyof CoSignerDetails, isDisabled = false) => {
         if (isDisabled) {
@@ -625,7 +647,7 @@ export function SupportStep({
                                             setValue={handlers.setValue}
                                             getError={handlers.getError}
                                             isTouched={handlers.isTouched}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createCoSignerFinancialBlur(index)}
                                             uploadUrl={`/applications/${data.id}/co-signer/${index}/document/upload`}
                                             documentTypePrefix={`cosigner_${index}_`}
                                             existingDocuments={getCoSignerExistingDocs(coSigner)}
@@ -829,7 +851,7 @@ export function SupportStep({
                                             setValue={handlers.setValue}
                                             getError={handlers.getError}
                                             isTouched={handlers.isTouched}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createGuarantorFinancialBlur(index)}
                                             uploadUrl={`/applications/${data.id}/guarantor/${index}/document/upload`}
                                             documentTypePrefix={`guarantor_${index}_`}
                                             existingDocuments={getGuarantorExistingDocs(guarantor)}

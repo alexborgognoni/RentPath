@@ -211,7 +211,7 @@ export default function ApplicationCreate() {
                         touchedFields={wizard.touchedFields}
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
-                        onBlur={handleBlur}
+                        onFieldBlur={handleFieldBlur}
                         existingDocuments={existingDocuments}
                     />
                 );
