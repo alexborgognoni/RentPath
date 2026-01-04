@@ -231,9 +231,8 @@ export function usePropertyWizard({
     const [isInitialized, setIsInitialized] = useState(!!property?.id);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Calculate initial step from property's wizard_step
+    // Calculate initial step from property's wizard_step (used as starting point before validation)
     const initialStepIndex = property?.wizard_step ? Math.min(property.wizard_step - 1, WIZARD_STEPS.length - 1) : 0;
-    const initialMaxStepReached = property?.wizard_step ? property.wizard_step - 1 : 0;
 
     // Property-specific validation wrapper
     const validateStepWrapper = useCallback((stepId: WizardStep, data: PropertyWizardData) => {
@@ -276,7 +275,6 @@ export function usePropertyWizard({
         steps: WIZARD_STEPS,
         initialData: getInitialData(property),
         initialStepIndex: Math.max(0, initialStepIndex),
-        initialMaxStepReached: Math.max(0, initialMaxStepReached),
         validateStep: validateStepWrapper,
         onSave: handleSave,
         enableAutosave: !isEditMode && isInitialized && !!propertyId,

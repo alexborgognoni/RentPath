@@ -978,6 +978,7 @@ return [
                 'relationship' => 'Beziehung',
                 'yearsKnown' => 'Jahre bekannt',
                 'consentToContact' => 'Ich stimme zu, dass diese Referenz kontaktiert werden darf',
+                'canContactLandlord' => 'Ich stimme zu, dass dieser Vermieter kontaktiert werden darf',
             ],
         ],
 

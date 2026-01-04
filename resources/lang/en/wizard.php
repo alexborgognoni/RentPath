@@ -1027,6 +1027,7 @@ return [
                 'relationship' => 'Relationship',
                 'yearsKnown' => 'Years Known',
                 'consentToContact' => 'I consent to this reference being contacted',
+                'canContactLandlord' => 'I consent to this landlord being contacted',
             ],
         ],
 

@@ -978,6 +978,7 @@ return [
                 'relationship' => 'Relatie',
                 'yearsKnown' => 'Jaren bekend',
                 'consentToContact' => 'Ik geef toestemming om deze referentie te contacteren',
+                'canContactLandlord' => 'Ik geef toestemming om deze verhuurder te contacteren',
             ],
         ],
 

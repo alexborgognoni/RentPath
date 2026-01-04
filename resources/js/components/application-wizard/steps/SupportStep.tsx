@@ -15,7 +15,7 @@ interface SupportStepProps {
     touchedFields: Record<string, boolean>;
     updateField: <K extends keyof ApplicationWizardData>(key: K, value: ApplicationWizardData[K]) => void;
     markFieldTouched: (field: string) => void;
-    onBlur: () => void;
+    /** Per-field blur handler - called with prefixed field name (e.g., 'cosigner_0_street_name') */
     onFieldBlur?: (field: string) => void;
     addCoSigner: () => void;
     removeCoSigner: (index: number) => void;
@@ -50,7 +50,6 @@ export function SupportStep({
     touchedFields,
     updateField,
     markFieldTouched,
-    onBlur,
     onFieldBlur,
     addCoSigner,
     removeCoSigner,
@@ -136,108 +135,86 @@ export function SupportStep({
         syncCoSignersFromOccupants();
     }, [syncCoSignersFromOccupants]);
 
+    // Update field value only - do NOT mark as touched (per DESIGN.md: touched on blur only)
     const handleFieldChange = (field: keyof ApplicationWizardData, value: unknown) => {
         updateField(field, value as ApplicationWizardData[typeof field]);
-        markFieldTouched(field);
     };
 
-    // Per-field blur handler
+    // Per-field blur handler for top-level fields (e.g., insurance fields)
     const handleFieldBlur = (field: string) => () => {
-        if (onFieldBlur) {
-            onFieldBlur(field);
-        } else {
-            markFieldTouched(field);
-            onBlur();
-        }
+        markFieldTouched(field);
+        onFieldBlur?.(field);
     };
 
     // Helper to create blur handler for co-signer fields
     const handleCoSignerFieldBlur = (index: number, field: keyof CoSignerDetails) => () => {
         const fieldKey = `cosigner_${index}_${field}`;
-        if (onFieldBlur) {
-            onFieldBlur(fieldKey);
-        } else {
-            markFieldTouched(fieldKey);
-            onBlur();
-        }
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
     };
 
     // Helper to create blur handler for guarantor fields
     const handleGuarantorFieldBlur = (index: number, field: keyof GuarantorDetails) => () => {
         const fieldKey = `guarantor_${index}_${field}`;
-        if (onFieldBlur) {
-            onFieldBlur(fieldKey);
-        } else {
-            markFieldTouched(fieldKey);
-            onBlur();
-        }
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
     };
 
     // Factory to create per-field blur handler for co-signer PersonalDetailsSection
     // Maps shared section field names to prefixed field names (e.g., 'date_of_birth' -> 'cosigner_0_date_of_birth')
     const createCoSignerPersonalDetailsBlur = (index: number) => (field: string) => {
         const fieldKey = `cosigner_${index}_${field}`;
-        if (onFieldBlur) {
-            onFieldBlur(fieldKey);
-        } else {
-            markFieldTouched(fieldKey);
-            onBlur();
-        }
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
     };
 
     // Factory to create per-field blur handler for co-signer IdDocumentSection
     const createCoSignerIdDocBlur = (index: number) => (field: string) => {
         const fieldKey = `cosigner_${index}_${field}`;
-        if (onFieldBlur) {
-            onFieldBlur(fieldKey);
-        } else {
-            markFieldTouched(fieldKey);
-            onBlur();
-        }
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
+    };
+
+    // Factory to create per-field blur handler for co-signer AddressForm
+    const createCoSignerAddressBlur = (index: number) => (field: string) => {
+        const fieldKey = `cosigner_${index}_${field}`;
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
     };
 
     // Factory to create per-field blur handler for guarantor PersonalDetailsSection
     const createGuarantorPersonalDetailsBlur = (index: number) => (field: string) => {
         const fieldKey = `guarantor_${index}_${field}`;
-        if (onFieldBlur) {
-            onFieldBlur(fieldKey);
-        } else {
-            markFieldTouched(fieldKey);
-            onBlur();
-        }
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
     };
 
     // Factory to create per-field blur handler for guarantor IdDocumentSection
     const createGuarantorIdDocBlur = (index: number) => (field: string) => {
         const fieldKey = `guarantor_${index}_${field}`;
-        if (onFieldBlur) {
-            onFieldBlur(fieldKey);
-        } else {
-            markFieldTouched(fieldKey);
-            onBlur();
-        }
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
+    };
+
+    // Factory to create per-field blur handler for guarantor AddressForm
+    const createGuarantorAddressBlur = (index: number) => (field: string) => {
+        const fieldKey = `guarantor_${index}_${field}`;
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
     };
 
     // Factory to create per-field blur handler for co-signer FinancialInfoSection
     const createCoSignerFinancialBlur = (index: number) => (field: string) => {
         const fieldKey = `cosigner_${index}_${field}`;
-        if (onFieldBlur) {
-            onFieldBlur(fieldKey);
-        } else {
-            markFieldTouched(fieldKey);
-            onBlur();
-        }
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
     };
 
     // Factory to create per-field blur handler for guarantor FinancialInfoSection
     const createGuarantorFinancialBlur = (index: number) => (field: string) => {
         const fieldKey = `guarantor_${index}_${field}`;
-        if (onFieldBlur) {
-            onFieldBlur(fieldKey);
-        } else {
-            markFieldTouched(fieldKey);
-            onBlur();
-        }
+        markFieldTouched(fieldKey);
+        onFieldBlur?.(fieldKey);
     };
 
     // Get field class with error styling for co-signer fields
@@ -632,7 +609,7 @@ export function SupportStep({
                                                 postal_code: !!touchedFields[`cosigner_${index}_postal_code`],
                                                 country: !!touchedFields[`cosigner_${index}_country`],
                                             }}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createCoSignerAddressBlur(index)}
                                         />
                                     </div>
 
@@ -836,7 +813,7 @@ export function SupportStep({
                                                 postal_code: !!touchedFields[`guarantor_${index}_postal_code`],
                                                 country: !!touchedFields[`guarantor_${index}_country`],
                                             }}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createGuarantorAddressBlur(index)}
                                         />
                                     </div>
 

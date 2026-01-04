@@ -114,6 +114,8 @@ class ApplicationController extends Controller
         // might invalidate steps that were previously valid
         if ($draftApplication) {
             $draftApplication = $this->revalidateDraftMaxStep($draftApplication, $tenantProfile);
+            // Transform references from combined storage to separate landlord/other arrays
+            $draftApplication = $this->transformDraftForFrontend($draftApplication);
         }
 
         // Check if property is accepting applications
@@ -456,6 +458,11 @@ class ApplicationController extends Controller
             if (array_key_exists($field, $allData)) {
                 $data[$field] = $allData[$field];
             }
+        }
+
+        // Merge landlord_references and other_references into combined references column
+        if (isset($allData['landlord_references']) || isset($allData['other_references'])) {
+            $data['references'] = $this->mergeReferencesForStorage($allData);
         }
 
         $data['tenant_profile_id'] = $tenantProfile->id;
@@ -990,7 +997,86 @@ class ApplicationController extends Controller
 
             case 5:
                 // Step 5: Credit & Rental History
-                return [];
+                $rules = [
+                    // Credit check authorization is REQUIRED
+                    'authorize_credit_check' => 'required|boolean|accepted',
+                ];
+
+                // If CCJs/bankruptcies disclosed, require details
+                $hasCcjs = $data['has_ccjs_or_bankruptcies'] ?? false;
+                if ($hasCcjs) {
+                    $rules['ccj_bankruptcy_details'] = 'required|string|max:2000';
+                }
+
+                // If eviction history disclosed, require details
+                $hasEvictions = $data['has_eviction_history'] ?? false;
+                if ($hasEvictions) {
+                    $rules['eviction_details'] = 'required|string|max:2000';
+                }
+
+                // Current Address is REQUIRED
+                $rules['current_living_situation'] = 'required|in:renting,owner,living_with_family,student_housing,employer_provided,other';
+                $rules['current_address_street_name'] = 'required|string|max:255';
+                $rules['current_address_house_number'] = 'required|string|max:50';
+                $rules['current_address_city'] = 'required|string|max:100';
+                $rules['current_address_postal_code'] = 'required|string|max:20';
+                $rules['current_address_country'] = 'required|string|size:2';
+                $rules['current_address_move_in_date'] = 'required|date|before_or_equal:today';
+
+                // Monthly rent is required if renting
+                $livingSituation = $data['current_living_situation'] ?? '';
+                if ($livingSituation === 'renting') {
+                    $rules['current_monthly_rent'] = 'required|numeric|min:0';
+                }
+
+                // Reason for moving is required
+                $rules['reason_for_moving'] = 'required|in:relocation_work,relocation_personal,upsizing,downsizing,end_of_lease,buying_property,relationship_change,closer_to_family,better_location,cost,first_time_renter,other';
+
+                // If reason is "other", require details
+                $reasonForMoving = $data['reason_for_moving'] ?? '';
+                if ($reasonForMoving === 'other') {
+                    $rules['reason_for_moving_other'] = 'required|string|max:500';
+                }
+
+                // === Previous Addresses validation (optional but if provided, validate) ===
+                $previousAddresses = $data['previous_addresses'] ?? [];
+                if (is_array($previousAddresses) && count($previousAddresses) > 0) {
+                    foreach ($previousAddresses as $index => $addr) {
+                        $prefix = "previous_addresses.{$index}";
+                        $rules["{$prefix}.street_name"] = 'required|string|max:255';
+                        $rules["{$prefix}.house_number"] = 'required|string|max:50';
+                        $rules["{$prefix}.city"] = 'required|string|max:100';
+                        $rules["{$prefix}.postal_code"] = 'required|string|max:20';
+                        $rules["{$prefix}.country"] = 'required|string|size:2';
+                        $rules["{$prefix}.from_date"] = 'required|date|before_or_equal:today';
+                        $rules["{$prefix}.to_date"] = 'required|date|before_or_equal:today';
+                    }
+                }
+
+                // === Landlord References validation (optional but if provided, validate) ===
+                $landlordRefs = $data['landlord_references'] ?? [];
+                if (is_array($landlordRefs) && count($landlordRefs) > 0) {
+                    foreach ($landlordRefs as $index => $ref) {
+                        $prefix = "landlord_references.{$index}";
+                        $rules["{$prefix}.name"] = 'required|string|max:200';
+                        $rules["{$prefix}.email"] = 'required|email|max:255';
+                        $rules["{$prefix}.phone"] = 'required|string|max:30';
+                    }
+                }
+
+                // === Other References validation (optional but if provided, validate) ===
+                $otherRefs = $data['other_references'] ?? [];
+                if (is_array($otherRefs) && count($otherRefs) > 0) {
+                    foreach ($otherRefs as $index => $ref) {
+                        $prefix = "other_references.{$index}";
+                        $rules["{$prefix}.name"] = 'required|string|max:200';
+                        $rules["{$prefix}.relationship"] = 'required|in:professional,personal';
+                        $rules["{$prefix}.email"] = 'required|email|max:255';
+                        $rules["{$prefix}.phone"] = 'required|string|max:30';
+                    }
+                }
+
+                return $rules;
 
             case 6:
                 // Step 6: Additional Information (optional)
@@ -1458,6 +1544,87 @@ class ApplicationController extends Controller
                 ]
             );
         }
+    }
+
+    /**
+     * Merge landlord_references and other_references into a single references array for storage.
+     * Each reference gets a 'type' field ('landlord' or 'other') for later extraction.
+     */
+    private function mergeReferencesForStorage(array $data): array
+    {
+        $references = [];
+
+        // Add landlord references with type marker
+        $landlordRefs = $data['landlord_references'] ?? [];
+        if (is_array($landlordRefs)) {
+            foreach ($landlordRefs as $ref) {
+                $ref['type'] = 'landlord';
+                $references[] = $ref;
+            }
+        }
+
+        // Add other references with type marker
+        $otherRefs = $data['other_references'] ?? [];
+        if (is_array($otherRefs)) {
+            foreach ($otherRefs as $ref) {
+                $ref['type'] = 'other';
+                $references[] = $ref;
+            }
+        }
+
+        return $references;
+    }
+
+    /**
+     * Extract landlord_references and other_references from the combined references array.
+     * Used when loading draft for frontend.
+     */
+    private function extractReferencesFromStorage(?array $references): array
+    {
+        $landlordRefs = [];
+        $otherRefs = [];
+
+        if (! is_array($references)) {
+            return [
+                'landlord_references' => [],
+                'other_references' => [],
+            ];
+        }
+
+        foreach ($references as $ref) {
+            $type = $ref['type'] ?? 'other';
+            unset($ref['type']); // Remove type marker before sending to frontend
+
+            if ($type === 'landlord') {
+                $landlordRefs[] = $ref;
+            } else {
+                $otherRefs[] = $ref;
+            }
+        }
+
+        return [
+            'landlord_references' => $landlordRefs,
+            'other_references' => $otherRefs,
+        ];
+    }
+
+    /**
+     * Transform draft application for frontend by extracting references.
+     */
+    private function transformDraftForFrontend(?Application $draft): ?Application
+    {
+        if (! $draft) {
+            return null;
+        }
+
+        // Extract references into separate arrays
+        $extractedRefs = $this->extractReferencesFromStorage($draft->references);
+
+        // Add virtual attributes to the model
+        $draft->landlord_references = $extractedRefs['landlord_references'];
+        $draft->other_references = $extractedRefs['other_references'];
+
+        return $draft;
     }
 
     /**

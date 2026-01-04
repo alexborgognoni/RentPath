@@ -307,27 +307,31 @@ export const STATE_PROVINCE_LABELS: Record<string, string> = {
 /**
  * Check if a country requires state/province.
  */
-export function requiresStateProvince(countryCode: string): boolean {
+export function requiresStateProvince(countryCode: string | null | undefined): boolean {
+    if (!countryCode) return false;
     return COUNTRIES_REQUIRING_STATE.includes(countryCode.toUpperCase());
 }
 
 /**
  * Check if a country has state/province options (required or optional).
  */
-export function hasStateProvinceOptions(countryCode: string): boolean {
+export function hasStateProvinceOptions(countryCode: string | null | undefined): boolean {
+    if (!countryCode) return false;
     return countryCode.toUpperCase() in STATE_PROVINCE_OPTIONS;
 }
 
 /**
  * Get state/province options for a country.
  */
-export function getStateProvinceOptions(countryCode: string): StateProvinceOption[] {
+export function getStateProvinceOptions(countryCode: string | null | undefined): StateProvinceOption[] {
+    if (!countryCode) return [];
     return STATE_PROVINCE_OPTIONS[countryCode.toUpperCase()] || [];
 }
 
 /**
  * Get the state/province label for a country.
  */
-export function getStateProvinceLabel(countryCode: string): string {
+export function getStateProvinceLabel(countryCode: string | null | undefined): string {
+    if (!countryCode) return 'State/Province';
     return STATE_PROVINCE_LABELS[countryCode.toUpperCase()] || 'State/Province';
 }

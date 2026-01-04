@@ -23,7 +23,6 @@ export interface UseWizardOptions<TData, TStepId extends string> {
     steps: WizardStepConfig<TStepId>[];
     initialData: TData;
     initialStepIndex?: number;
-    initialMaxStepReached?: number;
 
     // Validation - consumer provides the logic
     // This single function is used EVERYWHERE: goToNextStep AND computing first invalid step on mount
@@ -85,7 +84,6 @@ export function useWizard<TData, TStepId extends string>({
     steps,
     initialData,
     initialStepIndex = 0,
-    initialMaxStepReached = 0,
     validateStep: validateStepFn,
     onSave,
     saveDebounceMs = 1000,
@@ -97,7 +95,6 @@ export function useWizard<TData, TStepId extends string>({
     const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
     const [data, setData] = useState<TData>(initialData);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [maxStepReached, setMaxStepReached] = useState(initialMaxStepReached);
     const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
     // Autosave state
@@ -107,10 +104,7 @@ export function useWizard<TData, TStepId extends string>({
     const lastSavedDataRef = useRef<string | null>(null);
     const lastSavedStepRef = useRef<number | null>(null);
 
-    // Track if we should skip the next step lock check (for forward navigation)
-    const skipNextLockCheck = useRef(false);
-
-    // Track initial mount - don't re-validate all steps on mount, trust the saved step
+    // Track initial mount for one-time navigation to first invalid step
     const isInitialMount = useRef(true);
 
     // Derived values (with safety bounds check)
@@ -124,59 +118,47 @@ export function useWizard<TData, TStepId extends string>({
     // Memoize data for autosave comparison
     const dataString = useMemo(() => JSON.stringify(data), [data]);
 
-    // Effect to validate and lock steps - runs on mount AND when data changes
-    // This ensures the same validation is used everywhere:
-    // 1. On mount - validates all steps to compute correct max valid step
-    // 2. On data change (after interaction) - re-validates to lock steps if needed
-    useEffect(() => {
-        // Skip lock check during forward navigation (intentional advancement)
-        if (skipNextLockCheck.current) {
-            skipNextLockCheck.current = false;
-            return;
-        }
-
-        // After initial mount, only re-validate when user has interacted
-        // This prevents prop updates from Inertia from triggering unnecessary validation
-        if (!isInitialMount.current && !hasUserInteracted) {
-            return;
-        }
-
-        // Mark initial mount as complete
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-        }
-
-        // Compute first invalid step inline - SINGLE SOURCE OF TRUTH
-        // Uses the same validateStepFn that goToNextStep uses
-        let maxValid = steps.length;
+    // Compute first invalid step - this is the furthest the user can go
+    // Memoized to avoid recalculating on every render
+    const firstInvalidStepIndex = useMemo(() => {
         for (let i = 0; i < steps.length; i++) {
             const result = validateStepFn(steps[i].id, data);
             if (!result.success) {
-                maxValid = i;
-                break;
+                return i;
             }
         }
+        return steps.length; // All steps valid
+    }, [steps, validateStepFn, data]);
 
-        // If current data invalidates a previous step, lock user to that step
-        if (maxValid < maxStepReached) {
-            setMaxStepReached(maxValid);
-        }
+    // On mount: navigate to the first invalid step (where user needs to continue)
+    useEffect(() => {
+        if (!isInitialMount.current) return;
+        isInitialMount.current = false;
 
-        // If currently viewing a step beyond maxValid, navigate back
-        if (currentStepIndex > maxValid) {
-            setCurrentStepIndex(maxValid);
-            // Don't show errors on mount - only show when user interacts
-            if (hasUserInteracted) {
-                const stepId = steps[maxValid].id;
-                const result = validateStepFn(stepId, data);
-                if (!result.success) {
-                    setErrors(result.errors);
-                }
-            }
-            onStepChange?.(steps[maxValid].id, maxValid);
+        // Navigate to first invalid step
+        if (currentStepIndex !== firstInvalidStepIndex) {
+            setCurrentStepIndex(firstInvalidStepIndex);
+            onStepChange?.(steps[firstInvalidStepIndex].id, firstInvalidStepIndex);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dataString, maxStepReached, currentStepIndex, hasUserInteracted]);
+    }, []);
+
+    // After user interaction: handle step locking if validation changes
+    useEffect(() => {
+        if (!hasUserInteracted) return;
+
+        // If user is now beyond the first invalid step, navigate back
+        if (currentStepIndex > firstInvalidStepIndex) {
+            setCurrentStepIndex(firstInvalidStepIndex);
+            const stepId = steps[firstInvalidStepIndex].id;
+            const result = validateStepFn(stepId, data);
+            if (!result.success) {
+                setErrors(result.errors);
+            }
+            onStepChange?.(steps[firstInvalidStepIndex].id, firstInvalidStepIndex);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [firstInvalidStepIndex, hasUserInteracted]);
 
     // Autosave effect for data changes (debounced)
     useEffect(() => {
@@ -185,7 +167,7 @@ export function useWizard<TData, TStepId extends string>({
         }
 
         // Skip if neither data nor step has changed from last save
-        const stepToSave = maxStepReached + 1;
+        const stepToSave = firstInvalidStepIndex + 1; // 1-indexed for backend
         if (lastSavedDataRef.current === dataString && lastSavedStepRef.current === stepToSave) {
             return;
         }
@@ -202,31 +184,11 @@ export function useWizard<TData, TStepId extends string>({
         debounceTimerRef.current = setTimeout(async () => {
             setAutosaveStatus('saving');
             try {
-                const savedStep = maxStepReached + 1;
-                const result = await onSave(data, savedStep);
-
+                await onSave(data, stepToSave);
                 lastSavedDataRef.current = dataString;
-                lastSavedStepRef.current = savedStep;
+                lastSavedStepRef.current = stepToSave;
                 setLastSavedAt(new Date());
                 setAutosaveStatus('saved');
-
-                // Backend may reduce max_valid_step if validation failed
-                // Allow user to stay on the first invalid step to fix it
-                if (result.maxValidStep !== undefined) {
-                    const lastValidStepIndex = result.maxValidStep - 1; // 0-indexed
-                    const firstInvalidStepIndex = lastValidStepIndex + 1; // User can be here to fix
-
-                    // Only reduce maxStepReached if user has progressed beyond first invalid step
-                    if (firstInvalidStepIndex < maxStepReached) {
-                        setMaxStepReached(firstInvalidStepIndex);
-                    }
-
-                    // Only navigate back if currently beyond the first invalid step
-                    if (currentStepIndex > firstInvalidStepIndex) {
-                        setCurrentStepIndex(firstInvalidStepIndex);
-                        onStepChange?.(steps[firstInvalidStepIndex].id, firstInvalidStepIndex);
-                    }
-                }
             } catch (error) {
                 console.error('Autosave failed:', error);
                 setAutosaveStatus('error');
@@ -239,7 +201,7 @@ export function useWizard<TData, TStepId extends string>({
                 clearTimeout(debounceTimerRef.current);
             }
         };
-    }, [dataString, hasUserInteracted, enableAutosave, onSave, maxStepReached, currentStepIndex, saveDebounceMs, steps, onStepChange, data]);
+    }, [dataString, hasUserInteracted, enableAutosave, onSave, firstInvalidStepIndex, saveDebounceMs, data]);
 
     // Manual save function - optionally accepts a step override for immediate saves after state updates
     const saveNow = useCallback(
@@ -252,7 +214,7 @@ export function useWizard<TData, TStepId extends string>({
 
             setAutosaveStatus('saving');
             try {
-                const savedStep = stepOverride ?? maxStepReached + 1;
+                const savedStep = stepOverride ?? firstInvalidStepIndex + 1;
                 await onSave(data, savedStep);
                 lastSavedDataRef.current = dataString;
                 lastSavedStepRef.current = savedStep;
@@ -263,7 +225,7 @@ export function useWizard<TData, TStepId extends string>({
                 setAutosaveStatus('error');
             }
         },
-        [onSave, data, maxStepReached, dataString],
+        [onSave, data, firstInvalidStepIndex, dataString],
     );
 
     // Data update functions
@@ -378,13 +340,13 @@ export function useWizard<TData, TStepId extends string>({
                 return;
             }
 
-            // Can only go forward if within maxStepReached
-            if (targetIndex <= maxStepReached) {
+            // Can only go forward up to (and including) the first invalid step
+            if (targetIndex <= firstInvalidStepIndex) {
                 setCurrentStepIndex(targetIndex);
                 onStepChange?.(step, targetIndex);
             }
         },
-        [currentStepIndex, maxStepReached, steps, onStepChange],
+        [currentStepIndex, firstInvalidStepIndex, steps, onStepChange],
     );
 
     const goToNextStep = useCallback((): boolean => {
@@ -398,18 +360,12 @@ export function useWizard<TData, TStepId extends string>({
         const nextIndex = currentStepIndex + 1;
         if (nextIndex < steps.length) {
             setHasUserInteracted(true);
-            // Update maxStepReached if advancing beyond current max
-            if (nextIndex > maxStepReached) {
-                // Skip the lock check since we're intentionally advancing
-                skipNextLockCheck.current = true;
-                setMaxStepReached(nextIndex);
-            }
             setCurrentStepIndex(nextIndex);
             setErrors({}); // Clear errors when moving to next step
             onStepChange?.(steps[nextIndex].id, nextIndex);
         }
         return true; // Navigation succeeded
-    }, [currentStep, currentStepIndex, data, maxStepReached, steps, validateStepFn, onStepChange]);
+    }, [currentStep, currentStepIndex, data, steps, validateStepFn, onStepChange]);
 
     const goToPreviousStep = useCallback(() => {
         const prevIndex = currentStepIndex - 1;
@@ -424,10 +380,10 @@ export function useWizard<TData, TStepId extends string>({
             const stepIndex = steps.findIndex((s) => s.id === step);
             // Can always go back
             if (stepIndex <= currentStepIndex) return true;
-            // Can only go forward if within maxStepReached
-            return stepIndex <= maxStepReached;
+            // Can only go forward up to (and including) the first invalid step
+            return stepIndex <= firstInvalidStepIndex;
         },
-        [currentStepIndex, maxStepReached, steps],
+        [currentStepIndex, firstInvalidStepIndex, steps],
     );
 
     const markAsInteracted = useCallback(() => {
@@ -441,7 +397,7 @@ export function useWizard<TData, TStepId extends string>({
         currentStepConfig,
         isFirstStep,
         isLastStep,
-        maxStepReached,
+        maxStepReached: firstInvalidStepIndex, // For API compatibility
         steps,
 
         // Navigation

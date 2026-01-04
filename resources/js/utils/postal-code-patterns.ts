@@ -393,14 +393,16 @@ export const POSTAL_CODE_LABELS: Record<string, string> = {
 /**
  * Get the postal code label for a country.
  */
-export function getPostalCodeLabel(countryCode: string): string {
+export function getPostalCodeLabel(countryCode: string | null | undefined): string {
+    if (!countryCode) return 'Postal Code';
     return POSTAL_CODE_LABELS[countryCode.toUpperCase()] || 'Postal Code';
 }
 
 /**
  * Get the postal code placeholder example for a country.
  */
-export function getPostalCodePlaceholder(countryCode: string): string {
+export function getPostalCodePlaceholder(countryCode: string | null | undefined): string {
+    if (!countryCode) return '';
     return POSTAL_CODE_EXAMPLES[countryCode.toUpperCase()] || '';
 }
 
@@ -408,7 +410,8 @@ export function getPostalCodePlaceholder(countryCode: string): string {
  * Get the postal code pattern for a country.
  * Returns null if no pattern exists (country may not have standardized postal codes).
  */
-export function getPostalCodePattern(countryCode: string): RegExp | null {
+export function getPostalCodePattern(countryCode: string | null | undefined): RegExp | null {
+    if (!countryCode) return null;
     return POSTAL_CODE_PATTERNS[countryCode.toUpperCase()] || null;
 }
 

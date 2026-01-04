@@ -581,6 +581,9 @@ export interface DraftApplication {
     reason_for_moving?: string;
     reason_for_moving_other?: string;
     previous_addresses?: PreviousAddressDetails[];
+    // References (extracted from combined 'references' column by backend)
+    landlord_references?: LandlordReferenceDetails[];
+    other_references?: OtherReferenceDetails[];
 }
 
 // ===== Initial Data =====
@@ -865,14 +868,14 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         reason_for_moving_other: (draft?.reason_for_moving_other as string) || '',
         // Previous Addresses
         previous_addresses: (draft?.previous_addresses as PreviousAddressDetails[]) || [],
-        // References
-        landlord_references: [],
+        // References (loaded from draft - backend transforms from combined 'references' column)
+        landlord_references: (draft?.landlord_references as LandlordReferenceDetails[]) || [],
         employer_reference_name: '',
         employer_reference_email: '',
         employer_reference_phone: '',
         employer_reference_job_title: '',
         consent_to_contact_employer: false,
-        other_references: [],
+        other_references: (draft?.other_references as OtherReferenceDetails[]) || [],
 
         // ===== Step 6: Additional Information =====
         additional_information: '',
@@ -1083,9 +1086,8 @@ export function useApplicationWizard({
     const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
     const [pendingSave, setPendingSave] = useState(false);
 
-    // Calculate initial step from draft's current_step
+    // Calculate initial step from draft's current_step (used as starting point before validation)
     const initialStepIndex = draftApplication?.current_step ? Math.min(draftApplication.current_step - 1, steps.length - 1) : 0;
-    const initialMaxStepReached = draftApplication?.current_step ? draftApplication.current_step - 1 : 0;
 
     // Build existing documents context from tenant profile
     const existingDocsContext: ExistingDocumentsContext = {
@@ -1174,7 +1176,6 @@ export function useApplicationWizard({
         steps,
         initialData: getInitialData(draftApplication, tenantProfile, token),
         initialStepIndex: Math.max(0, initialStepIndex),
-        initialMaxStepReached: Math.max(0, initialMaxStepReached),
         validateStep: validateStepWrapper,
         onSave: handleSave,
         enableAutosave: true,
@@ -2057,24 +2058,19 @@ export function useApplicationWizard({
 
     // ===== Submission =====
     const submit = useCallback(() => {
-        if (!validateForSubmit()) {
-            // Find first step with errors and navigate to it
-            const stepIds: ApplicationStep[] = ['identity', 'household', 'financial', 'support', 'history', 'additional', 'consent'];
-            for (const stepId of stepIds) {
-                const result = validateApplicationStep(
-                    stepId as ApplicationStepId,
-                    wizard.data as unknown as Record<string, unknown>,
-                    existingDocsContext,
-                );
-                if (!result.success) {
-                    wizard.goToStep(stepId);
-                    markAllCurrentStepFieldsTouched();
-                    break;
-                }
-            }
+        // Re-use the same validation logic as mount/navigation
+        // wizard.maxStepReached is the index of the first invalid step (or steps.length if all valid)
+        const firstInvalidStepIndex = wizard.maxStepReached;
+
+        if (firstInvalidStepIndex < wizard.steps.length) {
+            // There's an invalid step - navigate to it
+            const invalidStep = wizard.steps[firstInvalidStepIndex];
+            wizard.goToStep(invalidStep.id);
+            markAllCurrentStepFieldsTouched();
             return;
         }
 
+        // All steps valid - submit
         setIsSubmitting(true);
 
         const url = route('applications.store', { property: propertyId }) + (token ? `?token=${token}` : '');
@@ -2095,7 +2091,7 @@ export function useApplicationWizard({
                 setUploadProgress(null);
             },
         });
-    }, [validateForSubmit, wizard, propertyId, token, markAllCurrentStepFieldsTouched]);
+    }, [wizard, propertyId, token, markAllCurrentStepFieldsTouched]);
 
     // ===== Custom updateField that handles profile autosave =====
     const updateField = useCallback(

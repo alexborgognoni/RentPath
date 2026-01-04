@@ -225,7 +225,6 @@ export default function ApplicationCreate() {
                         touchedFields={wizard.touchedFields}
                         updateField={wizard.updateField}
                         markFieldTouched={wizard.markFieldTouched}
-                        onBlur={handleBlur}
                         onFieldBlur={handleFieldBlur}
                         addCoSigner={wizard.addCoSigner}
                         removeCoSigner={wizard.removeCoSigner}
@@ -264,7 +263,6 @@ export default function ApplicationCreate() {
                         updateReference={wizard.updateReference}
                         // Blur handlers
                         createIndexedBlurHandler={wizard.createIndexedBlurHandler}
-                        onBlur={handleBlur}
                         onFieldBlur={handleFieldBlur}
                     />
                 );

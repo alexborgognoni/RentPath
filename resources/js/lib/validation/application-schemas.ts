@@ -606,13 +606,13 @@ const petWithOtherSchema = petSchema.refine(
 );
 
 const referenceSchema = z.object({
-    type: z.enum(['landlord', 'personal', 'professional']),
-    name: z.string(),
-    phone: z.string(),
-    email: z.string(),
-    relationship: z.string(),
-    relationship_other: z.string(),
-    years_known: z.string(),
+    type: z.enum(['landlord', 'personal', 'professional']).optional().nullable(),
+    name: z.string().optional().nullable(),
+    phone: z.string().optional().nullable(),
+    email: z.string().optional().nullable(),
+    relationship: z.string().optional().nullable(),
+    relationship_other: z.string().optional().nullable(),
+    years_known: z.string().optional().nullable(),
 });
 
 // ===== Step Schemas =====
@@ -1219,12 +1219,34 @@ export const detailsStepSchema = z
 // ===== NEW STEP SCHEMAS (8-step structure) =====
 
 // Step 4: Risk Mitigation - Support (co-signers, guarantors, insurance)
+// Base schema is lenient (accepts null/undefined) so superRefine can always run
+// The actual validation happens in superRefine
 const riskMitigationBaseSchema = z.object({
-    co_signers: z.array(z.any()),
-    guarantors: z.array(z.any()),
-    interested_in_rent_insurance: z.string(),
-    existing_insurance_provider: z.string().optional(),
-    existing_insurance_policy_number: z.string().optional(),
+    co_signers: z
+        .array(z.any())
+        .nullable()
+        .optional()
+        .transform((v) => v ?? []),
+    guarantors: z
+        .array(z.any())
+        .nullable()
+        .optional()
+        .transform((v) => v ?? []),
+    interested_in_rent_insurance: z
+        .string()
+        .nullable()
+        .optional()
+        .transform((v) => v ?? ''),
+    existing_insurance_provider: z
+        .string()
+        .nullable()
+        .optional()
+        .transform((v) => v ?? ''),
+    existing_insurance_policy_number: z
+        .string()
+        .nullable()
+        .optional()
+        .transform((v) => v ?? ''),
 });
 
 export const riskMitigationStepSchema = riskMitigationBaseSchema.superRefine((data, ctx) => {
@@ -1641,52 +1663,52 @@ export const riskMitigationStepSchema = riskMitigationBaseSchema.superRefine((da
 export const historyStepSchema = z
     .object({
         // Credit Check Authorization (Core Requirement per PLAN.md)
-        authorize_credit_check: z.boolean(),
-        credit_check_provider_preference: z.string().optional(),
+        authorize_credit_check: z.boolean().optional().nullable(),
+        credit_check_provider_preference: z.string().optional().nullable(),
         // Background & History (Optional - Suggested for US)
-        authorize_background_check: z.boolean().optional(),
-        has_ccjs_or_bankruptcies: z.boolean().optional(),
-        ccj_bankruptcy_details: z.string().max(2000).optional(),
-        has_eviction_history: z.boolean().optional(),
-        eviction_details: z.string().max(2000).optional(),
-        self_reported_credit_score: z.string().optional(),
+        authorize_background_check: z.boolean().optional().nullable(),
+        has_ccjs_or_bankruptcies: z.boolean().optional().nullable(),
+        ccj_bankruptcy_details: z.string().max(2000).optional().nullable(),
+        has_eviction_history: z.boolean().optional().nullable(),
+        eviction_details: z.string().max(2000).optional().nullable(),
+        self_reported_credit_score: z.string().optional().nullable(),
         credit_report_upload: z.any().nullable().optional(),
         // Current Address (required - matching AddressForm structure)
-        current_living_situation: z.string().optional(),
-        current_address_street_name: z.string().optional(),
-        current_address_house_number: z.string().optional(),
-        current_address_address_line_2: z.string().optional(),
-        current_address_city: z.string().optional(),
-        current_address_state_province: z.string().optional(),
-        current_address_postal_code: z.string().optional(),
-        current_address_country: z.string().optional(),
-        current_address_move_in_date: z.string().optional(),
-        current_monthly_rent: z.string().optional(),
-        current_rent_currency: z.string().optional(),
-        current_landlord_name: z.string().optional(),
-        current_landlord_contact: z.string().optional(),
-        reason_for_moving: z.string().optional(),
-        reason_for_moving_other: z.string().max(500).optional(),
+        current_living_situation: z.string().optional().nullable(),
+        current_address_street_name: z.string().optional().nullable(),
+        current_address_house_number: z.string().optional().nullable(),
+        current_address_address_line_2: z.string().optional().nullable(),
+        current_address_city: z.string().optional().nullable(),
+        current_address_state_province: z.string().optional().nullable(),
+        current_address_postal_code: z.string().optional().nullable(),
+        current_address_country: z.string().optional().nullable(),
+        current_address_move_in_date: z.string().optional().nullable(),
+        current_monthly_rent: z.string().optional().nullable(),
+        current_rent_currency: z.string().optional().nullable(),
+        current_landlord_name: z.string().optional().nullable(),
+        current_landlord_contact: z.string().optional().nullable(),
+        reason_for_moving: z.string().optional().nullable(),
+        reason_for_moving_other: z.string().max(500).optional().nullable(),
         // Previous Addresses (with AddressForm-compatible structure)
-        previous_addresses: z.array(z.any()).optional(),
+        previous_addresses: z.array(z.any()).optional().nullable(),
         // Landlord References
-        landlord_references: z.array(z.any()).optional(),
+        landlord_references: z.array(z.any()).optional().nullable(),
         // Employer Reference
-        employer_reference_name: z.string().optional(),
-        employer_reference_email: z.string().optional(),
-        employer_reference_phone: z.string().optional(),
-        employer_reference_job_title: z.string().optional(),
-        consent_to_contact_employer: z.boolean().optional(),
+        employer_reference_name: z.string().optional().nullable(),
+        employer_reference_email: z.string().optional().nullable(),
+        employer_reference_phone: z.string().optional().nullable(),
+        employer_reference_job_title: z.string().optional().nullable(),
+        consent_to_contact_employer: z.boolean().optional().nullable(),
         // Other References
-        other_references: z.array(z.any()).optional(),
-        // Legacy fields
-        references: z.array(referenceSchema).optional(),
-        previous_landlord_name: z.string().optional(),
-        previous_landlord_phone: z.string().optional(),
-        previous_landlord_email: z.string().optional(),
-        emergency_contact_name: z.string().optional(),
-        emergency_contact_phone: z.string().optional(),
-        emergency_contact_relationship: z.string().optional(),
+        other_references: z.array(z.any()).optional().nullable(),
+        // Legacy fields (use z.any() to avoid validation issues with old data)
+        references: z.array(z.any()).optional().nullable(),
+        previous_landlord_name: z.string().optional().nullable(),
+        previous_landlord_phone: z.string().optional().nullable(),
+        previous_landlord_email: z.string().optional().nullable(),
+        emergency_contact_name: z.string().optional().nullable(),
+        emergency_contact_phone: z.string().optional().nullable(),
+        emergency_contact_relationship: z.string().optional().nullable(),
     })
     .superRefine((data, ctx) => {
         // Credit check authorization is required
@@ -1869,6 +1891,67 @@ export const historyStepSchema = z
                         path: [`prevaddr_${index}_to_date`],
                     });
                 }
+            }
+        });
+
+        // === Landlord References validation ===
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const landlordRefs = data.landlord_references as any[];
+        landlordRefs?.forEach((ref, index) => {
+            if (!ref.name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.reference.name.required,
+                    path: [`landlordref_${index}_name`],
+                });
+            }
+            if (!ref.email?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.reference.email.required,
+                    path: [`landlordref_${index}_email`],
+                });
+            }
+            if (!ref.phone?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.reference.phone.required,
+                    path: [`landlordref_${index}_phone`],
+                });
+            }
+        });
+
+        // === Other References validation ===
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const otherRefs = data.other_references as any[];
+        otherRefs?.forEach((ref, index) => {
+            if (!ref.name?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.reference.name.required,
+                    path: [`otherref_${index}_name`],
+                });
+            }
+            if (!ref.relationship?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.reference.relationship.required,
+                    path: [`otherref_${index}_relationship`],
+                });
+            }
+            if (!ref.email?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.reference.email.required,
+                    path: [`otherref_${index}_email`],
+                });
+            }
+            if (!ref.phone?.trim()) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.reference.phone.required,
+                    path: [`otherref_${index}_phone`],
+                });
             }
         });
     });

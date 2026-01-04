@@ -41,8 +41,8 @@ interface AddressFormProps {
     data: AddressData;
     /** Callback when a field changes. Receives field name (without prefix) and value */
     onChange: (field: keyof AddressData, value: string) => void;
-    /** Blur handler for autosave */
-    onBlur?: () => void;
+    /** Per-field blur handler - called with field name for per-field validation */
+    onFieldBlur?: (field: keyof AddressData) => void;
     /** Errors object keyed by full field names */
     errors?: Record<string, string>;
     /** Touched fields object keyed by full field names */
@@ -76,7 +76,7 @@ const defaultTranslations: AddressFormTranslations = {
 export function AddressForm({
     data,
     onChange,
-    onBlur,
+    onFieldBlur,
     errors = {},
     touchedFields = {},
     fieldPrefix = '',
@@ -85,6 +85,11 @@ export function AddressForm({
     className,
 }: AddressFormProps) {
     const t = { ...defaultTranslations, ...providedTranslations, placeholders: { ...defaultTranslations.placeholders, ...providedTranslations?.placeholders } };
+
+    // Per-field blur handler factory
+    const handleBlur = (field: keyof AddressData) => () => {
+        onFieldBlur?.(field);
+    };
 
     // Generate full field name with prefix
     const fieldName = (field: keyof AddressData): string => {
@@ -117,10 +122,6 @@ export function AddressForm({
     const showStateProvince = useMemo(() => data.country && hasStateProvinceOptions(data.country), [data.country]);
     const stateProvinceRequired = useMemo(() => data.country && requiresStateProvince(data.country), [data.country]);
 
-    const handleStateProvinceChange = (value: string) => {
-        onChange('state_province', value);
-    };
-
     return (
         <div className={className}>
             {/* Street Name & House Number */}
@@ -131,7 +132,7 @@ export function AddressForm({
                         type="text"
                         value={data.street_name}
                         onChange={(e) => onChange('street_name', e.target.value)}
-                        onBlur={onBlur}
+                        onBlur={handleBlur('street_name')}
                         placeholder={t.placeholders?.streetName}
                         aria-invalid={hasError('street_name')}
                         className={getFieldClass('street_name')}
@@ -148,7 +149,7 @@ export function AddressForm({
                         type="text"
                         value={data.house_number}
                         onChange={(e) => onChange('house_number', e.target.value)}
-                        onBlur={onBlur}
+                        onBlur={handleBlur('house_number')}
                         placeholder={t.placeholders?.houseNumber}
                         aria-invalid={hasError('house_number')}
                         className={getFieldClass('house_number')}
@@ -170,7 +171,7 @@ export function AddressForm({
                     type="text"
                     value={data.address_line_2}
                     onChange={(e) => onChange('address_line_2', e.target.value)}
-                    onBlur={onBlur}
+                    onBlur={handleBlur('address_line_2')}
                     placeholder={t.placeholders?.apartment}
                     aria-invalid={hasError('address_line_2')}
                     className={getFieldClass('address_line_2')}
@@ -185,7 +186,7 @@ export function AddressForm({
                         type="text"
                         value={data.city}
                         onChange={(e) => onChange('city', e.target.value)}
-                        onBlur={onBlur}
+                        onBlur={handleBlur('city')}
                         placeholder={t.placeholders?.city}
                         aria-invalid={hasError('city')}
                         className={getFieldClass('city')}
@@ -204,8 +205,8 @@ export function AddressForm({
                         </label>
                         <StateProvinceSelect
                             value={data.state_province}
-                            onChange={handleStateProvinceChange}
-                            onBlur={onBlur}
+                            onChange={(value) => onChange('state_province', value)}
+                            onBlur={handleBlur('state_province')}
                             countryCode={data.country}
                             aria-invalid={hasError('state_province')}
                             error={getError('state_province')}
@@ -222,7 +223,7 @@ export function AddressForm({
                         type="text"
                         value={data.postal_code}
                         onChange={(e) => onChange('postal_code', e.target.value)}
-                        onBlur={onBlur}
+                        onBlur={handleBlur('postal_code')}
                         placeholder={postalCodePlaceholder}
                         aria-invalid={hasError('postal_code')}
                         className={getFieldClass('postal_code')}
@@ -238,7 +239,7 @@ export function AddressForm({
                     <CountrySelect
                         value={data.country}
                         onChange={(value) => onChange('country', value)}
-                        onBlur={onBlur}
+                        onBlur={handleBlur('country')}
                         placeholder={t.placeholders?.country}
                         aria-invalid={hasError('country')}
                         error={getError('country')}

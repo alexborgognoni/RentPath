@@ -37,9 +37,9 @@ interface HistoryStepProps {
     addReference: (type?: 'landlord' | 'personal' | 'professional') => void;
     removeReference: (index: number) => void;
     updateReference: (index: number, field: keyof ReferenceDetails, value: string) => void;
-    // Blur handler factory
+    // Blur handler factory for indexed entities
     createIndexedBlurHandler: (prefix: string, index: number, field: string) => () => void;
-    onBlur: () => void;
+    /** Per-field blur handler - called with prefixed field name */
     onFieldBlur?: (field: string) => void;
 }
 
@@ -59,7 +59,6 @@ export function HistoryStep({
     removeOtherReference,
     updateOtherReference,
     createIndexedBlurHandler,
-    onBlur,
     onFieldBlur,
 }: HistoryStepProps) {
     const { translations } = usePage<SharedData>().props;
@@ -107,17 +106,13 @@ export function HistoryStep({
         setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
     };
 
-    // Field blur handler
+    // Field blur handler for top-level fields
     const handleFieldBlur = useCallback(
         (field: string) => () => {
-            if (onFieldBlur) {
-                onFieldBlur(field);
-            } else {
-                markFieldTouched(field);
-                onBlur();
-            }
+            markFieldTouched(field);
+            onFieldBlur?.(field);
         },
-        [onFieldBlur, markFieldTouched, onBlur],
+        [markFieldTouched, onFieldBlur],
     );
 
     // Living situation options
@@ -202,10 +197,25 @@ export function HistoryStep({
         [updateField],
     );
 
-    // Handle current address blur
-    const handleCurrentAddressBlur = useCallback(() => {
-        onBlur();
-    }, [onBlur]);
+    // Per-field blur handler for current address fields
+    const handleCurrentAddressBlur = useCallback(
+        (field: keyof AddressData) => {
+            const fieldKey = `current_address_${field}`;
+            markFieldTouched(fieldKey);
+            onFieldBlur?.(fieldKey);
+        },
+        [markFieldTouched, onFieldBlur],
+    );
+
+    // Per-field blur handler factory for previous address fields
+    const createPreviousAddressBlur = useCallback(
+        (index: number) => (field: keyof AddressData) => {
+            const fieldKey = `prevaddr_${index}_${field}`;
+            markFieldTouched(fieldKey);
+            onFieldBlur?.(fieldKey);
+        },
+        [markFieldTouched, onFieldBlur],
+    );
 
     // Current address errors/touched for AddressForm
     const currentAddressErrors = useMemo(() => {
@@ -330,6 +340,7 @@ export function HistoryStep({
                                 onChange={(value) =>
                                     updateField('credit_check_provider_preference', value as typeof data.credit_check_provider_preference)
                                 }
+                                onBlur={handleFieldBlur('credit_check_provider_preference')}
                                 options={CREDIT_PROVIDERS}
                                 placeholder={t('creditCheck.providerPlaceholder') || 'Select provider...'}
                             />
@@ -341,6 +352,7 @@ export function HistoryStep({
                                 type="checkbox"
                                 checked={data.authorize_background_check}
                                 onChange={(e) => updateField('authorize_background_check', e.target.checked)}
+                                onBlur={handleFieldBlur('authorize_background_check')}
                                 className="mt-1 h-5 w-5 rounded border-border"
                             />
                             <div>
@@ -362,6 +374,7 @@ export function HistoryStep({
                                     type="checkbox"
                                     checked={data.has_ccjs_or_bankruptcies}
                                     onChange={(e) => updateField('has_ccjs_or_bankruptcies', e.target.checked)}
+                                    onBlur={handleFieldBlur('has_ccjs_or_bankruptcies')}
                                     className="mt-1 h-5 w-5 rounded border-border"
                                 />
                                 <span className="font-medium">
@@ -393,6 +406,7 @@ export function HistoryStep({
                                     type="checkbox"
                                     checked={data.has_eviction_history}
                                     onChange={(e) => updateField('has_eviction_history', e.target.checked)}
+                                    onBlur={handleFieldBlur('has_eviction_history')}
                                     className="mt-1 h-5 w-5 rounded border-border"
                                 />
                                 <span className="font-medium">{t('creditCheck.evictionLabel') || 'I have prior evictions to disclose'}</span>
@@ -454,7 +468,7 @@ export function HistoryStep({
                         <AddressForm
                             data={currentAddressData}
                             onChange={handleCurrentAddressChange}
-                            onBlur={handleCurrentAddressBlur}
+                            onFieldBlur={handleCurrentAddressBlur}
                             errors={currentAddressErrors}
                             touchedFields={currentAddressTouched}
                             fieldPrefix="current_address"
@@ -504,6 +518,7 @@ export function HistoryStep({
                                             type="text"
                                             value={data.current_landlord_name}
                                             onChange={(e) => updateField('current_landlord_name', e.target.value)}
+                                            onBlur={handleFieldBlur('current_landlord_name')}
                                             className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
@@ -516,6 +531,7 @@ export function HistoryStep({
                                             type="text"
                                             value={data.current_landlord_contact}
                                             onChange={(e) => updateField('current_landlord_contact', e.target.value)}
+                                            onBlur={handleFieldBlur('current_landlord_contact')}
                                             className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
@@ -608,7 +624,7 @@ export function HistoryStep({
                                         <AddressForm
                                             data={getPreviousAddressData(addr)}
                                             onChange={handlePreviousAddressChange(index)}
-                                            onBlur={onBlur}
+                                            onFieldBlur={createPreviousAddressBlur(index)}
                                             errors={getPreviousAddressErrors(index)}
                                             touchedFields={getPreviousAddressTouched(index)}
                                             fieldPrefix={`prevaddr_${index}`}
@@ -661,6 +677,7 @@ export function HistoryStep({
                                                         type="text"
                                                         value={addr.landlord_name}
                                                         onChange={(e) => updatePreviousAddress(index, 'landlord_name', e.target.value)}
+                                                        onBlur={createIndexedBlurHandler('prevaddr', index, 'landlord_name')}
                                                         className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                                     />
                                                 </div>
@@ -673,6 +690,7 @@ export function HistoryStep({
                                                         type="text"
                                                         value={addr.landlord_contact}
                                                         onChange={(e) => updatePreviousAddress(index, 'landlord_contact', e.target.value)}
+                                                        onBlur={createIndexedBlurHandler('prevaddr', index, 'landlord_contact')}
                                                         className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                                     />
                                                 </div>
@@ -683,6 +701,7 @@ export function HistoryStep({
                                                         type="checkbox"
                                                         checked={addr.can_contact_landlord}
                                                         onChange={(e) => updatePreviousAddress(index, 'can_contact_landlord', e.target.checked)}
+                                                        onBlur={createIndexedBlurHandler('prevaddr', index, 'can_contact_landlord')}
                                                         className="h-4 w-4 rounded border-border"
                                                     />
                                                     <span className="text-sm text-muted-foreground">
@@ -760,8 +779,14 @@ export function HistoryStep({
                                                     value={ref.name}
                                                     onChange={(e) => updateLandlordReference(index, 'name', e.target.value)}
                                                     onBlur={createIndexedBlurHandler('landlordref', index, 'name')}
-                                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                                    aria-invalid={
+                                                        !!(touchedFields[`landlordref_${index}_name`] && errors[`landlordref_${index}_name`])
+                                                    }
+                                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`landlordref_${index}_name`] && errors[`landlordref_${index}_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                                 />
+                                                {touchedFields[`landlordref_${index}_name`] && errors[`landlordref_${index}_name`] && (
+                                                    <p className="mt-1 text-sm text-destructive">{errors[`landlordref_${index}_name`]}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="mb-2 flex items-center gap-2 text-sm font-medium">
@@ -772,6 +797,7 @@ export function HistoryStep({
                                                     type="text"
                                                     value={ref.company}
                                                     onChange={(e) => updateLandlordReference(index, 'company', e.target.value)}
+                                                    onBlur={createIndexedBlurHandler('landlordref', index, 'company')}
                                                     className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                                 />
                                             </div>
@@ -782,8 +808,14 @@ export function HistoryStep({
                                                     value={ref.email}
                                                     onChange={(e) => updateLandlordReference(index, 'email', e.target.value)}
                                                     onBlur={createIndexedBlurHandler('landlordref', index, 'email')}
-                                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                                    aria-invalid={
+                                                        !!(touchedFields[`landlordref_${index}_email`] && errors[`landlordref_${index}_email`])
+                                                    }
+                                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`landlordref_${index}_email`] && errors[`landlordref_${index}_email`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                                 />
+                                                {touchedFields[`landlordref_${index}_email`] && errors[`landlordref_${index}_email`] && (
+                                                    <p className="mt-1 text-sm text-destructive">{errors[`landlordref_${index}_email`]}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium">{t('fields.phone') || 'Phone'}</label>
@@ -792,8 +824,14 @@ export function HistoryStep({
                                                     value={ref.phone}
                                                     onChange={(e) => updateLandlordReference(index, 'phone', e.target.value)}
                                                     onBlur={createIndexedBlurHandler('landlordref', index, 'phone')}
-                                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                                    aria-invalid={
+                                                        !!(touchedFields[`landlordref_${index}_phone`] && errors[`landlordref_${index}_phone`])
+                                                    }
+                                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`landlordref_${index}_phone`] && errors[`landlordref_${index}_phone`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                                 />
+                                                {touchedFields[`landlordref_${index}_phone`] && errors[`landlordref_${index}_phone`] && (
+                                                    <p className="mt-1 text-sm text-destructive">{errors[`landlordref_${index}_phone`]}</p>
+                                                )}
                                             </div>
                                             <div className="md:col-span-2">
                                                 <label className="mb-2 flex items-center gap-2 text-sm font-medium">
@@ -804,6 +842,7 @@ export function HistoryStep({
                                                     type="text"
                                                     value={ref.property_address}
                                                     onChange={(e) => updateLandlordReference(index, 'property_address', e.target.value)}
+                                                    onBlur={createIndexedBlurHandler('landlordref', index, 'property_address')}
                                                     className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                                 />
                                             </div>
@@ -815,6 +854,7 @@ export function HistoryStep({
                                                 <DatePicker
                                                     value={ref.tenancy_start_date}
                                                     onChange={(value) => updateLandlordReference(index, 'tenancy_start_date', value)}
+                                                    onBlur={createIndexedBlurHandler('landlordref', index, 'tenancy_start_date')}
                                                     restriction="past"
                                                 />
                                             </div>
@@ -826,6 +866,7 @@ export function HistoryStep({
                                                 <DatePicker
                                                     value={ref.tenancy_end_date}
                                                     onChange={(value) => updateLandlordReference(index, 'tenancy_end_date', value)}
+                                                    onBlur={createIndexedBlurHandler('landlordref', index, 'tenancy_end_date')}
                                                     restriction="past"
                                                 />
                                             </div>
@@ -835,6 +876,7 @@ export function HistoryStep({
                                                         type="checkbox"
                                                         checked={ref.consent_to_contact}
                                                         onChange={(e) => updateLandlordReference(index, 'consent_to_contact', e.target.checked)}
+                                                        onBlur={createIndexedBlurHandler('landlordref', index, 'consent_to_contact')}
                                                         className="h-4 w-4 rounded border-border"
                                                     />
                                                     <span className="text-sm">
@@ -912,8 +954,12 @@ export function HistoryStep({
                                                     value={ref.name}
                                                     onChange={(e) => updateOtherReference(index, 'name', e.target.value)}
                                                     onBlur={createIndexedBlurHandler('otherref', index, 'name')}
-                                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                                    aria-invalid={!!(touchedFields[`otherref_${index}_name`] && errors[`otherref_${index}_name`])}
+                                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`otherref_${index}_name`] && errors[`otherref_${index}_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                                 />
+                                                {touchedFields[`otherref_${index}_name`] && errors[`otherref_${index}_name`] && (
+                                                    <p className="mt-1 text-sm text-destructive">{errors[`otherref_${index}_name`]}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium">{t('fields.relationship') || 'Relationship'}</label>
@@ -925,7 +971,16 @@ export function HistoryStep({
                                                     onBlur={createIndexedBlurHandler('otherref', index, 'relationship')}
                                                     options={REFERENCE_RELATIONSHIPS}
                                                     placeholder="Select..."
+                                                    aria-invalid={
+                                                        !!(
+                                                            touchedFields[`otherref_${index}_relationship`] &&
+                                                            errors[`otherref_${index}_relationship`]
+                                                        )
+                                                    }
                                                 />
+                                                {touchedFields[`otherref_${index}_relationship`] && errors[`otherref_${index}_relationship`] && (
+                                                    <p className="mt-1 text-sm text-destructive">{errors[`otherref_${index}_relationship`]}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium">{t('fields.email') || 'Email'}</label>
@@ -934,8 +989,12 @@ export function HistoryStep({
                                                     value={ref.email}
                                                     onChange={(e) => updateOtherReference(index, 'email', e.target.value)}
                                                     onBlur={createIndexedBlurHandler('otherref', index, 'email')}
-                                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                                    aria-invalid={!!(touchedFields[`otherref_${index}_email`] && errors[`otherref_${index}_email`])}
+                                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`otherref_${index}_email`] && errors[`otherref_${index}_email`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                                 />
+                                                {touchedFields[`otherref_${index}_email`] && errors[`otherref_${index}_email`] && (
+                                                    <p className="mt-1 text-sm text-destructive">{errors[`otherref_${index}_email`]}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium">{t('fields.phone') || 'Phone'}</label>
@@ -944,8 +1003,12 @@ export function HistoryStep({
                                                     value={ref.phone}
                                                     onChange={(e) => updateOtherReference(index, 'phone', e.target.value)}
                                                     onBlur={createIndexedBlurHandler('otherref', index, 'phone')}
-                                                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                                                    aria-invalid={!!(touchedFields[`otherref_${index}_phone`] && errors[`otherref_${index}_phone`])}
+                                                    className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`otherref_${index}_phone`] && errors[`otherref_${index}_phone`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                                 />
+                                                {touchedFields[`otherref_${index}_phone`] && errors[`otherref_${index}_phone`] && (
+                                                    <p className="mt-1 text-sm text-destructive">{errors[`otherref_${index}_phone`]}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="mb-2 flex items-center gap-2 text-sm font-medium">
@@ -958,6 +1021,7 @@ export function HistoryStep({
                                                     max="100"
                                                     value={ref.years_known}
                                                     onChange={(e) => updateOtherReference(index, 'years_known', e.target.value)}
+                                                    onBlur={createIndexedBlurHandler('otherref', index, 'years_known')}
                                                     className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                                 />
                                             </div>
@@ -967,6 +1031,7 @@ export function HistoryStep({
                                                         type="checkbox"
                                                         checked={ref.consent_to_contact}
                                                         onChange={(e) => updateOtherReference(index, 'consent_to_contact', e.target.checked)}
+                                                        onBlur={createIndexedBlurHandler('otherref', index, 'consent_to_contact')}
                                                         className="h-4 w-4 rounded border-border"
                                                     />
                                                     <span className="text-sm">
