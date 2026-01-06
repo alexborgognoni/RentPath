@@ -2078,14 +2078,37 @@ export function useApplicationWizard({
 
     // ===== Submission =====
     const submit = useCallback(() => {
-        // Re-use the same validation logic as mount/navigation
-        // wizard.maxStepReached is the index of the first invalid step (or steps.length if all valid)
-        const firstInvalidStepIndex = wizard.maxStepReached;
+        // Explicitly re-validate all steps (same logic as useWizard's firstInvalidStepIndex)
+        // This ensures we catch any validation issues that might have been missed
+        let firstInvalidStepIndex = wizard.steps.length; // Assume all valid
+        for (let i = 0; i < wizard.steps.length; i++) {
+            const stepId = wizard.steps[i].id as ApplicationStep;
+            // Skip review step - it has no validation
+            if (stepId === 'review') continue;
+            const result = validateApplicationStep(
+                stepId as ApplicationStepId,
+                wizard.data as unknown as Record<string, unknown>,
+                existingDocsContext,
+            );
+            if (!result.success) {
+                firstInvalidStepIndex = i;
+                break;
+            }
+        }
 
         if (firstInvalidStepIndex < wizard.steps.length) {
-            // There's an invalid step - navigate to it
+            // There's an invalid step - navigate to it and show errors
             const invalidStep = wizard.steps[firstInvalidStepIndex];
             wizard.goToStep(invalidStep.id);
+            // Trigger validation to show errors
+            const result = validateApplicationStep(
+                invalidStep.id as ApplicationStepId,
+                wizard.data as unknown as Record<string, unknown>,
+                existingDocsContext,
+            );
+            if (!result.success) {
+                wizard.setErrors(result.errors);
+            }
             markAllCurrentStepFieldsTouched();
             return;
         }
@@ -2095,8 +2118,27 @@ export function useApplicationWizard({
 
         const url = route('applications.store', { property: propertyId }) + (token ? `?token=${token}` : '');
 
+        // Prepare submission data with computed fields
+        const submissionData = {
+            ...wizard.data,
+            // Compute has_pets from pets_details array length (required by backend)
+            has_pets: wizard.data.pets_details.length > 0,
+            // Filter out string file references from additional_documents (backend expects files, not strings)
+            additional_documents: wizard.data.additional_documents?.filter(
+                (doc: UploadedFile | string | File | null | undefined) => doc && typeof doc !== 'string' && doc instanceof File,
+            ),
+            // Map current_address_* fields to profile_current_* fields (backend expects profile_current_*)
+            profile_current_street_name: wizard.data.current_address_street_name,
+            profile_current_house_number: wizard.data.current_address_house_number,
+            profile_current_address_line_2: wizard.data.current_address_address_line_2,
+            profile_current_city: wizard.data.current_address_city,
+            profile_current_state_province: wizard.data.current_address_state_province,
+            profile_current_postal_code: wizard.data.current_address_postal_code,
+            profile_current_country: wizard.data.current_address_country,
+        };
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        router.post(url, wizard.data as any, {
+        router.post(url, submissionData as any, {
             onProgress: (progress) => {
                 if (progress?.percentage) {
                     setUploadProgress(progress.percentage);
@@ -2106,12 +2148,16 @@ export function useApplicationWizard({
                 setIsSubmitting(false);
                 setUploadProgress(null);
             },
-            onError: () => {
+            onError: (errors) => {
                 setIsSubmitting(false);
                 setUploadProgress(null);
+                // Set backend validation errors
+                if (errors && typeof errors === 'object') {
+                    wizard.setErrors(errors as Record<string, string>);
+                }
             },
         });
-    }, [wizard, propertyId, token, markAllCurrentStepFieldsTouched]);
+    }, [wizard, propertyId, token, markAllCurrentStepFieldsTouched, existingDocsContext]);
 
     // ===== Custom updateField that handles profile autosave =====
     const updateField = useCallback(

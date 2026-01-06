@@ -67,7 +67,7 @@ export function WizardProgress<TStepId extends string>({
                         <div
                             className="absolute top-0 bottom-0 left-0 rounded-full bg-primary transition-all duration-300"
                             style={{
-                                width: maxStepReached > 0 ? `${(maxStepReached / (steps.length - 1)) * 100}%` : '0%',
+                                width: maxStepReached > 0 ? `${(Math.min(maxStepReached, steps.length - 1) / (steps.length - 1)) * 100}%` : '0%',
                             }}
                         />
                     </div>

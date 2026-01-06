@@ -4,6 +4,7 @@ import {
     validateIdDocuments,
     type DocumentContext,
 } from '@/lib/validation/financial-validation';
+import { validatePostalCode } from '@/utils/address-validation';
 import { validatePhoneNumber } from '@/utils/phone-validation';
 import { z } from 'zod';
 
@@ -397,6 +398,7 @@ export const APPLICATION_MESSAGES = {
     },
     current_address_postal_code: {
         required: 'Postal code is required',
+        invalid: 'Invalid postal code format for selected country',
     },
     current_address_country: {
         required: 'Country is required',
@@ -1780,6 +1782,15 @@ export const historyStepSchema = z
                 message: APPLICATION_MESSAGES.current_address_postal_code.required,
                 path: ['current_address_postal_code'],
             });
+        } else if (data.current_address_country?.trim()) {
+            // Validate postal code format against country (matches backend ValidPostalCode rule)
+            if (!validatePostalCode(data.current_address_postal_code.trim(), data.current_address_country.trim())) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: APPLICATION_MESSAGES.current_address_postal_code.invalid,
+                    path: ['current_address_postal_code'],
+                });
+            }
         }
 
         // Country required
