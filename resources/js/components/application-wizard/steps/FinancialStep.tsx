@@ -1,5 +1,7 @@
+import { ProfileDataBanner } from '@/components/application-wizard/ProfileDataBanner';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import type { SharedData } from '@/types';
+import { translate } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';
 import { useCallback } from 'react';
 import { FinancialInfoSection, type ExistingDocuments } from '../shared';
@@ -27,6 +29,7 @@ export function FinancialStep({
     existingDocuments,
 }: FinancialStepProps) {
     const { translations } = usePage<SharedData>().props;
+    const t = (key: string) => translate(translations, `wizard.application.financialStep.${key}`);
 
     // Reload tenant profile data after successful upload
     const handleUploadSuccess = useCallback(() => {
@@ -75,6 +78,17 @@ export function FinancialStep({
 
     return (
         <div className="space-y-6">
+            {/* Header */}
+            <div>
+                <h2 className="text-xl font-bold">{t('title') || 'Financial Capability'}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    {t('description') || 'Provide your employment and income details to help verify your ability to pay rent.'}
+                </p>
+            </div>
+
+            {/* Profile Data Banner */}
+            <ProfileDataBanner />
+
             <FinancialInfoSection
                 entityType="tenant"
                 translations={translations}

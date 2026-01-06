@@ -327,6 +327,12 @@ return [
 
     // ===== Application Wizard =====
     'application' => [
+        // Profile data banner (shown on Identity, Financial, and History steps)
+        'profileDataBanner' => [
+            'message' => 'Uw gegevens worden veilig opgeslagen in uw profiel, zodat u ze kunt hergebruiken voor toekomstige aanvragen. Verhuurders zien deze gegevens pas na uw indiening.',
+            'manageProfile' => 'Profiel beheren',
+        ],
+
         // Page-level translations
         'page' => [
             'title' => 'Aanvraag voor :property',
@@ -388,7 +394,7 @@ return [
         // Personal Info Step (Identity & Legal Eligibility)
         'personalStep' => [
             'title' => 'Identiteit & Juridische Geschiktheid',
-            'description' => 'Verifieer uw identiteit en huurrecht. Wij versleutelen en bewaren uw gegevens veilig in uw profiel zodat u ze later kunt hergebruiken. Vastgoedbeheerders kunnen uw gegevens pas zien nadat u uw aanvraag heeft ingediend.',
+            'description' => 'Verifieer uw identiteit en huurrecht.',
             'required' => 'Verplicht',
             'sections' => [
                 'personalDetails' => 'Persoonlijke gegevens',
@@ -496,10 +502,16 @@ return [
             'optional' => 'optioneel',
         ],
 
-        // Employment & Income Step
+        // Financial Step (page header)
+        'financialStep' => [
+            'title' => 'Financiële draagkracht',
+            'description' => 'Geef uw werk- en inkomensgegevens op om uw betalingscapaciteit te verifiëren.',
+        ],
+
+        // Employment & Income Step (legacy - used by FinancialInfoSection)
         'employmentStep' => [
             'title' => 'Werk & Inkomen',
-            'description' => 'Deze informatie helpt verhuurders uw betalingscapaciteit te beoordelen. Het wordt opgeslagen in uw profiel.',
+            'description' => 'Deze informatie helpt verhuurders uw betalingscapaciteit te beoordelen.',
             'optional' => 'optioneel',
             'fields' => [
                 'employmentStatus' => 'Werkstatus',

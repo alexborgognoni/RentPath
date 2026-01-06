@@ -1,3 +1,4 @@
+import { ProfileDataBanner } from '@/components/application-wizard/ProfileDataBanner';
 import { OptionalBadge } from '@/components/ui/optional-badge';
 import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
 import { useGeoLocation } from '@/hooks/useGeoLocation';
@@ -327,6 +328,9 @@ export function IdentityStep({
                 <h2 className="text-xl font-bold">{t('title')}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
             </div>
+
+            {/* Profile Data Banner */}
+            <ProfileDataBanner />
 
             {/* Section 1: Personal Details */}
             <div className="rounded-lg border border-border bg-card">

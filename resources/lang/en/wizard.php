@@ -327,6 +327,12 @@ return [
 
     // ===== Application Wizard =====
     'application' => [
+        // Profile data banner (shown on Identity, Financial, and History steps)
+        'profileDataBanner' => [
+            'message' => 'Your information is securely stored in your profile so you can reuse it for future applications. Property managers will only see this data after you submit.',
+            'manageProfile' => 'Manage your profile',
+        ],
+
         // Page-level translations
         'page' => [
             'title' => 'Application for :property',
@@ -414,7 +420,7 @@ return [
         // Personal Info Step
         'personalStep' => [
             'title' => 'Identity & Legal Eligibility',
-            'description' => 'Verify your identity and right to rent. We encrypt and securely store your data to your profile so that you can reuse it later. Property managers will only be able to see your data after you submit your application.',
+            'description' => 'Verify your identity and right to rent.',
             'required' => 'Required',
             'sections' => [
                 'personalDetails' => 'Personal Details',
@@ -522,10 +528,16 @@ return [
             'optional' => 'Optional',
         ],
 
-        // Employment & Income Step
+        // Financial Step (page header)
+        'financialStep' => [
+            'title' => 'Financial Capability',
+            'description' => 'Provide your employment and income details to help verify your ability to pay rent.',
+        ],
+
+        // Employment & Income Step (legacy - used by FinancialInfoSection)
         'employmentStep' => [
             'title' => 'Employment & Income',
-            'description' => 'This information helps landlords assess your ability to pay rent. It will be saved to your profile.',
+            'description' => 'This information helps landlords assess your ability to pay rent.',
             'optional' => 'Optional',
             'fields' => [
                 'employmentStatus' => 'Employment Status',

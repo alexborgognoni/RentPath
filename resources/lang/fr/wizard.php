@@ -327,6 +327,12 @@ return [
 
     // ===== Application Wizard =====
     'application' => [
+        // Profile data banner (shown on Identity, Financial, and History steps)
+        'profileDataBanner' => [
+            'message' => 'Vos informations sont stockées en toute sécurité dans votre profil afin que vous puissiez les réutiliser pour de futures candidatures. Les propriétaires ne verront ces données qu\'après votre soumission.',
+            'manageProfile' => 'Gérer mon profil',
+        ],
+
         // Page-level translations
         'page' => [
             'title' => 'Candidature pour :property',
@@ -388,7 +394,7 @@ return [
         // Personal Info Step (Identity & Legal Eligibility)
         'personalStep' => [
             'title' => 'Identité & Éligibilité légale',
-            'description' => 'Vérifiez votre identité et votre droit de louer. Nous chiffrons et stockons vos données en toute sécurité dans votre profil afin que vous puissiez les réutiliser ultérieurement. Les gestionnaires immobiliers ne pourront voir vos données qu\'après avoir soumis votre candidature.',
+            'description' => 'Vérifiez votre identité et votre droit de louer.',
             'required' => 'Obligatoire',
             'sections' => [
                 'personalDetails' => 'Informations personnelles',
@@ -496,10 +502,16 @@ return [
             'optional' => 'optionnel',
         ],
 
-        // Employment & Income Step
+        // Financial Step (page header)
+        'financialStep' => [
+            'title' => 'Capacité financière',
+            'description' => 'Fournissez vos informations d\'emploi et de revenus pour vérifier votre capacité à payer le loyer.',
+        ],
+
+        // Employment & Income Step (legacy - used by FinancialInfoSection)
         'employmentStep' => [
             'title' => 'Emploi & Revenus',
-            'description' => 'Ces informations aident les propriétaires à évaluer votre capacité à payer le loyer. Elles seront enregistrées dans votre profil.',
+            'description' => 'Ces informations aident les propriétaires à évaluer votre capacité à payer le loyer.',
             'optional' => 'optionnel',
             'fields' => [
                 'employmentStatus' => 'Statut professionnel',

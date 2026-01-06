@@ -1,3 +1,4 @@
+import { ProfileDataBanner } from '@/components/application-wizard/ProfileDataBanner';
 import { AddressForm, type AddressData } from '@/components/ui/address-form';
 import { DatePicker } from '@/components/ui/date-picker';
 import { OptionalBadge } from '@/components/ui/optional-badge';
@@ -285,6 +286,9 @@ export function HistoryStep({
                 <h2 className="text-xl font-bold">{t('title') || 'Credit & Rental History'}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">{t('description') || 'Authorize credit checks and provide your rental history'}</p>
             </div>
+
+            {/* Profile Data Banner */}
+            <ProfileDataBanner />
 
             {/* Section 1: Credit Check Authorization (REQUIRED) */}
             <div className="rounded-lg border border-border bg-card">

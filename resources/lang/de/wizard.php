@@ -327,6 +327,12 @@ return [
 
     // ===== Application Wizard =====
     'application' => [
+        // Profile data banner (shown on Identity, Financial, and History steps)
+        'profileDataBanner' => [
+            'message' => 'Ihre Daten werden sicher in Ihrem Profil gespeichert, damit Sie sie für zukünftige Bewerbungen wiederverwenden können. Vermieter sehen diese Daten erst nach Ihrer Bewerbung.',
+            'manageProfile' => 'Profil verwalten',
+        ],
+
         // Page-level translations
         'page' => [
             'title' => 'Bewerbung für :property',
@@ -388,7 +394,7 @@ return [
         // Personal Info Step (Identity & Legal Eligibility)
         'personalStep' => [
             'title' => 'Identität & Rechtliche Berechtigung',
-            'description' => 'Verifizieren Sie Ihre Identität und Ihr Mietrecht. Wir verschlüsseln und speichern Ihre Daten sicher in Ihrem Profil, damit Sie sie später wiederverwenden können. Immobilienverwalter können Ihre Daten erst nach Absenden Ihrer Bewerbung einsehen.',
+            'description' => 'Verifizieren Sie Ihre Identität und Ihr Mietrecht.',
             'required' => 'Erforderlich',
             'sections' => [
                 'personalDetails' => 'Persönliche Daten',
@@ -496,10 +502,16 @@ return [
             'optional' => 'optional',
         ],
 
-        // Employment & Income Step
+        // Financial Step (page header)
+        'financialStep' => [
+            'title' => 'Finanzielle Leistungsfähigkeit',
+            'description' => 'Geben Sie Ihre Beschäftigungs- und Einkommensdaten an, um Ihre Zahlungsfähigkeit nachzuweisen.',
+        ],
+
+        // Employment & Income Step (legacy - used by FinancialInfoSection)
         'employmentStep' => [
             'title' => 'Beschäftigung & Einkommen',
-            'description' => 'Diese Informationen helfen Vermietern, Ihre Zahlungsfähigkeit einzuschätzen. Sie werden in Ihrem Profil gespeichert.',
+            'description' => 'Diese Informationen helfen Vermietern, Ihre Zahlungsfähigkeit einzuschätzen.',
             'optional' => 'optional',
             'fields' => [
                 'employmentStatus' => 'Beschäftigungsstatus',
