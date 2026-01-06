@@ -44,6 +44,21 @@
 
 ### 📋 Post-MVP (After Launch)
 
+#### 🔴 Technical Debt - High Priority
+
+- [ ] [refactor] **Migrate wizard validation to Laravel Precognition** - ~20h
+    - Current problem: validation rules defined twice (Zod frontend + Form Request backend), causing mismatches
+    - Frontend validation passes but backend rejects on submit (e.g., postal code format)
+    - Draft autosave has NO validation, only final submit validates
+    - Solution: Use [Laravel Precognition](https://laravel.com/docs/12.x/precognition) to reuse backend Form Request rules
+    - Steps:
+        - [ ] Install `laravel-precognition-react-inertia` package
+        - [ ] Add `HandlePrecognitiveRequests` middleware to application routes
+        - [ ] Replace custom `useForm` with Precognition's `useForm` in wizard
+        - [ ] Remove duplicate Zod validation schemas (keep backend as single source of truth)
+        - [ ] Add precognitive validation to `saveDraft` endpoint
+    - Benefits: Single source of truth, real-time validation, no more frontend/backend mismatches
+
 #### Monetization (Highest Priority - January)
 
 - [ ] [business] Finalize pricing model and tier structure based on beta feedback
