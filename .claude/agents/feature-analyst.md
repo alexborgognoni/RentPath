@@ -59,8 +59,11 @@ When analyzing a feature:
 
 ## Key Files to Reference
 
-- `DESIGN.md` for architectural decisions and design rationale
-- `TODO.md` for current roadmap and task status
+- `docs/INDEX.md` for documentation navigation
+- `docs/architecture/` for system architecture and design rationale
+- `docs/modules/` for entity-specific documentation
+- `docs/patterns/` for implementation patterns (wizard, validation, user flows)
+- `docs/TODO.md` for current roadmap and task status
 - `routes/web.php` and `routes/manager.php` for routing context
 - `app/Http/Middleware/CheckSubdomain.php` for portal routing logic
 - `resources/js/Pages/` for frontend component organization
