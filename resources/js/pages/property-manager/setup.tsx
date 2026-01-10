@@ -2,7 +2,6 @@ import { ManagerLayout } from '@/layouts/manager-layout';
 import { type SharedData } from '@/types';
 import type { PropertyManagerFormData, User } from '@/types/dashboard';
 import { route } from '@/utils/route';
-import { translate } from '@/utils/translate-utils';
 import { Head, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Building2, Camera, FileText, Globe, Phone, Trash2, User as UserIcon } from 'lucide-react';

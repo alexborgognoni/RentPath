@@ -3,7 +3,7 @@ import type { Application, SharedData } from '@/types';
 import { useReactiveCurrency } from '@/utils/currency-utils';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
-import { type ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 import { AlertCircle, Calendar, CheckCircle, Clock, Eye, FileCheck, FileText, Home, XCircle } from 'lucide-react';
 import { useMemo } from 'react';
 
