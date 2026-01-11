@@ -1,30 +1,190 @@
 import type { UploadedFile } from '@/components/ui/file-upload';
-import {
-    validateApplicationForSubmit,
-    validateApplicationStep,
-    type ApplicationStepId,
-    type ExistingDocumentsContext,
-} from '@/lib/validation/application-schemas';
+import axios from '@/lib/axios';
 import type { TenantProfile } from '@/types';
 import { route } from '@/utils/route';
 import { router } from '@inertiajs/react';
+import { AxiosError } from 'axios';
 import { useCallback, useState } from 'react';
 import { useProfileAutosave } from './useProfileAutosave';
-import { useWizard, type AutosaveStatus, type WizardStepConfig } from './useWizard';
+import { useWizardPrecognition, type AutosaveStatus, type WizardStepConfig } from './useWizardPrecognition';
 
-export type { AutosaveStatus } from './useWizard';
+export type { AutosaveStatus } from './useWizardPrecognition';
 
 export type ApplicationStep = 'identity' | 'household' | 'financial' | 'support' | 'history' | 'additional' | 'consent' | 'review';
 
 export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
-    { id: 'identity', title: 'Identity & Legal Eligibility', shortTitle: 'Identity' },
-    { id: 'household', title: 'Household Composition', shortTitle: 'Household' },
-    { id: 'financial', title: 'Financial Capability', shortTitle: 'Financial' },
-    { id: 'support', title: 'Financial Support', shortTitle: 'Support' },
-    { id: 'history', title: 'Credit & Rental History', shortTitle: 'History' },
-    { id: 'additional', title: 'Additional Information', shortTitle: 'Additional', optional: true },
-    { id: 'consent', title: 'Declarations & Consent', shortTitle: 'Consent' },
-    { id: 'review', title: 'Review & Submit', shortTitle: 'Review' },
+    {
+        id: 'identity',
+        title: 'Identity & Legal Eligibility',
+        shortTitle: 'Identity',
+        fields: [
+            'profile_date_of_birth',
+            'profile_middle_name',
+            'profile_nationality',
+            'profile_phone_country_code',
+            'profile_phone_number',
+            'profile_bio',
+            'profile_id_document_type',
+            'profile_id_number',
+            'profile_id_issuing_country',
+            'profile_id_expiry_date',
+            'profile_id_document_front',
+            'profile_id_document_back',
+            'profile_immigration_status',
+            'profile_immigration_status_other',
+            'profile_visa_type',
+            'profile_visa_expiry_date',
+            'profile_work_permit_number',
+            'profile_right_to_rent_share_code',
+            'profile_current_house_number',
+            'profile_current_address_line_2',
+            'profile_current_street_name',
+            'profile_current_city',
+            'profile_current_state_province',
+            'profile_current_postal_code',
+            'profile_current_country',
+        ],
+    },
+    {
+        id: 'household',
+        title: 'Household Composition',
+        shortTitle: 'Household',
+        fields: [
+            'desired_move_in_date',
+            'lease_duration_months',
+            'is_flexible_on_move_in',
+            'is_flexible_on_duration',
+            'additional_occupants',
+            'occupants_details',
+            'has_pets',
+            'pets_details',
+            'emergency_contact_first_name',
+            'emergency_contact_last_name',
+            'emergency_contact_relationship',
+            'emergency_contact_phone_country_code',
+            'emergency_contact_phone_number',
+            'emergency_contact_email',
+            'message_to_landlord',
+        ],
+    },
+    {
+        id: 'financial',
+        title: 'Financial Capability',
+        shortTitle: 'Financial',
+        fields: [
+            'profile_employment_status',
+            'profile_income_currency',
+            'profile_has_guarantor',
+            'profile_employer_name',
+            'profile_job_title',
+            'profile_employment_type',
+            'profile_employment_start_date',
+            'profile_monthly_income',
+            'profile_university_name',
+            'profile_program_of_study',
+            'profile_expected_graduation_date',
+            'profile_student_income_source',
+            'profile_employment_contract',
+            'profile_payslip_1',
+            'profile_payslip_2',
+            'profile_payslip_3',
+            'profile_student_proof',
+            'profile_other_income_proof',
+        ],
+    },
+    {
+        id: 'support',
+        title: 'Financial Support',
+        shortTitle: 'Support',
+        fields: [
+            'co_signers',
+            'guarantors',
+            'interested_in_rent_insurance',
+            'existing_insurance_provider',
+            'existing_insurance_policy_number',
+            'profile_guarantor_first_name',
+            'profile_guarantor_last_name',
+            'profile_guarantor_relationship',
+            'profile_guarantor_relationship_other',
+            'profile_guarantor_phone_country_code',
+            'profile_guarantor_phone_number',
+            'profile_guarantor_email',
+            'profile_guarantor_street_name',
+            'profile_guarantor_house_number',
+            'profile_guarantor_address_line_2',
+            'profile_guarantor_city',
+            'profile_guarantor_state_province',
+            'profile_guarantor_postal_code',
+            'profile_guarantor_country',
+            'profile_guarantor_employment_status',
+            'profile_guarantor_employer_name',
+            'profile_guarantor_job_title',
+            'profile_guarantor_employment_type',
+            'profile_guarantor_employment_start_date',
+            'profile_guarantor_monthly_income',
+            'profile_guarantor_income_currency',
+        ],
+    },
+    {
+        id: 'history',
+        title: 'Credit & Rental History',
+        shortTitle: 'History',
+        fields: [
+            'authorize_credit_check',
+            'credit_check_provider_preference',
+            'authorize_background_check',
+            'has_ccjs_or_bankruptcies',
+            'ccj_bankruptcy_details',
+            'has_eviction_history',
+            'eviction_details',
+            'self_reported_credit_score',
+            'current_living_situation',
+            'current_address_street_name',
+            'current_address_house_number',
+            'current_address_address_line_2',
+            'current_address_city',
+            'current_address_state_province',
+            'current_address_postal_code',
+            'current_address_country',
+            'current_address_move_in_date',
+            'current_monthly_rent',
+            'current_rent_currency',
+            'current_landlord_name',
+            'current_landlord_contact',
+            'reason_for_moving',
+            'reason_for_moving_other',
+            'previous_addresses',
+            'landlord_references',
+            'other_references',
+        ],
+    },
+    {
+        id: 'additional',
+        title: 'Additional Information',
+        shortTitle: 'Additional',
+        optional: true,
+        fields: ['additional_information', 'additional_documents'],
+    },
+    {
+        id: 'consent',
+        title: 'Declarations & Consent',
+        shortTitle: 'Consent',
+        fields: [
+            'declaration_accuracy',
+            'consent_screening',
+            'consent_data_processing',
+            'consent_reference_contact',
+            'consent_data_sharing',
+            'consent_marketing',
+            'digital_signature',
+        ],
+    },
+    {
+        id: 'review',
+        title: 'Review & Submit',
+        shortTitle: 'Review',
+        fields: [], // Review step validates all fields on submit
+    },
 ];
 
 // ===== Types =====
@@ -986,7 +1146,7 @@ export interface UseApplicationWizardReturn {
 
     // Navigation
     goToStep: (step: ApplicationStep) => void;
-    goToNextStep: () => boolean;
+    goToNextStep: () => Promise<boolean>;
     goToPreviousStep: () => void;
     canGoToStep: (step: ApplicationStep) => boolean;
 
@@ -1044,10 +1204,10 @@ export interface UseApplicationWizardReturn {
     // Validation
     errors: Record<string, string>;
     setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-    validateCurrentStep: () => boolean;
-    validateForSubmit: () => boolean;
-    validateField: (field: string) => void;
-    clearFieldError: (field: string) => void;
+    validateCurrentStep: () => Promise<boolean>;
+    validateForSubmit: () => Promise<boolean>;
+    validateField: (field: string) => Promise<void>;
+    clearErrors: () => void;
 
     // Touched fields (for showing errors)
     touchedFields: Record<string, boolean>;
@@ -1055,6 +1215,7 @@ export interface UseApplicationWizardReturn {
     clearTouchedFields: () => void;
     markAllCurrentStepFieldsTouched: () => void;
     createIndexedBlurHandler: (prefix: string, index: number, field: string) => () => void;
+    focusFirstInvalidField: () => void;
 
     // Autosave
     autosaveStatus: AutosaveStatus;
@@ -1086,52 +1247,15 @@ export function useApplicationWizard({
     // Application-specific state
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-    const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
     const [pendingSave, setPendingSave] = useState(false);
 
     // Calculate initial step from draft's current_step (used as starting point before validation)
     const initialStepIndex = draftApplication?.current_step ? Math.min(draftApplication.current_step - 1, steps.length - 1) : 0;
 
-    // Build existing documents context from tenant profile
-    const existingDocsContext: ExistingDocumentsContext = {
-        // Main tenant documents
-        id_document_front: !!tenantProfile?.id_document_front_path,
-        id_document_back: !!tenantProfile?.id_document_back_path,
-        residence_permit_document: !!tenantProfile?.residence_permit_document_path,
-        right_to_rent_document: !!tenantProfile?.right_to_rent_document_path,
-        employment_contract: !!tenantProfile?.employment_contract_path,
-        payslip_1: !!tenantProfile?.payslip_1_path,
-        payslip_2: !!tenantProfile?.payslip_2_path,
-        payslip_3: !!tenantProfile?.payslip_3_path,
-        student_proof: !!tenantProfile?.student_proof_path,
-        other_income_proof: !!tenantProfile?.other_income_proof_path,
-        // Guarantor documents
-        guarantor_id_front: !!tenantProfile?.guarantor_id_front_path,
-        guarantor_id_back: !!tenantProfile?.guarantor_id_back_path,
-        guarantor_proof_income: !!tenantProfile?.guarantor_proof_income_path,
-        guarantor_employment_contract: !!tenantProfile?.guarantor_employment_contract_path,
-        guarantor_payslip_1: !!tenantProfile?.guarantor_payslip_1_path,
-        guarantor_payslip_2: !!tenantProfile?.guarantor_payslip_2_path,
-        guarantor_payslip_3: !!tenantProfile?.guarantor_payslip_3_path,
-        guarantor_student_proof: !!tenantProfile?.guarantor_student_proof_path,
-        guarantor_other_income_proof: !!tenantProfile?.guarantor_other_income_proof_path,
-    };
-
-    // Validation wrapper - passes existing docs context for employment step
-    // This is the SINGLE SOURCE OF TRUTH for validation - used by both:
-    // 1. goToNextStep() - validates current step when clicking Continue
-    // 2. computeFirstInvalidStep() - validates all steps on mount/data change
-    // This ensures NO validation discrepancy between clicking Continue and refreshing the page
-    const validateStepWrapper = useCallback(
-        (stepId: ApplicationStep, data: ApplicationWizardData) => {
-            const result = validateApplicationStep(stepId as ApplicationStepId, data as unknown as Record<string, unknown>, existingDocsContext);
-            return {
-                success: result.success,
-                errors: result.errors,
-            };
-        },
-        [existingDocsContext],
-    );
+    // Validation route builder - returns null if no property ID (shouldn't happen for applications)
+    const getValidationRoute = useCallback(() => {
+        return route('applications.save-draft', { property: propertyId }) + (token ? `?token=${token}` : '');
+    }, [propertyId, token]);
 
     // Save function
     const handleSave = useCallback(
@@ -1174,12 +1298,13 @@ export function useApplicationWizard({
         [propertyId, token, onDraftUpdated],
     );
 
-    // Use the generic wizard hook
-    const wizard = useWizard<ApplicationWizardData, ApplicationStep>({
+    // Use the Precognition wizard hook
+    const wizard = useWizardPrecognition<ApplicationWizardData, ApplicationStep>({
         steps,
         initialData: getInitialData(draftApplication, tenantProfile, token),
         initialStepIndex: Math.max(0, initialStepIndex),
-        validateStep: validateStepWrapper,
+        getValidationRoute,
+        method: 'post',
         onSave: handleSave,
         enableAutosave: true,
         autosaveExcludeSteps: ['consent'], // Consent step data is saved on submit only
@@ -1660,35 +1785,16 @@ export function useApplicationWizard({
         [wizard],
     );
 
-    // ===== Touched Fields =====
-    const markFieldTouched = useCallback((field: string) => {
-        setTouchedFields((prev) => ({ ...prev, [field]: true }));
-    }, []);
-
-    const clearTouchedFields = useCallback(() => {
-        setTouchedFields({});
-    }, []);
+    // ===== Custom Touched Fields Logic =====
+    // Base hook provides: touchedFields, markFieldTouched, clearTouchedFields, createIndexedBlurHandler
+    // We override markAllCurrentStepFieldsTouched for application-specific conditional logic
 
     /**
-     * Creates a blur handler for indexed fields (occupants, pets, references, etc.)
-     * Returns a function that marks the specific field as touched when called.
-     *
-     * Usage in step components:
-     *   <input onBlur={createIndexedBlurHandler('occupant', index, 'first_name')} />
-     *   <input onBlur={createIndexedBlurHandler('pet', index, 'type')} />
-     *   <input onBlur={createIndexedBlurHandler('cosigner', index, 'email')} />
-     *
-     * The field key format is: `${prefix}_${index}_${field}`
+     * Mark all fields in the current step as touched.
+     * This override handles conditional field visibility (e.g., employment status fields).
      */
-    const createIndexedBlurHandler = useCallback(
-        (prefix: string, index: number, field: string) => () => {
-            setTouchedFields((prev) => ({ ...prev, [`${prefix}_${index}_${field}`]: true }));
-        },
-        [],
-    );
-
     const markAllCurrentStepFieldsTouched = useCallback(() => {
-        const newTouched: Record<string, boolean> = { ...touchedFields };
+        const newTouched: Record<string, boolean> = { ...wizard.touchedFields };
 
         if (wizard.currentStep === 'identity') {
             // Personal details
@@ -1797,22 +1903,22 @@ export function useApplicationWizard({
             newTouched.desired_move_in_date = true;
             newTouched.lease_duration_months = true;
 
-            // Occupants (if any)
+            // Occupants (if any) - use Laravel array format: occupants_details.{index}.{field}
             wizard.data.occupants_details.forEach((occupant, index) => {
-                newTouched[`occupant_${index}_first_name`] = true;
-                newTouched[`occupant_${index}_last_name`] = true;
-                newTouched[`occupant_${index}_date_of_birth`] = true;
-                newTouched[`occupant_${index}_relationship`] = true;
+                newTouched[`occupants_details.${index}.first_name`] = true;
+                newTouched[`occupants_details.${index}.last_name`] = true;
+                newTouched[`occupants_details.${index}.date_of_birth`] = true;
+                newTouched[`occupants_details.${index}.relationship`] = true;
                 if (occupant.relationship === 'other') {
-                    newTouched[`occupant_${index}_relationship_other`] = true;
+                    newTouched[`occupants_details.${index}.relationship_other`] = true;
                 }
             });
 
-            // Pets (if any)
+            // Pets (if any) - use Laravel array format: pets_details.{index}.{field}
             wizard.data.pets_details.forEach((pet, index) => {
-                newTouched[`pet_${index}_type`] = true;
+                newTouched[`pets_details.${index}.type`] = true;
                 if (pet.type === 'other') {
-                    newTouched[`pet_${index}_type_other`] = true;
+                    newTouched[`pets_details.${index}.type_other`] = true;
                 }
             });
 
@@ -2062,54 +2168,69 @@ export function useApplicationWizard({
             newTouched.digital_signature = true;
         }
 
-        setTouchedFields(newTouched);
-    }, [wizard.currentStep, wizard.data, touchedFields]);
+        wizard.setTouchedFields(newTouched);
+    }, [wizard]);
 
     // ===== Validation =====
-    const validateForSubmit = useCallback((): boolean => {
-        const result = validateApplicationForSubmit(wizard.data as unknown as Record<string, unknown>, existingDocsContext);
-        if (!result.success) {
-            wizard.setErrors(result.errors);
+    const validateForSubmit = useCallback(async (): Promise<boolean> => {
+        // Validate all fields via Precognition
+        const validationRoute = getValidationRoute();
+
+        try {
+            // Get all fields from all steps (except review)
+            const allFields = APPLICATION_STEPS.filter((s) => s.id !== 'review').flatMap((s) => s.fields);
+
+            await axios.post(validationRoute, wizard.data, {
+                headers: {
+                    Precognition: 'true',
+                    'Precognition-Validate-Only': allFields.join(','),
+                },
+            });
+
+            wizard.setErrors({});
+            return true;
+        } catch (error) {
+            if (error instanceof AxiosError && error.response?.status === 422) {
+                const responseErrors = error.response.data?.errors || {};
+                const flatErrors: Partial<Record<keyof ApplicationWizardData, string>> = {};
+
+                Object.entries(responseErrors).forEach(([field, messages]) => {
+                    if (Array.isArray(messages) && messages.length > 0) {
+                        flatErrors[field as keyof ApplicationWizardData] = messages[0] as string;
+                    } else if (typeof messages === 'string') {
+                        flatErrors[field as keyof ApplicationWizardData] = messages;
+                    }
+                });
+
+                wizard.setErrors(flatErrors);
+                return false;
+            }
+
+            console.error('Validation error:', error);
             return false;
         }
-        wizard.setErrors({});
-        return true;
-    }, [wizard, existingDocsContext]);
+    }, [wizard, getValidationRoute]);
 
     // ===== Submission =====
-    const submit = useCallback(() => {
-        // Explicitly re-validate all steps (same logic as useWizard's firstInvalidStepIndex)
-        // This ensures we catch any validation issues that might have been missed
-        let firstInvalidStepIndex = wizard.steps.length; // Assume all valid
-        for (let i = 0; i < wizard.steps.length; i++) {
-            const stepId = wizard.steps[i].id as ApplicationStep;
-            // Skip review step - it has no validation
-            if (stepId === 'review') continue;
-            const result = validateApplicationStep(
-                stepId as ApplicationStepId,
-                wizard.data as unknown as Record<string, unknown>,
-                existingDocsContext,
-            );
-            if (!result.success) {
-                firstInvalidStepIndex = i;
-                break;
-            }
-        }
+    const submit = useCallback(async () => {
+        // Validate all steps via Precognition before submitting
+        const isValid = await validateForSubmit();
 
-        if (firstInvalidStepIndex < wizard.steps.length) {
-            // There's an invalid step - navigate to it and show errors
-            const invalidStep = wizard.steps[firstInvalidStepIndex];
-            wizard.goToStep(invalidStep.id);
-            // Trigger validation to show errors
-            const result = validateApplicationStep(
-                invalidStep.id as ApplicationStepId,
-                wizard.data as unknown as Record<string, unknown>,
-                existingDocsContext,
-            );
-            if (!result.success) {
-                wizard.setErrors(result.errors);
+        if (!isValid) {
+            // Find first step with errors and navigate to it
+            for (let i = 0; i < wizard.steps.length; i++) {
+                const stepId = wizard.steps[i].id as ApplicationStep;
+                if (stepId === 'review') continue;
+
+                const stepFields = wizard.steps[i].fields;
+                const hasErrorsInStep = stepFields.some((field) => wizard.errors[field as keyof ApplicationWizardData]);
+
+                if (hasErrorsInStep) {
+                    wizard.goToStep(stepId);
+                    markAllCurrentStepFieldsTouched();
+                    return;
+                }
             }
-            markAllCurrentStepFieldsTouched();
             return;
         }
 
@@ -2157,7 +2278,7 @@ export function useApplicationWizard({
                 }
             },
         });
-    }, [wizard, propertyId, token, markAllCurrentStepFieldsTouched, existingDocsContext]);
+    }, [wizard, propertyId, token, markAllCurrentStepFieldsTouched, validateForSubmit]);
 
     // ===== Custom updateField that handles profile autosave =====
     const updateField = useCallback(
@@ -2184,12 +2305,14 @@ export function useApplicationWizard({
 
         // Navigation
         goToStep: wizard.goToStep,
-        // Wrap goToNextStep to mark all fields as touched when validation fails
-        goToNextStep: () => {
-            const success = wizard.goToNextStep();
+        // Wrap goToNextStep to mark all fields as touched and focus first invalid when validation fails
+        goToNextStep: async () => {
+            const success = await wizard.goToNextStep();
             if (!success) {
                 // Validation failed - mark all fields as touched so errors show
                 markAllCurrentStepFieldsTouched();
+                // Focus the first invalid field after a short delay for DOM update
+                wizard.focusFirstInvalidField();
             }
             return success;
         },
@@ -2245,20 +2368,18 @@ export function useApplicationWizard({
         // Validation
         errors: wizard.errors,
         setErrors: wizard.setErrors,
-        validateCurrentStep: wizard.validateCurrentStep,
+        validateCurrentStep: async () => wizard.validateStep(wizard.currentStep),
         validateForSubmit,
-        validateField: wizard.validateField,
-        clearFieldError: wizard.clearFieldError,
+        validateField: (field: string) => wizard.validateFieldAndRecalculateMaxStep(field as keyof ApplicationWizardData),
+        clearErrors: wizard.clearErrors,
 
-        // Touched fields
-        touchedFields,
-        markFieldTouched,
-        clearTouchedFields,
-        markAllCurrentStepFieldsTouched,
-
-        // Blur handler factory (for per-field blur pattern)
-        // Usage: createIndexedBlurHandler('occupant', index, 'first_name')
-        createIndexedBlurHandler,
+        // Touched fields (from base hook, except markAllCurrentStepFieldsTouched which is overridden)
+        touchedFields: wizard.touchedFields,
+        markFieldTouched: wizard.markFieldTouched,
+        clearTouchedFields: wizard.clearTouchedFields,
+        markAllCurrentStepFieldsTouched, // Override with application-specific logic
+        createIndexedBlurHandler: wizard.createIndexedBlurHandler,
+        focusFirstInvalidField: wizard.focusFirstInvalidField,
 
         // Autosave
         autosaveStatus: wizard.autosaveStatus,

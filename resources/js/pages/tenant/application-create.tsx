@@ -9,7 +9,7 @@ import {
     SupportStep,
 } from '@/components/application-wizard/steps';
 import { WizardNavigation, WizardProgress } from '@/components/wizard';
-import { useApplicationWizard, type ApplicationStep, type DraftApplication } from '@/hooks/useApplicationWizard';
+import { APPLICATION_STEPS, useApplicationWizard, type ApplicationStep, type DraftApplication } from '@/hooks/useApplicationWizard';
 import { TenantLayout } from '@/layouts/tenant-layout';
 import { type SharedData, type TenantProfile } from '@/types';
 import type { Property } from '@/types/dashboard';
@@ -44,15 +44,19 @@ export default function ApplicationCreate() {
         [translations],
     );
 
-    // Build translated step configs
+    // Build translated step configs - merge translations with fields from APPLICATION_STEPS
     const translatedSteps = useMemo(() => {
         const stepIds: ApplicationStep[] = ['identity', 'household', 'financial', 'support', 'history', 'additional', 'consent', 'review'];
-        return stepIds.map((id) => ({
-            id,
-            title: translate(translations, `wizard.application.steps.${id}.title`),
-            shortTitle: translate(translations, `wizard.application.steps.${id}.shortTitle`),
-            optional: id === 'additional',
-        }));
+        return stepIds.map((id) => {
+            const baseStep = APPLICATION_STEPS.find((s) => s.id === id);
+            return {
+                id,
+                title: translate(translations, `wizard.application.steps.${id}.title`),
+                shortTitle: translate(translations, `wizard.application.steps.${id}.shortTitle`),
+                optional: id === 'additional',
+                fields: baseStep?.fields || [],
+            };
+        });
     }, [translations]);
 
     const wizard = useApplicationWizard({
@@ -72,10 +76,10 @@ export default function ApplicationCreate() {
     // Handle blur for a specific field - marks as touched and validates just that field
     // This follows the DESIGN.md per-field blur pattern to prevent cascade errors
     const handleFieldBlur = useCallback(
-        (field: string) => {
+        async (field: string) => {
             wizard.markFieldTouched(field);
-            wizard.validateField(field);
-            wizard.saveNow();
+            await wizard.validateField(field);
+            // Autosave is handled by the hook, no need to call saveNow here
         },
         [wizard],
     );
@@ -298,12 +302,12 @@ export default function ApplicationCreate() {
     };
 
     // Handle next step with validation feedback
-    const handleNextStep = useCallback((): boolean => {
+    const handleNextStep = useCallback(async (): Promise<boolean> => {
         // Calculate the step that will be saved BEFORE calling goToNextStep
         // because state updates are batched and won't be available immediately
         const nextStepToSave = wizard.currentStepIndex + 2; // +1 for advancing, +1 for 1-indexed
 
-        const success = wizard.goToNextStep();
+        const success = await wizard.goToNextStep();
         if (!success) {
             wizard.markAllCurrentStepFieldsTouched();
         } else {

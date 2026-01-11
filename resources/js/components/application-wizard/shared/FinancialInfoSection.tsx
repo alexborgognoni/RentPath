@@ -8,10 +8,6 @@ import { translate } from '@/utils/translate-utils';
 import { Briefcase, Building, GraduationCap, HeartHandshake, UserCheck } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
-// Re-export validation utilities from the shared location
-export { validateFinancialFields } from '@/lib/validation/financial-validation';
-export type { FinancialEntityType, FinancialValidationErrors } from '@/lib/validation/financial-validation';
-
 const EMPLOYMENT_STATUS_ICONS = {
     employed: Briefcase,
     self_employed: Building,

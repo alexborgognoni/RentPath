@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
-use App\Http\Requests\PublishPropertyRequest;
-use App\Http\Requests\SavePropertyDraftRequest;
+use App\Http\Requests\Property\PublishPropertyRequest;
+use App\Http\Requests\Property\SavePropertyDraftRequest;
 use App\Http\Requests\UpdatePropertyRequest;
 use App\Models\Property;
+use App\Services\PropertyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,10 @@ use Inertia\Inertia;
 
 class PropertyController extends Controller
 {
+    public function __construct(
+        private readonly PropertyService $propertyService,
+    ) {}
+
     /**
      * Display a listing of the user's properties.
      */
@@ -98,22 +103,7 @@ class PropertyController extends Controller
             ], 403);
         }
 
-        // Create minimal draft property
-        $property = $propertyManager->properties()->create([
-            'status' => 'draft',
-            'title' => '',
-            'type' => $request->input('type', 'apartment'),
-            'subtype' => $request->input('subtype', 'studio'),
-            'house_number' => '',
-            'street_name' => '',
-            'city' => '',
-            'postal_code' => '',
-            'country' => 'CH',
-            'bedrooms' => 0,
-            'bathrooms' => 0,
-            'rent_amount' => 0,
-            'rent_currency' => 'eur',
-        ]);
+        $property = $this->propertyService->createDraft($propertyManager->id, $request->all());
 
         return response()->json([
             'id' => $property->id,
@@ -127,112 +117,18 @@ class PropertyController extends Controller
      */
     public function saveDraft(SavePropertyDraftRequest $request, Property $property)
     {
-        // Get validated data with boolean conversions
         $validated = $request->validatedWithBooleans();
-
-        // Extract wizard_step before filling property
         $requestedStep = $validated['wizard_step'] ?? $property->wizard_step ?? 1;
-        unset($validated['wizard_step']);
 
-        $property->fill($validated);
-
-        // Calculate max valid step based on current data
-        $maxValidStep = $this->calculateMaxValidStep($property);
-
-        // Update wizard_step (never exceed what was requested, but may reduce)
-        $property->wizard_step = min($requestedStep, $maxValidStep);
-
-        $property->save();
+        $result = $this->propertyService->saveDraft($property, $validated, $requestedStep);
 
         return response()->json([
             'id' => $property->id,
             'status' => 'draft',
-            'saved_at' => now()->toISOString(),
-            'wizard_step' => $property->wizard_step,
-            'max_valid_step' => $maxValidStep,
+            'saved_at' => $result['savedAt'],
+            'wizard_step' => $property->fresh()->wizard_step,
+            'max_valid_step' => $result['maxValidStep'],
         ]);
-    }
-
-    /**
-     * Type-specific required fields for specifications step.
-     * Must match SPECS_REQUIRED_BY_TYPE in property-validation.ts
-     */
-    private static array $specsRequiredByType = [
-        'apartment' => ['bedrooms' => ['min' => 0], 'bathrooms' => ['min' => 1], 'size' => true],
-        'house' => ['bedrooms' => ['min' => 1], 'bathrooms' => ['min' => 1], 'size' => true],
-        'room' => ['bathrooms' => ['min' => 0], 'size' => true],
-        'commercial' => ['size' => true],
-        'industrial' => ['size' => true],
-        'parking' => [], // No required fields
-    ];
-
-    /**
-     * Validate specifications step for a given property type.
-     */
-    private function validateSpecsStep(Property $property): bool
-    {
-        $requirements = self::$specsRequiredByType[$property->type] ?? [];
-
-        // Validate bedrooms requirement
-        if (isset($requirements['bedrooms'])) {
-            $minBedrooms = $requirements['bedrooms']['min'];
-            if ($property->bedrooms < $minBedrooms) {
-                return false;
-            }
-        }
-
-        // Validate bathrooms requirement
-        if (isset($requirements['bathrooms'])) {
-            $minBathrooms = $requirements['bathrooms']['min'];
-            if ($property->bathrooms < $minBathrooms) {
-                return false;
-            }
-        }
-
-        // Validate size requirement
-        if (isset($requirements['size']) && $requirements['size'] === true) {
-            if ($property->size === null || $property->size <= 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Calculate the maximum valid wizard step based on property data.
-     * Returns 1-indexed step number.
-     */
-    private function calculateMaxValidStep(Property $property): int
-    {
-        $steps = [
-            // Step 1: property-type
-            fn () => ! empty($property->type) && ! empty($property->subtype),
-            // Step 2: location
-            fn () => ! empty($property->house_number) && ! empty($property->street_name)
-                 && ! empty($property->city) && ! empty($property->postal_code)
-                 && ! empty($property->country),
-            // Step 3: specifications (type-specific validation)
-            fn () => $this->validateSpecsStep($property),
-            // Step 4: amenities (optional)
-            fn () => true,
-            // Step 5: energy (optional)
-            fn () => true,
-            // Step 6: pricing
-            fn () => $property->rent_amount > 0,
-            // Step 7: media
-            fn () => ! empty($property->title),
-            // Step 8: review (all previous must be valid)
-            fn () => true,
-        ];
-
-        for ($i = 0; $i < count($steps); $i++) {
-            if (! $steps[$i]()) {
-                return $i + 1; // Return 1-indexed step of first invalid
-            }
-        }
-
-        return count($steps); // All steps valid
     }
 
     /**
@@ -240,73 +136,16 @@ class PropertyController extends Controller
      */
     public function publishDraft(PublishPropertyRequest $request, Property $property)
     {
-        // Get validated data with boolean conversions
         $validated = $request->validatedWithBooleans();
 
-        // Extract image-related data
-        $newImages = $request->file('new_images', []);
-        $deletedImageIds = $request->input('deleted_image_ids', []);
-        $imageOrder = $request->input('image_order', []);
-        $mainImageId = $request->input('main_image_id');
-        $mainImageIndex = $request->input('main_image_index', 0);
-
-        // Update property and change status based on is_active preference
-        $isActive = $request->boolean('is_active', true);
-        $validated['status'] = Property::STATUS_VACANT;
-        $validated['visibility'] = $isActive ? Property::VISIBILITY_UNLISTED : Property::VISIBILITY_PRIVATE;
-        $validated['accepting_applications'] = $isActive;
-
-        // Remove image fields from validated data
-        unset($validated['new_images'], $validated['deleted_image_ids'], $validated['image_order'],
-            $validated['main_image_id'], $validated['main_image_index'], $validated['is_active']);
-
-        $property->fill($validated);
-        $property->save();
-
-        $disk = StorageHelper::getDisk('private');
-
-        // 1. Delete removed images
-        if (! empty($deletedImageIds)) {
-            $imagesToDelete = $property->images()->whereIn('id', $deletedImageIds)->get();
-            foreach ($imagesToDelete as $image) {
-                Storage::disk($disk)->delete($image->image_path);
-                $image->delete();
-            }
-        }
-
-        // 2. Upload new images and track their IDs for ordering
-        $newImageRecords = [];
-        foreach ($newImages as $image) {
-            $path = StorageHelper::store($image, 'properties/'.$property->id, 'private');
-            $newImageRecords[] = $property->images()->create([
-                'image_path' => $path,
-                'sort_order' => 999, // Temporary, will be updated below
-                'is_main' => false,
-            ]);
-        }
-
-        // 3. Update ordering based on image_order array
-        foreach ($imageOrder as $index => $orderValue) {
-            if (str_starts_with($orderValue, 'new:')) {
-                $newIndex = (int) substr($orderValue, 4);
-                if (isset($newImageRecords[$newIndex])) {
-                    $newImageRecords[$newIndex]->update(['sort_order' => $index]);
-                }
-            } else {
-                $imageId = (int) $orderValue;
-                $property->images()->where('id', $imageId)->update(['sort_order' => $index]);
-            }
-        }
-
-        // 4. Set main image
-        $property->images()->update(['is_main' => false]);
-        if ($mainImageId !== null) {
-            $property->images()->where('id', $mainImageId)->update(['is_main' => true]);
-        } elseif (! empty($newImageRecords) && isset($newImageRecords[$mainImageIndex])) {
-            $newImageRecords[$mainImageIndex]->update(['is_main' => true]);
-        } elseif ($property->images()->count() > 0) {
-            $property->images()->orderBy('sort_order')->first()?->update(['is_main' => true]);
-        }
+        $this->propertyService->publish($property, $validated, [
+            'new_images' => $request->file('new_images', []),
+            'deleted_image_ids' => $request->input('deleted_image_ids', []),
+            'image_order' => $request->input('image_order', []),
+            'main_image_id' => $request->input('main_image_id'),
+            'main_image_index' => $request->input('main_image_index', 0),
+            'is_active' => $request->boolean('is_active', true),
+        ]);
 
         return redirect()->route('manager.properties.index')
             ->with('success', 'Property published successfully.');

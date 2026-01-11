@@ -47,8 +47,9 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
               ]
             : [{ title: t('properties.title'), href: route('manager.properties.index') }, { title: t('wizard.page.addProperty') }];
 
-    const handleSubmit = useCallback(() => {
-        if (!wizard.validateForPublish()) {
+    const handleSubmit = useCallback(async () => {
+        const isValid = await wizard.validateForPublish();
+        if (!isValid) {
             return;
         }
 
@@ -236,7 +237,13 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
                         onBack={wizard.goToPreviousStep}
                         onNext={wizard.goToNextStep}
                         onSubmit={handleSubmit}
-                        onSkip={currentStepConfig?.optional ? wizard.goToNextStep : undefined}
+                        onSkip={
+                            currentStepConfig?.optional
+                                ? async () => {
+                                      await wizard.goToNextStep();
+                                  }
+                                : undefined
+                        }
                         isFirstStep={wizard.isFirstStep}
                         isLastStep={wizard.isLastStep}
                         isSubmitting={wizard.isSubmitting}

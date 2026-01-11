@@ -380,6 +380,8 @@ describe('Publish Validation', function () {
     });
 
     test('it validates subtype matches type on publish', function () {
+        Storage::fake('private');
+
         $response = $this->actingAs($this->user)
             ->post(managerUrl("/properties/{$this->draft->id}/publish"), [
                 'type' => 'apartment',
@@ -394,6 +396,7 @@ describe('Publish Validation', function () {
                 'bathrooms' => 1,
                 'rent_amount' => 1500,
                 'rent_currency' => 'eur',
+                'images' => [UploadedFile::fake()->create('property.jpg', 100, 'image/jpeg')],
             ]);
 
         $response->assertSessionHasErrors(['subtype']);
@@ -447,7 +450,8 @@ describe('Publish Validation', function () {
                 'rent_currency' => 'eur',
             ]);
 
-        $response->assertStatus(400);
+        // FormRequest authorization returns 403 for non-draft properties
+        $response->assertStatus(403);
     });
 
     test('it prevents publishing by non-owner', function () {

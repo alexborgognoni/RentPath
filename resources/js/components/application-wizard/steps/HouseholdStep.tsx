@@ -65,18 +65,20 @@ export function HouseholdStep({
     };
 
     // Effect to expand sections with errors
+    // Uses Laravel array format for nested fields: occupants_details.{index}.{field}
     useEffect(() => {
         const rentalIntentFields = ['desired_move_in_date', 'lease_duration_months', 'message_to_landlord'];
         const occupantFields = data.occupants_details.flatMap((_, i) => [
-            `occupant_${i}_first_name`,
-            `occupant_${i}_last_name`,
-            `occupant_${i}_date_of_birth`,
-            `occupant_${i}_relationship`,
-            `occupant_${i}_relationship_other`,
+            `occupants_details.${i}.first_name`,
+            `occupants_details.${i}.last_name`,
+            `occupants_details.${i}.date_of_birth`,
+            `occupants_details.${i}.relationship`,
+            `occupants_details.${i}.relationship_other`,
         ]);
-        const petFields = ['pets_details', ...data.pets_details.flatMap((_, i) => [`pet_${i}_type`, `pet_${i}_type_other`])];
+        const petFields = ['pets_details', ...data.pets_details.flatMap((_, i) => [`pets_details.${i}.type`, `pets_details.${i}.type_other`])];
         const emergencyContactFields = [
-            'emergency_contact_name',
+            'emergency_contact_first_name',
+            'emergency_contact_last_name',
             'emergency_contact_relationship',
             'emergency_contact_phone_number',
             'emergency_contact_email',
@@ -191,8 +193,9 @@ export function HouseholdStep({
     };
 
     // Helper to create blur handler for occupant fields
+    // Uses Laravel array format: occupants_details.{index}.{field}
     const handleOccupantFieldBlur = (index: number, field: keyof OccupantDetails) => () => {
-        const fieldKey = `occupant_${index}_${field}`;
+        const fieldKey = `occupants_details.${index}.${field}`;
         if (onFieldBlur) {
             onFieldBlur(fieldKey);
         } else {
@@ -202,8 +205,9 @@ export function HouseholdStep({
     };
 
     // Helper to create blur handler for pet fields
+    // Uses Laravel array format: pets_details.{index}.{field}
     const handlePetFieldBlur = (index: number, field: keyof PetDetails) => () => {
-        const fieldKey = `pet_${index}_${field}`;
+        const fieldKey = `pets_details.${index}.${field}`;
         if (onFieldBlur) {
             onFieldBlur(fieldKey);
         } else {
@@ -374,12 +378,18 @@ export function HouseholdStep({
                                             value={occupant.first_name}
                                             onChange={(e) => updateOccupant(index, 'first_name', e.target.value)}
                                             onBlur={handleOccupantFieldBlur(index, 'first_name')}
-                                            aria-invalid={!!(touchedFields[`occupant_${index}_first_name`] && errors[`occupant_${index}_first_name`])}
-                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupant_${index}_first_name`] && errors[`occupant_${index}_first_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                            aria-invalid={
+                                                !!(
+                                                    touchedFields[`occupants_details.${index}.first_name`] &&
+                                                    errors[`occupants_details.${index}.first_name`]
+                                                )
+                                            }
+                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupants_details.${index}.first_name`] && errors[`occupants_details.${index}.first_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                         />
-                                        {touchedFields[`occupant_${index}_first_name`] && errors[`occupant_${index}_first_name`] && (
-                                            <p className="mt-1 text-sm text-destructive">{errors[`occupant_${index}_first_name`]}</p>
-                                        )}
+                                        {touchedFields[`occupants_details.${index}.first_name`] &&
+                                            errors[`occupants_details.${index}.first_name`] && (
+                                                <p className="mt-1 text-sm text-destructive">{errors[`occupants_details.${index}.first_name`]}</p>
+                                            )}
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm">{t('occupants.lastName') || 'Last Name'}</label>
@@ -388,11 +398,16 @@ export function HouseholdStep({
                                             value={occupant.last_name}
                                             onChange={(e) => updateOccupant(index, 'last_name', e.target.value)}
                                             onBlur={handleOccupantFieldBlur(index, 'last_name')}
-                                            aria-invalid={!!(touchedFields[`occupant_${index}_last_name`] && errors[`occupant_${index}_last_name`])}
-                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupant_${index}_last_name`] && errors[`occupant_${index}_last_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                            aria-invalid={
+                                                !!(
+                                                    touchedFields[`occupants_details.${index}.last_name`] &&
+                                                    errors[`occupants_details.${index}.last_name`]
+                                                )
+                                            }
+                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupants_details.${index}.last_name`] && errors[`occupants_details.${index}.last_name`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                         />
-                                        {touchedFields[`occupant_${index}_last_name`] && errors[`occupant_${index}_last_name`] && (
-                                            <p className="mt-1 text-sm text-destructive">{errors[`occupant_${index}_last_name`]}</p>
+                                        {touchedFields[`occupants_details.${index}.last_name`] && errors[`occupants_details.${index}.last_name`] && (
+                                            <p className="mt-1 text-sm text-destructive">{errors[`occupants_details.${index}.last_name`]}</p>
                                         )}
                                     </div>
                                 </div>
@@ -407,12 +422,16 @@ export function HouseholdStep({
                                             onBlur={handleOccupantFieldBlur(index, 'date_of_birth')}
                                             max={new Date()}
                                             aria-invalid={
-                                                !!(touchedFields[`occupant_${index}_date_of_birth`] && errors[`occupant_${index}_date_of_birth`])
+                                                !!(
+                                                    touchedFields[`occupants_details.${index}.date_of_birth`] &&
+                                                    errors[`occupants_details.${index}.date_of_birth`]
+                                                )
                                             }
                                         />
-                                        {touchedFields[`occupant_${index}_date_of_birth`] && errors[`occupant_${index}_date_of_birth`] && (
-                                            <p className="mt-1 text-sm text-destructive">{errors[`occupant_${index}_date_of_birth`]}</p>
-                                        )}
+                                        {touchedFields[`occupants_details.${index}.date_of_birth`] &&
+                                            errors[`occupants_details.${index}.date_of_birth`] && (
+                                                <p className="mt-1 text-sm text-destructive">{errors[`occupants_details.${index}.date_of_birth`]}</p>
+                                            )}
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-sm">{t('occupants.relationship') || 'Relationship'}</label>
@@ -423,12 +442,16 @@ export function HouseholdStep({
                                             placeholder="Select..."
                                             onBlur={handleOccupantFieldBlur(index, 'relationship')}
                                             aria-invalid={
-                                                !!(touchedFields[`occupant_${index}_relationship`] && errors[`occupant_${index}_relationship`])
+                                                !!(
+                                                    touchedFields[`occupants_details.${index}.relationship`] &&
+                                                    errors[`occupants_details.${index}.relationship`]
+                                                )
                                             }
                                         />
-                                        {touchedFields[`occupant_${index}_relationship`] && errors[`occupant_${index}_relationship`] && (
-                                            <p className="mt-1 text-sm text-destructive">{errors[`occupant_${index}_relationship`]}</p>
-                                        )}
+                                        {touchedFields[`occupants_details.${index}.relationship`] &&
+                                            errors[`occupants_details.${index}.relationship`] && (
+                                                <p className="mt-1 text-sm text-destructive">{errors[`occupants_details.${index}.relationship`]}</p>
+                                            )}
                                     </div>
                                 </div>
 
@@ -443,15 +466,18 @@ export function HouseholdStep({
                                             placeholder={t('occupants.placeholder') || 'Enter relationship...'}
                                             aria-invalid={
                                                 !!(
-                                                    touchedFields[`occupant_${index}_relationship_other`] &&
-                                                    errors[`occupant_${index}_relationship_other`]
+                                                    touchedFields[`occupants_details.${index}.relationship_other`] &&
+                                                    errors[`occupants_details.${index}.relationship_other`]
                                                 )
                                             }
-                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupant_${index}_relationship_other`] && errors[`occupant_${index}_relationship_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`occupants_details.${index}.relationship_other`] && errors[`occupants_details.${index}.relationship_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                         />
-                                        {touchedFields[`occupant_${index}_relationship_other`] && errors[`occupant_${index}_relationship_other`] && (
-                                            <p className="mt-1 text-sm text-destructive">{errors[`occupant_${index}_relationship_other`]}</p>
-                                        )}
+                                        {touchedFields[`occupants_details.${index}.relationship_other`] &&
+                                            errors[`occupants_details.${index}.relationship_other`] && (
+                                                <p className="mt-1 text-sm text-destructive">
+                                                    {errors[`occupants_details.${index}.relationship_other`]}
+                                                </p>
+                                            )}
                                     </div>
                                 )}
 
@@ -544,10 +570,10 @@ export function HouseholdStep({
                                             options={PET_TYPES}
                                             placeholder="Select..."
                                             onBlur={handlePetFieldBlur(index, 'type')}
-                                            aria-invalid={!!(touchedFields[`pet_${index}_type`] && errors[`pet_${index}_type`])}
+                                            aria-invalid={!!(touchedFields[`pets_details.${index}.type`] && errors[`pets_details.${index}.type`])}
                                         />
-                                        {touchedFields[`pet_${index}_type`] && errors[`pet_${index}_type`] && (
-                                            <p className="mt-1 text-sm text-destructive">{errors[`pet_${index}_type`]}</p>
+                                        {touchedFields[`pets_details.${index}.type`] && errors[`pets_details.${index}.type`] && (
+                                            <p className="mt-1 text-sm text-destructive">{errors[`pets_details.${index}.type`]}</p>
                                         )}
                                     </div>
                                     <div>
@@ -619,11 +645,13 @@ export function HouseholdStep({
                                             onChange={(e) => updatePet(index, 'type_other', e.target.value)}
                                             onBlur={handlePetFieldBlur(index, 'type_other')}
                                             placeholder={t('pets.placeholder') || 'Enter pet type...'}
-                                            aria-invalid={!!(touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`])}
-                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
+                                            aria-invalid={
+                                                !!(touchedFields[`pets_details.${index}.type_other`] && errors[`pets_details.${index}.type_other`])
+                                            }
+                                            className={`w-full rounded-lg border px-4 py-2 ${touchedFields[`pets_details.${index}.type_other`] && errors[`pets_details.${index}.type_other`] ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`}
                                         />
-                                        {touchedFields[`pet_${index}_type_other`] && errors[`pet_${index}_type_other`] && (
-                                            <p className="mt-1 text-sm text-destructive">{errors[`pet_${index}_type_other`]}</p>
+                                        {touchedFields[`pets_details.${index}.type_other`] && errors[`pets_details.${index}.type_other`] && (
+                                            <p className="mt-1 text-sm text-destructive">{errors[`pets_details.${index}.type_other`]}</p>
                                         )}
                                     </div>
                                 )}
@@ -646,7 +674,7 @@ export function HouseholdStep({
                                         <div className="mt-3">
                                             <FileUpload
                                                 label={t('pets.assistanceDocumentation') || 'Assistance Animal Documentation'}
-                                                documentType={`pet_${index}_assistance_documentation`}
+                                                documentType={`pets_details.${index}.assistance_documentation`}
                                                 uploadUrl="/tenant-profile/document/upload"
                                                 accept={{
                                                     'image/*': ['.png', '.jpg', '.jpeg'],
@@ -658,11 +686,11 @@ export function HouseholdStep({
                                                     maxFileSize: '20MB',
                                                 }}
                                                 onUploadSuccess={() => {
-                                                    markFieldTouched(`pet_${index}_assistance_documentation`);
+                                                    markFieldTouched(`pets_details.${index}.assistance_documentation`);
                                                 }}
                                                 error={
-                                                    touchedFields[`pet_${index}_assistance_documentation`]
-                                                        ? errors[`pet_${index}_assistance_documentation`]
+                                                    touchedFields[`pets_details.${index}.assistance_documentation`]
+                                                        ? errors[`pets_details.${index}.assistance_documentation`]
                                                         : undefined
                                                 }
                                             />

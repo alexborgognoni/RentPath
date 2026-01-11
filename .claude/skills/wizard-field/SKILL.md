@@ -1,6 +1,6 @@
 ---
 name: wizard-field
-description: Guide for adding new fields to application or property wizards. Ensures 3-layer validation (Zod, FormRequest, Database) is properly implemented. Auto-triggers on "add field to wizard", "new wizard field", "add to application form", "add to property form", "wizard validation".
+description: Guide for adding new fields to application or property wizards. Uses Laravel Precognition with FormRequest rules as single source of truth. Auto-triggers on "add field to wizard", "new wizard field", "add to application form", "add to property form", "wizard validation".
 ---
 
 # Adding Wizard Fields Guide
@@ -13,26 +13,28 @@ You are helping add new fields to RentPath's multi-step wizard forms (Applicatio
 2. **Read the wizard pattern**: `docs/patterns/wizard.md`
 3. **Identify which wizard**: Application (tenant) or Property (manager)
 
+## Validation Architecture
+
+RentPath uses **Laravel Precognition** for real-time validation:
+
+- Backend FormRequest rules are the **single source of truth**
+- Frontend uses Precognition requests to validate against backend rules
+- No Zod schemas - validation is not duplicated
+
+```
+Frontend (Precognition) → Backend (FormRequest) → Database
+```
+
 ## Tools to Use
 
-| Task                  | Tool   | Command/Action                                                                |
-| --------------------- | ------ | ----------------------------------------------------------------------------- |
-| Check existing schema | `Read` | `resources/js/lib/validation/application-schemas.ts` or `property-schemas.ts` |
-| Check Form Request    | `Read` | `app/Http/Requests/StoreApplicationRequest.php` or property requests          |
-| Check model           | `Read` | `app/Models/Application.php` or `Property.php`                                |
-| Create migration      | `Bash` | `php artisan make:migration add_[field]_to_[table]`                           |
-| Check types           | `Read` | `resources/js/types/index.d.ts`                                               |
-| Run validation        | `Bash` | `php artisan test --filter=Validation`                                        |
-
-## The 3-Layer Validation Rule
-
-**Every field must be validated at all 3 layers with IDENTICAL error messages:**
-
-```
-Layer 1: Frontend (Zod)     -> Immediate UX feedback
-Layer 2: Backend (FormRequest) -> Server-side validation
-Layer 3: Database           -> Constraints, enums, types
-```
+| Task                   | Tool   | Command/Action                                                         |
+| ---------------------- | ------ | ---------------------------------------------------------------------- |
+| Check Step FormRequest | `Read` | `app/Http/Requests/Property/Steps/` or `Application/Steps/`            |
+| Check model            | `Read` | `app/Models/Application.php` or `Property.php`                         |
+| Create migration       | `Bash` | `php artisan make:migration add_[field]_to_[table]`                    |
+| Check types            | `Read` | `resources/js/types/index.d.ts`                                        |
+| Check wizard hook      | `Read` | `resources/js/hooks/usePropertyWizard.ts` or `useApplicationWizard.ts` |
+| Run validation         | `Bash` | `php artisan test --filter=Validation`                                 |
 
 ## Step-by-Step Implementation
 
@@ -46,21 +48,7 @@ php artisan make:migration add_[field_name]_to_[table_name] --no-interaction
 public function up(): void
 {
     Schema::table('applications', function (Blueprint $table) {
-        // Choose appropriate type
-        $table->string('new_field')->nullable();           // Optional string
-        $table->string('required_field');                   // Required string
-        $table->enum('status_field', ['a', 'b', 'c']);     // Enum
-        $table->boolean('flag_field')->default(false);     // Boolean
-        $table->integer('count_field')->nullable();        // Number
-        $table->json('complex_field')->nullable();         // JSON array/object
-        $table->date('date_field')->nullable();            // Date
-    });
-}
-
-public function down(): void
-{
-    Schema::table('applications', function (Blueprint $table) {
-        $table->dropColumn('new_field');
+        $table->string('new_field')->nullable();
     });
 }
 ```
@@ -89,85 +77,24 @@ protected $fillable = [
 protected function casts(): array
 {
     return [
-        // ... existing casts
         'flag_field' => 'boolean',
         'complex_field' => 'array',
-        'date_field' => 'date',
     ];
 }
 ```
 
-### 3. Update TypeScript Types
+### 3. Update Step FormRequest (Backend Validation)
 
-```typescript
-// resources/js/types/index.d.ts
-
-// For Application fields
-interface Application {
-    // ... existing fields
-    new_field: string | null;
-    required_field: string;
-    status_field: 'a' | 'b' | 'c';
-    flag_field: boolean;
-}
-
-// For wizard data (may differ from model)
-interface ApplicationWizardData {
-    // ... existing fields
-    new_field: string; // Required in wizard even if nullable in DB
-}
-```
-
-### 4. Update Zod Schema (Frontend Validation)
-
-```typescript
-// resources/js/lib/validation/application-schemas.ts
-
-// Find the appropriate step schema
-export const identityStepSchema = z.object({
-    // ... existing fields
-    new_field: z.string().min(1, 'New field is required').max(255, 'New field must be less than 255 characters'),
-
-    // Optional field
-    optional_field: z.string().max(255, 'Optional field must be less than 255 characters').optional().or(z.literal('')),
-
-    // Enum field
-    status_field: z.enum(['a', 'b', 'c'], {
-        errorMap: () => ({ message: 'Please select a valid status' }),
-    }),
-
-    // Boolean field
-    flag_field: z.boolean(),
-
-    // Date field
-    date_field: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Please enter a valid date'),
-});
-```
-
-### 5. Update Form Request (Backend Validation)
+Find the appropriate step FormRequest and add the field:
 
 ```php
-// app/Http/Requests/StoreApplicationRequest.php
+// app/Http/Requests/Application/Steps/IdentityStepRequest.php
 
 public function rules(): array
 {
     return [
         // ... existing rules
-
-        // Required field - message must match Zod exactly!
         'new_field' => ['required', 'string', 'max:255'],
-
-        // Optional field
-        'optional_field' => ['nullable', 'string', 'max:255'],
-
-        // Enum field
-        'status_field' => ['required', Rule::in(['a', 'b', 'c'])],
-
-        // Boolean field
-        'flag_field' => ['required', 'boolean'],
-
-        // Date field
-        'date_field' => ['required', 'date', 'after:today'],
     ];
 }
 
@@ -175,13 +102,58 @@ public function messages(): array
 {
     return [
         // ... existing messages
-
-        // Messages MUST match Zod error messages exactly!
         'new_field.required' => 'New field is required',
         'new_field.max' => 'New field must be less than 255 characters',
-        'status_field.in' => 'Please select a valid status',
-        'date_field.date' => 'Please enter a valid date',
     ];
+}
+```
+
+### 4. Update TypeScript Types
+
+```typescript
+// resources/js/types/index.d.ts
+
+interface Application {
+    // ... existing fields
+    new_field: string | null;
+}
+```
+
+### 5. Update Wizard Hook Step Config
+
+Add the field to the step's `fields` array for Precognition targeting:
+
+```typescript
+// resources/js/hooks/useApplicationWizard.ts or usePropertyWizard.ts
+
+export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
+    {
+        id: 'identity',
+        title: 'Identity & Legal Eligibility',
+        shortTitle: 'Identity',
+        fields: [
+            // ... existing fields
+            'new_field', // Add here - IMPORTANT for step validation
+        ],
+    },
+    // ...
+];
+```
+
+**Why fields array matters:**
+
+- Precognition uses `Precognition-Validate-Only` header with these field names
+- `validateFieldAndRecalculateMaxStep` uses this to know which step a field belongs to
+- If field is missing from array, validation won't target it correctly
+
+Also add to initial data:
+
+```typescript
+function getInitialData(draft?: DraftApplication): ApplicationWizardData {
+    return {
+        // ... existing fields
+        new_field: draft?.new_field || '',
+    };
 }
 ```
 
@@ -190,15 +162,18 @@ public function messages(): array
 ```tsx
 // resources/js/components/application-wizard/steps/[Step]Step.tsx
 
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { FieldError } from '@/components/ui/field-error';
+interface StepProps {
+    data: ApplicationWizardData;
+    errors: Record<string, string>;
+    touchedFields: Record<string, boolean>;
+    updateField: (field: string, value: any) => void;
+    markFieldTouched: (field: string) => void;
+    onFieldBlur: (field: string) => void; // Validates + recalculates maxStepReached
+}
 
-export function IdentityStep({ data, errors, onChange }: StepProps) {
+export function IdentityStep({ data, errors, touchedFields, updateField, markFieldTouched, onFieldBlur }: StepProps) {
     return (
         <div className="space-y-4">
-            {/* ... existing fields */}
-
             {/* New field */}
             <div className="space-y-2">
                 <Label htmlFor="new_field">
@@ -207,73 +182,56 @@ export function IdentityStep({ data, errors, onChange }: StepProps) {
                 <Input
                     id="new_field"
                     value={data.new_field}
-                    onChange={(e) => onChange('new_field', e.target.value)}
-                    className={errors.new_field ? 'border-red-500' : ''}
+                    onChange={(e) => updateField('new_field', e.target.value)}
+                    onBlur={() => onFieldBlur('new_field')}
+                    aria-invalid={touchedFields.new_field && !!errors.new_field}
+                    className={touchedFields.new_field && errors.new_field ? 'border-red-500' : ''}
                 />
-                <FieldError error={errors.new_field} />
+                {touchedFields.new_field && errors.new_field && <p className="text-sm text-red-500">{errors.new_field}</p>}
             </div>
         </div>
     );
 }
 ```
 
-### 7. Update Wizard Hook
+**Key patterns:**
 
-```typescript
-// resources/js/hooks/useApplicationWizard.ts
+- `updateField` clears the error for that field
+- `onFieldBlur` validates the field AND recalculates maxStepReached if field is from a previous step
+- Errors only show when field is touched (prevents cascade errors on mount)
+- `aria-invalid` must be set for scroll-to-first-error to work
 
-// Add to initial state
-const initialData: ApplicationWizardData = {
-    // ... existing fields
-    new_field: '',
-};
+### 7. Update Controller/Service (if needed)
 
-// If field affects step validation, update step schemas
-const stepSchemas = {
-    1: identityStepSchema, // If field is in step 1
-    // ...
-};
-```
-
-### 8. Update Controller (if needed)
+If the field requires special handling:
 
 ```php
-// app/Http/Controllers/ApplicationController.php
+// app/Services/ApplicationService.php
 
-// In store/update method, ensure field is handled
+// In the publish/submit method, ensure field is handled
 $application->update([
     // ... existing fields
-    'new_field' => $request->validated('new_field'),
-]);
-
-// In show/edit method, ensure field is passed to frontend
-return Inertia::render('tenant/application-edit', [
-    'application' => [
-        // ... existing fields
-        'new_field' => $application->new_field,
-    ],
+    'new_field' => $data['new_field'],
 ]);
 ```
 
-### 9. Add Translations (i18n)
+### 8. Add Translations (i18n)
 
 ```php
-// resources/lang/en/validation.php (if custom messages)
-// resources/lang/en/application.php (if labels)
+// resources/lang/en/validation.php or application.php
 
 return [
     'new_field' => [
         'label' => 'New Field',
         'placeholder' => 'Enter value...',
-        'help' => 'This field is used for...',
     ],
 ];
 ```
 
-### 10. Update Tests
+### 9. Update Tests
 
 ```php
-// tests/Feature/ApplicationFlowTest.php
+// tests/Feature/ApplicationWizardValidationTest.php
 
 test('application requires new_field', function () {
     $user = User::factory()->withTenantProfile()->create();
@@ -286,21 +244,9 @@ test('application requires new_field', function () {
 
     $response->assertSessionHasErrors('new_field');
 });
-
-test('application accepts valid new_field', function () {
-    $user = User::factory()->withTenantProfile()->create();
-
-    $response = $this->actingAs($user)
-        ->post('/applications', [
-            // ... other required fields
-            'new_field' => 'Valid value',
-        ]);
-
-    $response->assertSessionDoesntHaveErrors('new_field');
-});
 ```
 
-### 11. Update Factory (for tests)
+### 10. Update Factory (for tests)
 
 ```php
 // database/factories/ApplicationFactory.php
@@ -318,29 +264,31 @@ public function definition(): array
 
 ### Application Wizard Steps
 
-| Step          | Fields                               |
-| ------------- | ------------------------------------ |
-| 1. Identity   | Name, DOB, nationality, ID documents |
-| 2. Address    | Current address, previous addresses  |
-| 3. Employment | Employment status, income, employer  |
-| 4. Financial  | Bank details, credit info            |
-| 5. History    | Rental history, references           |
-| 6. Review     | Summary, consents, submission        |
+| Step          | FormRequest           | Fields                               |
+| ------------- | --------------------- | ------------------------------------ |
+| 1. Identity   | IdentityStepRequest   | Name, DOB, nationality, ID documents |
+| 2. Household  | HouseholdStepRequest  | Move-in, occupants, pets             |
+| 3. Financial  | FinancialStepRequest  | Employment, income, proof            |
+| 4. Support    | SupportStepRequest    | Co-signers, guarantors, insurance    |
+| 5. History    | HistoryStepRequest    | Address, references, credit          |
+| 6. Additional | AdditionalStepRequest | Extra documents, notes               |
+| 7. Consent    | ConsentStepRequest    | Declarations, signature              |
 
 ### Property Wizard Steps
 
-| Step        | Fields                               |
-| ----------- | ------------------------------------ |
-| 1. Basics   | Type, title, description             |
-| 2. Location | Address, coordinates                 |
-| 3. Details  | Bedrooms, bathrooms, size, amenities |
-| 4. Pricing  | Rent, deposit, availability          |
-| 5. Images   | Photos, floor plans                  |
-| 6. Review   | Summary, visibility, publish         |
+| Step         | FormRequest          | Fields                       |
+| ------------ | -------------------- | ---------------------------- |
+| 1. Type      | TypeStepRequest      | Property type, subtype       |
+| 2. Location  | LocationStepRequest  | Address, country             |
+| 3. Specs     | SpecsStepRequest     | Bedrooms, bathrooms, size    |
+| 4. Amenities | AmenitiesStepRequest | Kitchen, amenities           |
+| 5. Energy    | EnergyStepRequest    | Energy class, heating        |
+| 6. Pricing   | PricingStepRequest   | Rent, currency, availability |
+| 7. Media     | MediaStepRequest     | Title, description, images   |
 
 ## Documentation References
 
-- `docs/patterns/validation.md` - 3-layer validation strategy
+- `docs/patterns/validation.md` - Precognition validation strategy
 - `docs/patterns/wizard.md` - Wizard architecture
 - `docs/modules/applications.md` - Application fields
 - `docs/modules/properties.md` - Property fields
@@ -349,12 +297,12 @@ public function definition(): array
 
 - [ ] Migration created and run
 - [ ] Model updated (fillable, casts)
+- [ ] Step FormRequest updated with rules and messages
 - [ ] TypeScript types updated
-- [ ] Zod schema updated with validation
-- [ ] Form Request updated with matching messages
-- [ ] Step component updated with UI
-- [ ] Wizard hook updated (if needed)
-- [ ] Controller updated (if needed)
+- [ ] Wizard hook step config updated (fields array)
+- [ ] Wizard hook initial data updated
+- [ ] Step component updated with UI and onBlur handler
+- [ ] Service/Controller updated (if needed)
 - [ ] Translations added
 - [ ] Tests written
 - [ ] Factory updated

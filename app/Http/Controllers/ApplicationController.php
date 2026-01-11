@@ -3,19 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StorageHelper;
-use App\Http\Requests\StoreApplicationRequest;
+use App\Http\Requests\Application\SubmitApplicationRequest;
 use App\Models\Application;
 use App\Models\ApplicationCoSigner;
 use App\Models\ApplicationGuarantor;
 use App\Models\Lead;
 use App\Models\Property;
 use App\Models\TenantReference;
+use App\Services\ApplicationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ApplicationController extends Controller
 {
+    public function __construct(
+        private readonly ApplicationService $applicationService,
+    ) {}
+
     /**
      * Display a listing of the tenant's applications.
      */
@@ -92,12 +97,12 @@ class ApplicationController extends Controller
         }
 
         // Check if already applied (excluding drafts - those can continue)
-        $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
-            ->where('property_id', $property->id)
-            ->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted'])
-            ->first();
+        if ($this->applicationService->hasExistingApplication($tenantProfile, $property)) {
+            $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
+                ->where('property_id', $property->id)
+                ->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted'])
+                ->first();
 
-        if ($existingApplication) {
             return redirect()->route('applications.show', ['application' => $existingApplication->id])
                 ->with('message', 'You already have an application for this property');
         }
@@ -110,11 +115,8 @@ class ApplicationController extends Controller
             ->first();
 
         // Re-validate max step based on current profile data
-        // This handles the edge case where profile changes in another application
-        // might invalidate steps that were previously valid
         if ($draftApplication) {
-            $draftApplication = $this->revalidateDraftMaxStep($draftApplication, $tenantProfile);
-            // Transform references from combined storage to separate landlord/other arrays
+            $draftApplication = $this->applicationService->revalidateDraft($draftApplication);
             $draftApplication = $this->transformDraftForFrontend($draftApplication);
         }
 
@@ -128,7 +130,7 @@ class ApplicationController extends Controller
             'property' => $property->load('images', 'mainImage', 'propertyManager'),
             'tenantProfile' => $tenantProfile,
             'draftApplication' => $draftApplication,
-            'token' => request()->query('token'), // Pass token if accessing via invite
+            'token' => request()->query('token'),
         ]);
     }
 
@@ -192,7 +194,7 @@ class ApplicationController extends Controller
     /**
      * Store a new application.
      */
-    public function store(StoreApplicationRequest $request, Property $property)
+    public function store(SubmitApplicationRequest $request, Property $property)
     {
         $user = Auth::user();
 
@@ -203,119 +205,28 @@ class ApplicationController extends Controller
         }
 
         // Check for existing application
-        $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
-            ->where('property_id', $property->id)
-            ->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted'])
-            ->first();
+        if ($this->applicationService->hasExistingApplication($tenantProfile, $property)) {
+            $existingApplication = Application::where('tenant_profile_id', $tenantProfile->id)
+                ->where('property_id', $property->id)
+                ->whereNotIn('status', ['draft', 'withdrawn', 'archived', 'deleted'])
+                ->first();
 
-        if ($existingApplication) {
             return redirect()->route('applications.show', ['application' => $existingApplication->id])
                 ->with('error', 'You already have an application for this property');
         }
 
-        // Check for draft application (we'll update it instead of creating new)
-        $draftApplication = Application::where('tenant_profile_id', $tenantProfile->id)
-            ->where('property_id', $property->id)
-            ->where('status', 'draft')
-            ->first();
+        // Get or create draft application
+        $application = $this->applicationService->getOrCreateDraft($tenantProfile, $property);
 
-        // Validation is handled by StoreApplicationRequest with conditional rules
+        // Submit application using service
         $validated = $request->validated();
-
-        // Sync profile data (save profile fields to TenantProfile for reuse)
-        $this->syncProfileDataFromWizard($request, $tenantProfile);
-
-        // Refresh the tenant profile to get updated data for snapshot
-        $tenantProfile->refresh();
-
-        // Handle file uploads for application-specific documents
-        if ($request->hasFile('application_id_document')) {
-            $validated['application_id_document_path'] = StorageHelper::store(
-                $request->file('application_id_document'),
-                'applications/id-documents',
-                'private'
-            );
-            $validated['application_id_document_original_name'] = $request->file('application_id_document')->getClientOriginalName();
-        }
-
-        if ($request->hasFile('application_proof_of_income')) {
-            $validated['application_proof_of_income_path'] = StorageHelper::store(
-                $request->file('application_proof_of_income'),
-                'applications/proof-of-income',
-                'private'
-            );
-            $validated['application_proof_of_income_original_name'] = $request->file('application_proof_of_income')->getClientOriginalName();
-        }
-
-        if ($request->hasFile('application_reference_letter')) {
-            $validated['application_reference_letter_path'] = StorageHelper::store(
-                $request->file('application_reference_letter'),
-                'applications/reference-letters',
-                'private'
-            );
-            $validated['application_reference_letter_original_name'] = $request->file('application_reference_letter')->getClientOriginalName();
-        }
-
-        // Handle additional documents
-        if ($request->hasFile('additional_documents')) {
-            $additionalDocs = [];
-            foreach ($request->file('additional_documents') as $index => $file) {
-                $path = StorageHelper::store($file, 'applications/additional-documents', 'private');
-                $additionalDocs[] = [
-                    'path' => $path,
-                    'original_name' => $file->getClientOriginalName(),
-                    'type' => $file->getClientMimeType(),
-                    'description' => $request->input("additional_documents_description.{$index}", ''),
-                ];
-            }
-            $validated['additional_documents'] = $additionalDocs;
-        }
-
-        // Remove file fields from validated data
-        unset(
-            $validated['application_id_document'],
-            $validated['application_proof_of_income'],
-            $validated['application_reference_letter']
-        );
-
-        // Remove profile fields from validated data (they're saved to TenantProfile, not Application)
-        $profileFieldPrefixes = ['profile_'];
-        foreach (array_keys($validated) as $key) {
-            foreach ($profileFieldPrefixes as $prefix) {
-                if (str_starts_with($key, $prefix)) {
-                    unset($validated[$key]);
-                    break;
-                }
-            }
-        }
-
-        // Snapshot profile data at submission time (for audit trail)
-        $validated = array_merge($validated, $this->snapshotProfileData($tenantProfile));
-
-        // Update draft or create new application
-        $validated['property_id'] = $property->id;
-        $validated['tenant_profile_id'] = $tenantProfile->id;
-        $validated['status'] = 'submitted';
-        $validated['submitted_at'] = now();
-
-        if ($draftApplication) {
-            $draftApplication->update($validated);
-            $application = $draftApplication;
-        } else {
-            $application = Application::create($validated);
-        }
-
-        // Auto-verify profile if minimum required data is present
-        $this->autoVerifyProfileIfReady($tenantProfile);
+        $this->applicationService->submit($application, $validated, $tenantProfile);
 
         // Sync application data (references, emergency contact, pets, occupants) back to profile
         $this->syncApplicationToProfile($application, $tenantProfile);
 
         // Update lead status to 'applied' if exists
-        $this->updateLeadOnApplicationSubmit($user, $property, $application);
-
-        // TODO: Send email notifications to property manager and tenant
-        // Note: Property funnel stage is now derived from applications, no need to update property status
+        $this->applicationService->updateLeadOnSubmit($user, $property, $application);
 
         return redirect()->route('applications.show', ['application' => $application->id])
             ->with('success', 'Application submitted successfully!');
@@ -328,7 +239,7 @@ class ApplicationController extends Controller
      * Draft only stores application-specific fields (move-in date, occupants, pets, references, etc.).
      * On final submission, profile data is snapshotted from the current TenantProfile.
      */
-    public function saveDraft(Request $request, Property $property)
+    public function saveDraft(\App\Http\Requests\Application\SaveApplicationDraftRequest $request, Property $property)
     {
         $user = Auth::user();
 
@@ -338,182 +249,26 @@ class ApplicationController extends Controller
             $tenantProfile = $user->tenantProfile()->create([]);
         }
 
-        // Check if draft already exists for this user and property
-        $application = Application::where('tenant_profile_id', $tenantProfile->id)
-            ->where('property_id', $property->id)
-            ->where('status', 'draft')
-            ->first();
-
-        $requestedStep = $request->input('current_step', 1);
+        // Get or create draft application
+        $application = $this->applicationService->getOrCreateDraft($tenantProfile, $property);
 
         $allData = $request->all();
-
-        // Save profile fields to TenantProfile (ensures data is persisted even if autosave hasn't run)
-        // Note: Emergency contact fields are now application-specific, NOT stored in profile
-        // Only include fields that actually exist in tenant_profiles table
-        $profileFields = [
-            'date_of_birth', 'middle_name', 'nationality', 'phone_country_code', 'phone_number', 'bio',
-            'id_document_type', 'id_number', 'id_issuing_country', 'id_expiry_date',
-            'immigration_status', 'immigration_status_other', 'visa_type', 'visa_type_other', 'visa_expiry_date',
-            'right_to_rent_share_code',
-            'current_house_number', 'current_address_line_2', 'current_street_name', 'current_city',
-            'current_state_province', 'current_postal_code', 'current_country',
-            'employment_status', 'employer_name', 'job_title', 'employment_type', 'employment_start_date',
-            'monthly_income', 'income_currency',
-            'university_name', 'program_of_study', 'expected_graduation_date', 'student_income_source',
-            'has_guarantor', 'guarantor_first_name', 'guarantor_last_name', 'guarantor_relationship',
-            'guarantor_phone_country_code', 'guarantor_phone_number',
-            'guarantor_email', 'guarantor_street_name', 'guarantor_house_number', 'guarantor_address_line_2',
-            'guarantor_city', 'guarantor_state_province', 'guarantor_postal_code', 'guarantor_country',
-            'guarantor_employment_status', 'guarantor_employer_name', 'guarantor_job_title',
-            'guarantor_monthly_income', 'guarantor_income_currency',
-        ];
-
-        $profileData = [];
-        foreach ($allData as $key => $value) {
-            // Handle profile_ prefix from wizard form fields
-            $fieldName = str_starts_with($key, 'profile_') ? substr($key, 8) : $key;
-            if (in_array($fieldName, $profileFields)) {
-                // Handle boolean conversion for has_guarantor
-                if ($fieldName === 'has_guarantor') {
-                    $profileData[$fieldName] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                } else {
-                    $profileData[$fieldName] = $value === '' ? null : $value;
-                }
-            }
-        }
-
-        if (! empty($profileData)) {
-            $tenantProfile->update($profileData);
-            $tenantProfile->refresh();
-        }
-
-        // Only save application-specific fields to draft (not profile fields)
-        $applicationFields = [
-            // Rental Intent
-            'desired_move_in_date',
-            'lease_duration_months',
-            'is_flexible_on_move_in',
-            'is_flexible_on_duration',
-            'message_to_landlord',
-            // Occupants
-            'additional_occupants',
-            'occupants_details',
-            // Pets
-            'pets_details',
-            // Credit Check & History
-            'authorize_credit_check',
-            'authorize_background_check',
-            'credit_check_provider_preference',
-            'has_ccjs_or_bankruptcies',
-            'ccj_bankruptcy_details',
-            'has_eviction_history',
-            'eviction_details',
-            'self_reported_credit_score',
-            // Current Address (matching AddressForm structure)
-            'current_living_situation',
-            'current_address_street_name',
-            'current_address_house_number',
-            'current_address_address_line_2',
-            'current_address_city',
-            'current_address_state_province',
-            'current_address_postal_code',
-            'current_address_country',
-            'current_address_move_in_date',
-            'current_monthly_rent',
-            'current_rent_currency',
-            'current_landlord_name',
-            'current_landlord_contact',
-            'reason_for_moving',
-            'reason_for_moving_other',
-            // Previous Addresses
-            'previous_addresses',
-            // Rent Insurance
-            'interested_in_rent_insurance',
-            'existing_insurance_provider',
-            'existing_insurance_policy_number',
-            // References
-            'references',
-            'previous_landlord_name',
-            'previous_landlord_phone',
-            'previous_landlord_email',
-            // Emergency Contact (application-specific, split fields)
-            'emergency_contact_first_name',
-            'emergency_contact_last_name',
-            'emergency_contact_relationship',
-            'emergency_contact_relationship_other',
-            'emergency_contact_phone_country_code',
-            'emergency_contact_phone_number',
-            'emergency_contact_email',
-            // Additional Info & Consent
-            'additional_information',
-            // Legacy fields (for backwards compatibility during migration)
-            'emergency_contact_name',
-            'emergency_contact_phone',
-            'invited_via_token',
-        ];
-
-        $data = [];
-        foreach ($applicationFields as $field) {
-            if (array_key_exists($field, $allData)) {
-                $data[$field] = $allData[$field];
-            }
-        }
+        $requestedStep = $request->input('current_step', 1);
 
         // Merge landlord_references and other_references into combined references column
         if (isset($allData['landlord_references']) || isset($allData['other_references'])) {
-            $data['references'] = $this->mergeReferencesForStorage($allData);
+            $allData['references'] = $this->mergeReferencesForStorage($allData);
         }
 
-        $data['tenant_profile_id'] = $tenantProfile->id;
-        $data['property_id'] = $property->id;
-        $data['status'] = 'draft';
-
-        // Validate to determine actual allowed max step
-        // Note: Validation still uses profile fields from the request to check step validity,
-        // but profile data comes from TenantProfile (already autosaved) for actual validation
-        $validatedMaxStep = 0;
-
-        // Merge current profile data with request for validation
-        $validationData = array_merge($this->mapProfileToValidationData($tenantProfile), $allData);
-
-        // Check all steps up to the requested step
-        for ($step = 1; $step <= $requestedStep; $step++) {
-            $stepValidation = $this->getStepValidationRules($step, $validationData);
-
-            if (! empty($stepValidation)) {
-                // Create a validator instance to check without throwing
-                $validator = \Validator::make($validationData, $stepValidation);
-
-                if ($validator->fails()) {
-                    // This step is invalid - can't progress beyond here
-                    // But we still save the data
-                    break;
-                }
-            }
-
-            // This step is valid
-            $validatedMaxStep = $step;
-        }
-
-        // The actual current_step is the max validated step
-        $data['current_step'] = $validatedMaxStep;
-
-        if ($application) {
-            $application->update($data);
-        } else {
-            $application = Application::create($data);
-        }
-
-        // Refresh to get updated values
-        $application->refresh();
+        // Use service to save draft and calculate max step
+        $this->applicationService->saveDraft($application, $allData, $requestedStep);
 
         // Sync co-signers and guarantors to their respective tables
         $this->syncCoSignersFromRequest($application, $allData['co_signers'] ?? []);
         $this->syncGuarantorsFromRequest($application, $allData['guarantors'] ?? []);
 
         // Update lead status to 'drafting' if exists
-        $this->updateLeadOnDraft($user, $property);
+        $this->applicationService->updateLeadOnDraft($user, $property);
 
         // Return back - Inertia will reload the page and get updated draftApplication from create()
         return back(303);

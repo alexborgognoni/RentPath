@@ -41,8 +41,8 @@ export default function PropertyEdit({ property }: PropertyEditProps) {
         setEditingSection(step);
     };
 
-    const handleDoneEditing = () => {
-        if (editingSection && wizard.validateSpecificStep(editingSection)) {
+    const handleDoneEditing = async () => {
+        if (editingSection && (await wizard.validateSpecificStep(editingSection))) {
             setEditingSection(null);
         }
     };

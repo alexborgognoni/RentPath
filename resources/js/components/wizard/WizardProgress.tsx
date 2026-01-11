@@ -1,4 +1,4 @@
-import type { WizardStepConfig } from '@/hooks/useWizard';
+import type { WizardStepConfig } from '@/hooks/useWizardPrecognition';
 import { cn } from '@/lib/utils';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';

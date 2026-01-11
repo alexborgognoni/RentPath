@@ -1,43 +1,70 @@
 import axios from '@/lib/axios';
-import { PROPERTY_MESSAGES } from '@/lib/validation/property-messages';
-import { validateField, validateForPublish, validateStep, type StepId } from '@/lib/validation/property-schemas';
 import type { SharedData } from '@/types';
 import type { Property, PropertyFormData } from '@/types/dashboard';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
+import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useWizard, type AutosaveStatus, type WizardStepConfig } from './useWizard';
+import { useWizardPrecognition, type AutosaveStatus, type WizardStepConfig } from './useWizardPrecognition';
 
-export type { AutosaveStatus } from './useWizard';
+export type { AutosaveStatus } from './useWizardPrecognition';
 
 export type WizardStep = 'property-type' | 'location' | 'specifications' | 'amenities' | 'energy' | 'pricing' | 'media' | 'review';
 
 export type { WizardStepConfig };
 
+/**
+ * Step configuration with fields for Precognition validation.
+ * Fields must match the Laravel FormRequest rules.
+ */
 export const WIZARD_STEPS: WizardStepConfig<WizardStep>[] = [
     {
         id: 'property-type',
         title: 'Property Type',
         shortTitle: 'Type',
         description: 'What kind of property are you listing?',
+        fields: ['type', 'subtype'],
     },
     {
         id: 'location',
         title: 'Location',
         shortTitle: 'Location',
         description: 'Where is your property located?',
+        fields: ['house_number', 'street_name', 'street_line2', 'city', 'state', 'postal_code', 'country'],
     },
     {
         id: 'specifications',
         title: 'Specifications',
         shortTitle: 'Specs',
         description: 'Tell us about the space',
+        fields: [
+            'bedrooms',
+            'bathrooms',
+            'size',
+            'floor_level',
+            'has_elevator',
+            'year_built',
+            'parking_spots_interior',
+            'parking_spots_exterior',
+            'balcony_size',
+            'land_size',
+        ],
     },
     {
         id: 'amenities',
         title: 'Features & Amenities',
         shortTitle: 'Features',
         description: 'What does your property offer?',
+        fields: [
+            'kitchen_equipped',
+            'kitchen_separated',
+            'has_cellar',
+            'has_laundry',
+            'has_fireplace',
+            'has_air_conditioning',
+            'has_garden',
+            'has_rooftop',
+        ],
     },
     {
         id: 'energy',
@@ -45,24 +72,28 @@ export const WIZARD_STEPS: WizardStepConfig<WizardStep>[] = [
         shortTitle: 'Energy',
         description: 'Energy ratings help attract eco-conscious tenants',
         optional: true,
+        fields: ['energy_class', 'thermal_insulation_class', 'heating_type'],
     },
     {
         id: 'pricing',
         title: 'Pricing & Availability',
         shortTitle: 'Pricing',
         description: 'Set your rent and availability',
+        fields: ['rent_amount', 'rent_currency', 'available_date'],
     },
     {
         id: 'media',
         title: 'Photos & Description',
         shortTitle: 'Photos',
         description: 'Make your listing stand out',
+        fields: ['title', 'description'],
     },
     {
         id: 'review',
         title: 'Review & Publish',
         shortTitle: 'Review',
         description: 'Review your listing before publishing',
+        fields: [], // Review step validates all fields on submit
     },
 ];
 
@@ -184,7 +215,7 @@ export interface UsePropertyWizardReturn {
 
     // Navigation
     goToStep: (step: WizardStep) => void;
-    goToNextStep: () => boolean; // Returns true if navigation succeeded, false if validation failed
+    goToNextStep: () => Promise<boolean>; // Returns true if navigation succeeded, false if validation failed
     goToPreviousStep: () => void;
     canGoToStep: (step: WizardStep) => boolean;
 
@@ -196,10 +227,18 @@ export interface UsePropertyWizardReturn {
     // Validation
     errors: Partial<Record<keyof PropertyWizardData, string>>;
     setErrors: React.Dispatch<React.SetStateAction<Partial<Record<keyof PropertyWizardData, string>>>>;
-    validateCurrentStep: () => boolean;
-    validateSpecificStep: (step: WizardStep) => boolean;
-    validateForPublish: () => boolean;
-    validateFieldOnBlur: (field: keyof PropertyWizardData, value: unknown) => void;
+    validateCurrentStep: () => Promise<boolean>;
+    validateSpecificStep: (step: WizardStep) => Promise<boolean>;
+    validateForPublish: () => Promise<boolean>;
+    validateFieldOnBlur: (field: keyof PropertyWizardData) => void;
+
+    // Touched fields - for showing errors only after user interaction
+    touchedFields: Record<string, boolean>;
+    markFieldTouched: (field: string) => void;
+    clearTouchedFields: () => void;
+    markAllCurrentStepFieldsTouched: () => void;
+    createIndexedBlurHandler: (prefix: string, index: number, field: string) => () => void;
+    focusFirstInvalidField: () => void;
 
     // Step locking
     maxStepReached: number;
@@ -234,21 +273,11 @@ export function usePropertyWizard({
     // Calculate initial step from property's wizard_step (used as starting point before validation)
     const initialStepIndex = property?.wizard_step ? Math.min(property.wizard_step - 1, WIZARD_STEPS.length - 1) : 0;
 
-    // Property-specific validation wrapper
-    const validateStepWrapper = useCallback((stepId: WizardStep, data: PropertyWizardData) => {
-        // Additional image validation for media step
-        if (stepId === 'media') {
-            if (data.images.length === 0) {
-                return { success: false, errors: { images: PROPERTY_MESSAGES.images.required } };
-            }
-        }
-
-        const result = validateStep(stepId as StepId, data);
-        return {
-            success: result.success,
-            errors: result.success ? {} : (result.errors as Record<string, string>),
-        };
-    }, []);
+    // Validation route builder - returns null if no property ID yet
+    const getValidationRoute = useCallback(() => {
+        if (!propertyId) return null;
+        return `/properties/${propertyId}/draft`;
+    }, [propertyId]);
 
     // Property-specific save function
     const handleSave = useCallback(
@@ -270,12 +299,13 @@ export function usePropertyWizard({
         [propertyId, isEditMode],
     );
 
-    // Use the generic wizard hook
-    const wizard = useWizard<PropertyWizardData, WizardStep>({
+    // Use the Precognition wizard hook
+    const wizard = useWizardPrecognition<PropertyWizardData, WizardStep>({
         steps: WIZARD_STEPS,
         initialData: getInitialData(property),
         initialStepIndex: Math.max(0, initialStepIndex),
-        validateStep: validateStepWrapper,
+        getValidationRoute,
+        method: 'patch',
         onSave: handleSave,
         enableAutosave: !isEditMode && isInitialized && !!propertyId,
     });
@@ -356,73 +386,90 @@ export function usePropertyWizard({
 
     // Property-specific field validation on blur
     const validateFieldOnBlur = useCallback(
-        (field: keyof PropertyWizardData, value: unknown) => {
-            const stepId = wizard.currentStep as StepId;
-            if (stepId === 'review') return; // Review step uses full validation
-
-            const error = validateField(stepId, field as string, value, wizard.data as unknown as Record<string, unknown>);
-
-            wizard.setErrors((prev) => {
-                if (error) {
-                    return { ...prev, [field]: error };
-                } else {
-                    const newErrors = { ...prev };
-                    delete newErrors[field as string];
-                    return newErrors;
-                }
-            });
+        (field: keyof PropertyWizardData) => {
+            if (wizard.currentStep === 'review') return; // Review step uses full validation
+            wizard.validateField(field);
         },
         [wizard],
     );
 
+    // Property-specific: validate current step
+    const validateCurrentStep = useCallback(async (): Promise<boolean> => {
+        // Additional image validation for media step (files not validated by backend)
+        if (wizard.currentStep === 'media') {
+            if (wizard.data.images.length === 0) {
+                wizard.setErrors({ images: 'At least one photo is required' });
+                return false;
+            }
+        }
+
+        return wizard.validateStep(wizard.currentStep);
+    }, [wizard]);
+
     // Property-specific: validate a specific step (for edit mode)
     const validateSpecificStep = useCallback(
-        (step: WizardStep): boolean => {
-            const stepId = step as StepId;
-
+        async (step: WizardStep): Promise<boolean> => {
             // Special handling for media step - check images
-            if (stepId === 'media') {
+            if (step === 'media') {
                 if (wizard.data.images.length === 0) {
-                    wizard.setErrors({ images: PROPERTY_MESSAGES.images.required });
+                    wizard.setErrors({ images: 'At least one photo is required' });
                     return false;
                 }
             }
 
-            const result = validateStep(stepId, wizard.data);
-
-            if (result.success) {
-                wizard.setErrors({});
-                return true;
-            }
-
-            wizard.setErrors(result.errors as Partial<Record<keyof PropertyWizardData, string>>);
-            return false;
+            return wizard.validateStep(step);
         },
         [wizard],
     );
 
     // Property-specific: validate all data for publishing
-    const validateForPublishFn = useCallback((): boolean => {
-        const result = validateForPublish(wizard.data);
-        const errors: Partial<Record<keyof PropertyWizardData, string>> = {};
-
-        if (!result.success) {
-            Object.assign(errors, result.errors);
-        }
-
-        // Validate images separately (File objects can't be validated with Zod)
+    const validateForPublish = useCallback(async (): Promise<boolean> => {
+        // Validate images first (not handled by backend)
         if (wizard.data.images.length === 0) {
-            errors.images = PROPERTY_MESSAGES.images.required;
-        }
-
-        if (Object.keys(errors).length > 0) {
-            wizard.setErrors(errors);
+            wizard.setErrors({ images: 'At least one photo is required' });
             return false;
         }
 
-        wizard.setErrors({});
-        return true;
-    }, [wizard]);
+        // Validate all steps via Precognition
+        // We send all fields and let the backend validate everything
+        const allFields = WIZARD_STEPS.flatMap((step) => step.fields);
+
+        const route = getValidationRoute();
+        if (!route) {
+            // No route, can't validate - assume valid (will be caught on submit)
+            return true;
+        }
+
+        try {
+            await axios.patch(route, getAutosaveData(wizard.data), {
+                headers: {
+                    Precognition: 'true',
+                    'Precognition-Validate-Only': allFields.join(','),
+                },
+            });
+            wizard.setErrors({});
+            return true;
+        } catch (error) {
+            if (error instanceof AxiosError && error.response?.status === 422) {
+                const responseErrors = error.response.data?.errors || {};
+                const flatErrors: Partial<Record<keyof PropertyWizardData, string>> = {};
+
+                Object.entries(responseErrors).forEach(([field, messages]) => {
+                    if (Array.isArray(messages) && messages.length > 0) {
+                        flatErrors[field as keyof PropertyWizardData] = messages[0] as string;
+                    } else if (typeof messages === 'string') {
+                        flatErrors[field as keyof PropertyWizardData] = messages;
+                    }
+                });
+
+                wizard.setErrors(flatErrors);
+                return false;
+            }
+
+            console.error('Validation error:', error);
+            return false;
+        }
+    }, [wizard, getValidationRoute]);
 
     return {
         // Step state
@@ -447,10 +494,18 @@ export function usePropertyWizard({
         // Validation
         errors: wizard.errors as Partial<Record<keyof PropertyWizardData, string>>,
         setErrors: wizard.setErrors as React.Dispatch<React.SetStateAction<Partial<Record<keyof PropertyWizardData, string>>>>,
-        validateCurrentStep: wizard.validateCurrentStep,
+        validateCurrentStep,
         validateSpecificStep,
-        validateForPublish: validateForPublishFn,
+        validateForPublish,
         validateFieldOnBlur,
+
+        // Touched fields (from base hook)
+        touchedFields: wizard.touchedFields,
+        markFieldTouched: wizard.markFieldTouched,
+        clearTouchedFields: wizard.clearTouchedFields,
+        markAllCurrentStepFieldsTouched: wizard.markAllCurrentStepFieldsTouched,
+        createIndexedBlurHandler: wizard.createIndexedBlurHandler,
+        focusFirstInvalidField: wizard.focusFirstInvalidField,
 
         // Submission
         isSubmitting,
@@ -483,24 +538,48 @@ export function useWizardSteps(): WizardStepConfig<WizardStep>[] {
                 title: t('wizard.steps.propertyType.title'),
                 shortTitle: t('wizard.steps.propertyType.shortTitle'),
                 description: t('wizard.steps.propertyType.description'),
+                fields: ['type', 'subtype'],
             },
             {
                 id: 'location',
                 title: t('wizard.steps.location.title'),
                 shortTitle: t('wizard.steps.location.shortTitle'),
                 description: t('wizard.steps.location.description'),
+                fields: ['house_number', 'street_name', 'street_line2', 'city', 'state', 'postal_code', 'country'],
             },
             {
                 id: 'specifications',
                 title: t('wizard.steps.specifications.title'),
                 shortTitle: t('wizard.steps.specifications.shortTitle'),
                 description: t('wizard.steps.specifications.description'),
+                fields: [
+                    'bedrooms',
+                    'bathrooms',
+                    'size',
+                    'floor_level',
+                    'has_elevator',
+                    'year_built',
+                    'parking_spots_interior',
+                    'parking_spots_exterior',
+                    'balcony_size',
+                    'land_size',
+                ],
             },
             {
                 id: 'amenities',
                 title: t('wizard.steps.amenities.title'),
                 shortTitle: t('wizard.steps.amenities.shortTitle'),
                 description: t('wizard.steps.amenities.description'),
+                fields: [
+                    'kitchen_equipped',
+                    'kitchen_separated',
+                    'has_cellar',
+                    'has_laundry',
+                    'has_fireplace',
+                    'has_air_conditioning',
+                    'has_garden',
+                    'has_rooftop',
+                ],
             },
             {
                 id: 'energy',
@@ -508,24 +587,28 @@ export function useWizardSteps(): WizardStepConfig<WizardStep>[] {
                 shortTitle: t('wizard.steps.energy.shortTitle'),
                 description: t('wizard.steps.energy.description'),
                 optional: true,
+                fields: ['energy_class', 'thermal_insulation_class', 'heating_type'],
             },
             {
                 id: 'pricing',
                 title: t('wizard.steps.pricing.title'),
                 shortTitle: t('wizard.steps.pricing.shortTitle'),
                 description: t('wizard.steps.pricing.description'),
+                fields: ['rent_amount', 'rent_currency', 'available_date'],
             },
             {
                 id: 'media',
                 title: t('wizard.steps.media.title'),
                 shortTitle: t('wizard.steps.media.shortTitle'),
                 description: t('wizard.steps.media.description'),
+                fields: ['title', 'description'],
             },
             {
                 id: 'review',
                 title: t('wizard.steps.review.title'),
                 shortTitle: t('wizard.steps.review.shortTitle'),
                 description: t('wizard.steps.review.description'),
+                fields: [],
             },
         ],
         [translations],

@@ -8,8 +8,8 @@ import { useCallback } from 'react';
 
 interface WizardNavigationProps {
     onBack?: () => void;
-    onNext?: () => boolean; // Returns true if validation passed, false otherwise
-    onSkip?: () => void;
+    onNext?: () => boolean | Promise<boolean>; // Returns true if validation passed, false otherwise
+    onSkip?: () => void | Promise<void>;
     onSubmit?: () => void;
     isFirstStep: boolean;
     isLastStep: boolean;
@@ -70,11 +70,11 @@ export function WizardNavigation({
         });
     }, [shakeAnimation]);
 
-    const handleNext = useCallback(() => {
+    const handleNext = useCallback(async () => {
         if (isLastStep && onSubmit) {
             onSubmit();
         } else if (onNext) {
-            const success = onNext();
+            const success = await onNext();
             if (!success) {
                 triggerShake();
                 scrollToFirstError();
