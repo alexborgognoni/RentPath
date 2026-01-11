@@ -27,14 +27,14 @@ Frontend (Precognition) → Backend (FormRequest) → Database
 
 ## Tools to Use
 
-| Task                   | Tool   | Command/Action                                                         |
-| ---------------------- | ------ | ---------------------------------------------------------------------- |
-| Check Step FormRequest | `Read` | `app/Http/Requests/Property/Steps/` or `Application/Steps/`            |
-| Check model            | `Read` | `app/Models/Application.php` or `Property.php`                         |
-| Create migration       | `Bash` | `php artisan make:migration add_[field]_to_[table]`                    |
-| Check types            | `Read` | `resources/js/types/index.d.ts`                                        |
-| Check wizard hook      | `Read` | `resources/js/hooks/usePropertyWizard.ts` or `useApplicationWizard.ts` |
-| Run validation         | `Bash` | `php artisan test --filter=Validation`                                 |
+| Task                   | Tool   | Command/Action                                                             |
+| ---------------------- | ------ | -------------------------------------------------------------------------- |
+| Check Step FormRequest | `Read` | `app/Http/Requests/Property/Steps/` or `Application/Steps/`                |
+| Check model            | `Read` | `app/Models/Application.php` or `Property.php`                             |
+| Create migration       | `Bash` | `php artisan make:migration add_[field]_to_[table]`                        |
+| Check types            | `Read` | `resources/js/types/index.d.ts`                                            |
+| Check wizard hook      | `Read` | `resources/js/hooks/use-property-wizard.ts` or `use-application-wizard.ts` |
+| Run validation         | `Bash` | `php artisan test --filter=Validation`                                     |
 
 ## Step-by-Step Implementation
 
@@ -124,7 +124,7 @@ interface Application {
 Add the field to the step's `fields` array for Precognition targeting:
 
 ```typescript
-// resources/js/hooks/useApplicationWizard.ts or usePropertyWizard.ts
+// resources/js/hooks/use-application-wizard.ts or use-property-wizard.ts
 
 export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
     {

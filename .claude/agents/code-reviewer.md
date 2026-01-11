@@ -128,15 +128,15 @@ const { data } = useForm({ ... });
 
 ### Naming Conventions
 
-| Element         | Convention                | Example                     |
-| --------------- | ------------------------- | --------------------------- |
-| Controller      | PascalCase + Controller   | `ApplicationController`     |
-| Model           | PascalCase singular       | `Application`               |
-| Migration       | snake_case with timestamp | `create_applications_table` |
-| Form Request    | PascalCase + Request      | `StoreApplicationRequest`   |
-| React Component | PascalCase                | `ApplicationForm`           |
-| Hook            | camelCase with use prefix | `useApplicationWizard`      |
-| CSS class       | kebab-case (Tailwind)     | `text-primary`              |
+| Element         | Convention                  | Example                     |
+| --------------- | --------------------------- | --------------------------- |
+| Controller      | PascalCase + Controller     | `ApplicationController`     |
+| Model           | PascalCase singular         | `Application`               |
+| Migration       | snake_case with timestamp   | `create_applications_table` |
+| Form Request    | PascalCase + Request        | `StoreApplicationRequest`   |
+| React Component | PascalCase                  | `ApplicationForm`           |
+| Hook            | kebab-case with use- prefix | `use-application-wizard`    |
+| CSS class       | kebab-case (Tailwind)       | `text-primary`              |
 
 ## Review Checklist
 
@@ -154,7 +154,7 @@ const { data } = useForm({ ... });
 ### Frontend (React/TypeScript)
 
 - [ ] Proper TypeScript types (no `any`)
-- [ ] Zod schema matches Form Request
+- [ ] Uses Precognition for validation (no frontend validation duplication)
 - [ ] Error states handled
 - [ ] Loading states for async operations
 - [ ] Proper key props for lists

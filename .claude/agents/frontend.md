@@ -267,21 +267,28 @@ export function useDebounce<T>(value: T, delay: number): T {
 
 ## State Management Patterns
 
-### Wizard State (useWizard)
+### Wizard State (use-wizard-precognition)
 
 ```typescript
-const wizard = useWizard({
-  steps: ['identity', 'financial', 'review'],
-  initialData: {},
-  onSave: async (data) => { ... },
+// Property wizard
+const wizard = usePropertyWizard({
+  property,
+  onSaveSuccess: () => { ... },
+});
+
+// Application wizard
+const wizard = useApplicationWizard({
+  draft,
+  property,
+  existingProfile,
 });
 
 // Key properties
 wizard.currentStep      // Current step ID
 wizard.data            // Form data
-wizard.errors          // Validation errors
+wizard.errors          // Validation errors from Precognition
 wizard.updateField     // Update single field
-wizard.validateStep    // Validate current step
+wizard.validateStep    // Validate via Precognition
 wizard.goToNextStep    // Advance (with validation)
 wizard.autosaveStatus  // 'idle' | 'saving' | 'saved' | 'error'
 ```
@@ -301,25 +308,24 @@ useEffect(() => {
 
 ## Validation Integration
 
-### Zod Schema + Form
+### Laravel Precognition Pattern
+
+RentPath uses Laravel Precognition for validation - backend FormRequest rules are the single source of truth.
 
 ```typescript
-import { z } from 'zod';
+// Validation happens via Precognition requests to backend
+// See: use-wizard-precognition.ts
 
-const schema = z.object({
-    email: z.string().email('Invalid email'),
-    phone: z.string().regex(/^\+?[\d\s-]+$/, 'Invalid phone'),
-});
-
-// Validate on blur
+// On field blur - validates and recalculates maxStepReached
 const handleBlur = (field: string) => {
-    const result = schema.safeParse(data);
-    if (!result.success) {
-        const fieldError = result.error.flatten().fieldErrors[field];
-        setErrors((prev) => ({ ...prev, [field]: fieldError?.[0] }));
-    }
+    onFieldBlur(field); // Sends Precognition request
 };
+
+// Errors come from backend FormRequest rules
+{errors.email && <InputError>{errors.email}</InputError>}
 ```
+
+See `docs/patterns/validation.md` for full details.
 
 ## Accessibility Checklist
 
@@ -351,8 +357,8 @@ const handleBlur = (field: string) => {
 ## Key Files to Reference
 
 - `resources/js/components/ui/` - Base UI components
-- `resources/js/hooks/useApplicationWizard.ts` - Complex state example
-- `resources/js/lib/validation/` - Zod schemas
+- `resources/js/hooks/use-application-wizard.ts` - Complex wizard state example
+- `resources/js/hooks/use-wizard-precognition.ts` - Base Precognition hook
 - `resources/js/types/index.d.ts` - Core type definitions
 - `resources/css/app.css` - Theme configuration
 

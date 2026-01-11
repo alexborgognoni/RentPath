@@ -47,7 +47,7 @@
 #### 🔴 Technical Debt - High Priority
 
 - [x] [refactor] **Migrate wizard validation to Laravel Precognition** - ~20h ✅ _(2026-01-11)_
-    - Both Property and Application wizards now use `useWizardPrecognition` hook
+    - Both Property and Application wizards now use `use-wizard-precognition` hook
     - Backend FormRequest rules are single source of truth (no more Zod duplication)
     - Features implemented:
         - [x] Per-field blur validation via Precognition
@@ -55,7 +55,7 @@
         - [x] Step locking: editing previous step recalculates maxStepReached
         - [x] Mount validation: maxStepReached recalculated on page load
         - [x] Dual-mode SaveDraftRequest (Precognition strict, autosave relaxed)
-    - See: `docs/patterns/wizard.md`, `docs/plans/precognition-migration.md`
+    - See: `docs/patterns/wizard.md`, `docs/patterns/validation.md`
 
 #### Monetization (Highest Priority - January)
 
