@@ -1,7 +1,7 @@
 import { AddressForm } from '@/components/ui/address-form';
 import { OptionalBadge } from '@/components/ui/optional-badge';
 import { Select } from '@/components/ui/select';
-import type { ApplicationWizardData, CoSignerDetails, GuarantorDetails } from '@/hooks/useApplicationWizard';
+import type { ApplicationWizardData, CoSignerDetails, GuarantorDetails } from '@/hooks/use-application-wizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';

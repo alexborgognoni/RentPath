@@ -1,7 +1,7 @@
-import { NumberStepper } from '@/components/property-wizard/components/NumberStepper';
-import { StepContainer } from '@/components/property-wizard/components/StepContainer';
+import { NumberStepper } from '@/components/property-wizard/components/number-stepper';
+import { StepContainer } from '@/components/property-wizard/components/step-container';
 import { AreaUnitSelect, getAreaUnitSymbol } from '@/components/ui/area-unit-select';
-import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
+import type { PropertyWizardData } from '@/hooks/use-property-wizard';
 import { cn } from '@/lib/utils';
 import { PROPERTY_CONSTRAINTS } from '@/lib/validation/property-validation';
 import type { SharedData } from '@/types';

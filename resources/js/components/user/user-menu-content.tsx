@@ -1,6 +1,6 @@
-import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { UserInfo } from '@/components/user-info';
+import { LogoutConfirmationPopover } from '@/components/user/logout-confirmation-popover';
+import { UserInfo } from '@/components/user/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type SharedData, type User } from '@/types';
 import { settingsRoute } from '@/utils/route';

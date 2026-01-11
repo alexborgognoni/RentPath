@@ -1,5 +1,5 @@
 import { LanguageSelector } from '@/components/language-selector';
-import { LogoHomeButton } from '@/components/logo-home-button';
+import { LogoHomeButton } from '@/components/layout/logo-home-button';
 import { type PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {

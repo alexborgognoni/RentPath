@@ -1,6 +1,6 @@
 import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
 import { OptionalBadge } from '@/components/ui/optional-badge';
-import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
+import type { ApplicationWizardData } from '@/hooks/use-application-wizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';

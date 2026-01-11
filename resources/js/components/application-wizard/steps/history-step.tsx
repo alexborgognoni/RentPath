@@ -1,4 +1,4 @@
-import { ProfileDataBanner } from '@/components/application-wizard/ProfileDataBanner';
+import { ProfileDataBanner } from '@/components/application-wizard/profile-data-banner';
 import { AddressForm, type AddressData } from '@/components/ui/address-form';
 import { DatePicker } from '@/components/ui/date-picker';
 import { OptionalBadge } from '@/components/ui/optional-badge';
@@ -9,7 +9,7 @@ import type {
     OtherReferenceDetails,
     PreviousAddressDetails,
     ReferenceDetails,
-} from '@/hooks/useApplicationWizard';
+} from '@/hooks/use-application-wizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';

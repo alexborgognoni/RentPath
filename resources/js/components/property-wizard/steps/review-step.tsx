@@ -1,5 +1,5 @@
-import { StepContainer } from '@/components/property-wizard/components/StepContainer';
-import type { PropertyWizardData, WizardStep } from '@/hooks/usePropertyWizard';
+import { StepContainer } from '@/components/property-wizard/components/step-container';
+import type { PropertyWizardData, WizardStep } from '@/hooks/use-property-wizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';

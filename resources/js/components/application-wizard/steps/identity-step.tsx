@@ -1,7 +1,7 @@
-import { ProfileDataBanner } from '@/components/application-wizard/ProfileDataBanner';
+import { ProfileDataBanner } from '@/components/application-wizard/profile-data-banner';
 import { OptionalBadge } from '@/components/ui/optional-badge';
-import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
-import { useGeoLocation } from '@/hooks/useGeoLocation';
+import type { ApplicationWizardData } from '@/hooks/use-application-wizard';
+import { useGeoLocation } from '@/hooks/use-geo-location';
 import type { SharedData } from '@/types';
 import { getCountryByIso2 } from '@/utils/country-data';
 import { translate } from '@/utils/translate-utils';

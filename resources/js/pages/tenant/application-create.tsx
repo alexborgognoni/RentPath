@@ -9,7 +9,7 @@ import {
     SupportStep,
 } from '@/components/application-wizard/steps';
 import { WizardNavigation, WizardProgress } from '@/components/wizard';
-import { APPLICATION_STEPS, useApplicationWizard, type ApplicationStep, type DraftApplication } from '@/hooks/useApplicationWizard';
+import { APPLICATION_STEPS, useApplicationWizard, type ApplicationStep, type DraftApplication } from '@/hooks/use-application-wizard';
 import { TenantLayout } from '@/layouts/tenant-layout';
 import { type SharedData, type TenantProfile } from '@/types';
 import type { Property } from '@/types/dashboard';

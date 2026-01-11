@@ -1,5 +1,5 @@
-import { AppHeader } from '@/components/app-header';
 import { CookieBanner } from '@/components/cookie-banner';
+import { AppHeader } from '@/components/layout/app-header';
 import type { PropsWithChildren } from 'react';
 
 interface BaseLayoutProps extends PropsWithChildren {

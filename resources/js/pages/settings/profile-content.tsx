@@ -7,8 +7,8 @@ import { Transition } from '@headlessui/react';
 import { Form, Link, usePage } from '@inertiajs/react';
 import { Trash2, User } from 'lucide-react';
 
-import { InputError } from '@/components/input-error';
 import { Input } from '@/components/ui/input';
+import { InputError } from '@/components/ui/input-error';
 
 interface ProfileContentProps {
     mustVerifyEmail: boolean;

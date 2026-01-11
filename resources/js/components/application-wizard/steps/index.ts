@@ -1,8 +1,8 @@
-export { AdditionalStep } from './AdditionalStep';
-export { ConsentStep } from './ConsentStep';
-export { FinancialStep } from './FinancialStep';
-export { HistoryStep } from './HistoryStep';
-export { HouseholdStep } from './HouseholdStep';
-export { IdentityStep } from './IdentityStep';
-export { ReviewStep } from './ReviewStep';
-export { SupportStep } from './SupportStep';
+export { AdditionalStep } from './additional-step';
+export { ConsentStep } from './consent-step';
+export { FinancialStep } from './financial-step';
+export { HistoryStep } from './history-step';
+export { HouseholdStep } from './household-step';
+export { IdentityStep } from './identity-step';
+export { ReviewStep } from './review-step';
+export { SupportStep } from './support-step';

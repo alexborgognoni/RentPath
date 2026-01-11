@@ -1,14 +1,14 @@
-export { FinancialInfoSection } from './FinancialInfoSection';
-export type { EntityType, ExistingDocuments, FinancialInfoSectionProps } from './FinancialInfoSection';
+export { FinancialInfoSection } from './financial-info-section';
+export type { EntityType, ExistingDocuments, FinancialInfoSectionProps } from './financial-info-section';
 
-export { PersonalDetailsSection } from './PersonalDetailsSection';
-export type { PersonalDetailsData, PersonalDetailsSectionProps } from './PersonalDetailsSection';
+export { PersonalDetailsSection } from './personal-details-section';
+export type { PersonalDetailsData, PersonalDetailsSectionProps } from './personal-details-section';
 
-export { IdDocumentSection } from './IdDocumentSection';
-export type { IdDocumentData, IdDocumentSectionProps } from './IdDocumentSection';
+export { IdDocumentSection } from './id-document-section';
+export type { IdDocumentData, IdDocumentSectionProps } from './id-document-section';
 
-export { ImmigrationStatusSection } from './ImmigrationStatusSection';
-export type { ImmigrationStatusData, ImmigrationStatusSectionProps } from './ImmigrationStatusSection';
+export { ImmigrationStatusSection } from './immigration-status-section';
+export type { ImmigrationStatusData, ImmigrationStatusSectionProps } from './immigration-status-section';
 
-export { RightToRentSection } from './RightToRentSection';
-export type { RightToRentData, RightToRentSectionProps } from './RightToRentSection';
+export { RightToRentSection } from './right-to-rent-section';
+export type { RightToRentData, RightToRentSectionProps } from './right-to-rent-section';

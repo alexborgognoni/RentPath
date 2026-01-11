@@ -1,6 +1,6 @@
-import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
-import { TenantNavMobile } from '@/components/tenant-nav';
+import { TenantNavMobile } from '@/components/navigation/tenant-nav';
 import { Button } from '@/components/ui/button';
+import { LogoutConfirmationPopover } from '@/components/user/logout-confirmation-popover';
 import { SharedData } from '@/types';
 import { currencies, getCurrency, getCurrencyFromStorage, setCurrencyInStorage, type Currency, type CurrencyCode } from '@/utils/currency-utils';
 import { isManagerSubdomain, route, settingsRoute } from '@/utils/route';

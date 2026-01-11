@@ -1,5 +1,5 @@
-import { ProfileDataBanner } from '@/components/application-wizard/ProfileDataBanner';
-import type { ApplicationWizardData } from '@/hooks/useApplicationWizard';
+import { ProfileDataBanner } from '@/components/application-wizard/profile-data-banner';
+import type { ApplicationWizardData } from '@/hooks/use-application-wizard';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { router, usePage } from '@inertiajs/react';

@@ -1,5 +1,5 @@
-import { StepContainer } from '@/components/property-wizard/components/StepContainer';
-import type { PropertyWizardData } from '@/hooks/usePropertyWizard';
+import { StepContainer } from '@/components/property-wizard/components/step-container';
+import type { PropertyWizardData } from '@/hooks/use-property-wizard';
 import { cn } from '@/lib/utils';
 import type { SharedData } from '@/types';
 import { translate } from '@/utils/translate-utils';

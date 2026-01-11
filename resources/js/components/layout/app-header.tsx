@@ -1,9 +1,9 @@
 import { CurrencySelector } from '@/components/currency-selector';
 import { LanguageSelector } from '@/components/language-selector';
-import { LogoHomeButton } from '@/components/logo-home-button';
-import { LogoutConfirmationPopover } from '@/components/logout-confirmation-popover';
-import { MobileMenu } from '@/components/mobile-menu';
-import { TenantNav } from '@/components/tenant-nav';
+import { LogoHomeButton } from '@/components/layout/logo-home-button';
+import { MobileMenu } from '@/components/navigation/mobile-menu';
+import { TenantNav } from '@/components/navigation/tenant-nav';
+import { LogoutConfirmationPopover } from '@/components/user/logout-confirmation-popover';
 import { type SharedData } from '@/types';
 import { isManagerSubdomain, route, settingsRoute } from '@/utils/route';
 import { translate as t } from '@/utils/translate-utils';

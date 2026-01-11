@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { PhoneInput } from '@/components/ui/phone-input';
-import { useGeoLocation } from '@/hooks/useGeoLocation';
+import { useGeoLocation } from '@/hooks/use-geo-location';
 import { BaseLayout } from '@/layouts/base-layout';
 import { type SharedData } from '@/types';
 import type { PropertyManager, User } from '@/types/dashboard';

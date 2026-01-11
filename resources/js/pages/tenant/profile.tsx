@@ -8,7 +8,7 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import { SaveStatus } from '@/components/ui/save-status';
 import { Select } from '@/components/ui/select';
 import { StateProvinceSelect } from '@/components/ui/state-province-select';
-import type { AutosaveStatus } from '@/hooks/usePropertyWizard';
+import type { AutosaveStatus } from '@/hooks/use-property-wizard';
 import { TenantLayout } from '@/layouts/tenant-layout';
 import type { SharedData, TenantProfile } from '@/types';
 import {

@@ -5,9 +5,9 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useWizardPrecognition, type AutosaveStatus, type WizardStepConfig } from './useWizardPrecognition';
+import { useWizardPrecognition, type AutosaveStatus, type WizardStepConfig } from './use-wizard-precognition';
 
-export type { AutosaveStatus } from './useWizardPrecognition';
+export type { AutosaveStatus } from './use-wizard-precognition';
 
 export type WizardStep = 'property-type' | 'location' | 'specifications' | 'amenities' | 'energy' | 'pricing' | 'media' | 'review';
 

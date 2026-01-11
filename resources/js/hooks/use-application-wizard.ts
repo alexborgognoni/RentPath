@@ -5,10 +5,10 @@ import { route } from '@/utils/route';
 import { router } from '@inertiajs/react';
 import { AxiosError } from 'axios';
 import { useCallback, useState } from 'react';
-import { useProfileAutosave } from './useProfileAutosave';
-import { useWizardPrecognition, type AutosaveStatus, type WizardStepConfig } from './useWizardPrecognition';
+import { useProfileAutosave } from './use-profile-autosave';
+import { useWizardPrecognition, type AutosaveStatus, type WizardStepConfig } from './use-wizard-precognition';
 
-export type { AutosaveStatus } from './useWizardPrecognition';
+export type { AutosaveStatus } from './use-wizard-precognition';
 
 export type ApplicationStep = 'identity' | 'household' | 'financial' | 'support' | 'history' | 'additional' | 'consent' | 'review';
 

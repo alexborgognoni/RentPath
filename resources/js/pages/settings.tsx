@@ -1,4 +1,4 @@
-import { SettingsNavigation } from '@/components/settings-navigation';
+import { SettingsNavigation } from '@/components/navigation/settings-navigation';
 import { Head } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { JSX, useEffect, useState } from 'react';

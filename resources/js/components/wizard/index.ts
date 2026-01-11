@@ -1,2 +1,2 @@
-export { WizardNavigation } from './WizardNavigation';
-export { WizardProgress } from './WizardProgress';
+export { WizardNavigation } from './wizard-navigation';
+export { WizardProgress } from './wizard-progress';
