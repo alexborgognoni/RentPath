@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyManagerController;
@@ -378,13 +377,6 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
 
         Route::post('leads/{lead}/archive', [\App\Http\Controllers\LeadController::class, 'archive'])
             ->name('manager.leads.archive');
-
-        // Image upload/delete routes (legacy - not currently used)
-        Route::post('api/images/upload', [ImageUploadController::class, 'upload'])
-            ->name('images.upload');
-
-        Route::delete('api/images/delete', [ImageUploadController::class, 'delete'])
-            ->name('images.delete');
 
         Route::get('/private-storage/{path}', function ($path, Request $request) {
             $disk = \App\Helpers\StorageHelper::getDisk('private');

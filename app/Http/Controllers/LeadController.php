@@ -6,22 +6,25 @@ use App\Http\Requests\StoreLeadRequest;
 use App\Http\Requests\UpdateLeadRequest;
 use App\Models\Lead;
 use App\Models\Property;
+use App\Services\LeadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class LeadController extends Controller
 {
+    public function __construct(
+        private readonly LeadService $leadService,
+    ) {}
+
     /**
      * Display a listing of leads for the property manager.
      */
     public function index(Request $request)
     {
-        $propertyManager = Auth::user()->propertyManager;
+        $this->authorize('viewAny', Lead::class);
 
-        if (! $propertyManager) {
-            abort(403, 'You must be a property manager to access leads.');
-        }
+        $propertyManager = Auth::user()->propertyManager;
 
         // Get all property IDs for this manager
         $propertyIds = Property::where('property_manager_id', $propertyManager->id)->pluck('id');
@@ -83,42 +86,21 @@ class LeadController extends Controller
      */
     public function store(StoreLeadRequest $request)
     {
-        $propertyManager = Auth::user()->propertyManager;
+        $this->authorize('create', Lead::class);
+
         $validated = $request->validated();
 
         // Verify property belongs to manager
         $property = Property::findOrFail($validated['property_id']);
-        if ($property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('update', $property);
 
         // Check if lead already exists for this email + property
-        $existingLead = Lead::where('property_id', $property->id)
-            ->where('email', $validated['email'])
-            ->first();
-
-        if ($existingLead) {
+        if ($this->leadService->existsForProperty($property, $validated['email'])) {
             return back()->withErrors(['email' => 'A lead with this email already exists for this property.']);
         }
 
-        // Create the lead
-        $lead = Lead::create([
-            'property_id' => $property->id,
-            'email' => $validated['email'],
-            'first_name' => $validated['first_name'] ?? null,
-            'last_name' => $validated['last_name'] ?? null,
-            'phone' => $validated['phone'] ?? null,
-            'token' => Lead::generateToken(),
-            'source' => $validated['source'] ?? Lead::SOURCE_MANUAL,
-            'status' => Lead::STATUS_INVITED,
-            'notes' => $validated['notes'] ?? null,
-            'invited_at' => now(),
-        ]);
-
-        // TODO: Send invite email if source is 'invite'
-        // if ($validated['source'] === Lead::SOURCE_INVITE) {
-        //     $lead->sendInviteEmail();
-        // }
+        // Create the lead via service
+        $this->leadService->create($property, $validated);
 
         return redirect()->route('manager.leads.index')
             ->with('success', 'Lead created successfully.');
@@ -129,12 +111,7 @@ class LeadController extends Controller
      */
     public function show(Lead $lead)
     {
-        $propertyManager = Auth::user()->propertyManager;
-
-        // Verify lead's property belongs to manager
-        if ($lead->property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('view', $lead);
 
         $lead->load(['property', 'user', 'application', 'inviteToken']);
 
@@ -150,16 +127,9 @@ class LeadController extends Controller
      */
     public function update(UpdateLeadRequest $request, Lead $lead)
     {
-        $propertyManager = Auth::user()->propertyManager;
+        $this->authorize('update', $lead);
 
-        // Verify lead's property belongs to manager
-        if ($lead->property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
-
-        $validated = $request->validated();
-
-        $lead->update($validated);
+        $this->leadService->update($lead, $request->validated());
 
         return back()->with('success', 'Lead updated successfully.');
     }
@@ -169,12 +139,7 @@ class LeadController extends Controller
      */
     public function destroy(Lead $lead)
     {
-        $propertyManager = Auth::user()->propertyManager;
-
-        // Verify lead's property belongs to manager
-        if ($lead->property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('delete', $lead);
 
         $lead->delete();
 
@@ -187,17 +152,9 @@ class LeadController extends Controller
      */
     public function resendInvite(Lead $lead)
     {
-        $propertyManager = Auth::user()->propertyManager;
+        $this->authorize('resend', $lead);
 
-        // Verify lead's property belongs to manager
-        if ($lead->property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
-
-        // TODO: Send invite email
-        // $lead->sendInviteEmail();
-
-        $lead->update(['invited_at' => now()]);
+        $this->leadService->resendInvite($lead);
 
         return back()->with('success', 'Invite resent successfully.');
     }
@@ -207,14 +164,9 @@ class LeadController extends Controller
      */
     public function archive(Lead $lead)
     {
-        $propertyManager = Auth::user()->propertyManager;
+        $this->authorize('archive', $lead);
 
-        // Verify lead's property belongs to manager
-        if ($lead->property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
-
-        $lead->archive();
+        $this->leadService->archive($lead);
 
         return back()->with('success', 'Lead archived successfully.');
     }

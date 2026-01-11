@@ -53,6 +53,14 @@ class Conversation extends Model
     }
 
     /**
+     * Get the latest message in this conversation (for eager loading).
+     */
+    public function latestMessage(): HasMany
+    {
+        return $this->hasMany(Message::class)->latest('created_at')->limit(1);
+    }
+
+    /**
      * Get the participant (Lead or User) dynamically.
      * Note: For tenants, participant_id stores the user_id, not tenant_profile_id.
      */

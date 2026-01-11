@@ -855,12 +855,7 @@ class ApplicationController extends Controller
      */
     public function show(Application $application)
     {
-        $user = Auth::user();
-
-        // Check authorization: must be the applicant (tenant portal is for tenants only)
-        if ($application->tenantProfile->user_id !== $user->id) {
-            abort(403, 'Unauthorized to view this application');
-        }
+        $this->authorize('viewAsTenant', $application);
 
         // If viewing a draft application, redirect to continue editing
         if ($application->status === 'draft') {
@@ -888,12 +883,7 @@ class ApplicationController extends Controller
      */
     public function withdraw(Application $application)
     {
-        $user = Auth::user();
-
-        // Check authorization: must be the applicant
-        if ($application->tenantProfile->user_id !== $user->id) {
-            abort(403, 'Unauthorized to withdraw this application');
-        }
+        $this->authorize('viewAsTenant', $application);
 
         // Check if can be withdrawn
         if (! $application->canBeWithdrawn()) {
@@ -911,12 +901,7 @@ class ApplicationController extends Controller
      */
     public function update(Request $request, Application $application)
     {
-        $user = Auth::user();
-
-        // Check authorization
-        if ($application->tenantProfile->user_id !== $user->id) {
-            abort(403, 'Unauthorized to update this application');
-        }
+        $this->authorize('updateAsTenant', $application);
 
         // Check if can be edited
         if (! $application->canBeEdited()) {
@@ -989,12 +974,7 @@ class ApplicationController extends Controller
      */
     public function destroy(Application $application)
     {
-        $user = Auth::user();
-
-        // Check authorization
-        if ($application->tenantProfile->user_id !== $user->id) {
-            abort(403, 'Unauthorized to delete this application');
-        }
+        $this->authorize('deleteAsTenant', $application);
 
         // Check if can be deleted
         if (! $application->isDraft()) {
@@ -1569,12 +1549,9 @@ class ApplicationController extends Controller
      */
     public function indexManager(Request $request)
     {
-        $user = Auth::user();
-        $propertyManager = $user->propertyManager;
+        $this->authorize('viewAnyAsManager', Application::class);
 
-        if (! $propertyManager) {
-            abort(403, 'Property manager profile required');
-        }
+        $user = Auth::user();
 
         // Get all property IDs owned by this manager
         $propertyIds = $user->properties()->pluck('properties.id');
@@ -1613,13 +1590,7 @@ class ApplicationController extends Controller
      */
     public function showManager(Application $application)
     {
-        $user = Auth::user();
-        $propertyManager = $user->propertyManager;
-
-        // Check authorization: must be property owner
-        if (! $propertyManager || $application->property->property_manager_id !== $propertyManager->id) {
-            abort(403, 'Unauthorized to view this application');
-        }
+        $this->authorize('viewAsManager', $application);
 
         // Load relationships
         $application->load([
@@ -1645,13 +1616,7 @@ class ApplicationController extends Controller
      */
     public function updateStatus(Request $request, Application $application)
     {
-        $user = Auth::user();
-        $propertyManager = $user->propertyManager;
-
-        // Check authorization
-        if (! $propertyManager || $application->property->property_manager_id !== $propertyManager->id) {
-            abort(403, 'Unauthorized to update this application');
-        }
+        $this->authorize('updateStatus', $application);
 
         $validated = $request->validate([
             'status' => 'required|string',
@@ -1869,12 +1834,7 @@ class ApplicationController extends Controller
      */
     public function uploadCoSignerDocument(Request $request, Application $application, int $index)
     {
-        $user = Auth::user();
-
-        // Verify user owns this application
-        if ($application->tenantProfile->user_id !== $user->id) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('uploadDocument', $application);
 
         // Verify application is still in draft
         if ($application->status !== 'draft') {
@@ -1958,12 +1918,7 @@ class ApplicationController extends Controller
      */
     public function uploadGuarantorDocument(Request $request, Application $application, int $index)
     {
-        $user = Auth::user();
-
-        // Verify user owns this application
-        if ($application->tenantProfile->user_id !== $user->id) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('uploadDocument', $application);
 
         // Verify application is still in draft
         if ($application->status !== 'draft') {

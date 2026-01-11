@@ -25,7 +25,7 @@ class TenantMessageController extends Controller
             $user->id
         )
             ->withActivity()
-            ->with('propertyManager.user')
+            ->with(['propertyManager.user', 'latestMessage'])
             ->get()
             ->map(function ($conversation) {
                 $manager = $conversation->propertyManager;
@@ -35,7 +35,7 @@ class TenantMessageController extends Controller
                     'manager_name' => $manager->company_name ?? $manager->user->name ?? 'Property Manager',
                     'last_message_at' => $conversation->last_message_at,
                     'has_unread' => $conversation->hasUnreadForParticipant(),
-                    'last_message' => $conversation->messages()->latest('created_at')->first()?->body,
+                    'last_message' => $conversation->latestMessage->first()?->body,
                 ];
             });
 

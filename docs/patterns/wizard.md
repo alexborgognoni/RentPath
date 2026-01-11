@@ -58,7 +58,7 @@ If valid: advance to next step, update maxStepReached
 Validation uses Laravel Precognition headers to validate without saving:
 
 ```typescript
-// useWizardPrecognition.ts
+// use-wizard-precognition.ts
 const headers = {
     Precognition: 'true',
 };
@@ -188,7 +188,7 @@ const handleOccupantFieldBlur = (index: number, field: keyof OccupantDetails) =>
 For steps with nested fields, override `markAllCurrentStepFieldsTouched` in the wrapper hook:
 
 ```typescript
-// useApplicationWizard.ts
+// use-application-wizard.ts
 const markAllCurrentStepFieldsTouched = useCallback(() => {
     const newTouched = { ...wizard.touchedFields };
 
@@ -268,20 +268,20 @@ See [validation.md](validation.md) for the complete checklist.
 
 ### Base Hook (Shared)
 
-- `resources/js/hooks/useWizardPrecognition.ts` - Base Precognition hook with step locking
+- `resources/js/hooks/use-wizard-precognition.ts` - Base Precognition hook with step locking
 
 ### Property Wizard
 
-- `resources/js/hooks/usePropertyWizard.ts` - Property-specific wrapper
-- `resources/js/pages/property-create.tsx` - Create page
+- `resources/js/hooks/use-property-wizard.ts` - Property-specific wrapper
+- `resources/js/pages/manager/property-create.tsx` - Create page
+- `resources/js/components/property-wizard/steps/` - Step components (kebab-case)
 - `app/Http/Requests/Property/Steps/` - Step FormRequests
-- `app/Http/Requests/Property/SavePropertyDraftRequest.php` - Draft validation
 - `app/Services/PropertyService.php` - Business logic
 
 ### Application Wizard
 
-- `resources/js/hooks/useApplicationWizard.ts` - Application-specific wrapper
+- `resources/js/hooks/use-application-wizard.ts` - Application-specific wrapper
 - `resources/js/pages/tenant/application-create.tsx` - Create page
+- `resources/js/components/application-wizard/steps/` - Step components (kebab-case)
 - `app/Http/Requests/Application/Steps/` - Step FormRequests
-- `app/Http/Requests/Application/SaveApplicationDraftRequest.php` - Draft validation
 - `app/Services/ApplicationService.php` - Business logic

@@ -53,7 +53,7 @@ const headers = {
 
 ### Both Wizards (Precognition-based)
 
-Both Property and Application wizards use `useWizardPrecognition` hook which:
+Both Property and Application wizards use `use-wizard-precognition` hook which:
 
 - Makes axios requests with Precognition headers
 - Validates against draft endpoints (`/properties/{id}/draft`, `/properties/{id}/apply/draft`)
@@ -116,9 +116,9 @@ app/Http/Requests/
 
 ```
 resources/js/hooks/
-├── useWizardPrecognition.ts    # Base wizard hook with Precognition
-├── usePropertyWizard.ts        # Property-specific wrapper (uses useWizardPrecognition)
-└── useApplicationWizard.ts     # Application-specific wrapper (uses useWizardPrecognition)
+├── use-wizard-precognition.ts    # Base wizard hook with Precognition
+├── use-property-wizard.ts        # Property-specific wrapper
+└── use-application-wizard.ts     # Application-specific wrapper
 ```
 
 ### Constraints (UI display)
@@ -205,4 +205,4 @@ The `DatePicker` component has built-in validation:
 - `app/Http/Requests/Application/Steps/` (Step FormRequests)
 - `app/Services/PropertyService.php`
 - `app/Services/ApplicationService.php`
-- `resources/js/hooks/useWizardPrecognition.ts`
+- `resources/js/hooks/use-wizard-precognition.ts`

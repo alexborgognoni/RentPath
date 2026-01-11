@@ -27,6 +27,7 @@ class MessageController extends Controller
 
         $conversations = Conversation::forManager($propertyManager->id)
             ->withActivity()
+            ->with('latestMessage')
             ->get()
             ->map(function ($conversation) {
                 return [
@@ -36,7 +37,7 @@ class MessageController extends Controller
                     'participant_type' => $conversation->participant_type,
                     'last_message_at' => $conversation->last_message_at,
                     'has_unread' => $conversation->hasUnreadForManager(),
-                    'last_message' => $conversation->messages()->latest('created_at')->first()?->body,
+                    'last_message' => $conversation->latestMessage->first()?->body,
                 ];
             });
 

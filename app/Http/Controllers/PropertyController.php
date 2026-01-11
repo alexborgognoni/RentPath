@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Helpers\StorageHelper;
 use App\Http\Requests\Property\PublishPropertyRequest;
 use App\Http\Requests\Property\SavePropertyDraftRequest;
+use App\Http\Requests\Property\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
 use App\Models\Property;
 use App\Services\PropertyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class PropertyController extends Controller
@@ -33,14 +33,8 @@ class PropertyController extends Controller
         }
 
         $properties = $propertyManager->properties()
-            // ->with(['tenantApplications' => function ($query) {
-            //     $query->selectRaw('property_id, count(*) as tenant_count')
-            //         ->groupBy('property_id');
-            // }])
             ->get()
             ->map(function ($property) {
-                // $property->tenant_count = $property->tenantApplications->first()?->tenant_count ?? 0;
-                // unset($property->tenantApplications);
                 $property->tenant_count = 0;
 
                 return $property;
@@ -156,11 +150,7 @@ class PropertyController extends Controller
      */
     public function deleteDraft(Property $property)
     {
-        $propertyManager = Auth::user()->propertyManager;
-
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('delete', $property);
 
         if ($property->status !== 'draft') {
             return response()->json([
@@ -184,86 +174,13 @@ class PropertyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePropertyRequest $request)
     {
-        $validated = $request->validate([
-            // Basic info
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+        // Get validated data with boolean conversion
+        $validated = $request->validatedWithBooleans();
 
-            // Address
-            'house_number' => 'required|string|max:20',
-            'street_name' => 'required|string|max:255',
-            'street_line2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'country' => 'required|string|size:2',
-
-            // Type
-            'type' => ['required', Rule::in(['apartment', 'house', 'room', 'commercial', 'industrial', 'parking'])],
-            'subtype' => ['required', Rule::in([
-                'studio', 'loft', 'duplex', 'triplex', 'penthouse', 'serviced',
-                'detached', 'semi-detached', 'villa', 'bungalow',
-                'private_room', 'student_room', 'co-living',
-                'office', 'retail',
-                'warehouse', 'factory',
-                'garage', 'indoor_spot', 'outdoor_spot',
-            ])],
-
-            // Specifications
-            'bedrooms' => 'required|integer|min:0|max:20',
-            'bathrooms' => 'required|numeric|min:0|max:10',
-            'parking_spots_interior' => 'nullable|integer|min:0|max:20',
-            'parking_spots_exterior' => 'nullable|integer|min:0|max:20',
-            'size' => 'nullable|numeric|min:0|max:100000',
-            'balcony_size' => 'nullable|numeric|min:0|max:10000',
-            'land_size' => 'nullable|numeric|min:0|max:1000000',
-            'floor_level' => 'nullable|integer',
-            'has_elevator' => 'nullable|boolean',
-            'year_built' => 'nullable|integer|min:1800|max:'.date('Y'),
-
-            // Energy/Building
-            'energy_class' => ['nullable', Rule::in(['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'])],
-            'thermal_insulation_class' => ['nullable', Rule::in(['A', 'B', 'C', 'D', 'E', 'F', 'G'])],
-            'heating_type' => ['nullable', Rule::in(['gas', 'electric', 'district', 'wood', 'heat_pump', 'other'])],
-
-            // Kitchen
-            'kitchen_equipped' => 'nullable|boolean',
-            'kitchen_separated' => 'nullable|boolean',
-
-            // Amenities
-            'has_cellar' => 'nullable|boolean',
-            'has_laundry' => 'nullable|boolean',
-            'has_fireplace' => 'nullable|boolean',
-            'has_air_conditioning' => 'nullable|boolean',
-            'has_garden' => 'nullable|boolean',
-            'has_rooftop' => 'nullable|boolean',
-            'extras' => 'nullable|json',
-
-            // Rental
-            'rent_amount' => 'required|numeric|min:0|max:999999.99',
-            'rent_currency' => ['required', Rule::in(['eur', 'usd', 'gbp', 'chf'])],
-            'available_date' => 'nullable|date|after_or_equal:today',
-
-            // Delta image handling
-            'new_images' => 'nullable|array',
-            'new_images.*' => 'image|mimes:jpeg,png,webp|max:5120',
-            'deleted_image_ids' => 'nullable|array',
-            'deleted_image_ids.*' => 'integer',
-            'image_order' => 'nullable|array',
-            'image_order.*' => 'string',
-            'main_image_id' => 'nullable|integer',
-            'main_image_index' => 'nullable|integer|min:0',
-        ]);
-
-        // Get the user's property manager profile
+        // Get the user's property manager profile (authorization is in FormRequest)
         $propertyManager = Auth::user()->propertyManager;
-
-        if (! $propertyManager) {
-            return redirect()->route('profile.setup')
-                ->with('error', 'You need to set up your property manager profile first.');
-        }
 
         // Set status based on is_active preference (default to vacant)
         $isActive = $request->boolean('is_active', true);
@@ -271,15 +188,6 @@ class PropertyController extends Controller
         $validated['visibility'] = $isActive ? Property::VISIBILITY_UNLISTED : Property::VISIBILITY_PRIVATE;
         $validated['accepting_applications'] = $isActive;
         unset($validated['is_active']);
-
-        // Convert boolean fields from strings to actual booleans
-        $booleanFields = ['has_elevator', 'kitchen_equipped', 'kitchen_separated', 'has_cellar',
-            'has_laundry', 'has_fireplace', 'has_air_conditioning', 'has_garden', 'has_rooftop'];
-        foreach ($booleanFields as $field) {
-            if (isset($validated[$field])) {
-                $validated[$field] = filter_var($validated[$field], FILTER_VALIDATE_BOOLEAN);
-            }
-        }
 
         // Extract image-related data
         $newImages = $request->file('new_images', []);
@@ -334,11 +242,7 @@ class PropertyController extends Controller
      */
     public function show(Property $property)
     {
-        // Ensure user owns this property through their property manager
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('view', $property);
 
         // Load property images
         $property->load('images');
@@ -380,11 +284,7 @@ class PropertyController extends Controller
      */
     public function edit(Property $property)
     {
-        // Ensure user owns this property through their property manager
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('update', $property);
 
         // Load property with images
         $property->load('images');
@@ -492,11 +392,7 @@ class PropertyController extends Controller
      */
     public function destroy(Property $property)
     {
-        // Ensure user owns this property through their property manager
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('delete', $property);
 
         $property->delete();
 
@@ -543,11 +439,7 @@ class PropertyController extends Controller
      */
     public function generateInviteToken(Request $request, Property $property)
     {
-        // Ensure user owns this property
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('manageTokens', $property);
 
         $validated = $request->validate([
             'expiration_days' => 'nullable|integer|min:1|max:365',
@@ -568,11 +460,7 @@ class PropertyController extends Controller
      */
     public function invalidateInviteToken(Property $property)
     {
-        // Ensure user owns this property
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('manageTokens', $property);
 
         $property->invalidateInviteToken();
 
@@ -587,11 +475,7 @@ class PropertyController extends Controller
      */
     public function togglePublicAccess(Property $property)
     {
-        // Ensure user owns this property
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('manageTokens', $property);
 
         // Toggle between 'open' and 'link_required'
         $property->application_access = $property->application_access === Property::ACCESS_OPEN
@@ -620,11 +504,7 @@ class PropertyController extends Controller
      */
     public function regenerateDefaultToken(Property $property)
     {
-        // Ensure user owns this property
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('manageTokens', $property);
 
         $defaultToken = $property->regenerateDefaultToken();
 
@@ -639,11 +519,7 @@ class PropertyController extends Controller
      */
     public function getInviteTokens(Property $property)
     {
-        // Ensure user owns this property
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('manageTokens', $property);
 
         $tokens = $property->inviteTokens()->get()->map(function ($token) {
             return [
@@ -670,11 +546,7 @@ class PropertyController extends Controller
      */
     public function createCustomToken(Request $request, Property $property)
     {
-        // Ensure user owns this property
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('manageTokens', $property);
 
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
@@ -712,11 +584,7 @@ class PropertyController extends Controller
      */
     public function updateCustomToken(Request $request, Property $property, $tokenId)
     {
-        // Ensure user owns this property
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('manageTokens', $property);
 
         $token = $property->inviteTokens()->findOrFail($tokenId);
 
@@ -760,11 +628,7 @@ class PropertyController extends Controller
      */
     public function deleteCustomToken(Property $property, $tokenId)
     {
-        // Ensure user owns this property
-        $propertyManager = Auth::user()->propertyManager;
-        if (! $propertyManager || $property->property_manager_id !== $propertyManager->id) {
-            abort(403);
-        }
+        $this->authorize('manageTokens', $property);
 
         $token = $property->inviteTokens()->findOrFail($tokenId);
 
