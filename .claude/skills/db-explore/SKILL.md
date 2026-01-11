@@ -9,24 +9,28 @@ You are helping explore the RentPath database safely using Laravel Boost tools.
 
 ## Tools to Use
 
-| Task | Tool | Why |
-|------|------|-----|
-| View schema | `laravel-boost` → `database-schema` | See tables, columns, indexes |
-| Run queries | `laravel-boost` → `database-query` | Read-only SQL queries |
-| Execute PHP | `laravel-boost` → `tinker` | Eloquent queries, complex logic |
-| Check connections | `laravel-boost` → `database-connections` | List available databases |
+| Task              | Tool                                      | Why                             |
+| ----------------- | ----------------------------------------- | ------------------------------- |
+| View schema       | `laravel-boost` -> `database-schema`      | See tables, columns, indexes    |
+| Run queries       | `laravel-boost` -> `database-query`       | Read-only SQL queries           |
+| Execute PHP       | `laravel-boost` -> `tinker`               | Eloquent queries, complex logic |
+| Check connections | `laravel-boost` -> `database-connections` | List available databases        |
 
 ## Quick Start
 
 ### 1. View Schema
+
 Use the `database-schema` tool to see table structure:
+
 - All tables and columns
 - Data types and constraints
 - Indexes and foreign keys
 - Filter by table name if needed
 
 ### 2. Query Data
+
 Use the `database-query` tool for read-only SQL:
+
 ```sql
 -- Only SELECT, SHOW, EXPLAIN, DESCRIBE allowed
 SELECT * FROM users LIMIT 10;
@@ -36,7 +40,9 @@ EXPLAIN SELECT * FROM properties WHERE status = 'vacant';
 ```
 
 ### 3. Eloquent Queries
+
 Use the `tinker` tool for complex queries:
+
 ```php
 // Find specific records
 User::find(1);
@@ -56,26 +62,26 @@ Application::query()
 
 ### Core Entities
 
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| `users` | Authentication | `id`, `email`, `first_name`, `last_name` |
-| `property_managers` | PM profiles | `user_id`, `type`, `profile_verified_at` |
-| `tenant_profiles` | Tenant profiles | `user_id`, `employment_status`, `profile_verified_at` |
-| `properties` | Listings | `property_manager_id`, `status`, `visibility` |
-| `applications` | Tenant apps | `property_id`, `tenant_profile_id`, `status` |
+| Table               | Purpose         | Key Columns                                           |
+| ------------------- | --------------- | ----------------------------------------------------- |
+| `users`             | Authentication  | `id`, `email`, `first_name`, `last_name`              |
+| `property_managers` | PM profiles     | `user_id`, `type`, `profile_verified_at`              |
+| `tenant_profiles`   | Tenant profiles | `user_id`, `employment_status`, `profile_verified_at` |
+| `properties`        | Listings        | `property_manager_id`, `status`, `visibility`         |
+| `applications`      | Tenant apps     | `property_id`, `tenant_profile_id`, `status`          |
 
 ### Supporting Tables
 
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| `application_co_signers` | Co-signers | `application_id`, `first_name`, `email` |
-| `application_guarantors` | Guarantors | `application_co_signer_id`, `relationship` |
-| `application_references` | References | `application_id`, `type`, `name` |
+| Table                       | Purpose       | Key Columns                                  |
+| --------------------------- | ------------- | -------------------------------------------- |
+| `application_co_signers`    | Co-signers    | `application_id`, `first_name`, `email`      |
+| `application_guarantors`    | Guarantors    | `application_co_signer_id`, `relationship`   |
+| `application_references`    | References    | `application_id`, `type`, `name`             |
 | `application_invite_tokens` | Access tokens | `property_id`, `token`, `type`, `expires_at` |
-| `leads` | Lead tracking | `property_id`, `email`, `status`, `source` |
-| `property_images` | Photos | `property_id`, `path`, `is_main` |
-| `conversations` | Messaging | `property_id`, participants |
-| `messages` | Messages | `conversation_id`, `content`, `sender_id` |
+| `leads`                     | Lead tracking | `property_id`, `email`, `status`, `source`   |
+| `property_images`           | Photos        | `property_id`, `path`, `is_main`             |
+| `conversations`             | Messaging     | `property_id`, participants                  |
+| `messages`                  | Messages      | `conversation_id`, `content`, `sender_id`    |
 
 ## Common Queries
 
@@ -99,6 +105,7 @@ LEFT JOIN tenant_profiles tp ON tp.user_id = u.id;
 ```
 
 **Tinker:**
+
 ```php
 // User with all relationships
 User::with(['propertyManager', 'tenantProfile'])->find(1);
@@ -132,6 +139,7 @@ LIMIT 20;
 ```
 
 **Tinker:**
+
 ```php
 // With eager loading
 Property::with(['propertyManager.user', 'applications'])
@@ -174,6 +182,7 @@ FROM applications;
 ```
 
 **Tinker:**
+
 ```php
 // Full application with relationships
 Application::with([

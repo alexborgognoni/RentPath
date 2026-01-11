@@ -15,23 +15,23 @@ You are helping add new fields to RentPath's multi-step wizard forms (Applicatio
 
 ## Tools to Use
 
-| Task | Tool | Command/Action |
-|------|------|----------------|
+| Task                  | Tool   | Command/Action                                                                |
+| --------------------- | ------ | ----------------------------------------------------------------------------- |
 | Check existing schema | `Read` | `resources/js/lib/validation/application-schemas.ts` or `property-schemas.ts` |
-| Check Form Request | `Read` | `app/Http/Requests/StoreApplicationRequest.php` or property requests |
-| Check model | `Read` | `app/Models/Application.php` or `Property.php` |
-| Create migration | `Bash` | `php artisan make:migration add_[field]_to_[table]` |
-| Check types | `Read` | `resources/js/types/index.d.ts` |
-| Run validation | `Bash` | `php artisan test --filter=Validation` |
+| Check Form Request    | `Read` | `app/Http/Requests/StoreApplicationRequest.php` or property requests          |
+| Check model           | `Read` | `app/Models/Application.php` or `Property.php`                                |
+| Create migration      | `Bash` | `php artisan make:migration add_[field]_to_[table]`                           |
+| Check types           | `Read` | `resources/js/types/index.d.ts`                                               |
+| Run validation        | `Bash` | `php artisan test --filter=Validation`                                        |
 
 ## The 3-Layer Validation Rule
 
 **Every field must be validated at all 3 layers with IDENTICAL error messages:**
 
 ```
-Layer 1: Frontend (Zod)     → Immediate UX feedback
-Layer 2: Backend (FormRequest) → Server-side validation
-Layer 3: Database           → Constraints, enums, types
+Layer 1: Frontend (Zod)     -> Immediate UX feedback
+Layer 2: Backend (FormRequest) -> Server-side validation
+Layer 3: Database           -> Constraints, enums, types
 ```
 
 ## Step-by-Step Implementation
@@ -66,6 +66,7 @@ public function down(): void
 ```
 
 Run migration:
+
 ```bash
 php artisan migrate
 ```
@@ -73,6 +74,7 @@ php artisan migrate
 ### 2. Update Model
 
 **Add to fillable:**
+
 ```php
 // app/Models/Application.php
 protected $fillable = [
@@ -82,6 +84,7 @@ protected $fillable = [
 ```
 
 **Add casts if needed:**
+
 ```php
 protected function casts(): array
 {
@@ -111,7 +114,7 @@ interface Application {
 // For wizard data (may differ from model)
 interface ApplicationWizardData {
     // ... existing fields
-    new_field: string;  // Required in wizard even if nullable in DB
+    new_field: string; // Required in wizard even if nullable in DB
 }
 ```
 
@@ -123,15 +126,10 @@ interface ApplicationWizardData {
 // Find the appropriate step schema
 export const identityStepSchema = z.object({
     // ... existing fields
-    new_field: z.string()
-        .min(1, 'New field is required')
-        .max(255, 'New field must be less than 255 characters'),
+    new_field: z.string().min(1, 'New field is required').max(255, 'New field must be less than 255 characters'),
 
     // Optional field
-    optional_field: z.string()
-        .max(255, 'Optional field must be less than 255 characters')
-        .optional()
-        .or(z.literal('')),
+    optional_field: z.string().max(255, 'Optional field must be less than 255 characters').optional().or(z.literal('')),
 
     // Enum field
     status_field: z.enum(['a', 'b', 'c'], {
@@ -142,8 +140,7 @@ export const identityStepSchema = z.object({
     flag_field: z.boolean(),
 
     // Date field
-    date_field: z.string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Please enter a valid date'),
+    date_field: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Please enter a valid date'),
 });
 ```
 
@@ -233,7 +230,7 @@ const initialData: ApplicationWizardData = {
 
 // If field affects step validation, update step schemas
 const stepSchemas = {
-    1: identityStepSchema,  // If field is in step 1
+    1: identityStepSchema, // If field is in step 1
     // ...
 };
 ```
@@ -320,24 +317,26 @@ public function definition(): array
 ## Which Step Does the Field Belong To?
 
 ### Application Wizard Steps
-| Step | Fields |
-|------|--------|
-| 1. Identity | Name, DOB, nationality, ID documents |
-| 2. Address | Current address, previous addresses |
-| 3. Employment | Employment status, income, employer |
-| 4. Financial | Bank details, credit info |
-| 5. History | Rental history, references |
-| 6. Review | Summary, consents, submission |
+
+| Step          | Fields                               |
+| ------------- | ------------------------------------ |
+| 1. Identity   | Name, DOB, nationality, ID documents |
+| 2. Address    | Current address, previous addresses  |
+| 3. Employment | Employment status, income, employer  |
+| 4. Financial  | Bank details, credit info            |
+| 5. History    | Rental history, references           |
+| 6. Review     | Summary, consents, submission        |
 
 ### Property Wizard Steps
-| Step | Fields |
-|------|--------|
-| 1. Basics | Type, title, description |
-| 2. Location | Address, coordinates |
-| 3. Details | Bedrooms, bathrooms, size, amenities |
-| 4. Pricing | Rent, deposit, availability |
-| 5. Images | Photos, floor plans |
-| 6. Review | Summary, visibility, publish |
+
+| Step        | Fields                               |
+| ----------- | ------------------------------------ |
+| 1. Basics   | Type, title, description             |
+| 2. Location | Address, coordinates                 |
+| 3. Details  | Bedrooms, bathrooms, size, amenities |
+| 4. Pricing  | Rent, deposit, availability          |
+| 5. Images   | Photos, floor plans                  |
+| 6. Review   | Summary, visibility, publish         |
 
 ## Documentation References
 

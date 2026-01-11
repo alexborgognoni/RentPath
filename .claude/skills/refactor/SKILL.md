@@ -15,26 +15,26 @@ You are helping refactor RentPath code from fat controllers to a clean service l
 
 ## Tools to Use
 
-| Task | Tool | Command/Action |
-|------|------|----------------|
-| Analyze controller | `Read` | Read the controller file |
-| Find usages | `Grep` | Search for method calls |
-| Check model | `Read` | Read related model files |
-| Create service | `Bash` | `php artisan make:class Services/[Name]Service` |
-| Run tests | `Bash` | `php artisan test --filter=[Controller]` |
+| Task               | Tool   | Command/Action                                  |
+| ------------------ | ------ | ----------------------------------------------- |
+| Analyze controller | `Read` | Read the controller file                        |
+| Find usages        | `Grep` | Search for method calls                         |
+| Check model        | `Read` | Read related model files                        |
+| Create service     | `Bash` | `php artisan make:class Services/[Name]Service` |
+| Run tests          | `Bash` | `php artisan test --filter=[Controller]`        |
 
 ## Extraction Decision Tree
 
 ```
 Controller method > 50 lines?
-├─ Yes → Extract to Service
-└─ No → Is logic reused elsewhere?
-    ├─ Yes → Extract to Service
-    └─ No → Does it involve multiple models?
-        ├─ Yes → Extract to Service
-        └─ No → Are there complex business rules?
-            ├─ Yes → Extract to Service
-            └─ No → Keep in Controller (simple CRUD)
+├─ Yes -> Extract to Service
+└─ No -> Is logic reused elsewhere?
+    ├─ Yes -> Extract to Service
+    └─ No -> Does it involve multiple models?
+        ├─ Yes -> Extract to Service
+        └─ No -> Are there complex business rules?
+            ├─ Yes -> Extract to Service
+            └─ No -> Keep in Controller (simple CRUD)
 ```
 
 ## Step-by-Step Process
@@ -50,6 +50,7 @@ grep -n "public function" app/Http/Controllers/[Name]Controller.php
 ```
 
 **Key questions:**
+
 - What are the main responsibilities?
 - Which methods have business logic vs HTTP handling?
 - What models are touched?
@@ -135,6 +136,7 @@ class ApplicationService
 ### 4. Refactor the Controller
 
 **Before (fat controller):**
+
 ```php
 public function submit(Application $application)
 {
@@ -143,6 +145,7 @@ public function submit(Application $application)
 ```
 
 **After (thin controller):**
+
 ```php
 public function __construct(
     private ApplicationService $applicationService
@@ -187,11 +190,11 @@ test('submit endpoint uses service', function () {
 
 Based on codebase analysis:
 
-| Controller | Size | Priority | Suggested Services |
-|------------|------|----------|-------------------|
-| `ApplicationController` | 115KB | High | `ApplicationService`, `ApplicationSnapshotService` |
-| `PropertyController` | 35KB | Medium | `PropertyService`, `PropertyPublishingService` |
-| `TenantProfileController` | 30KB | Medium | `TenantProfileService`, `VerificationService` |
+| Controller                | Size  | Priority | Suggested Services                                 |
+| ------------------------- | ----- | -------- | -------------------------------------------------- |
+| `ApplicationController`   | 115KB | High     | `ApplicationService`, `ApplicationSnapshotService` |
+| `PropertyController`      | 35KB  | Medium   | `PropertyService`, `PropertyPublishingService`     |
+| `TenantProfileController` | 30KB  | Medium   | `TenantProfileService`, `VerificationService`      |
 
 ## Action Classes (Single Operations)
 

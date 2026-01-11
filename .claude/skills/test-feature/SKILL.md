@@ -15,13 +15,13 @@ You are helping write Pest PHP tests following RentPath conventions.
 
 ## Tools to Use
 
-| Task | Tool | Command/Action |
-|------|------|----------------|
-| Create test | `Bash` | `php artisan make:test [Name]Test` |
-| View factories | `Read` | `database/factories/[Model]Factory.php` |
-| Run tests | `Bash` | `php artisan test --filter=[pattern]` |
+| Task              | Tool   | Command/Action                              |
+| ----------------- | ------ | ------------------------------------------- |
+| Create test       | `Bash` | `php artisan make:test [Name]Test`          |
+| View factories    | `Read` | `database/factories/[Model]Factory.php`     |
+| Run tests         | `Bash` | `php artisan test --filter=[pattern]`       |
 | Run specific file | `Bash` | `php artisan test tests/Feature/[File].php` |
-| Check coverage | `Bash` | `php artisan test --coverage` |
+| Check coverage    | `Bash` | `php artisan test --coverage`               |
 
 ## Test Structure
 

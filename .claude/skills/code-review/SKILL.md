@@ -15,15 +15,15 @@ You are performing a code review using RentPath-specific standards and patterns.
 
 ## Tools to Use
 
-| Task | Tool | Command/Action |
-|------|------|----------------|
-| View changes | `Bash` | `git diff` or `git diff --staged` |
-| Check file | `Read` | Read specific files |
-| Find patterns | `Grep` | Search for similar code |
-| Run tests | `Bash` | `php artisan test` |
-| Type check | `Bash` | `npm run types` |
-| Lint PHP | `Bash` | `./vendor/bin/pint --test` |
-| Lint JS | `Bash` | `npm run lint` |
+| Task          | Tool   | Command/Action                    |
+| ------------- | ------ | --------------------------------- |
+| View changes  | `Bash` | `git diff` or `git diff --staged` |
+| Check file    | `Read` | Read specific files               |
+| Find patterns | `Grep` | Search for similar code           |
+| Run tests     | `Bash` | `php artisan test`                |
+| Type check    | `Bash` | `npm run types`                   |
+| Lint PHP      | `Bash` | `./vendor/bin/pint --test`        |
+| Lint JS       | `Bash` | `npm run lint`                    |
 
 ## Review Checklist
 
@@ -41,6 +41,7 @@ You are performing a code review using RentPath-specific standards and patterns.
 ```
 
 **Red flags:**
+
 ```php
 // BAD: SQL injection risk
 DB::select("SELECT * FROM users WHERE id = $id");
@@ -67,6 +68,7 @@ $user->update($request->validated());
 ```
 
 **Check validation alignment:**
+
 ```bash
 # Compare Zod schema
 grep -A 20 "fieldName" resources/js/lib/validation/application-schemas.ts
@@ -86,6 +88,7 @@ grep -A 5 "field_name" app/Http/Requests/StoreApplicationRequest.php
 ```
 
 **Pattern checks:**
+
 ```php
 // BAD: Fat controller with business logic
 public function approve(Application $application)
@@ -123,6 +126,7 @@ $applications = Application::with('property')->get();
 ```
 
 **Pattern checks:**
+
 ```tsx
 // BAD: Inline styles
 <div style={{ color: 'red' }}>Error</div>
@@ -149,6 +153,7 @@ $applications = Application::with('property')->get();
 ```
 
 **Check test coverage:**
+
 ```bash
 # Run specific tests
 php artisan test --filter=ApplicationFlow
@@ -168,6 +173,7 @@ php artisan test --coverage
 ```
 
 **Migration checks:**
+
 ```php
 // GOOD: Complete migration
 public function up(): void
@@ -226,37 +232,47 @@ php artisan test --filter=Authorization
 
 When providing review feedback, use this format:
 
-```markdown
+````markdown
 ## Code Review: [Feature/PR Name]
 
 ### Summary
+
 [Brief description of what was reviewed]
 
 ### Approval Status
+
 - [ ] Approved
 - [ ] Approved with minor changes
 - [ ] Changes requested
 
 ### Critical Issues (Must Fix)
+
 1. **[File:Line]** - [Issue description]
-   ```php
-   // Current code
-   ```
-   **Suggestion:**
-   ```php
-   // Recommended fix
-   ```
+    ```php
+    // Current code
+    ```
+````
+
+**Suggestion:**
+
+```php
+// Recommended fix
+```
 
 ### Suggestions (Nice to Have)
+
 1. **[File:Line]** - [Suggestion]
 
 ### Positive Notes
+
 - [What was done well]
 
 ### Checklist Verification
+
 - [x] Security review passed
 - [x] Validation aligned
 - [ ] Tests need expansion
+
 ```
 
 ## Documentation References
@@ -291,3 +307,4 @@ When providing review feedback, use this format:
 - Not using factories
 - Testing implementation instead of behavior
 - Flaky async tests
+```

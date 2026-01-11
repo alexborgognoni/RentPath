@@ -15,14 +15,14 @@ You are helping implement a new feature in RentPath following established patter
 
 ## Tools to Use
 
-| Task | Tool | Command/Action |
-|------|------|----------------|
-| Search codebase | `Grep`, `Glob` | Find similar patterns |
-| Read docs | `Read` | Check `docs/` for patterns |
-| Create files | `Bash` | `php artisan make:*` commands |
-| Database schema | `laravel-boost` → `database-schema` | Check existing tables |
-| Run tests | `Bash` | `php artisan test` |
-| Type check | `Bash` | `npm run types` |
+| Task            | Tool                                 | Command/Action                |
+| --------------- | ------------------------------------ | ----------------------------- |
+| Search codebase | `Grep`, `Glob`                       | Find similar patterns         |
+| Read docs       | `Read`                               | Check `docs/` for patterns    |
+| Create files    | `Bash`                               | `php artisan make:*` commands |
+| Database schema | `laravel-boost` -> `database-schema` | Check existing tables         |
+| Run tests       | `Bash`                               | `php artisan test`            |
+| Type check      | `Bash`                               | `npm run types`               |
 
 ## Feature Implementation Checklist
 
@@ -76,6 +76,7 @@ You are helping implement a new feature in RentPath following established patter
 ### 1. Database Layer
 
 **Create migration:**
+
 ```bash
 php artisan make:migration create_[table]_table --no-interaction
 # or
@@ -83,6 +84,7 @@ php artisan make:migration add_[field]_to_[table] --no-interaction
 ```
 
 **Migration template:**
+
 ```php
 public function up(): void
 {
@@ -105,6 +107,7 @@ public function down(): void
 ```
 
 **Run migration:**
+
 ```bash
 php artisan migrate
 ```
@@ -112,11 +115,13 @@ php artisan migrate
 ### 2. Model Layer
 
 **Create model:**
+
 ```bash
 php artisan make:model FeatureItem --no-interaction
 ```
 
 **Model template:**
+
 ```php
 <?php
 
@@ -166,11 +171,13 @@ class FeatureItem extends Model
 ### 3. Factory Layer
 
 **Create factory:**
+
 ```bash
 php artisan make:factory FeatureItemFactory --no-interaction
 ```
 
 **Factory template:**
+
 ```php
 <?php
 
@@ -213,11 +220,13 @@ class FeatureItemFactory extends Factory
 ### 4. Form Request Layer
 
 **Create form request:**
+
 ```bash
 php artisan make:request StoreFeatureItemRequest --no-interaction
 ```
 
 **Form request template:**
+
 ```php
 <?php
 
@@ -257,11 +266,13 @@ class StoreFeatureItemRequest extends FormRequest
 ### 5. Controller Layer
 
 **Create controller:**
+
 ```bash
 php artisan make:controller FeatureItemController --no-interaction
 ```
 
 **Controller template:**
+
 ```php
 <?php
 
@@ -350,6 +361,7 @@ class FeatureItemController extends Controller
 ### 6. Routes
 
 **Add to routes/web.php:**
+
 ```php
 // Feature Items
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -358,6 +370,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 ```
 
 **Generate Wayfinder routes:**
+
 ```bash
 php artisan wayfinder:generate
 ```
@@ -365,11 +378,13 @@ php artisan wayfinder:generate
 ### 7. Policy (Authorization)
 
 **Create policy:**
+
 ```bash
 php artisan make:policy FeatureItemPolicy --model=FeatureItem --no-interaction
 ```
 
 **Policy template:**
+
 ```php
 <?php
 
@@ -402,6 +417,7 @@ class FeatureItemPolicy
 ### 8. TypeScript Types
 
 **Add to resources/js/types/index.d.ts:**
+
 ```typescript
 export interface FeatureItem {
     id: number;
@@ -423,18 +439,14 @@ export interface FeatureItemFormData {
 ### 9. Zod Schema
 
 **Create/update validation schema:**
+
 ```typescript
 // resources/js/lib/validation/feature-item-schemas.ts
 import { z } from 'zod';
 
 export const featureItemSchema = z.object({
-    title: z.string()
-        .min(1, 'Title is required')
-        .max(255, 'Title must be less than 255 characters'),
-    description: z.string()
-        .max(1000, 'Description must be less than 1000 characters')
-        .optional()
-        .or(z.literal('')),
+    title: z.string().min(1, 'Title is required').max(255, 'Title must be less than 255 characters'),
+    description: z.string().max(1000, 'Description must be less than 1000 characters').optional().or(z.literal('')),
     status: z.enum(['draft', 'active', 'archived'], {
         errorMap: () => ({ message: 'Please select a valid status' }),
     }),
@@ -446,6 +458,7 @@ export type FeatureItemFormData = z.infer<typeof featureItemSchema>;
 ### 10. Page Components
 
 **Create page component:**
+
 ```tsx
 // resources/js/pages/feature-items/index.tsx
 import { Head } from '@inertiajs/react';
@@ -465,19 +478,16 @@ export default function FeatureItemsIndex({ items }: Props) {
             <Head title="Feature Items" />
 
             <div className="container mx-auto py-8">
-                <div className="flex justify-between items-center mb-6">
+                <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Feature Items</h1>
-                    <Link
-                        href="/feature-items/create"
-                        className="btn btn-primary"
-                    >
+                    <Link href="/feature-items/create" className="btn btn-primary">
                         Create New
                     </Link>
                 </div>
 
                 <div className="space-y-4">
                     {items.data.map((item) => (
-                        <div key={item.id} className="p-4 bg-white rounded-lg shadow">
+                        <div key={item.id} className="rounded-lg bg-white p-4 shadow">
                             <h2 className="font-semibold">{item.title}</h2>
                             <p className="text-gray-600">{item.description}</p>
                             <span className="text-sm text-gray-500">{item.status}</span>
@@ -493,11 +503,13 @@ export default function FeatureItemsIndex({ items }: Props) {
 ### 11. Feature Tests
 
 **Create test file:**
+
 ```bash
 php artisan make:test FeatureItemTest --no-interaction
 ```
 
 **Test template:**
+
 ```php
 <?php
 
