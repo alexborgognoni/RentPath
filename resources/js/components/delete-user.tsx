@@ -1,6 +1,6 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import HeadingSmall from '@/components/heading-small';
-import InputError from '@/components/input-error';
+import { HeadingSmall } from '@/components/heading-small';
+import { InputError } from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { getWayfinderDomain, isManagerSubdomain } from '@/utils/route';
 import { Form, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 
-export default function DeleteUser() {
+export function DeleteUser() {
     const { subdomain, managerSubdomain, appDomain } = usePage<SharedData>().props;
     const passwordInput = useRef<HTMLInputElement>(null);
 

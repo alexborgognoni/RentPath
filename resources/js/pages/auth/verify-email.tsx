@@ -3,7 +3,7 @@ import EmailVerificationNotificationController from '@/actions/App/Http/Controll
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
-import TextLink from '@/components/text-link';
+import { TextLink } from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 import { route } from '@/utils/route';

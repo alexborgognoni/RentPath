@@ -8,7 +8,7 @@ interface UserTypeToggleProps {
     onUserTypeChange: (newType: 'tenant' | 'property-manager') => void;
 }
 
-export default function UserTypeToggle({ userType, onUserTypeChange }: UserTypeToggleProps) {
+export function UserTypeToggle({ userType, onUserTypeChange }: UserTypeToggleProps) {
     const page = usePage<SharedData>();
     const { translations } = page.props;
 

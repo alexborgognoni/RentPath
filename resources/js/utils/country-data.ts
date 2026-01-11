@@ -196,14 +196,6 @@ export function iso2ToFlagEmoji(iso2: string): string {
 }
 
 /**
- * Get demonym (nationality name) for a country code
- * e.g., "NL" -> "Dutch", "US" -> "American"
- */
-export function getDemonym(iso2: string): string {
-    return getCountryByIso2(iso2)?.demonym || iso2;
-}
-
-/**
  * Format dial code with + prefix
  */
 export function formatDialCode(dialCode: string | null): string {

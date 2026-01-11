@@ -4,12 +4,12 @@ import { Form, Head, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
+import { InputError } from '@/components/input-error';
+import { TextLink } from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import UserTypeToggle from '@/components/user-type-toggle';
+import { UserTypeToggle } from '@/components/user-type-toggle';
 import AuthLayout from '@/layouts/auth-layout';
 import { SharedData } from '@/types';
 import { translate as t } from '@/utils/translate-utils';

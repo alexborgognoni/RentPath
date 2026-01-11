@@ -158,8 +158,6 @@ export function useProfileAutosave(): UseProfileAutosaveReturn {
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-            console.log('[Autosave] Sending fields:', fieldsToSave);
-
             const response = await fetch(AUTOSAVE_URL, {
                 method: 'POST',
                 headers: {
@@ -170,11 +168,9 @@ export function useProfileAutosave(): UseProfileAutosaveReturn {
                 body: JSON.stringify(fieldsToSave),
             });
 
-            const result = await response.json();
-            console.log('[Autosave] Response:', result);
-        } catch (error) {
+            await response.json();
+        } catch {
             // Silently fail - autosave is best-effort
-            console.error('[Autosave] Failed:', error);
         } finally {
             isSaving.current = false;
 
@@ -195,11 +191,9 @@ export function useProfileAutosave(): UseProfileAutosaveReturn {
     const autosaveField = useCallback(
         (fieldName: string, value: unknown) => {
             if (!isProfileField(fieldName)) {
-                console.log('[Autosave] Field not in profile fields:', fieldName);
                 return;
             }
 
-            console.log('[Autosave] Queuing field:', fieldName, '=', value);
             pendingFields.current[fieldName] = value;
             scheduleSave();
         },

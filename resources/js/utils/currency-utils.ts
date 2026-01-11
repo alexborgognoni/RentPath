@@ -90,34 +90,6 @@ export const convertAndRoundUpPrice = (basePrice: number, baseCurrency: Currency
     return Math.ceil(convertedPrice); // Always round up to nearest whole number
 };
 
-// Hook for currency conversion (non-reactive, reads from storage on each call)
-export const useCurrency = () => {
-    const currentCurrency = getCurrencyFromStorage();
-
-    const changeCurrency = (newCurrency: CurrencyCode) => {
-        setCurrencyInStorage(newCurrency);
-        // Trigger page refresh or state update
-        window.dispatchEvent(new CustomEvent('currencyChange', { detail: newCurrency }));
-    };
-
-    const formatPrice = (amount: string) => {
-        return formatCurrency(amount, currentCurrency);
-    };
-
-    const convertPrice = (basePrice: number, baseCurrency: CurrencyCode = 'EUR') => {
-        return convertAndRoundUpPrice(basePrice, baseCurrency, currentCurrency);
-    };
-
-    return {
-        currentCurrency,
-        changeCurrency,
-        formatPrice,
-        convertPrice,
-        currencies,
-        getCurrency: () => getCurrency(currentCurrency),
-    };
-};
-
 // Format amount with currency symbol (whole numbers, no decimals)
 const formatWithSymbol = (amount: number, currencyCode: CurrencyCode): string => {
     const currency = getCurrency(currencyCode);

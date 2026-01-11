@@ -1601,7 +1601,7 @@ class ApplicationController extends Controller
             ->orderBy('properties.title')
             ->get();
 
-        return Inertia::render('applications', [
+        return Inertia::render('manager/applications', [
             'applications' => $applications,
             'properties' => $properties,
             'selectedPropertyId' => $request->property ? (int) $request->property : null,
@@ -1634,7 +1634,7 @@ class ApplicationController extends Controller
         // Define allowed status transitions based on current status
         $allowedTransitions = $this->getAllowedTransitions($application->status);
 
-        return Inertia::render('application', [
+        return Inertia::render('manager/application', [
             'application' => $applicationData,
             'allowedTransitions' => $allowedTransitions,
         ]);

@@ -82,7 +82,7 @@ class PropertyController extends Controller
             }
         }
 
-        return Inertia::render('property-create', [
+        return Inertia::render('manager/property-create', [
             'property' => $property,
             'isEditing' => false,
             'isDraft' => $property !== null,
@@ -369,7 +369,7 @@ class PropertyController extends Controller
             ];
         }
 
-        return Inertia::render('property', [
+        return Inertia::render('manager/property', [
             'property' => $propertyData,
             'propertyId' => (string) $property->id,
         ]);
@@ -401,7 +401,7 @@ class PropertyController extends Controller
             ];
         })->sortBy('sort_order')->values();
 
-        return Inertia::render('property-edit', [
+        return Inertia::render('manager/property-edit', [
             'property' => $propertyData,
         ]);
     }

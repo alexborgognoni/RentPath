@@ -28,7 +28,7 @@ class PropertyManagerController extends Controller
             return redirect()->route('manager.properties.index');
         }
 
-        return Inertia::render('profile-setup', [
+        return Inertia::render('manager/profile-setup', [
             'user' => $user,
             'isEditing' => false,
             'rejectionReason' => null,
@@ -152,7 +152,7 @@ class PropertyManagerController extends Controller
             return redirect()->route('profile.setup');
         }
 
-        return Inertia::render('profile-setup', [
+        return Inertia::render('manager/profile-setup', [
             'propertyManager' => $propertyManager,
             'user' => Auth::user(),
             'isEditing' => true,

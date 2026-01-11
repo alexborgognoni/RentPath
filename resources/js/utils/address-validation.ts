@@ -3,7 +3,7 @@
  * Combines postal code validation and state/province requirements.
  */
 
-import { getPostalCodeLabel, getPostalCodePattern, getPostalCodePlaceholder, POSTAL_CODE_EXAMPLES } from './postal-code-patterns';
+import { getPostalCodeLabel, getPostalCodePattern, getPostalCodePlaceholder } from './postal-code-patterns';
 import {
     getStateProvinceLabel,
     getStateProvinceOptions,
@@ -30,29 +30,6 @@ export function validatePostalCode(postalCode: string, countryCode: string): boo
     }
 
     return pattern.test(postalCode.trim());
-}
-
-/**
- * Get postal code validation error message.
- * @returns Error message or null if valid
- */
-export function getPostalCodeError(postalCode: string, countryCode: string): string | null {
-    if (!postalCode || !countryCode) {
-        return null;
-    }
-
-    if (validatePostalCode(postalCode, countryCode)) {
-        return null;
-    }
-
-    const example = POSTAL_CODE_EXAMPLES[countryCode.toUpperCase()];
-    const label = getPostalCodeLabel(countryCode);
-
-    if (example) {
-        return `Invalid ${label.toLowerCase()} format. Example: ${example}`;
-    }
-
-    return `Invalid ${label.toLowerCase()} format`;
 }
 
 // Re-export all functions from the underlying modules for convenience

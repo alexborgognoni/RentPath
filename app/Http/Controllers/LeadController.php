@@ -64,7 +64,7 @@ class LeadController extends Controller
             ->orderBy('title')
             ->get();
 
-        return Inertia::render('leads', [
+        return Inertia::render('manager/leads', [
             'leads' => $leads,
             'properties' => $properties,
             'filters' => [
@@ -138,7 +138,7 @@ class LeadController extends Controller
 
         $lead->load(['property', 'user', 'application', 'inviteToken']);
 
-        return Inertia::render('lead', [
+        return Inertia::render('manager/lead', [
             'lead' => $lead,
             'statusOptions' => Lead::getStatusOptions(),
             'sourceOptions' => Lead::getSourceOptions(),

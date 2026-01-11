@@ -194,10 +194,8 @@ class TenantProfileController extends Controller
                 ->with('info', 'Your profile is already verified. Contact support to make changes.');
         }
 
-        // TODO: Update this to use a proper edit form (not the old setup form)
-        return Inertia::render('tenant/tenant-profile-setup', [
-            'user' => Auth::user(),
-            'tenantProfile' => $tenantProfile,
+        return Inertia::render('tenant/profile', [
+            'profile' => $tenantProfile,
             'isEditing' => true,
             'rejectionReason' => $tenantProfile->verification_rejection_reason,
             'rejectedFields' => $tenantProfile->verification_rejected_fields ?? [],

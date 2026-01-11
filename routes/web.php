@@ -5,7 +5,6 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyManagerController;
 use App\Http\Controllers\PropertyViewController;
-use App\Http\Controllers\SchemaViewerController;
 use App\Http\Controllers\TenantMessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -150,12 +149,6 @@ Route::domain(config('app.domain'))->group(function () {
         return response()->json(['locale' => session('locale')]);
     })->name('locale.update');
 
-    // Development tools (local only)
-    if (config('app.env') === 'local') {
-        Route::get('dev/schema', [SchemaViewerController::class, 'index'])
-            ->name('dev.schema');
-    }
-
     // Auth routes (login, register, password reset, email verification)
     require __DIR__.'/auth.php';
 });
@@ -235,7 +228,7 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
 
         \Log::info('Rendering manager properties');
 
-        return Inertia::render('dashboard', [
+        return Inertia::render('manager/dashboard', [
             'properties' => $properties,
         ]);
     })->name('manager.properties.index');
@@ -277,7 +270,7 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
             }
 
             if ($request->get('edit')) {
-                return Inertia::render('profile-setup', [
+                return Inertia::render('manager/profile-setup', [
                     'propertyManager' => $propertyManager,
                     'user' => $user,
                     'isEditing' => true,
@@ -286,7 +279,7 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
                 ]);
             }
 
-            return Inertia::render('profile-unverified', [
+            return Inertia::render('manager/profile-unverified', [
                 'isRejected' => $propertyManager ? $propertyManager->isRejected() : false,
                 'rejectionReason' => $propertyManager ? $propertyManager->rejection_reason : null,
             ]);
@@ -308,15 +301,17 @@ Route::domain(config('app.manager_subdomain').'.'.config('app.domain'))->middlew
         Route::post('properties', [PropertyController::class, 'store'])
             ->name('properties.store');
 
-        // Property draft endpoints (autosave)
-        Route::post('properties/draft', [PropertyController::class, 'createDraft'])
-            ->name('properties.createDraft');
+        // Property draft endpoints (autosave) - with Precognition for real-time validation
+        Route::middleware([\Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class])->group(function () {
+            Route::post('properties/draft', [PropertyController::class, 'createDraft'])
+                ->name('properties.createDraft');
 
-        Route::patch('properties/{property}/draft', [PropertyController::class, 'saveDraft'])
-            ->name('properties.saveDraft');
+            Route::patch('properties/{property}/draft', [PropertyController::class, 'saveDraft'])
+                ->name('properties.saveDraft');
 
-        Route::post('properties/{property}/publish', [PropertyController::class, 'publishDraft'])
-            ->name('properties.publishDraft');
+            Route::post('properties/{property}/publish', [PropertyController::class, 'publishDraft'])
+                ->name('properties.publishDraft');
+        });
 
         Route::delete('properties/{property}/draft', [PropertyController::class, 'deleteDraft'])
             ->name('properties.deleteDraft');
@@ -497,15 +492,17 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
     Route::get('applications', [\App\Http\Controllers\ApplicationController::class, 'index'])
         ->name('applications.index');
 
-    // Application routes
+    // Application routes - with Precognition for real-time validation
     Route::get('properties/{property}/apply', [\App\Http\Controllers\ApplicationController::class, 'create'])
         ->name('applications.create');
 
-    Route::post('properties/{property}/apply', [\App\Http\Controllers\ApplicationController::class, 'store'])
-        ->name('applications.store');
+    Route::middleware([\Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class])->group(function () {
+        Route::post('properties/{property}/apply', [\App\Http\Controllers\ApplicationController::class, 'store'])
+            ->name('applications.store');
 
-    Route::post('properties/{property}/apply/draft', [\App\Http\Controllers\ApplicationController::class, 'saveDraft'])
-        ->name('applications.save-draft');
+        Route::post('properties/{property}/apply/draft', [\App\Http\Controllers\ApplicationController::class, 'saveDraft'])
+            ->name('applications.save-draft');
+    });
 
     Route::post('properties/{property}/apply/document', [\App\Http\Controllers\ApplicationController::class, 'uploadDocument'])
         ->name('applications.upload-document');
