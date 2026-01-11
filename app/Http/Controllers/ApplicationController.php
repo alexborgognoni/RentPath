@@ -1618,6 +1618,8 @@ class ApplicationController extends Controller
     {
         $this->authorize('updateStatus', $application);
 
+        $user = $request->user();
+
         $validated = $request->validate([
             'status' => 'required|string',
             'notes' => 'nullable|string|max:2000',

@@ -48,7 +48,7 @@ test('manager can view leads list', function () {
 
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
-        ->component('leads')
+        ->component('manager/leads')
         ->has('leads', 1)
         ->has('properties')
         ->has('statusOptions')
@@ -71,7 +71,7 @@ test('manager can filter leads by property', function () {
 
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
-        ->component('leads')
+        ->component('manager/leads')
         ->has('leads', 1)
     );
 });
@@ -89,7 +89,7 @@ test('manager can filter leads by status', function () {
 
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
-        ->component('leads')
+        ->component('manager/leads')
         ->has('leads', 1)
     );
 });
@@ -100,7 +100,7 @@ test('manager can search leads by email', function () {
 
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
-        ->component('leads')
+        ->component('manager/leads')
         ->has('leads', 1)
     );
 });
@@ -111,7 +111,7 @@ test('manager can view single lead', function () {
 
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
-        ->component('lead')
+        ->component('manager/lead')
         ->has('lead')
         ->has('statusOptions')
         ->has('sourceOptions')

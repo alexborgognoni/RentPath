@@ -54,7 +54,7 @@ test('manager can view applications list', function () {
 
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
-        ->component('applications')
+        ->component('manager/applications')
         ->has('applications', 1)
         ->has('properties')
     );
@@ -71,7 +71,7 @@ test('manager can filter applications by property', function () {
 
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
-        ->component('applications')
+        ->component('manager/applications')
         ->has('applications', 1)
         ->where('selectedPropertyId', $this->property->id)
     );
@@ -83,7 +83,7 @@ test('manager can view single application', function () {
 
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
-        ->component('application')
+        ->component('manager/application')
         ->has('application')
         ->has('allowedTransitions')
     );
