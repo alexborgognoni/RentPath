@@ -76,8 +76,8 @@ const EMPLOYMENT_STATUS_ICONS = {
 
 export default function ProfilePage({ profile, hasProfile, completeness, profileDocuments }: ProfilePageProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, `tenant.profile.${key}`);
-    const tEdit = (key: string) => translate(translations, `tenant.profile.edit.${key}`);
+    const t = useCallback((key: string) => translate(translations, `tenant.profile.${key}`), [translations]);
+    const tEdit = useCallback((key: string) => translate(translations, `tenant.profile.edit.${key}`), [translations]);
 
     // State management
     const [expandedSections, setExpandedSections] = useState<Set<SectionId>>(new Set(['personal']));
@@ -213,7 +213,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                 isVisible: () => true,
             },
         ],
-        [translations],
+        [t, tEdit],
     );
 
     // Employment options
@@ -233,7 +233,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
             },
             { value: 'retired', label: t('employment_types.retired') || 'Retired', icon: EMPLOYMENT_STATUS_ICONS.retired },
         ],
-        [translations],
+        [t],
     );
 
     const EMPLOYMENT_TYPES = useMemo(
@@ -243,7 +243,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
             { value: 'contract', label: tEdit('employment_types.contract') || 'Contract' },
             { value: 'temporary', label: tEdit('employment_types.temporary') || 'Temporary' },
         ],
-        [translations],
+        [tEdit],
     );
 
     const GUARANTOR_RELATIONSHIPS = useMemo(
@@ -258,7 +258,7 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
             { value: 'Employer', label: tEdit('guarantor.relationships.employer') || 'Employer' },
             { value: 'Other', label: tEdit('guarantor.relationships.other') || 'Other' },
         ],
-        [translations],
+        [tEdit],
     );
 
     // Address field helpers

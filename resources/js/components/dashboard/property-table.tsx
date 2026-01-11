@@ -10,7 +10,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { type ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { Bath, Bed, Car, ChevronRight, Link as LinkIcon, Users } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface PropertyTableProps {
     properties: Property[];
@@ -59,29 +59,35 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
     const { translations, appUrlScheme, appDomain, appPort } = usePage<SharedData>().props;
     const { formatRent } = useReactiveCurrency();
 
-    const handleInvite = async (e: React.MouseEvent, property: Property) => {
-        e.stopPropagation();
-        const rootDomain = getRootDomainUrl(appUrlScheme, appDomain, appPort);
-        const applicationUrl = property.default_token
-            ? `${rootDomain}/properties/${property.id}?token=${property.default_token.token}`
-            : `${rootDomain}/properties/${property.id}`;
+    const handleInvite = useCallback(
+        async (e: React.MouseEvent, property: Property) => {
+            e.stopPropagation();
+            const rootDomain = getRootDomainUrl(appUrlScheme, appDomain, appPort);
+            const applicationUrl = property.default_token
+                ? `${rootDomain}/properties/${property.id}?token=${property.default_token.token}`
+                : `${rootDomain}/properties/${property.id}`;
 
-        const success = await copyToClipboard(applicationUrl);
-        if (success) {
-            toast.success(translate(translations, 'properties.linkCopied'));
-        } else {
-            toast.error(translate(translations, 'properties.linkCopyFailed'));
-        }
-    };
+            const success = await copyToClipboard(applicationUrl);
+            if (success) {
+                toast.success(translate(translations, 'properties.linkCopied'));
+            } else {
+                toast.error(translate(translations, 'properties.linkCopyFailed'));
+            }
+        },
+        [appUrlScheme, appDomain, appPort, translations],
+    );
 
-    const handleEdit = (e: React.MouseEvent, property: Property) => {
-        e.stopPropagation();
-        onEditProperty(property);
-    };
+    const handleEdit = useCallback(
+        (e: React.MouseEvent, property: Property) => {
+            e.stopPropagation();
+            onEditProperty(property);
+        },
+        [onEditProperty],
+    );
 
-    const handleRowClick = (property: Property) => {
+    const handleRowClick = useCallback((property: Property) => {
         window.location.href = route('properties.show', { property: property.id });
-    };
+    }, []);
 
     const columns = useMemo(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -260,7 +266,7 @@ export function PropertyTable({ properties, onEditProperty }: PropertyTableProps
                 },
             }),
         ],
-        [translations, formatRent],
+        [translations, formatRent, handleInvite, handleEdit, handleRowClick],
     );
 
     return <DataTable columns={columns} data={properties} onRowClick={handleRowClick} />;

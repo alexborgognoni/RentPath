@@ -115,21 +115,21 @@ export function FinancialInfoSection({
     existingDocuments,
     onUploadSuccess,
 }: FinancialInfoSectionProps) {
-    const t = (key: string) => translate(translations, `wizard.application.employmentStep.${key}`);
+    const t = useCallback((key: string) => translate(translations, `wizard.application.employmentStep.${key}`), [translations]);
 
     // Helper to get prefixed field name
-    const f = (field: string) => `${fieldPrefix}${field}`;
+    const f = useCallback((field: string) => `${fieldPrefix}${field}`, [fieldPrefix]);
 
     // Per-field blur handler - calls onFieldBlur with the prefixed field name
     const handleBlur = useCallback(
         (field: string) => () => {
             onFieldBlur?.(f(field));
         },
-        [onFieldBlur, fieldPrefix],
+        [onFieldBlur, f],
     );
 
     // Helper to get document type with prefix
-    const docType = (type: string) => (documentTypePrefix ? `${documentTypePrefix}${type}` : type);
+    const docType = useCallback((type: string) => (documentTypePrefix ? `${documentTypePrefix}${type}` : type), [documentTypePrefix]);
 
     // Default employment_status to 'employed' if not set
     const hasSetDefault = useRef(false);
@@ -179,7 +179,7 @@ export function FinancialInfoSection({
                 label: t(`employmentStatuses.${value}`),
                 icon: EMPLOYMENT_STATUS_ICONS[value as keyof typeof EMPLOYMENT_STATUS_ICONS],
             })),
-        [availableStatuses, translations],
+        [availableStatuses, t],
     );
 
     const EMPLOYMENT_TYPES = useMemo(
@@ -189,7 +189,7 @@ export function FinancialInfoSection({
             { value: 'contract', label: t('employmentTypes.contract') },
             { value: 'temporary', label: t('employmentTypes.temporary') },
         ],
-        [translations],
+        [t],
     );
 
     const BUSINESS_TYPES = useMemo(
@@ -199,7 +199,7 @@ export function FinancialInfoSection({
             { value: 'limited_company', label: t('businessTypes.limited_company') },
             { value: 'partnership', label: t('businessTypes.partnership') },
         ],
-        [translations],
+        [t],
     );
 
     const STUDENT_INCOME_SOURCES = useMemo(
@@ -212,7 +212,7 @@ export function FinancialInfoSection({
             { value: 'savings', label: t('studentIncomeSources.savings') },
             { value: 'other', label: t('studentIncomeSources.other') },
         ],
-        [translations],
+        [t],
     );
 
     const UNEMPLOYED_INCOME_SOURCES = useMemo(
@@ -229,7 +229,7 @@ export function FinancialInfoSection({
             { value: 'freelance_gig', label: t('unemployedIncomeSources.freelance_gig') },
             { value: 'other', label: t('unemployedIncomeSources.other') },
         ],
-        [translations],
+        [t],
     );
 
     const PENSION_TYPES = useMemo(
@@ -240,7 +240,7 @@ export function FinancialInfoSection({
             { value: 'annuity', label: t('pensionTypes.annuity') },
             { value: 'other', label: t('pensionTypes.other') },
         ],
-        [translations],
+        [t],
     );
 
     const OTHER_SITUATIONS = useMemo(
@@ -258,7 +258,7 @@ export function FinancialInfoSection({
             { value: 'military_service', label: t('otherSituations.military_service') },
             { value: 'other', label: t('otherSituations.other') },
         ],
-        [translations],
+        [t],
     );
 
     const status = getValue(f('employment_status'));

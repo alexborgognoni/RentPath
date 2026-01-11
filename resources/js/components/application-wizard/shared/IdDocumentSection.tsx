@@ -4,7 +4,7 @@ import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
 import { Select } from '@/components/ui/select';
 import type { Translations } from '@/types/translations';
 import { translate } from '@/utils/translate-utils';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export interface IdDocumentData {
     id_document_type: string;
@@ -63,7 +63,7 @@ export function IdDocumentSection({
     documentTypePrefix = '',
     onUploadSuccess,
 }: IdDocumentSectionProps) {
-    const t = (key: string) => translate(translations, `wizard.application.shared.idDocument.${key}`);
+    const t = useCallback((key: string) => translate(translations, `wizard.application.shared.idDocument.${key}`), [translations]);
 
     // Helper to get prefixed field key for errors/touched lookups
     const fieldKey = (field: string) => (fieldPrefix ? `${fieldPrefix}${field}` : field);
@@ -85,7 +85,7 @@ export function IdDocumentSection({
                 value: opt.value,
                 label: t(`documentTypes.${opt.value}`) || opt.label,
             })),
-        [translations],
+        [t],
     );
 
     // Build document type for upload endpoint

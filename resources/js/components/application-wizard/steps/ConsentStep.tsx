@@ -16,14 +16,14 @@ interface ConsentStepProps {
 
 export function ConsentStep({ data, errors, touchedFields, updateField, markFieldTouched }: ConsentStepProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, `wizard.application.consentStep.${key}`);
+    const t = useCallback((key: string) => translate(translations, `wizard.application.consentStep.${key}`), [translations]);
 
     // Auto-capture signature date when component mounts
     useEffect(() => {
         if (!data.signature_date) {
             updateField('signature_date', new Date().toISOString());
         }
-    }, []);
+    }, [data.signature_date, updateField]);
 
     // Checkbox change handler - just update value and mark touched
     // Don't trigger validation here - updateField already clears errors, and Continue button handles validation

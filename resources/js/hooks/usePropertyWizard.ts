@@ -529,7 +529,7 @@ export function usePropertyWizard({
  */
 export function useWizardSteps(): WizardStepConfig<WizardStep>[] {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = useCallback((key: string) => translate(translations, key), [translations]);
 
     return useMemo(
         () => [
@@ -611,6 +611,6 @@ export function useWizardSteps(): WizardStepConfig<WizardStep>[] {
                 fields: [],
             },
         ],
-        [translations],
+        [t],
     );
 }

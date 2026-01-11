@@ -6,7 +6,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AirVent, ChefHat, Fence, Flame, Package, Sunrise, UtensilsCrossed, WashingMachine } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface AmenitiesStepProps {
     data: PropertyWizardData;
@@ -39,7 +39,7 @@ const AMENITY_KEYS: { key: AmenityKey; translationKey: string; icon: React.Eleme
 
 function useAmenities() {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = useCallback((key: string) => translate(translations, key), [translations]);
 
     return useMemo(
         () =>
@@ -49,13 +49,13 @@ function useAmenities() {
                 icon: amenity.icon,
                 category: amenity.category,
             })),
-        [translations],
+        [t],
     );
 }
 
 function useCategories() {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = useCallback((key: string) => translate(translations, key), [translations]);
 
     return useMemo(
         () => [
@@ -63,7 +63,7 @@ function useCategories() {
             { id: 'building' as const, label: t('wizard.amenitiesStep.categories.building') },
             { id: 'outdoor' as const, label: t('wizard.amenitiesStep.categories.outdoor') },
         ],
-        [translations],
+        [t],
     );
 }
 

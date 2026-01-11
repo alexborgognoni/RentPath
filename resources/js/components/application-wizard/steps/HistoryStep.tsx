@@ -63,7 +63,7 @@ export function HistoryStep({
     onFieldBlur,
 }: HistoryStepProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, `wizard.application.historyStep.${key}`);
+    const t = useCallback((key: string) => translate(translations, `wizard.application.historyStep.${key}`), [translations]);
 
     // Collapsible sections state
     const [expandedSections, setExpandedSections] = useState({
@@ -126,7 +126,7 @@ export function HistoryStep({
             { value: 'employer_provided', label: t('livingSituations.employerProvided') || 'Employer Provided' },
             { value: 'other', label: t('livingSituations.other') || 'Other' },
         ],
-        [translations],
+        [t],
     );
 
     // Reason for moving options
@@ -145,7 +145,7 @@ export function HistoryStep({
             { value: 'first_time_renter', label: t('reasonsForMoving.firstTimeRenter') || 'First Time Renter' },
             { value: 'other', label: t('reasonsForMoving.other') || 'Other' },
         ],
-        [translations],
+        [t],
     );
 
     // Credit check provider options
@@ -157,7 +157,7 @@ export function HistoryStep({
             { value: 'transunion', label: 'TransUnion' },
             { value: 'illion_au', label: 'Illion (Australia)' },
         ],
-        [translations],
+        [t],
     );
 
     // Other reference relationship options
@@ -166,7 +166,7 @@ export function HistoryStep({
             { value: 'professional', label: t('referenceRelationships.professional') || 'Professional' },
             { value: 'personal', label: t('referenceRelationships.personal') || 'Personal' },
         ],
-        [translations],
+        [t],
     );
 
     // Error display helper

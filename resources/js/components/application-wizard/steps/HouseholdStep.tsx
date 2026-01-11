@@ -10,7 +10,7 @@ import { getCountryByIso2 } from '@/utils/country-data';
 import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { AlertCircle, Calendar, ChevronDown, ChevronUp, PawPrint, Phone, Plus, Trash2, Users } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface HouseholdStepProps {
     data: ApplicationWizardData;
@@ -46,7 +46,7 @@ export function HouseholdStep({
     propertyCountry,
 }: HouseholdStepProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, `wizard.application.detailsStep.${key}`);
+    const t = useCallback((key: string) => translate(translations, `wizard.application.detailsStep.${key}`), [translations]);
 
     const { countryCode: detectedCountry } = useGeoLocation();
     const hasSetDefaults = useRef(false);
@@ -131,7 +131,7 @@ export function HouseholdStep({
             { value: 'roommate', label: t('occupants.relationships.roommate') || 'Roommate' },
             { value: 'other', label: t('occupants.relationships.other') || 'Other' },
         ],
-        [translations],
+        [t],
     );
 
     const PET_TYPES = useMemo(
@@ -146,7 +146,7 @@ export function HouseholdStep({
             { value: 'reptile', label: t('pets.types.reptile') || 'Reptile' },
             { value: 'other', label: t('pets.types.other') || 'Other' },
         ],
-        [translations],
+        [t],
     );
 
     const PET_SIZES = useMemo(
@@ -155,7 +155,7 @@ export function HouseholdStep({
             { value: 'medium', label: t('pets.sizes.medium') || 'Medium (10-25kg)' },
             { value: 'large', label: t('pets.sizes.large') || 'Large (> 25kg)' },
         ],
-        [translations],
+        [t],
     );
 
     const EMERGENCY_CONTACT_RELATIONSHIPS = useMemo(
@@ -168,7 +168,7 @@ export function HouseholdStep({
             { value: 'friend', label: t('emergencyContact.relationships.friend') || 'Friend' },
             { value: 'other', label: t('emergencyContact.relationships.other') || 'Other' },
         ],
-        [translations],
+        [t],
     );
 
     const handleFieldChange = (field: keyof ApplicationWizardData, value: unknown) => {

@@ -7,7 +7,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface LocationStepProps {
     data: PropertyWizardData;
@@ -20,7 +20,7 @@ const COUNTRY_CODES = ['CH', 'DE', 'FR', 'AT', 'IT', 'US', 'GB', 'NL', 'BE', 'ES
 
 function useCountries() {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = useCallback((key: string) => translate(translations, key), [translations]);
 
     return useMemo(
         () =>
@@ -28,7 +28,7 @@ function useCountries() {
                 value: code,
                 label: t(`wizard.locationStep.countries.${code}`),
             })),
-        [translations],
+        [t],
     );
 }
 

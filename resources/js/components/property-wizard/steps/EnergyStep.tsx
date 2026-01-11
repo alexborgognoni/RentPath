@@ -6,7 +6,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Flame, Leaf, Thermometer, Zap } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface EnergyStepProps {
     data: PropertyWizardData;
@@ -28,7 +28,7 @@ const HEATING_ICONS = {
 
 function useHeatingTypes() {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = useCallback((key: string) => translate(translations, key), [translations]);
 
     return useMemo(
         () => [
@@ -39,7 +39,7 @@ function useHeatingTypes() {
             { value: 'wood' as const, label: t('wizard.energyStep.heatingTypes.wood'), icon: HEATING_ICONS.wood },
             { value: 'other' as const, label: t('wizard.energyStep.heatingTypes.other'), icon: HEATING_ICONS.other },
         ],
-        [translations],
+        [t],
     );
 }
 

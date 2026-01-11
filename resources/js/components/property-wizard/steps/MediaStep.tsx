@@ -28,12 +28,15 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
     };
 
     // Check if an image is the main image
-    const isMainImage = (image: WizardImage, index: number): boolean => {
-        if (image.id !== null && data.mainImageId !== null) {
-            return image.id === data.mainImageId;
-        }
-        return index === data.mainImageIndex;
-    };
+    const isMainImage = useCallback(
+        (image: WizardImage, index: number): boolean => {
+            if (image.id !== null && data.mainImageId !== null) {
+                return image.id === data.mainImageId;
+            }
+            return index === data.mainImageIndex;
+        },
+        [data.mainImageId, data.mainImageIndex],
+    );
 
     const handleImageSelect = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +108,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                 mainImageIndex: Math.max(0, Math.min(newMainImageIndex, newImages.length - 1)),
             });
         },
-        [data.images, data.deletedImageIds, data.mainImageId, data.mainImageIndex, updateMultipleFields],
+        [data.images, data.deletedImageIds, data.mainImageId, data.mainImageIndex, updateMultipleFields, isMainImage],
     );
 
     const handleSetMainImage = useCallback(
@@ -130,7 +133,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                 mainImageIndex: newMainIndex >= 0 ? newMainIndex : 0,
             });
         },
-        [data.images, data.mainImageId, data.mainImageIndex, updateMultipleFields],
+        [data.images, updateMultipleFields, isMainImage],
     );
 
     const inputClassName = (hasError: boolean) =>

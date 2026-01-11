@@ -5,7 +5,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { AlertCircle, Calendar, CheckCircle, Clock, Eye, FileCheck, FileText, Home, XCircle } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface ApplicationsTableProps {
     applications: Application[];
@@ -65,7 +65,7 @@ const statusConfig: Record<string, { labelKey: string; className: string; icon: 
 export function ApplicationsTable({ applications, onRowClick }: ApplicationsTableProps) {
     const { translations, locale } = usePage<SharedData>().props;
     const { formatAmount } = useReactiveCurrency();
-    const t = (key: string) => translate(translations.applications, key);
+    const t = useCallback((key: string) => translate(translations.applications, key), [translations.applications]);
 
     const columns = useMemo(
         () => [
@@ -182,7 +182,7 @@ export function ApplicationsTable({ applications, onRowClick }: ApplicationsTabl
                 ),
             }),
         ],
-        [translations, locale, formatAmount, onRowClick, t],
+        [locale, formatAmount, onRowClick, t],
     );
 
     return <DataTable columns={columns} data={applications} onRowClick={onRowClick} />;

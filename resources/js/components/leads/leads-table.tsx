@@ -4,7 +4,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { Archive, CheckCircle, Eye, FileEdit, Send } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface LeadsTableProps {
     leads: Lead[];
@@ -66,7 +66,7 @@ const sourceConfig: Record<string, { labelKey: string; className: string }> = {
 
 export function LeadsTable({ leads, onRowClick }: LeadsTableProps) {
     const { translations, locale } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations.leads, key);
+    const t = useCallback((key: string) => translate(translations.leads, key), [translations.leads]);
 
     const columns = useMemo(
         () => [

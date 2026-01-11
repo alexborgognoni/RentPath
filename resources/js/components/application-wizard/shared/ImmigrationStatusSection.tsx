@@ -4,7 +4,7 @@ import { Select } from '@/components/ui/select';
 import type { Translations } from '@/types/translations';
 import { getCountryByIso2 } from '@/utils/country-data';
 import { translate } from '@/utils/translate-utils';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export interface ImmigrationStatusData {
     immigration_status: string;
@@ -94,7 +94,7 @@ export function ImmigrationStatusSection({
     onUploadSuccess,
     existingDocument,
 }: ImmigrationStatusSectionProps) {
-    const t = (key: string) => translate(translations, `wizard.application.shared.immigrationStatus.${key}`);
+    const t = useCallback((key: string) => translate(translations, `wizard.application.shared.immigrationStatus.${key}`), [translations]);
 
     // Helper to get prefixed field key for errors/touched lookups
     const fieldKey = (field: string) => (fieldPrefix ? `${fieldPrefix}${field}` : field);
@@ -129,7 +129,7 @@ export function ImmigrationStatusSection({
                 value: opt.value,
                 label: t(`statuses.${opt.value}`) || opt.label,
             })),
-        [translations],
+        [t],
     );
 
     const visaTypeOptions = useMemo(
@@ -138,7 +138,7 @@ export function ImmigrationStatusSection({
                 value: opt.value,
                 label: t(`visaTypes.${opt.value}`) || opt.label,
             })),
-        [translations],
+        [t],
     );
 
     // Build document type for upload endpoint

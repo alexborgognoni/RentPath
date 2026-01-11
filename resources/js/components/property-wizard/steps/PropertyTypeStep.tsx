@@ -7,7 +7,7 @@ import { translate } from '@/utils/translate-utils';
 import { usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Building2, Car, Factory, Home, Hotel, Users } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface PropertyTypeStepProps {
     data: PropertyWizardData;
@@ -25,7 +25,7 @@ interface PropertyTypeOption {
 
 function usePropertyTypes(): PropertyTypeOption[] {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = useCallback((key: string) => translate(translations, key), [translations]);
 
     return useMemo(
         () => [
@@ -98,7 +98,7 @@ function usePropertyTypes(): PropertyTypeOption[] {
                 ],
             },
         ],
-        [translations],
+        [t],
     );
 }
 
