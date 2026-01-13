@@ -217,16 +217,26 @@ $application->update([
 
 ### 8. Add Translations (i18n)
 
+Translations are organized by route/domain. Add to the appropriate wizard file:
+
 ```php
-// resources/lang/en/validation.php or application.php
+// For Application Wizard: resources/lang/en/wizard/application.php
+// For Property Wizard: resources/lang/en/wizard/property.php
 
 return [
-    'new_field' => [
-        'label' => 'New Field',
-        'placeholder' => 'Enter value...',
+    'steps' => [
+        'identity' => [
+            // ... existing fields
+            'newField' => [
+                'label' => 'New Field',
+                'placeholder' => 'Enter value...',
+            ],
+        ],
     ],
 ];
 ```
+
+Remember to add translations for all 4 locales (en, de, fr, nl). See `docs/architecture/i18n.md` for the full translation structure.
 
 ### 9. Update Tests
 

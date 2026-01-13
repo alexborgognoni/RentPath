@@ -111,6 +111,7 @@ resources/js/
 
 ```typescript
 import { usePage, Head } from '@inertiajs/react';
+import { translate } from '@/utils/translate-utils';
 import type { SharedData } from '@/types';
 
 interface Props extends SharedData {
@@ -119,12 +120,14 @@ interface Props extends SharedData {
 
 export default function PropertyShow() {
   const { property, translations, auth } = usePage<Props>().props;
-  const t = (key: string) => translate(translations, key);
+  // Scope translations to the specific domain file
+  const t = (key: string) => translate(translations.manager.properties, key);
 
   return (
     <>
       <Head title={property.title} />
       <div className="container mx-auto px-4 py-8">
+        <h1>{t('details.propertyDetails')}</h1>
         {/* content */}
       </div>
     </>

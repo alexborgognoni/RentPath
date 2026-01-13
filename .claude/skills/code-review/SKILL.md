@@ -143,8 +143,9 @@ $applications = Application::with('property')->get();
 // BAD: Hardcoded string
 <label>Email Address</label>
 
-// GOOD: i18n
-<label>{translate(translations, 'form.email')}</label>
+// GOOD: i18n (scoped to specific domain file)
+const t = (key: string) => translate(translations.auth.login, key);
+<label>{t('form.email')}</label>
 ```
 
 **Note**: Status badges (application states like submitted, approved, rejected) may intentionally use hardcoded colors for visual differentiation.
