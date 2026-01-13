@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
  * Step 5: Credit & Rental History
  *
  * Validates credit authorization, current/previous addresses, and references.
+ * All fields are stored in TenantProfile (profile_ prefix).
  */
 class HistoryStepRequest extends FormRequest
 {
@@ -23,71 +24,70 @@ class HistoryStepRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Credit Check Authorization
-            'authorize_credit_check' => 'required|boolean|accepted',
-            'authorize_background_check' => 'nullable|boolean',
-            'credit_check_provider_preference' => ['nullable', Rule::in(['experian', 'equifax', 'transunion', 'illion_au', 'no_preference'])],
-            'has_ccjs_or_bankruptcies' => 'nullable|boolean',
-            'ccj_bankruptcy_details' => 'nullable|string|max:2000|required_if:has_ccjs_or_bankruptcies,true',
-            'has_eviction_history' => 'nullable|boolean',
-            'eviction_details' => 'nullable|string|max:2000|required_if:has_eviction_history,true',
-            'self_reported_credit_score' => 'nullable|integer|min:300|max:850',
+            // Credit Check Authorization (stored in TenantProfile)
+            'profile_authorize_credit_check' => 'required|boolean|accepted',
+            'profile_authorize_background_check' => 'nullable|boolean',
+            'profile_credit_check_provider_preference' => ['nullable', Rule::in(['experian', 'equifax', 'transunion', 'illion_au', 'no_preference'])],
+            'profile_has_ccjs_or_bankruptcies' => 'nullable|boolean',
+            'profile_ccj_bankruptcy_details' => 'nullable|string|max:2000|required_if:profile_has_ccjs_or_bankruptcies,true',
+            'profile_has_eviction_history' => 'nullable|boolean',
+            'profile_eviction_details' => 'nullable|string|max:2000|required_if:profile_has_eviction_history,true',
 
-            // Current Address
-            'current_living_situation' => ['required', Rule::in($this->livingSituations())],
-            'current_address_street_name' => 'required|string|max:255',
-            'current_address_house_number' => 'required|string|max:20',
-            'current_address_address_line_2' => 'nullable|string|max:100',
-            'current_address_city' => 'required|string|max:100',
-            'current_address_state_province' => 'nullable|string|max:100',
-            'current_address_postal_code' => 'required|string|max:20',
-            'current_address_country' => 'required|string|max:2',
-            'current_address_move_in_date' => 'required|date|before_or_equal:today',
-            'current_monthly_rent' => 'nullable|numeric|min:0|required_if:current_living_situation,renting',
-            'current_rent_currency' => 'nullable|string|max:3',
-            'current_landlord_name' => 'nullable|string|max:200',
-            'current_landlord_contact' => 'nullable|string|max:200',
-            'reason_for_moving' => ['required', Rule::in($this->reasonsForMoving())],
-            'reason_for_moving_other' => 'nullable|string|max:200|required_if:reason_for_moving,other',
+            // Current Address (uses existing profile current address fields)
+            'profile_current_living_situation' => ['required', Rule::in($this->livingSituations())],
+            'profile_current_street_name' => 'required|string|max:255',
+            'profile_current_house_number' => 'required|string|max:20',
+            'profile_current_address_line_2' => 'nullable|string|max:100',
+            'profile_current_city' => 'required|string|max:100',
+            'profile_current_state_province' => 'nullable|string|max:100',
+            'profile_current_postal_code' => 'required|string|max:20',
+            'profile_current_country' => 'required|string|max:2',
+            'profile_current_address_move_in_date' => 'required|date|before_or_equal:today',
+            'profile_current_monthly_rent' => 'nullable|numeric|min:0|required_if:profile_current_living_situation,renting',
+            'profile_current_rent_currency' => 'nullable|string|max:3',
+            'profile_current_landlord_name' => 'nullable|string|max:200',
+            'profile_current_landlord_contact' => 'nullable|string|max:200',
+            'profile_reason_for_moving' => ['required', Rule::in($this->reasonsForMoving())],
+            'profile_reason_for_moving_other' => 'nullable|string|max:200|required_if:profile_reason_for_moving,other',
 
-            // Previous Addresses
-            'previous_addresses' => 'nullable|array|max:5',
-            'previous_addresses.*.street_name' => 'required|string|max:255',
-            'previous_addresses.*.house_number' => 'required|string|max:20',
-            'previous_addresses.*.address_line_2' => 'nullable|string|max:100',
-            'previous_addresses.*.city' => 'required|string|max:100',
-            'previous_addresses.*.state_province' => 'nullable|string|max:100',
-            'previous_addresses.*.postal_code' => 'required|string|max:20',
-            'previous_addresses.*.country' => 'required|string|max:2',
-            'previous_addresses.*.from_date' => 'required|date',
-            'previous_addresses.*.to_date' => 'required|date|after:previous_addresses.*.from_date',
-            'previous_addresses.*.living_situation' => ['nullable', Rule::in($this->livingSituations())],
-            'previous_addresses.*.monthly_rent' => 'nullable|numeric|min:0',
-            'previous_addresses.*.rent_currency' => 'nullable|string|max:3',
-            'previous_addresses.*.landlord_name' => 'nullable|string|max:200',
-            'previous_addresses.*.landlord_contact' => 'nullable|string|max:200',
-            'previous_addresses.*.can_contact_landlord' => 'nullable|boolean',
+            // Previous Addresses (stored in TenantProfile as JSON)
+            'profile_previous_addresses' => 'nullable|array|max:5',
+            'profile_previous_addresses.*.street_name' => 'required|string|max:255',
+            'profile_previous_addresses.*.house_number' => 'required|string|max:20',
+            'profile_previous_addresses.*.address_line_2' => 'nullable|string|max:100',
+            'profile_previous_addresses.*.city' => 'required|string|max:100',
+            'profile_previous_addresses.*.state_province' => 'nullable|string|max:100',
+            'profile_previous_addresses.*.postal_code' => 'required|string|max:20',
+            'profile_previous_addresses.*.country' => 'required|string|max:2',
+            'profile_previous_addresses.*.from_date' => 'required|date',
+            'profile_previous_addresses.*.to_date' => 'required|date|after:profile_previous_addresses.*.from_date',
+            'profile_previous_addresses.*.living_situation' => ['nullable', Rule::in($this->livingSituations())],
+            'profile_previous_addresses.*.monthly_rent' => 'nullable|numeric|min:0',
+            'profile_previous_addresses.*.rent_currency' => 'nullable|string|max:3',
+            'profile_previous_addresses.*.landlord_name' => 'nullable|string|max:200',
+            'profile_previous_addresses.*.landlord_contact' => 'nullable|string|max:200',
+            'profile_previous_addresses.*.can_contact_landlord' => 'nullable|boolean',
 
-            // References
-            'references' => 'nullable|array',
-            'references.*.type' => ['required', Rule::in(['landlord', 'employer', 'personal', 'professional'])],
-            'references.*.name' => 'required|string|max:200',
-            'references.*.company' => 'nullable|string|max:200',
-            'references.*.email' => 'required|email|max:255',
-            'references.*.phone' => 'required|string|max:50',
-            'references.*.property_address' => 'nullable|string|max:500',
-            'references.*.tenancy_start_date' => 'nullable|date',
-            'references.*.tenancy_end_date' => 'nullable|date',
-            'references.*.monthly_rent_paid' => 'nullable|numeric|min:0',
-            'references.*.job_title' => 'nullable|string|max:100',
-            'references.*.relationship' => ['nullable', Rule::in(['professional', 'personal'])],
-            'references.*.years_known' => 'nullable|integer|min:0|max:100',
-            'references.*.consent_to_contact' => 'required|boolean|accepted',
+            // Landlord References (stored in TenantProfile as JSON)
+            'profile_landlord_references' => 'nullable|array|max:3',
+            'profile_landlord_references.*.name' => 'required|string|max:200',
+            'profile_landlord_references.*.company' => 'nullable|string|max:200',
+            'profile_landlord_references.*.email' => 'required|email|max:255',
+            'profile_landlord_references.*.phone' => 'required|string|max:50',
+            'profile_landlord_references.*.property_address' => 'nullable|string|max:500',
+            'profile_landlord_references.*.tenancy_start_date' => 'nullable|date',
+            'profile_landlord_references.*.tenancy_end_date' => 'nullable|date',
+            'profile_landlord_references.*.monthly_rent_paid' => 'nullable|numeric|min:0',
+            'profile_landlord_references.*.consent_to_contact' => 'required|boolean|accepted',
 
-            // Legacy reference fields (backward compatibility)
-            'previous_landlord_name' => 'nullable|string|max:255',
-            'previous_landlord_phone' => 'nullable|string|max:20',
-            'previous_landlord_email' => 'nullable|email|max:255',
+            // Other References (stored in TenantProfile as JSON)
+            'profile_other_references' => 'nullable|array|max:2',
+            'profile_other_references.*.name' => 'required|string|max:200',
+            'profile_other_references.*.email' => 'required|email|max:255',
+            'profile_other_references.*.phone' => 'required|string|max:50',
+            'profile_other_references.*.relationship' => ['required', Rule::in(['professional', 'personal'])],
+            'profile_other_references.*.years_known' => 'nullable|integer|min:0|max:100',
+            'profile_other_references.*.consent_to_contact' => 'required|boolean|accepted',
         ];
     }
 
@@ -95,37 +95,45 @@ class HistoryStepRequest extends FormRequest
     {
         return [
             // Credit
-            'authorize_credit_check.required' => 'Credit check authorization is required',
-            'authorize_credit_check.accepted' => 'You must authorize the credit check to proceed',
-            'ccj_bankruptcy_details.required_if' => 'Please provide details about your CCJs or bankruptcies',
-            'eviction_details.required_if' => 'Please provide details about your eviction history',
+            'profile_authorize_credit_check.required' => 'Credit check authorization is required',
+            'profile_authorize_credit_check.accepted' => 'You must authorize the credit check to proceed',
+            'profile_ccj_bankruptcy_details.required_if' => 'Please provide details about your CCJs or bankruptcies',
+            'profile_eviction_details.required_if' => 'Please provide details about your eviction history',
 
             // Current Address
-            'current_living_situation.required' => 'Please select your current living situation',
-            'current_address_street_name.required' => 'Street name is required',
-            'current_address_house_number.required' => 'House number is required',
-            'current_address_city.required' => 'City is required',
-            'current_address_postal_code.required' => 'Postal code is required',
-            'current_address_country.required' => 'Country is required',
-            'current_address_move_in_date.required' => 'Move-in date is required',
-            'current_address_move_in_date.before_or_equal' => 'Move-in date cannot be in the future',
-            'current_monthly_rent.required_if' => 'Monthly rent is required for renters',
-            'reason_for_moving.required' => 'Please select your reason for moving',
-            'reason_for_moving_other.required_if' => 'Please specify your reason for moving',
+            'profile_current_living_situation.required' => 'Please select your current living situation',
+            'profile_current_street_name.required' => 'Street name is required',
+            'profile_current_house_number.required' => 'House number is required',
+            'profile_current_city.required' => 'City is required',
+            'profile_current_postal_code.required' => 'Postal code is required',
+            'profile_current_country.required' => 'Country is required',
+            'profile_current_address_move_in_date.required' => 'Move-in date is required',
+            'profile_current_address_move_in_date.before_or_equal' => 'Move-in date cannot be in the future',
+            'profile_current_monthly_rent.required_if' => 'Monthly rent is required for renters',
+            'profile_reason_for_moving.required' => 'Please select your reason for moving',
+            'profile_reason_for_moving_other.required_if' => 'Please specify your reason for moving',
 
             // Previous Addresses
-            'previous_addresses.*.street_name.required' => 'Street name is required',
-            'previous_addresses.*.city.required' => 'City is required',
-            'previous_addresses.*.from_date.required' => 'Start date is required',
-            'previous_addresses.*.to_date.required' => 'End date is required',
-            'previous_addresses.*.to_date.after' => 'End date must be after start date',
+            'profile_previous_addresses.*.street_name.required' => 'Street name is required',
+            'profile_previous_addresses.*.city.required' => 'City is required',
+            'profile_previous_addresses.*.from_date.required' => 'Start date is required',
+            'profile_previous_addresses.*.to_date.required' => 'End date is required',
+            'profile_previous_addresses.*.to_date.after' => 'End date must be after start date',
 
-            // References
-            'references.*.name.required' => 'Reference name is required',
-            'references.*.email.required' => 'Reference email is required',
-            'references.*.email.email' => 'Please enter a valid email address',
-            'references.*.phone.required' => 'Reference phone is required',
-            'references.*.consent_to_contact.accepted' => 'Reference must consent to being contacted',
+            // Landlord References
+            'profile_landlord_references.*.name.required' => 'Reference name is required',
+            'profile_landlord_references.*.email.required' => 'Reference email is required',
+            'profile_landlord_references.*.email.email' => 'Please enter a valid email address',
+            'profile_landlord_references.*.phone.required' => 'Reference phone is required',
+            'profile_landlord_references.*.consent_to_contact.accepted' => 'Reference must consent to being contacted',
+
+            // Other References
+            'profile_other_references.*.name.required' => 'Reference name is required',
+            'profile_other_references.*.email.required' => 'Reference email is required',
+            'profile_other_references.*.email.email' => 'Please enter a valid email address',
+            'profile_other_references.*.phone.required' => 'Reference phone is required',
+            'profile_other_references.*.relationship.required' => 'Reference relationship is required',
+            'profile_other_references.*.consent_to_contact.accepted' => 'Reference must consent to being contacted',
         ];
     }
 }

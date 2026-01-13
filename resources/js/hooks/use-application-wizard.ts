@@ -130,32 +130,35 @@ export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
         title: 'Credit & Rental History',
         shortTitle: 'History',
         fields: [
-            'authorize_credit_check',
-            'credit_check_provider_preference',
-            'authorize_background_check',
-            'has_ccjs_or_bankruptcies',
-            'ccj_bankruptcy_details',
-            'has_eviction_history',
-            'eviction_details',
-            'self_reported_credit_score',
-            'current_living_situation',
-            'current_address_street_name',
-            'current_address_house_number',
-            'current_address_address_line_2',
-            'current_address_city',
-            'current_address_state_province',
-            'current_address_postal_code',
-            'current_address_country',
-            'current_address_move_in_date',
-            'current_monthly_rent',
-            'current_rent_currency',
-            'current_landlord_name',
-            'current_landlord_contact',
-            'reason_for_moving',
-            'reason_for_moving_other',
-            'previous_addresses',
-            'landlord_references',
-            'other_references',
+            // Credit & Background Authorization
+            'profile_authorize_credit_check',
+            'profile_credit_check_provider_preference',
+            'profile_authorize_background_check',
+            'profile_has_ccjs_or_bankruptcies',
+            'profile_ccj_bankruptcy_details',
+            'profile_has_eviction_history',
+            'profile_eviction_details',
+            // Current Address (reuses profile fields from identity step)
+            'profile_current_living_situation',
+            'profile_current_street_name',
+            'profile_current_house_number',
+            'profile_current_address_line_2',
+            'profile_current_city',
+            'profile_current_state_province',
+            'profile_current_postal_code',
+            'profile_current_country',
+            'profile_current_address_move_in_date',
+            'profile_current_monthly_rent',
+            'profile_current_rent_currency',
+            'profile_current_landlord_name',
+            'profile_current_landlord_contact',
+            // Reason for Moving
+            'profile_reason_for_moving',
+            'profile_reason_for_moving_other',
+            // Previous Addresses & References
+            'profile_previous_addresses',
+            'profile_landlord_references',
+            'profile_other_references',
         ],
     },
     {
@@ -544,33 +547,25 @@ export interface ApplicationWizardData {
     existing_insurance_provider: string;
     existing_insurance_policy_number: string;
 
-    // ===== Step 5: Credit & Rental History =====
-    // Credit Check Authorization (Core)
-    authorize_credit_check: boolean;
-    credit_check_provider_preference: 'experian' | 'equifax' | 'transunion' | 'illion_au' | 'no_preference' | '';
-    // Background & History (Optional - Suggested for US)
-    authorize_background_check: boolean;
-    has_ccjs_or_bankruptcies: boolean;
-    ccj_bankruptcy_details: string;
-    has_eviction_history: boolean;
-    eviction_details: string;
-    self_reported_credit_score: string;
-    credit_report_upload: File | null;
-    // Current Address (matching AddressForm component structure)
-    current_living_situation: 'renting' | 'owner' | 'living_with_family' | 'student_housing' | 'employer_provided' | 'other' | '';
-    current_address_street_name: string;
-    current_address_house_number: string;
-    current_address_address_line_2: string;
-    current_address_city: string;
-    current_address_state_province: string;
-    current_address_postal_code: string;
-    current_address_country: string;
-    current_address_move_in_date: string;
-    current_monthly_rent: string;
-    current_rent_currency: string;
-    current_landlord_name: string;
-    current_landlord_contact: string;
-    reason_for_moving:
+    // ===== Step 5: Credit & Rental History (stored in TenantProfile) =====
+    // Credit Check Authorization
+    profile_authorize_credit_check: boolean;
+    profile_credit_check_provider_preference: 'experian' | 'equifax' | 'transunion' | 'illion_au' | 'no_preference' | '';
+    profile_authorize_background_check: boolean;
+    // Credit & Background Self-Disclosure
+    profile_has_ccjs_or_bankruptcies: boolean;
+    profile_ccj_bankruptcy_details: string;
+    profile_has_eviction_history: boolean;
+    profile_eviction_details: string;
+    // Current Living Situation (supplements profile current address)
+    profile_current_living_situation: 'renting' | 'owner' | 'living_with_family' | 'student_housing' | 'employer_provided' | 'other' | '';
+    profile_current_address_move_in_date: string;
+    profile_current_monthly_rent: string;
+    profile_current_rent_currency: string;
+    profile_current_landlord_name: string;
+    profile_current_landlord_contact: string;
+    // Reason for Moving
+    profile_reason_for_moving:
         | 'relocation_work'
         | 'relocation_personal'
         | 'upsizing'
@@ -584,19 +579,21 @@ export interface ApplicationWizardData {
         | 'first_time_renter'
         | 'other'
         | '';
-    reason_for_moving_other: string;
+    profile_reason_for_moving_other: string;
     // Previous Addresses (Last 3 years)
-    previous_addresses: PreviousAddressDetails[];
+    profile_previous_addresses: PreviousAddressDetails[];
     // Landlord References
-    landlord_references: LandlordReferenceDetails[];
-    // Employer Reference
+    profile_landlord_references: LandlordReferenceDetails[];
+    // Employer Reference (application-specific, not in profile)
     employer_reference_name: string;
     employer_reference_email: string;
     employer_reference_phone: string;
     employer_reference_job_title: string;
     consent_to_contact_employer: boolean;
     // Other References
-    other_references: OtherReferenceDetails[];
+    profile_other_references: OtherReferenceDetails[];
+    // Legacy fields (backwards compatibility - kept for drafts)
+    credit_report_upload: File | null;
 
     // ===== Step 6: Additional Information & Documents =====
     additional_information: string;
@@ -1001,44 +998,38 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         existing_insurance_provider: (draft?.existing_insurance_provider as string) || '',
         existing_insurance_policy_number: (draft?.existing_insurance_policy_number as string) || '',
 
-        // ===== Step 5: Credit & Rental History =====
-        // Credit Check
-        authorize_credit_check: draft?.authorize_credit_check || false,
-        credit_check_provider_preference:
-            (draft?.credit_check_provider_preference as ApplicationWizardData['credit_check_provider_preference']) || '',
-        authorize_background_check: draft?.authorize_background_check || false,
-        has_ccjs_or_bankruptcies: draft?.has_ccjs_or_bankruptcies || false,
-        ccj_bankruptcy_details: (draft?.ccj_bankruptcy_details as string) || '',
-        has_eviction_history: draft?.has_eviction_history || false,
-        eviction_details: (draft?.eviction_details as string) || '',
-        self_reported_credit_score: (draft?.self_reported_credit_score as string) || '',
+        // ===== Step 5: Credit & Rental History (loaded from TenantProfile) =====
+        // Credit Check Authorization
+        profile_authorize_credit_check: tp?.authorize_credit_check || false,
+        profile_credit_check_provider_preference:
+            (tp?.credit_check_provider_preference as ApplicationWizardData['profile_credit_check_provider_preference']) || '',
+        profile_authorize_background_check: tp?.authorize_background_check || false,
+        // Credit & Background Self-Disclosure
+        profile_has_ccjs_or_bankruptcies: tp?.has_ccjs_or_bankruptcies || false,
+        profile_ccj_bankruptcy_details: (tp?.ccj_bankruptcy_details as string) || '',
+        profile_has_eviction_history: tp?.has_eviction_history || false,
+        profile_eviction_details: (tp?.eviction_details as string) || '',
         credit_report_upload: null,
-        // Current Address (matching AddressForm component)
-        current_living_situation: (draft?.current_living_situation as ApplicationWizardData['current_living_situation']) || '',
-        current_address_street_name: (draft?.current_address_street_name as string) || tenantProfile?.current_street_name || '',
-        current_address_house_number: (draft?.current_address_house_number as string) || tenantProfile?.current_house_number || '',
-        current_address_address_line_2: (draft?.current_address_address_line_2 as string) || tenantProfile?.current_address_line_2 || '',
-        current_address_city: (draft?.current_address_city as string) || tenantProfile?.current_city || '',
-        current_address_state_province: (draft?.current_address_state_province as string) || tenantProfile?.current_state_province || '',
-        current_address_postal_code: (draft?.current_address_postal_code as string) || tenantProfile?.current_postal_code || '',
-        current_address_country: (draft?.current_address_country as string) || tenantProfile?.current_country || '',
-        current_address_move_in_date: draft?.current_address_move_in_date ? formatDateForInput(draft.current_address_move_in_date) : '',
-        current_monthly_rent: (draft?.current_monthly_rent as string) || '',
-        current_rent_currency: (draft?.current_rent_currency as string) || 'eur',
-        current_landlord_name: (draft?.current_landlord_name as string) || '',
-        current_landlord_contact: (draft?.current_landlord_contact as string) || '',
-        reason_for_moving: (draft?.reason_for_moving as ApplicationWizardData['reason_for_moving']) || '',
-        reason_for_moving_other: (draft?.reason_for_moving_other as string) || '',
+        // Current Living Situation (supplements profile current address)
+        profile_current_living_situation: (tp?.current_living_situation as ApplicationWizardData['profile_current_living_situation']) || '',
+        profile_current_address_move_in_date: formatDateForInput(tp?.current_address_move_in_date),
+        profile_current_monthly_rent: tp?.current_monthly_rent?.toString() || '',
+        profile_current_rent_currency: (tp?.current_rent_currency as string) || 'eur',
+        profile_current_landlord_name: (tp?.current_landlord_name as string) || '',
+        profile_current_landlord_contact: (tp?.current_landlord_contact as string) || '',
+        // Reason for Moving
+        profile_reason_for_moving: (tp?.reason_for_moving as ApplicationWizardData['profile_reason_for_moving']) || '',
+        profile_reason_for_moving_other: (tp?.reason_for_moving_other as string) || '',
         // Previous Addresses
-        previous_addresses: (draft?.previous_addresses as PreviousAddressDetails[]) || [],
-        // References (loaded from draft - backend transforms from combined 'references' column)
-        landlord_references: (draft?.landlord_references as LandlordReferenceDetails[]) || [],
+        profile_previous_addresses: (tp?.previous_addresses as PreviousAddressDetails[]) || [],
+        // References (loaded from TenantProfile)
+        profile_landlord_references: (tp?.landlord_references as LandlordReferenceDetails[]) || [],
         employer_reference_name: '',
         employer_reference_email: '',
         employer_reference_phone: '',
         employer_reference_job_title: '',
         consent_to_contact_employer: false,
-        other_references: (draft?.other_references as OtherReferenceDetails[]) || [],
+        profile_other_references: (tp?.other_references as OtherReferenceDetails[]) || [],
 
         // ===== Step 6: Additional Information =====
         additional_information: draft?.additional_information || '',
@@ -1690,14 +1681,14 @@ export function useApplicationWizard({
             landlord_contact: '',
             can_contact_landlord: true,
         };
-        wizard.updateField('previous_addresses', [...wizard.data.previous_addresses, newAddress]);
+        wizard.updateField('profile_previous_addresses', [...wizard.data.profile_previous_addresses, newAddress]);
     }, [wizard]);
 
     const removePreviousAddress = useCallback(
         (index: number) => {
             wizard.updateField(
-                'previous_addresses',
-                wizard.data.previous_addresses.filter((_, i) => i !== index),
+                'profile_previous_addresses',
+                wizard.data.profile_previous_addresses.filter((_, i) => i !== index),
             );
         },
         [wizard],
@@ -1706,9 +1697,9 @@ export function useApplicationWizard({
     const updatePreviousAddress = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (index: number, field: keyof PreviousAddressDetails, value: any) => {
-            const updated = [...wizard.data.previous_addresses];
+            const updated = [...wizard.data.profile_previous_addresses];
             updated[index] = { ...updated[index], [field]: value };
-            wizard.updateField('previous_addresses', updated);
+            wizard.updateField('profile_previous_addresses', updated);
             // Don't mark as touched here - that happens on blur
         },
         [wizard],
@@ -1727,14 +1718,14 @@ export function useApplicationWizard({
             monthly_rent_paid: '',
             consent_to_contact: true,
         };
-        wizard.updateField('landlord_references', [...wizard.data.landlord_references, newRef]);
+        wizard.updateField('profile_landlord_references', [...wizard.data.profile_landlord_references, newRef]);
     }, [wizard]);
 
     const removeLandlordReference = useCallback(
         (index: number) => {
             wizard.updateField(
-                'landlord_references',
-                wizard.data.landlord_references.filter((_, i) => i !== index),
+                'profile_landlord_references',
+                wizard.data.profile_landlord_references.filter((_, i) => i !== index),
             );
         },
         [wizard],
@@ -1743,9 +1734,9 @@ export function useApplicationWizard({
     const updateLandlordReference = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (index: number, field: keyof LandlordReferenceDetails, value: any) => {
-            const updated = [...wizard.data.landlord_references];
+            const updated = [...wizard.data.profile_landlord_references];
             updated[index] = { ...updated[index], [field]: value };
-            wizard.updateField('landlord_references', updated);
+            wizard.updateField('profile_landlord_references', updated);
             // Don't mark as touched here - that happens on blur
         },
         [wizard],
@@ -1761,14 +1752,14 @@ export function useApplicationWizard({
             years_known: '',
             consent_to_contact: true,
         };
-        wizard.updateField('other_references', [...wizard.data.other_references, newRef]);
+        wizard.updateField('profile_other_references', [...wizard.data.profile_other_references, newRef]);
     }, [wizard]);
 
     const removeOtherReference = useCallback(
         (index: number) => {
             wizard.updateField(
-                'other_references',
-                wizard.data.other_references.filter((_, i) => i !== index),
+                'profile_other_references',
+                wizard.data.profile_other_references.filter((_, i) => i !== index),
             );
         },
         [wizard],
@@ -1777,9 +1768,9 @@ export function useApplicationWizard({
     const updateOtherReference = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (index: number, field: keyof OtherReferenceDetails, value: any) => {
-            const updated = [...wizard.data.other_references];
+            const updated = [...wizard.data.profile_other_references];
             updated[index] = { ...updated[index], [field]: value };
-            wizard.updateField('other_references', updated);
+            wizard.updateField('profile_other_references', updated);
             // Don't mark as touched here - that happens on blur
         },
         [wizard],
@@ -2089,10 +2080,10 @@ export function useApplicationWizard({
             newTouched.authorize_credit_check = true;
 
             // CCJ/eviction details if applicable
-            if (wizard.data.has_ccjs_or_bankruptcies) {
+            if (wizard.data.profile_has_ccjs_or_bankruptcies) {
                 newTouched.ccj_bankruptcy_details = true;
             }
-            if (wizard.data.has_eviction_history) {
+            if (wizard.data.profile_has_eviction_history) {
                 newTouched.eviction_details = true;
             }
 
@@ -2107,17 +2098,17 @@ export function useApplicationWizard({
 
             // Reason for moving
             newTouched.reason_for_moving = true;
-            if (wizard.data.reason_for_moving === 'other') {
+            if (wizard.data.profile_reason_for_moving === 'other') {
                 newTouched.reason_for_moving_other = true;
             }
 
             // Landlord info if renting
-            if (wizard.data.current_living_situation === 'renting') {
+            if (wizard.data.profile_current_living_situation === 'renting') {
                 newTouched.current_monthly_rent = true;
             }
 
             // Previous addresses
-            wizard.data.previous_addresses.forEach((_, index) => {
+            wizard.data.profile_previous_addresses.forEach((_, index) => {
                 newTouched[`prevaddr_${index}_street_name`] = true;
                 newTouched[`prevaddr_${index}_house_number`] = true;
                 newTouched[`prevaddr_${index}_city`] = true;
@@ -2128,14 +2119,14 @@ export function useApplicationWizard({
             });
 
             // Landlord references
-            wizard.data.landlord_references.forEach((_, index) => {
+            wizard.data.profile_landlord_references.forEach((_, index) => {
                 newTouched[`landlordref_${index}_name`] = true;
                 newTouched[`landlordref_${index}_email`] = true;
                 newTouched[`landlordref_${index}_phone`] = true;
             });
 
             // Other references
-            wizard.data.other_references.forEach((_, index) => {
+            wizard.data.profile_other_references.forEach((_, index) => {
                 newTouched[`otherref_${index}_name`] = true;
                 newTouched[`otherref_${index}_email`] = true;
                 newTouched[`otherref_${index}_phone`] = true;
@@ -2249,13 +2240,13 @@ export function useApplicationWizard({
                 (doc: UploadedFile | string | File | null | undefined) => doc && typeof doc !== 'string' && doc instanceof File,
             ),
             // Map current_address_* fields to profile_current_* fields (backend expects profile_current_*)
-            profile_current_street_name: wizard.data.current_address_street_name,
-            profile_current_house_number: wizard.data.current_address_house_number,
-            profile_current_address_line_2: wizard.data.current_address_address_line_2,
-            profile_current_city: wizard.data.current_address_city,
-            profile_current_state_province: wizard.data.current_address_state_province,
-            profile_current_postal_code: wizard.data.current_address_postal_code,
-            profile_current_country: wizard.data.current_address_country,
+            profile_current_street_name: wizard.data.profile_current_street_name,
+            profile_current_house_number: wizard.data.profile_current_house_number,
+            profile_current_address_line_2: wizard.data.profile_current_address_line_2,
+            profile_current_city: wizard.data.profile_current_city,
+            profile_current_state_province: wizard.data.profile_current_state_province,
+            profile_current_postal_code: wizard.data.profile_current_postal_code,
+            profile_current_country: wizard.data.profile_current_country,
         };
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

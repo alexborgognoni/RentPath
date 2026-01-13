@@ -78,11 +78,11 @@ export function HistoryStep({
     useEffect(() => {
         const hasCurrentAddressErrors = Object.keys(errors).some(
             (key) =>
-                key.startsWith('current_address_') ||
-                key === 'current_living_situation' ||
-                key === 'current_monthly_rent' ||
-                key === 'reason_for_moving' ||
-                key === 'reason_for_moving_other',
+                key.startsWith('profile_current_') ||
+                key === 'profile_current_living_situation' ||
+                key === 'profile_current_monthly_rent' ||
+                key === 'profile_reason_for_moving' ||
+                key === 'profile_reason_for_moving_other',
         );
         const hasPreviousAddressErrors = Object.keys(errors).some((key) => key.startsWith('prevaddr_'));
         const hasLandlordRefErrors = Object.keys(errors).some((key) => key.startsWith('landlordref_'));
@@ -178,21 +178,21 @@ export function HistoryStep({
         return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
 
-    // Current address as AddressData
+    // Current address as AddressData (uses profile current address fields)
     const currentAddressData: AddressData = {
-        street_name: data.current_address_street_name,
-        house_number: data.current_address_house_number,
-        address_line_2: data.current_address_address_line_2,
-        city: data.current_address_city,
-        state_province: data.current_address_state_province,
-        postal_code: data.current_address_postal_code,
-        country: data.current_address_country,
+        street_name: data.profile_current_street_name,
+        house_number: data.profile_current_house_number,
+        address_line_2: data.profile_current_address_line_2,
+        city: data.profile_current_city,
+        state_province: data.profile_current_state_province,
+        postal_code: data.profile_current_postal_code,
+        country: data.profile_current_country,
     };
 
-    // Handle current address field changes
+    // Handle current address field changes (maps to profile_current_* fields)
     const handleCurrentAddressChange = useCallback(
         (field: keyof AddressData, value: string) => {
-            const fieldName = `current_address_${field}` as keyof ApplicationWizardData;
+            const fieldName = `profile_current_${field}` as keyof ApplicationWizardData;
             updateField(fieldName, value as ApplicationWizardData[typeof fieldName]);
         },
         [updateField],
@@ -201,7 +201,7 @@ export function HistoryStep({
     // Per-field blur handler for current address fields
     const handleCurrentAddressBlur = useCallback(
         (field: keyof AddressData) => {
-            const fieldKey = `current_address_${field}`;
+            const fieldKey = `profile_current_${field}`;
             markFieldTouched(fieldKey);
             onFieldBlur?.(fieldKey);
         },
@@ -218,11 +218,11 @@ export function HistoryStep({
         [markFieldTouched, onFieldBlur],
     );
 
-    // Current address errors/touched for AddressForm
+    // Current address errors/touched for AddressForm (uses profile_current_* field prefix)
     const currentAddressErrors = useMemo(() => {
         const result: Record<string, string> = {};
         Object.keys(errors).forEach((key) => {
-            if (key.startsWith('current_address_')) {
+            if (key.startsWith('profile_current_')) {
                 result[key] = errors[key];
             }
         });
@@ -232,7 +232,7 @@ export function HistoryStep({
     const currentAddressTouched = useMemo(() => {
         const result: Record<string, boolean> = {};
         Object.keys(touchedFields).forEach((key) => {
-            if (key.startsWith('current_address_')) {
+            if (key.startsWith('profile_current_')) {
                 result[key] = touchedFields[key];
             }
         });
@@ -316,10 +316,10 @@ export function HistoryStep({
                             <label className="flex cursor-pointer items-start gap-3">
                                 <input
                                     type="checkbox"
-                                    checked={data.authorize_credit_check}
-                                    onChange={(e) => updateField('authorize_credit_check', e.target.checked)}
-                                    onBlur={handleFieldBlur('authorize_credit_check')}
-                                    aria-invalid={!!(touchedFields.authorize_credit_check && errors.authorize_credit_check)}
+                                    checked={data.profile_authorize_credit_check}
+                                    onChange={(e) => updateField('profile_authorize_credit_check', e.target.checked)}
+                                    onBlur={handleFieldBlur('profile_authorize_credit_check')}
+                                    aria-invalid={!!(touchedFields.profile_authorize_credit_check && errors.profile_authorize_credit_check)}
                                     className="mt-1 h-5 w-5 rounded border-border"
                                 />
                                 <div>
@@ -330,7 +330,9 @@ export function HistoryStep({
                                     </p>
                                 </div>
                             </label>
-                            {showError('authorize_credit_check') && <p className="mt-2 text-sm text-destructive">{errors.authorize_credit_check}</p>}
+                            {showError('profile_authorize_credit_check') && (
+                                <p className="mt-2 text-sm text-destructive">{errors.profile_authorize_credit_check}</p>
+                            )}
                         </div>
 
                         {/* Provider Preference (Optional) */}
@@ -340,11 +342,14 @@ export function HistoryStep({
                                 <OptionalBadge />
                             </label>
                             <Select
-                                value={data.credit_check_provider_preference}
+                                value={data.profile_credit_check_provider_preference}
                                 onChange={(value) =>
-                                    updateField('credit_check_provider_preference', value as typeof data.credit_check_provider_preference)
+                                    updateField(
+                                        'profile_credit_check_provider_preference',
+                                        value as typeof data.profile_credit_check_provider_preference,
+                                    )
                                 }
-                                onBlur={handleFieldBlur('credit_check_provider_preference')}
+                                onBlur={handleFieldBlur('profile_credit_check_provider_preference')}
                                 options={CREDIT_PROVIDERS}
                                 placeholder={t('creditCheck.providerPlaceholder') || 'Select provider...'}
                             />
@@ -354,9 +359,9 @@ export function HistoryStep({
                         <label className="flex cursor-pointer items-start gap-3">
                             <input
                                 type="checkbox"
-                                checked={data.authorize_background_check}
-                                onChange={(e) => updateField('authorize_background_check', e.target.checked)}
-                                onBlur={handleFieldBlur('authorize_background_check')}
+                                checked={data.profile_authorize_background_check}
+                                onChange={(e) => updateField('profile_authorize_background_check', e.target.checked)}
+                                onBlur={handleFieldBlur('profile_authorize_background_check')}
                                 className="mt-1 h-5 w-5 rounded border-border"
                             />
                             <div>
@@ -376,28 +381,28 @@ export function HistoryStep({
                             <label className="flex cursor-pointer items-start gap-3">
                                 <input
                                     type="checkbox"
-                                    checked={data.has_ccjs_or_bankruptcies}
-                                    onChange={(e) => updateField('has_ccjs_or_bankruptcies', e.target.checked)}
-                                    onBlur={handleFieldBlur('has_ccjs_or_bankruptcies')}
+                                    checked={data.profile_has_ccjs_or_bankruptcies}
+                                    onChange={(e) => updateField('profile_has_ccjs_or_bankruptcies', e.target.checked)}
+                                    onBlur={handleFieldBlur('profile_has_ccjs_or_bankruptcies')}
                                     className="mt-1 h-5 w-5 rounded border-border"
                                 />
                                 <span className="font-medium">
                                     {t('creditCheck.ccjLabel') || 'I have CCJs, defaults, or bankruptcies to disclose'}
                                 </span>
                             </label>
-                            {data.has_ccjs_or_bankruptcies && (
+                            {data.profile_has_ccjs_or_bankruptcies && (
                                 <div className="mt-3 ml-8">
                                     <textarea
-                                        value={data.ccj_bankruptcy_details}
-                                        onChange={(e) => updateField('ccj_bankruptcy_details', e.target.value)}
-                                        onBlur={handleFieldBlur('ccj_bankruptcy_details')}
+                                        value={data.profile_ccj_bankruptcy_details}
+                                        onChange={(e) => updateField('profile_ccj_bankruptcy_details', e.target.value)}
+                                        onBlur={handleFieldBlur('profile_ccj_bankruptcy_details')}
                                         placeholder={t('creditCheck.ccjPlaceholder') || 'Please provide details...'}
-                                        aria-invalid={!!(touchedFields.ccj_bankruptcy_details && errors.ccj_bankruptcy_details)}
-                                        className={getFieldClass('ccj_bankruptcy_details')}
+                                        aria-invalid={!!(touchedFields.profile_ccj_bankruptcy_details && errors.profile_ccj_bankruptcy_details)}
+                                        className={getFieldClass('profile_ccj_bankruptcy_details')}
                                         rows={3}
                                     />
-                                    {showError('ccj_bankruptcy_details') && (
-                                        <p className="mt-1 text-sm text-destructive">{errors.ccj_bankruptcy_details}</p>
+                                    {showError('profile_ccj_bankruptcy_details') && (
+                                        <p className="mt-1 text-sm text-destructive">{errors.profile_ccj_bankruptcy_details}</p>
                                     )}
                                 </div>
                             )}
@@ -408,25 +413,27 @@ export function HistoryStep({
                             <label className="flex cursor-pointer items-start gap-3">
                                 <input
                                     type="checkbox"
-                                    checked={data.has_eviction_history}
-                                    onChange={(e) => updateField('has_eviction_history', e.target.checked)}
-                                    onBlur={handleFieldBlur('has_eviction_history')}
+                                    checked={data.profile_has_eviction_history}
+                                    onChange={(e) => updateField('profile_has_eviction_history', e.target.checked)}
+                                    onBlur={handleFieldBlur('profile_has_eviction_history')}
                                     className="mt-1 h-5 w-5 rounded border-border"
                                 />
                                 <span className="font-medium">{t('creditCheck.evictionLabel') || 'I have prior evictions to disclose'}</span>
                             </label>
-                            {data.has_eviction_history && (
+                            {data.profile_has_eviction_history && (
                                 <div className="mt-3 ml-8">
                                     <textarea
-                                        value={data.eviction_details}
-                                        onChange={(e) => updateField('eviction_details', e.target.value)}
-                                        onBlur={handleFieldBlur('eviction_details')}
+                                        value={data.profile_eviction_details}
+                                        onChange={(e) => updateField('profile_eviction_details', e.target.value)}
+                                        onBlur={handleFieldBlur('profile_eviction_details')}
                                         placeholder={t('creditCheck.evictionPlaceholder') || 'Please provide details...'}
-                                        aria-invalid={!!(touchedFields.eviction_details && errors.eviction_details)}
-                                        className={getFieldClass('eviction_details')}
+                                        aria-invalid={!!(touchedFields.profile_eviction_details && errors.profile_eviction_details)}
+                                        className={getFieldClass('profile_eviction_details')}
                                         rows={3}
                                     />
-                                    {showError('eviction_details') && <p className="mt-1 text-sm text-destructive">{errors.eviction_details}</p>}
+                                    {showError('profile_eviction_details') && (
+                                        <p className="mt-1 text-sm text-destructive">{errors.profile_eviction_details}</p>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -456,15 +463,17 @@ export function HistoryStep({
                                 {t('currentAddress.livingSituation') || 'Current Living Situation'}
                             </label>
                             <Select
-                                value={data.current_living_situation}
-                                onChange={(value) => updateField('current_living_situation', value as typeof data.current_living_situation)}
-                                onBlur={handleFieldBlur('current_living_situation')}
+                                value={data.profile_current_living_situation}
+                                onChange={(value) =>
+                                    updateField('profile_current_living_situation', value as typeof data.profile_current_living_situation)
+                                }
+                                onBlur={handleFieldBlur('profile_current_living_situation')}
                                 options={LIVING_SITUATIONS}
                                 placeholder={t('currentAddress.livingSituationPlaceholder') || 'Select...'}
-                                aria-invalid={!!(touchedFields.current_living_situation && errors.current_living_situation)}
+                                aria-invalid={!!(touchedFields.profile_current_living_situation && errors.profile_current_living_situation)}
                             />
-                            {showError('current_living_situation') && (
-                                <p className="mt-1 text-sm text-destructive">{errors.current_living_situation}</p>
+                            {showError('profile_current_living_situation') && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_current_living_situation}</p>
                             )}
                         </div>
 
@@ -475,7 +484,7 @@ export function HistoryStep({
                             onFieldBlur={handleCurrentAddressBlur}
                             errors={currentAddressErrors}
                             touchedFields={currentAddressTouched}
-                            fieldPrefix="current_address"
+                            fieldPrefix="profile_current"
                             required={true}
                         />
 
@@ -483,19 +492,19 @@ export function HistoryStep({
                         <div>
                             <label className="mb-2 block text-sm font-medium">{t('fields.moveInDate') || 'Move-in Date'}</label>
                             <DatePicker
-                                value={data.current_address_move_in_date}
-                                onChange={(value) => updateField('current_address_move_in_date', value)}
-                                onBlur={handleFieldBlur('current_address_move_in_date')}
+                                value={data.profile_current_address_move_in_date}
+                                onChange={(value) => updateField('profile_current_address_move_in_date', value)}
+                                onBlur={handleFieldBlur('profile_current_address_move_in_date')}
                                 restriction="past"
-                                aria-invalid={!!(touchedFields.current_address_move_in_date && errors.current_address_move_in_date)}
+                                aria-invalid={!!(touchedFields.profile_current_address_move_in_date && errors.profile_current_address_move_in_date)}
                             />
-                            {showError('current_address_move_in_date') && (
-                                <p className="mt-1 text-sm text-destructive">{errors.current_address_move_in_date}</p>
+                            {showError('profile_current_address_move_in_date') && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_current_address_move_in_date}</p>
                             )}
                         </div>
 
                         {/* Landlord Details (if renting) */}
-                        {data.current_living_situation === 'renting' && (
+                        {data.profile_current_living_situation === 'renting' && (
                             <div className="mt-4 border-t border-border pt-4">
                                 <h4 className="mb-3 font-medium">{t('currentAddress.landlordDetails') || 'Current Landlord'}</h4>
                                 <div className="grid gap-4 md:grid-cols-2">
@@ -503,14 +512,14 @@ export function HistoryStep({
                                         <label className="mb-2 block text-sm font-medium">{t('fields.monthlyRent') || 'Monthly Rent'}</label>
                                         <input
                                             type="number"
-                                            value={data.current_monthly_rent}
-                                            onChange={(e) => updateField('current_monthly_rent', e.target.value)}
-                                            onBlur={handleFieldBlur('current_monthly_rent')}
-                                            aria-invalid={!!(touchedFields.current_monthly_rent && errors.current_monthly_rent)}
-                                            className={getFieldClass('current_monthly_rent')}
+                                            value={data.profile_current_monthly_rent}
+                                            onChange={(e) => updateField('profile_current_monthly_rent', e.target.value)}
+                                            onBlur={handleFieldBlur('profile_current_monthly_rent')}
+                                            aria-invalid={!!(touchedFields.profile_current_monthly_rent && errors.profile_current_monthly_rent)}
+                                            className={getFieldClass('profile_current_monthly_rent')}
                                         />
-                                        {showError('current_monthly_rent') && (
-                                            <p className="mt-1 text-sm text-destructive">{errors.current_monthly_rent}</p>
+                                        {showError('profile_current_monthly_rent') && (
+                                            <p className="mt-1 text-sm text-destructive">{errors.profile_current_monthly_rent}</p>
                                         )}
                                     </div>
                                     <div>
@@ -520,9 +529,9 @@ export function HistoryStep({
                                         </label>
                                         <input
                                             type="text"
-                                            value={data.current_landlord_name}
-                                            onChange={(e) => updateField('current_landlord_name', e.target.value)}
-                                            onBlur={handleFieldBlur('current_landlord_name')}
+                                            value={data.profile_current_landlord_name}
+                                            onChange={(e) => updateField('profile_current_landlord_name', e.target.value)}
+                                            onBlur={handleFieldBlur('profile_current_landlord_name')}
                                             className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
@@ -533,9 +542,9 @@ export function HistoryStep({
                                         </label>
                                         <input
                                             type="text"
-                                            value={data.current_landlord_contact}
-                                            onChange={(e) => updateField('current_landlord_contact', e.target.value)}
-                                            onBlur={handleFieldBlur('current_landlord_contact')}
+                                            value={data.profile_current_landlord_contact}
+                                            onChange={(e) => updateField('profile_current_landlord_contact', e.target.value)}
+                                            onBlur={handleFieldBlur('profile_current_landlord_contact')}
                                             className="w-full rounded-lg border border-border bg-background px-4 py-2"
                                         />
                                     </div>
@@ -547,27 +556,29 @@ export function HistoryStep({
                         <div className="mt-4 border-t border-border pt-4">
                             <label className="mb-2 block text-sm font-medium">{t('currentAddress.reasonForMoving') || 'Reason for Moving'}</label>
                             <Select
-                                value={data.reason_for_moving}
-                                onChange={(value) => updateField('reason_for_moving', value as typeof data.reason_for_moving)}
-                                onBlur={handleFieldBlur('reason_for_moving')}
+                                value={data.profile_reason_for_moving}
+                                onChange={(value) => updateField('profile_reason_for_moving', value as typeof data.profile_reason_for_moving)}
+                                onBlur={handleFieldBlur('profile_reason_for_moving')}
                                 options={REASONS_FOR_MOVING}
                                 placeholder={t('currentAddress.reasonPlaceholder') || 'Select reason...'}
-                                aria-invalid={!!(touchedFields.reason_for_moving && errors.reason_for_moving)}
+                                aria-invalid={!!(touchedFields.profile_reason_for_moving && errors.profile_reason_for_moving)}
                             />
-                            {showError('reason_for_moving') && <p className="mt-1 text-sm text-destructive">{errors.reason_for_moving}</p>}
-                            {data.reason_for_moving === 'other' && (
+                            {showError('profile_reason_for_moving') && (
+                                <p className="mt-1 text-sm text-destructive">{errors.profile_reason_for_moving}</p>
+                            )}
+                            {data.profile_reason_for_moving === 'other' && (
                                 <div className="mt-3">
                                     <input
                                         type="text"
-                                        value={data.reason_for_moving_other}
-                                        onChange={(e) => updateField('reason_for_moving_other', e.target.value)}
-                                        onBlur={handleFieldBlur('reason_for_moving_other')}
+                                        value={data.profile_reason_for_moving_other}
+                                        onChange={(e) => updateField('profile_reason_for_moving_other', e.target.value)}
+                                        onBlur={handleFieldBlur('profile_reason_for_moving_other')}
                                         placeholder={t('currentAddress.reasonOtherPlaceholder') || 'Please specify...'}
-                                        aria-invalid={!!(touchedFields.reason_for_moving_other && errors.reason_for_moving_other)}
-                                        className={getFieldClass('reason_for_moving_other')}
+                                        aria-invalid={!!(touchedFields.profile_reason_for_moving_other && errors.profile_reason_for_moving_other)}
+                                        className={getFieldClass('profile_reason_for_moving_other')}
                                     />
-                                    {showError('reason_for_moving_other') && (
-                                        <p className="mt-1 text-sm text-destructive">{errors.reason_for_moving_other}</p>
+                                    {showError('profile_reason_for_moving_other') && (
+                                        <p className="mt-1 text-sm text-destructive">{errors.profile_reason_for_moving_other}</p>
                                     )}
                                 </div>
                             )}
@@ -587,8 +598,10 @@ export function HistoryStep({
                         <MapPin size={20} className="text-primary" />
                         <div className="flex items-center gap-2">
                             <h3 className="font-semibold">{t('previousAddresses.title') || 'Previous Addresses'}</h3>
-                            {data.previous_addresses.length > 0 ? (
-                                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{data.previous_addresses.length}</span>
+                            {data.profile_previous_addresses.length > 0 ? (
+                                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                    {data.profile_previous_addresses.length}
+                                </span>
                             ) : (
                                 <OptionalBadge />
                             )}
@@ -603,13 +616,13 @@ export function HistoryStep({
                             {t('previousAddresses.description') || 'Add your previous addresses from the last 3 years (optional but recommended)'}
                         </p>
 
-                        {data.previous_addresses.length === 0 ? (
+                        {data.profile_previous_addresses.length === 0 ? (
                             <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
                                 <p className="text-sm text-muted-foreground">{t('previousAddresses.empty') || 'No previous addresses added'}</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {data.previous_addresses.map((addr, index) => (
+                                {data.profile_previous_addresses.map((addr, index) => (
                                     <div key={index} className="rounded-lg border border-border p-4">
                                         <div className="mb-4 flex items-center justify-between">
                                             <h4 className="font-medium">
@@ -718,7 +731,7 @@ export function HistoryStep({
                                 ))}
                             </div>
                         )}
-                        {data.previous_addresses.length < 5 && (
+                        {data.profile_previous_addresses.length < 5 && (
                             <button
                                 type="button"
                                 onClick={addPreviousAddress}
@@ -743,8 +756,10 @@ export function HistoryStep({
                         <Building2 size={20} className="text-primary" />
                         <div className="flex items-center gap-2">
                             <h3 className="font-semibold">{t('landlordReferences.title') || 'Landlord References'}</h3>
-                            {data.landlord_references.length > 0 ? (
-                                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{data.landlord_references.length}</span>
+                            {data.profile_landlord_references.length > 0 ? (
+                                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                    {data.profile_landlord_references.length}
+                                </span>
                             ) : (
                                 <OptionalBadge />
                             )}
@@ -755,13 +770,13 @@ export function HistoryStep({
 
                 {expandedSections.landlordReferences && (
                     <div className="space-y-4 border-t border-border p-4">
-                        {data.landlord_references.length === 0 ? (
+                        {data.profile_landlord_references.length === 0 ? (
                             <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
                                 <p className="text-sm text-muted-foreground">{t('landlordReferences.empty') || 'No landlord references added'}</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {data.landlord_references.map((ref, index) => (
+                                {data.profile_landlord_references.map((ref, index) => (
                                     <div key={index} className="rounded-lg border border-border p-4">
                                         <div className="mb-3 flex items-center justify-between">
                                             <h4 className="font-medium">
@@ -893,7 +908,7 @@ export function HistoryStep({
                                 ))}
                             </div>
                         )}
-                        {data.landlord_references.length < 3 && (
+                        {data.profile_landlord_references.length < 3 && (
                             <button
                                 type="button"
                                 onClick={addLandlordReference}
@@ -918,8 +933,10 @@ export function HistoryStep({
                         <User size={20} className="text-primary" />
                         <div className="flex items-center gap-2">
                             <h3 className="font-semibold">{t('otherReferences.title') || 'Other References'}</h3>
-                            {data.other_references.length > 0 ? (
-                                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{data.other_references.length}</span>
+                            {data.profile_other_references.length > 0 ? (
+                                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                    {data.profile_other_references.length}
+                                </span>
                             ) : (
                                 <OptionalBadge />
                             )}
@@ -930,13 +947,13 @@ export function HistoryStep({
 
                 {expandedSections.otherReferences && (
                     <div className="space-y-4 border-t border-border p-4">
-                        {data.other_references.length === 0 ? (
+                        {data.profile_other_references.length === 0 ? (
                             <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
                                 <p className="text-sm text-muted-foreground">{t('otherReferences.empty') || 'No other references added'}</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {data.other_references.map((ref, index) => (
+                                {data.profile_other_references.map((ref, index) => (
                                     <div key={index} className="rounded-lg border border-border p-4">
                                         <div className="mb-3 flex items-center justify-between">
                                             <h4 className="font-medium">
@@ -1048,7 +1065,7 @@ export function HistoryStep({
                                 ))}
                             </div>
                         )}
-                        {data.other_references.length < 2 && (
+                        {data.profile_other_references.length < 2 && (
                             <button
                                 type="button"
                                 onClick={addOtherReference}

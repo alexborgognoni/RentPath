@@ -251,13 +251,26 @@ class ApplicationService
             'guarantor_city', 'guarantor_state_province', 'guarantor_postal_code', 'guarantor_country',
             'guarantor_employment_status', 'guarantor_employer_name', 'guarantor_job_title',
             'guarantor_monthly_income', 'guarantor_income_currency',
+            // History step fields (Credit & Rental History)
+            'authorize_credit_check', 'authorize_background_check', 'credit_check_provider_preference',
+            'has_ccjs_or_bankruptcies', 'ccj_bankruptcy_details', 'has_eviction_history', 'eviction_details',
+            'current_living_situation', 'current_address_move_in_date',
+            'current_monthly_rent', 'current_rent_currency',
+            'current_landlord_name', 'current_landlord_contact',
+            'reason_for_moving', 'reason_for_moving_other',
+            'previous_addresses', 'landlord_references', 'other_references',
+        ];
+
+        $booleanFields = [
+            'has_guarantor', 'authorize_credit_check', 'authorize_background_check',
+            'has_ccjs_or_bankruptcies', 'has_eviction_history',
         ];
 
         $profileData = [];
         foreach ($data as $key => $value) {
             $fieldName = str_starts_with($key, 'profile_') ? substr($key, 8) : $key;
             if (in_array($fieldName, $profileFields)) {
-                if ($fieldName === 'has_guarantor') {
+                if (in_array($fieldName, $booleanFields)) {
                     $profileData[$fieldName] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
                 } else {
                     $profileData[$fieldName] = $value === '' ? null : $value;
@@ -311,6 +324,14 @@ class ApplicationService
             'right_to_rent_document_path', 'employment_contract_path', 'payslip_1_path',
             'payslip_2_path', 'payslip_3_path', 'student_proof_path', 'pension_statement_path',
             'benefits_statement_path', 'other_income_proof_path',
+            // History step fields (Credit & Rental History)
+            'authorize_credit_check', 'authorize_background_check', 'credit_check_provider_preference',
+            'has_ccjs_or_bankruptcies', 'ccj_bankruptcy_details', 'has_eviction_history', 'eviction_details',
+            'current_living_situation', 'current_address_move_in_date',
+            'current_monthly_rent', 'current_rent_currency',
+            'current_landlord_name', 'current_landlord_contact',
+            'reason_for_moving', 'reason_for_moving_other',
+            'previous_addresses', 'landlord_references', 'other_references',
         ];
 
         foreach ($fields as $field) {
@@ -325,22 +346,17 @@ class ApplicationService
      */
     private function filterApplicationFields(array $data): array
     {
+        // Note: History step fields (credit check, rental history, references) now go to TenantProfile
         $applicationFields = [
             'desired_move_in_date', 'lease_duration_months', 'is_flexible_on_move_in', 'is_flexible_on_duration',
             'message_to_landlord', 'additional_occupants', 'occupants_details', 'has_pets', 'pets_details',
-            'authorize_credit_check', 'authorize_background_check', 'credit_check_provider_preference',
-            'has_ccjs_or_bankruptcies', 'ccj_bankruptcy_details', 'has_eviction_history', 'eviction_details',
-            'self_reported_credit_score', 'current_living_situation', 'current_address_street_name',
-            'current_address_house_number', 'current_address_address_line_2', 'current_address_city',
-            'current_address_state_province', 'current_address_postal_code', 'current_address_country',
-            'current_address_move_in_date', 'current_monthly_rent', 'current_rent_currency',
-            'current_landlord_name', 'current_landlord_contact', 'reason_for_moving', 'reason_for_moving_other',
-            'previous_addresses', 'interested_in_rent_insurance', 'existing_insurance_provider',
-            'existing_insurance_policy_number', 'references', 'previous_landlord_name',
-            'previous_landlord_phone', 'previous_landlord_email', 'emergency_contact_first_name',
-            'emergency_contact_last_name', 'emergency_contact_relationship', 'emergency_contact_relationship_other',
-            'emergency_contact_phone_country_code', 'emergency_contact_phone_number', 'emergency_contact_email',
-            'additional_information', 'declaration_accuracy', 'consent_screening', 'consent_data_processing',
+            'interested_in_rent_insurance', 'existing_insurance_provider', 'existing_insurance_policy_number',
+            'co_signers', 'guarantors',
+            'emergency_contact_first_name', 'emergency_contact_last_name', 'emergency_contact_relationship',
+            'emergency_contact_relationship_other', 'emergency_contact_phone_country_code',
+            'emergency_contact_phone_number', 'emergency_contact_email',
+            'additional_information', 'additional_documents',
+            'declaration_accuracy', 'consent_screening', 'consent_data_processing',
             'consent_reference_contact', 'consent_data_sharing', 'consent_marketing', 'digital_signature',
             'invited_via_token', 'current_step', 'status',
         ];

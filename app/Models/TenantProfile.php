@@ -214,6 +214,34 @@ class TenantProfile extends Model
         'profile_verified_at',
         'verification_rejection_reason',
         'verification_rejected_fields',
+
+        // Credit & Background Authorization (History Step)
+        'authorize_credit_check',
+        'authorize_background_check',
+        'credit_check_provider_preference',
+
+        // Credit & Background Self-Disclosure (History Step)
+        'has_ccjs_or_bankruptcies',
+        'ccj_bankruptcy_details',
+        'has_eviction_history',
+        'eviction_details',
+
+        // Current Living Situation (History Step)
+        'current_living_situation',
+        'current_address_move_in_date',
+        'current_monthly_rent',
+        'current_rent_currency',
+        'current_landlord_name',
+        'current_landlord_contact',
+
+        // Reason for Moving (History Step)
+        'reason_for_moving',
+        'reason_for_moving_other',
+
+        // Previous Addresses & References (History Step)
+        'previous_addresses',
+        'landlord_references',
+        'other_references',
     ];
 
     /**
@@ -259,6 +287,16 @@ class TenantProfile extends Model
         'tax_returns_paths' => 'array',
         'bank_statements_paths' => 'array',
         'business_bank_statements_paths' => 'array',
+        // History Step casts
+        'authorize_credit_check' => 'boolean',
+        'authorize_background_check' => 'boolean',
+        'has_ccjs_or_bankruptcies' => 'boolean',
+        'has_eviction_history' => 'boolean',
+        'current_address_move_in_date' => 'date',
+        'current_monthly_rent' => 'decimal:2',
+        'previous_addresses' => 'array',
+        'landlord_references' => 'array',
+        'other_references' => 'array',
     ];
 
     /**

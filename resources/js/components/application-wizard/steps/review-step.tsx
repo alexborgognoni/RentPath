@@ -539,40 +539,42 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                         <Field
                             label={t('labels.creditCheckAuthorized') || 'Credit Check'}
                             value={
-                                data.authorize_credit_check ? t('labels.authorized') || 'Authorized' : t('labels.notAuthorized') || 'Not Authorized'
+                                data.profile_authorize_credit_check
+                                    ? t('labels.authorized') || 'Authorized'
+                                    : t('labels.notAuthorized') || 'Not Authorized'
                             }
                         />
-                        {data.authorize_background_check && (
+                        {data.profile_authorize_background_check && (
                             <Field label={t('labels.backgroundCheck') || 'Background Check'} value={t('labels.authorized') || 'Authorized'} />
                         )}
-                        {data.credit_check_provider_preference && data.credit_check_provider_preference !== 'no_preference' && (
+                        {data.profile_credit_check_provider_preference && data.profile_credit_check_provider_preference !== 'no_preference' && (
                             <Field
                                 label={t('labels.creditProvider') || 'Preferred Provider'}
-                                value={formatEnum(data.credit_check_provider_preference)}
+                                value={formatEnum(data.profile_credit_check_provider_preference)}
                             />
                         )}
                     </dl>
 
                     {/* Disclosures */}
-                    {(data.has_ccjs_or_bankruptcies || data.has_eviction_history) && (
+                    {(data.profile_has_ccjs_or_bankruptcies || data.profile_has_eviction_history) && (
                         <div className="mt-4 space-y-3">
-                            {data.has_ccjs_or_bankruptcies && (
+                            {data.profile_has_ccjs_or_bankruptcies && (
                                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950">
                                     <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                                         {t('labels.hasCcjsBankruptcies') || 'Has CCJs/Bankruptcies'}
                                     </p>
-                                    {data.ccj_bankruptcy_details && (
-                                        <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">{data.ccj_bankruptcy_details}</p>
+                                    {data.profile_ccj_bankruptcy_details && (
+                                        <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">{data.profile_ccj_bankruptcy_details}</p>
                                     )}
                                 </div>
                             )}
-                            {data.has_eviction_history && (
+                            {data.profile_has_eviction_history && (
                                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950">
                                     <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                                         {t('labels.hasEvictionHistory') || 'Has Eviction History'}
                                     </p>
-                                    {data.eviction_details && (
-                                        <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">{data.eviction_details}</p>
+                                    {data.profile_eviction_details && (
+                                        <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">{data.profile_eviction_details}</p>
                                     )}
                                 </div>
                             )}
@@ -586,37 +588,49 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                         <Home className="h-3 w-3" /> {t('subsections.currentAddress') || 'Current Address'}
                     </h4>
                     <dl className="grid gap-4 md:grid-cols-2">
-                        <Field label={t('labels.livingSituation') || 'Living Situation'} value={getLivingSituation(data.current_living_situation)} />
+                        <Field
+                            label={t('labels.livingSituation') || 'Living Situation'}
+                            value={getLivingSituation(data.profile_current_living_situation)}
+                        />
                         <Field label={t('labels.address') || 'Address'} value={formatAddress('current_address')} />
-                        <Field label={t('labels.currentMoveInDate') || 'Living Since'} value={formatDate(data.current_address_move_in_date)} />
-                        {data.current_monthly_rent && (
+                        <Field
+                            label={t('labels.currentMoveInDate') || 'Living Since'}
+                            value={formatDate(data.profile_current_address_move_in_date)}
+                        />
+                        {data.profile_current_monthly_rent && (
                             <Field
                                 label={t('labels.monthlyRent') || 'Monthly Rent'}
-                                value={`${data.current_rent_currency || 'EUR'} ${Number(data.current_monthly_rent).toLocaleString()}`}
+                                value={`${data.profile_current_rent_currency || 'EUR'} ${Number(data.profile_current_monthly_rent).toLocaleString()}`}
                             />
                         )}
-                        {data.current_landlord_name && (
-                            <Field label={t('labels.currentLandlord') || 'Current Landlord'} value={data.current_landlord_name} />
+                        {data.profile_current_landlord_name && (
+                            <Field label={t('labels.currentLandlord') || 'Current Landlord'} value={data.profile_current_landlord_name} />
                         )}
-                        {data.current_landlord_contact && (
-                            <Field label={t('labels.landlordContact') || 'Landlord Contact'} value={data.current_landlord_contact} />
+                        {data.profile_current_landlord_contact && (
+                            <Field label={t('labels.landlordContact') || 'Landlord Contact'} value={data.profile_current_landlord_contact} />
                         )}
                         <Field
                             label={t('labels.reasonForMoving') || 'Reason for Moving'}
-                            value={data.reason_for_moving === 'other' ? data.reason_for_moving_other : getReasonForMoving(data.reason_for_moving)}
+                            value={
+                                data.profile_reason_for_moving === 'other'
+                                    ? data.profile_reason_for_moving_other
+                                    : getReasonForMoving(data.profile_reason_for_moving)
+                            }
                         />
                     </dl>
                 </div>
 
                 {/* Previous Addresses */}
-                {data.previous_addresses.length > 0 && (
+                {data.profile_previous_addresses.length > 0 && (
                     <div className="border-t border-border pt-4">
                         <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
                             <MapPin className="h-3 w-3" /> {t('subsections.previousAddresses') || 'Previous Addresses'}{' '}
-                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{data.previous_addresses.length}</span>
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                {data.profile_previous_addresses.length}
+                            </span>
                         </h4>
                         <div className="space-y-2">
-                            {data.previous_addresses.map((addr, index) => (
+                            {data.profile_previous_addresses.map((addr, index) => (
                                 <div key={index} className="text-sm">
                                     <span className="font-medium">
                                         {addr.house_number} {addr.street_name}, {addr.city}
@@ -634,14 +648,16 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                 )}
 
                 {/* Landlord References */}
-                {data.landlord_references.length > 0 && (
+                {data.profile_landlord_references.length > 0 && (
                     <div className="border-t border-border pt-4">
                         <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
                             <Building2 className="h-3 w-3" /> {t('subsections.landlordReferences') || 'Landlord References'}{' '}
-                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{data.landlord_references.length}</span>
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                {data.profile_landlord_references.length}
+                            </span>
                         </h4>
                         <div className="space-y-3">
-                            {data.landlord_references.map((ref, index) => (
+                            {data.profile_landlord_references.map((ref, index) => (
                                 <div key={index} className="rounded-lg border border-border p-3">
                                     <div className="flex flex-wrap items-center gap-4 text-sm">
                                         <span className="font-medium">{ref.name}</span>
@@ -666,14 +682,16 @@ export function ReviewStep({ data, onEditStep }: ReviewStepProps) {
                 )}
 
                 {/* Other References */}
-                {data.other_references.length > 0 && (
+                {data.profile_other_references.length > 0 && (
                     <div className="border-t border-border pt-4">
                         <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
                             <User className="h-3 w-3" /> {t('subsections.otherReferences') || 'Other References'}{' '}
-                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{data.other_references.length}</span>
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                {data.profile_other_references.length}
+                            </span>
                         </h4>
                         <div className="space-y-3">
-                            {data.other_references.map((ref, index) => (
+                            {data.profile_other_references.map((ref, index) => (
                                 <div key={index} className="rounded-lg border border-border p-3">
                                     <div className="flex flex-wrap items-center gap-4 text-sm">
                                         <span className="font-medium">{ref.name}</span>
