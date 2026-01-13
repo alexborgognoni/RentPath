@@ -32,12 +32,12 @@ function useHeatingTypes() {
 
     return useMemo(
         () => [
-            { value: 'gas' as const, label: t('wizard.energyStep.heatingTypes.gas'), icon: HEATING_ICONS.gas },
-            { value: 'electric' as const, label: t('wizard.energyStep.heatingTypes.electric'), icon: HEATING_ICONS.electric },
-            { value: 'district' as const, label: t('wizard.energyStep.heatingTypes.district'), icon: HEATING_ICONS.district },
-            { value: 'heat_pump' as const, label: t('wizard.energyStep.heatingTypes.heat_pump'), icon: HEATING_ICONS.heat_pump },
-            { value: 'wood' as const, label: t('wizard.energyStep.heatingTypes.wood'), icon: HEATING_ICONS.wood },
-            { value: 'other' as const, label: t('wizard.energyStep.heatingTypes.other'), icon: HEATING_ICONS.other },
+            { value: 'gas' as const, label: t('wizard.property.energyStep.heatingTypes.gas'), icon: HEATING_ICONS.gas },
+            { value: 'electric' as const, label: t('wizard.property.energyStep.heatingTypes.electric'), icon: HEATING_ICONS.electric },
+            { value: 'district' as const, label: t('wizard.property.energyStep.heatingTypes.district'), icon: HEATING_ICONS.district },
+            { value: 'heat_pump' as const, label: t('wizard.property.energyStep.heatingTypes.heat_pump'), icon: HEATING_ICONS.heat_pump },
+            { value: 'wood' as const, label: t('wizard.property.energyStep.heatingTypes.wood'), icon: HEATING_ICONS.wood },
+            { value: 'other' as const, label: t('wizard.property.energyStep.heatingTypes.other'), icon: HEATING_ICONS.other },
         ],
         [t],
     );
@@ -63,13 +63,13 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
     const heatingTypes = useHeatingTypes();
 
     return (
-        <StepContainer title={t('wizard.energyStep.title')} description={t('wizard.energyStep.description')}>
+        <StepContainer title={t('wizard.property.energyStep.title')} description={t('wizard.property.energyStep.description')}>
             <div className="mx-auto max-w-3xl">
                 {/* Optional step indicator */}
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex items-center justify-center">
                     <div className="flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm text-muted-foreground">
                         <Leaf className="h-4 w-4" />
-                        <span>{t('wizard.energyStep.optionalNote')}</span>
+                        <span>{t('wizard.property.energyStep.optionalNote')}</span>
                     </div>
                 </motion.div>
 
@@ -77,7 +77,7 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Zap className="h-5 w-5 text-primary" />
-                        {t('wizard.energyStep.energyPerformance')}
+                        {t('wizard.property.energyStep.energyPerformance')}
                     </h3>
 
                     <div className="flex flex-wrap justify-center gap-2">
@@ -110,14 +110,14 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                             );
                         })}
                     </div>
-                    <p className="mt-2 text-center text-xs text-muted-foreground">{t('wizard.energyStep.energyHelp')}</p>
+                    <p className="mt-2 text-center text-xs text-muted-foreground">{t('wizard.property.energyStep.energyHelp')}</p>
                 </motion.div>
 
                 {/* Thermal Insulation */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Thermometer className="h-5 w-5 text-primary" />
-                        {t('wizard.energyStep.thermalInsulation')}
+                        {t('wizard.property.energyStep.thermalInsulation')}
                     </h3>
 
                     <div className="flex flex-wrap justify-center gap-2">
@@ -156,7 +156,7 @@ export function EnergyStep({ data, updateData }: EnergyStepProps) {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Flame className="h-5 w-5 text-primary" />
-                        {t('wizard.energyStep.heatingSystem')}
+                        {t('wizard.property.energyStep.heatingSystem')}
                     </h3>
 
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3">

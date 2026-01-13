@@ -31,70 +31,70 @@ function usePropertyTypes(): PropertyTypeOption[] {
         () => [
             {
                 value: 'apartment',
-                label: t('wizard.propertyTypeStep.types.apartment'),
-                description: t('wizard.propertyTypeStep.types.apartmentDesc'),
+                label: t('wizard.property.propertyTypeStep.types.apartment'),
+                description: t('wizard.property.propertyTypeStep.types.apartmentDesc'),
                 icon: Building2,
                 subtypes: [
-                    { value: 'studio', label: t('wizard.propertyTypeStep.subtypes.studio') },
-                    { value: 'loft', label: t('wizard.propertyTypeStep.subtypes.loft') },
-                    { value: 'duplex', label: t('wizard.propertyTypeStep.subtypes.duplex') },
-                    { value: 'triplex', label: t('wizard.propertyTypeStep.subtypes.triplex') },
-                    { value: 'penthouse', label: t('wizard.propertyTypeStep.subtypes.penthouse') },
-                    { value: 'serviced', label: t('wizard.propertyTypeStep.subtypes.serviced') },
+                    { value: 'studio', label: t('wizard.property.propertyTypeStep.subtypes.studio') },
+                    { value: 'loft', label: t('wizard.property.propertyTypeStep.subtypes.loft') },
+                    { value: 'duplex', label: t('wizard.property.propertyTypeStep.subtypes.duplex') },
+                    { value: 'triplex', label: t('wizard.property.propertyTypeStep.subtypes.triplex') },
+                    { value: 'penthouse', label: t('wizard.property.propertyTypeStep.subtypes.penthouse') },
+                    { value: 'serviced', label: t('wizard.property.propertyTypeStep.subtypes.serviced') },
                 ],
             },
             {
                 value: 'house',
-                label: t('wizard.propertyTypeStep.types.house'),
-                description: t('wizard.propertyTypeStep.types.houseDesc'),
+                label: t('wizard.property.propertyTypeStep.types.house'),
+                description: t('wizard.property.propertyTypeStep.types.houseDesc'),
                 icon: Home,
                 subtypes: [
-                    { value: 'detached', label: t('wizard.propertyTypeStep.subtypes.detached') },
-                    { value: 'semi-detached', label: t('wizard.propertyTypeStep.subtypes.semi-detached') },
-                    { value: 'villa', label: t('wizard.propertyTypeStep.subtypes.villa') },
-                    { value: 'bungalow', label: t('wizard.propertyTypeStep.subtypes.bungalow') },
+                    { value: 'detached', label: t('wizard.property.propertyTypeStep.subtypes.detached') },
+                    { value: 'semi-detached', label: t('wizard.property.propertyTypeStep.subtypes.semi-detached') },
+                    { value: 'villa', label: t('wizard.property.propertyTypeStep.subtypes.villa') },
+                    { value: 'bungalow', label: t('wizard.property.propertyTypeStep.subtypes.bungalow') },
                 ],
             },
             {
                 value: 'room',
-                label: t('wizard.propertyTypeStep.types.room'),
-                description: t('wizard.propertyTypeStep.types.roomDesc'),
+                label: t('wizard.property.propertyTypeStep.types.room'),
+                description: t('wizard.property.propertyTypeStep.types.roomDesc'),
                 icon: Users,
                 subtypes: [
-                    { value: 'private_room', label: t('wizard.propertyTypeStep.subtypes.private_room') },
-                    { value: 'student_room', label: t('wizard.propertyTypeStep.subtypes.student_room') },
-                    { value: 'co-living', label: t('wizard.propertyTypeStep.subtypes.co-living') },
+                    { value: 'private_room', label: t('wizard.property.propertyTypeStep.subtypes.private_room') },
+                    { value: 'student_room', label: t('wizard.property.propertyTypeStep.subtypes.student_room') },
+                    { value: 'co-living', label: t('wizard.property.propertyTypeStep.subtypes.co-living') },
                 ],
             },
             {
                 value: 'commercial',
-                label: t('wizard.propertyTypeStep.types.commercial'),
-                description: t('wizard.propertyTypeStep.types.commercialDesc'),
+                label: t('wizard.property.propertyTypeStep.types.commercial'),
+                description: t('wizard.property.propertyTypeStep.types.commercialDesc'),
                 icon: Hotel,
                 subtypes: [
-                    { value: 'office', label: t('wizard.propertyTypeStep.subtypes.office') },
-                    { value: 'retail', label: t('wizard.propertyTypeStep.subtypes.retail') },
+                    { value: 'office', label: t('wizard.property.propertyTypeStep.subtypes.office') },
+                    { value: 'retail', label: t('wizard.property.propertyTypeStep.subtypes.retail') },
                 ],
             },
             {
                 value: 'industrial',
-                label: t('wizard.propertyTypeStep.types.industrial'),
-                description: t('wizard.propertyTypeStep.types.industrialDesc'),
+                label: t('wizard.property.propertyTypeStep.types.industrial'),
+                description: t('wizard.property.propertyTypeStep.types.industrialDesc'),
                 icon: Factory,
                 subtypes: [
-                    { value: 'warehouse', label: t('wizard.propertyTypeStep.subtypes.warehouse') },
-                    { value: 'factory', label: t('wizard.propertyTypeStep.subtypes.factory') },
+                    { value: 'warehouse', label: t('wizard.property.propertyTypeStep.subtypes.warehouse') },
+                    { value: 'factory', label: t('wizard.property.propertyTypeStep.subtypes.factory') },
                 ],
             },
             {
                 value: 'parking',
-                label: t('wizard.propertyTypeStep.types.parking'),
-                description: t('wizard.propertyTypeStep.types.parkingDesc'),
+                label: t('wizard.property.propertyTypeStep.types.parking'),
+                description: t('wizard.property.propertyTypeStep.types.parkingDesc'),
                 icon: Car,
                 subtypes: [
-                    { value: 'garage', label: t('wizard.propertyTypeStep.subtypes.garage') },
-                    { value: 'indoor_spot', label: t('wizard.propertyTypeStep.subtypes.indoor_spot') },
-                    { value: 'outdoor_spot', label: t('wizard.propertyTypeStep.subtypes.outdoor_spot') },
+                    { value: 'garage', label: t('wizard.property.propertyTypeStep.subtypes.garage') },
+                    { value: 'indoor_spot', label: t('wizard.property.propertyTypeStep.subtypes.indoor_spot') },
+                    { value: 'outdoor_spot', label: t('wizard.property.propertyTypeStep.subtypes.outdoor_spot') },
                 ],
             },
         ],
@@ -118,7 +118,7 @@ export function PropertyTypeStep({ data, updateData, errors }: PropertyTypeStepP
     };
 
     return (
-        <StepContainer title={t('wizard.propertyTypeStep.title')} description={t('wizard.propertyTypeStep.description')}>
+        <StepContainer title={t('wizard.property.propertyTypeStep.title')} description={t('wizard.property.propertyTypeStep.description')}>
             {/* Property Type Cards */}
             <div className="mx-auto max-w-4xl">
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
@@ -176,7 +176,7 @@ export function PropertyTypeStep({ data, updateData, errors }: PropertyTypeStepP
                         className="mt-8"
                     >
                         <h3 className="mb-4 text-center text-lg font-medium text-foreground">
-                            {t('wizard.propertyTypeStep.whatKind', { type: selectedType.label.toLowerCase() })}
+                            {t('wizard.property.propertyTypeStep.whatKind', { type: selectedType.label.toLowerCase() })}
                         </h3>
 
                         <div className="flex flex-wrap justify-center gap-3">

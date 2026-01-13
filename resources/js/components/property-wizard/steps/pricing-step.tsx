@@ -35,7 +35,7 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
     };
 
     return (
-        <StepContainer title={t('wizard.pricingStep.title')} description={t('wizard.pricingStep.description')}>
+        <StepContainer title={t('wizard.property.pricingStep.title')} description={t('wizard.property.pricingStep.description')}>
             <div className="mx-auto max-w-2xl">
                 {/* Main rent input - Hero style */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
@@ -68,7 +68,7 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
 
                         {/* Per month label */}
                         <div className="absolute top-1/2 right-6 -translate-y-1/2">
-                            <span className="text-lg text-muted-foreground">{t('wizard.pricingStep.perMonth')}</span>
+                            <span className="text-lg text-muted-foreground">{t('wizard.property.pricingStep.perMonth')}</span>
                         </div>
                     </div>
 
@@ -102,7 +102,7 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Calendar className="h-5 w-5 text-primary" />
-                        {t('wizard.pricingStep.whenAvailable')}
+                        {t('wizard.property.pricingStep.whenAvailable')}
                     </h3>
 
                     <div className="mx-auto max-w-sm">
@@ -125,13 +125,13 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                             )}
                         >
                             <Zap className="h-4 w-4" />
-                            {t('wizard.pricingStep.availableImmediately')}
+                            {t('wizard.property.pricingStep.availableImmediately')}
                         </button>
 
                         {/* Or separator */}
                         <div className="mb-4 flex items-center gap-4">
                             <div className="h-px flex-1 bg-border" />
-                            <span className="text-sm text-muted-foreground">{t('wizard.pricingStep.orChooseDate')}</span>
+                            <span className="text-sm text-muted-foreground">{t('wizard.property.pricingStep.orChooseDate')}</span>
                             <div className="h-px flex-1 bg-border" />
                         </div>
 
@@ -162,7 +162,7 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-12">
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <DoorOpen className="h-5 w-5 text-primary" />
-                        {t('wizard.pricingStep.acceptApplications')}
+                        {t('wizard.property.pricingStep.acceptApplications')}
                     </h3>
 
                     <div className="mx-auto flex max-w-md gap-3">
@@ -177,8 +177,8 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                             )}
                         >
                             <DoorOpen className="h-6 w-6" />
-                            <span className="font-medium">{t('wizard.pricingStep.openForApplications')}</span>
-                            <span className="text-xs text-muted-foreground">{t('wizard.pricingStep.startReceiving')}</span>
+                            <span className="font-medium">{t('wizard.property.pricingStep.openForApplications')}</span>
+                            <span className="text-xs text-muted-foreground">{t('wizard.property.pricingStep.startReceiving')}</span>
                         </button>
 
                         <button
@@ -192,8 +192,8 @@ export function PricingStep({ data, updateData, errors, onBlur }: PricingStepPro
                             )}
                         >
                             <Pause className="h-6 w-6" />
-                            <span className="font-medium">{t('wizard.pricingStep.notYet')}</span>
-                            <span className="text-xs text-muted-foreground">{t('wizard.pricingStep.openLater')}</span>
+                            <span className="font-medium">{t('wizard.property.pricingStep.notYet')}</span>
+                            <span className="text-xs text-muted-foreground">{t('wizard.property.pricingStep.openLater')}</span>
                         </button>
                     </div>
                 </motion.div>

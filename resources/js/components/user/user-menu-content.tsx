@@ -49,7 +49,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                         onClick={cleanup}
                     >
                         <Settings className="mr-2" />
-                        {t(translations.header, 'settings')}
+                        {t(translations.layout.header, 'settings')}
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -57,7 +57,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuItem asChild>
                 <button className="flex w-full items-center" onClick={handleLogoutClick}>
                     <LogOut className="mr-2" />
-                    {t(translations.header, 'sign_out')}
+                    {t(translations.layout.header, 'signOut')}
                 </button>
             </DropdownMenuItem>
 

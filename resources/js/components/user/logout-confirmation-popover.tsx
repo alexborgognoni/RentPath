@@ -68,15 +68,15 @@ export function LogoutConfirmationPopover({ isOpen, onClose, onConfirm }: Logout
                     </div>
 
                     <div className="min-w-0 flex-1">
-                        <h3 className="mb-2 text-lg font-semibold text-foreground">{t(translations.header, 'logout_confirmation.title')}</h3>
-                        <p className="mb-6 text-sm text-muted-foreground">{t(translations.header, 'logout_confirmation.message')}</p>
+                        <h3 className="mb-2 text-lg font-semibold text-foreground">{t(translations.layout.header, 'logoutConfirmation.title')}</h3>
+                        <p className="mb-6 text-sm text-muted-foreground">{t(translations.layout.header, 'logoutConfirmation.message')}</p>
 
                         <div className="flex justify-end gap-3">
                             <Button variant="outline" onClick={onClose} className="cursor-pointer px-4 py-2">
-                                {t(translations.header, 'logout_confirmation.cancel')}
+                                {t(translations.layout.header, 'logoutConfirmation.cancel')}
                             </Button>
                             <Button variant="destructive" onClick={handleLogout} className="cursor-pointer px-4 py-2">
-                                {t(translations.header, 'logout_confirmation.confirm')}
+                                {t(translations.layout.header, 'logoutConfirmation.confirm')}
                             </Button>
                         </div>
                     </div>

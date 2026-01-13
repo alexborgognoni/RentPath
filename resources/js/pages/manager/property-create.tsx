@@ -43,9 +43,9 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
             ? [
                   { title: t('properties.title'), href: route('manager.properties.index') },
                   { title: property.title || t('properties.property'), href: route('properties.show', { property: property.id }) },
-                  { title: t('wizard.reviewStep.edit') },
+                  { title: t('wizard.property.reviewStep.edit') },
               ]
-            : [{ title: t('properties.title'), href: route('manager.properties.index') }, { title: t('wizard.page.addProperty') }];
+            : [{ title: t('properties.title'), href: route('manager.properties.index') }, { title: t('wizard.property.page.addProperty') }];
 
     const handleSubmit = useCallback(async () => {
         const isValid = await wizard.validateForPublish();
@@ -190,7 +190,7 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
 
     return (
         <ManagerLayout breadcrumbs={breadcrumbs}>
-            <Head title={isEditing ? t('wizard.page.editProperty') : t('wizard.page.addProperty')} />
+            <Head title={isEditing ? t('wizard.property.page.editProperty') : t('wizard.property.page.addProperty')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] flex-col">
                 {/* Header */}
@@ -202,7 +202,7 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold text-foreground">
-                                    {isEditing ? t('wizard.page.editProperty') : t('wizard.page.addProperty')}
+                                    {isEditing ? t('wizard.property.page.editProperty') : t('wizard.property.page.addProperty')}
                                 </h1>
                                 <p className="text-sm text-muted-foreground">{currentStepConfig?.description}</p>
                             </div>
@@ -248,11 +248,17 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
                         isLastStep={wizard.isLastStep}
                         isSubmitting={wizard.isSubmitting}
                         showSkip={currentStepConfig?.optional}
-                        nextLabel={wizard.isLastStep ? (isEditing ? t('wizard.page.updateListing') : t('wizard.page.publishListing')) : undefined}
-                        backLabel={t('wizard.nav.back')}
-                        skipLabel={t('wizard.nav.skip')}
-                        submitLabel={isEditing ? t('wizard.page.updateListing') : t('wizard.page.publishListing')}
-                        submittingLabel={t('wizard.nav.submitting')}
+                        nextLabel={
+                            wizard.isLastStep
+                                ? isEditing
+                                    ? t('wizard.property.page.updateListing')
+                                    : t('wizard.property.page.publishListing')
+                                : undefined
+                        }
+                        backLabel={t('wizard.common.nav.back')}
+                        skipLabel={t('wizard.common.nav.skip')}
+                        submitLabel={isEditing ? t('wizard.property.page.updateListing') : t('wizard.property.page.publishListing')}
+                        submittingLabel={t('wizard.common.nav.submitting')}
                     />
                 </div>
             </div>

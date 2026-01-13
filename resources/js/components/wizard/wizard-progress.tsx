@@ -36,7 +36,7 @@ export function WizardProgress<TStepId extends string>({
             <div className="md:hidden">
                 <div className="mb-2 flex items-center justify-between text-sm">
                     <span className="font-medium text-foreground">
-                        {t('wizard.progress.stepOf', { current: safeStepIndex + 1, total: steps.length })}
+                        {t('wizard.common.progress.stepOf', { current: safeStepIndex + 1, total: steps.length })}
                     </span>
                     <span className="text-muted-foreground">{currentStepConfig?.shortTitle}</span>
                 </div>

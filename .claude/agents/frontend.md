@@ -240,19 +240,51 @@ export function useDebounce<T>(value: T, delay: number): T {
 <div className="flex-grow">
 ```
 
-### Theme Variables
+### OKLCH Color System
+
+Tailwind CSS v4 uses OKLCH (Lightness, Chroma, Hue) for colors. Theme colors are defined in `resources/css/app.css` using CSS custom properties with OKLCH values:
 
 ```css
-/* CSS variables in app.css */
-:root {
-    --primary: #06b6d4;
-    --secondary: #8b5cf6;
-}
-
-.dark {
-    --primary: #22d3ee;
+/* app.css - OKLCH color definitions */
+@theme {
+    --color-primary-500: oklch(0.65 0.2 195); /* Brand cyan */
+    --color-secondary-500: oklch(0.6 0.22 290); /* Brand purple */
+    --color-success: oklch(0.7 0.2 145); /* Green */
+    --color-warning: oklch(0.75 0.18 85); /* Amber */
+    --color-error: oklch(0.65 0.25 25); /* Red */
 }
 ```
+
+### Semantic Color Tokens
+
+Always use semantic color tokens for consistent theming:
+
+```tsx
+// GOOD: Semantic colors - adapts to theme
+<p className="text-error">Validation error</p>
+<p className="text-success">Success message</p>
+<p className="text-warning">Warning message</p>
+<div className="bg-primary text-primary-foreground">Primary button</div>
+<div className="bg-destructive text-destructive-foreground">Delete button</div>
+
+// BAD: Hardcoded colors - won't adapt
+<p className="text-red-500">Error</p>
+<p className="text-green-600">Success</p>
+```
+
+**Available semantic tokens:**
+| Token | Usage |
+|-------|-------|
+| `primary` | Brand color, primary actions |
+| `secondary` | Secondary actions, accents |
+| `success` | Success states, confirmations |
+| `warning` | Warnings, pending states |
+| `error` | Validation errors, failures |
+| `destructive` | Delete/remove actions |
+| `info` | Informational messages |
+| `muted` | Disabled, low-priority content |
+
+**Exception**: Status badges (application states like submitted, approved, rejected) intentionally use hardcoded colors (blue, purple, amber, green, red) for visual differentiation.
 
 ### Spacing & Layout
 

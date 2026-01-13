@@ -29,7 +29,7 @@ export function UserTypeToggle({ userType, onUserTypeChange }: UserTypeTogglePro
                 }`}
             >
                 <User className="h-4 w-4 flex-shrink-0" />
-                <span className="text-center leading-tight">{t(translations.auth, 'user_types.tenant')}</span>
+                <span className="text-center leading-tight">{t(translations.auth.common, 'userTypes.tenant')}</span>
             </button>
             <button
                 type="button"
@@ -39,7 +39,7 @@ export function UserTypeToggle({ userType, onUserTypeChange }: UserTypeTogglePro
                 }`}
             >
                 <Building2 className="h-4 w-4 flex-shrink-0" />
-                <span className="text-center leading-tight">{t(translations.auth, 'user_types.property_manager')}</span>
+                <span className="text-center leading-tight">{t(translations.auth.common, 'userTypes.propertyManager')}</span>
             </button>
         </div>
     );

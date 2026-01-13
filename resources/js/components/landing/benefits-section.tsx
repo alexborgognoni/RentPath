@@ -12,16 +12,16 @@ export function BenefitsSection() {
 
     const HEADING = translate(translations, 'landing.benefits.heading');
 
-    const FASTER_PLACEMENTS_TITLE = translate(translations, 'landing.benefits.benefits.faster_placements.title');
-    const FASTER_PLACEMENTS_DESCRIPTION = translate(translations, 'landing.benefits.benefits.faster_placements.description');
-    const CENTRALIZED_DATA_TITLE = translate(translations, 'landing.benefits.benefits.centralized_data.title');
-    const CENTRALIZED_DATA_DESCRIPTION = translate(translations, 'landing.benefits.benefits.centralized_data.description');
-    const AUTOMATED_UPDATES_TITLE = translate(translations, 'landing.benefits.benefits.automated_updates.title');
-    const AUTOMATED_UPDATES_DESCRIPTION = translate(translations, 'landing.benefits.benefits.automated_updates.description');
-    const REDUCED_OVERHEAD_TITLE = translate(translations, 'landing.benefits.benefits.reduced_overhead.title');
-    const REDUCED_OVERHEAD_DESCRIPTION = translate(translations, 'landing.benefits.benefits.reduced_overhead.description');
-    const HIGHER_CONVERSION_TITLE = translate(translations, 'landing.benefits.benefits.higher_conversion.title');
-    const HIGHER_CONVERSION_DESCRIPTION = translate(translations, 'landing.benefits.benefits.higher_conversion.description');
+    const FASTER_PLACEMENTS_TITLE = translate(translations, 'landing.benefits.benefits.fasterPlacements.title');
+    const FASTER_PLACEMENTS_DESCRIPTION = translate(translations, 'landing.benefits.benefits.fasterPlacements.description');
+    const CENTRALIZED_DATA_TITLE = translate(translations, 'landing.benefits.benefits.centralizedData.title');
+    const CENTRALIZED_DATA_DESCRIPTION = translate(translations, 'landing.benefits.benefits.centralizedData.description');
+    const AUTOMATED_UPDATES_TITLE = translate(translations, 'landing.benefits.benefits.automatedUpdates.title');
+    const AUTOMATED_UPDATES_DESCRIPTION = translate(translations, 'landing.benefits.benefits.automatedUpdates.description');
+    const REDUCED_OVERHEAD_TITLE = translate(translations, 'landing.benefits.benefits.reducedOverhead.title');
+    const REDUCED_OVERHEAD_DESCRIPTION = translate(translations, 'landing.benefits.benefits.reducedOverhead.description');
+    const HIGHER_CONVERSION_TITLE = translate(translations, 'landing.benefits.benefits.higherConversion.title');
+    const HIGHER_CONVERSION_DESCRIPTION = translate(translations, 'landing.benefits.benefits.higherConversion.description');
 
     const BENEFITS = [
         {
@@ -56,10 +56,10 @@ export function BenefitsSection() {
         },
     ];
 
-    const COMPLETION_RATE_LABEL = translate(translations, 'landing.benefits.metrics.completion_rate_label');
-    const TIME_TO_PLACEMENT_LABEL = translate(translations, 'landing.benefits.metrics.time_to_placement_label');
-    const LANDLORD_SATISFACTION_LABEL = translate(translations, 'landing.benefits.metrics.landlord_satisfaction_label');
-    const ADMIN_TIME_LABEL = translate(translations, 'landing.benefits.metrics.admin_time_label');
+    const COMPLETION_RATE_LABEL = translate(translations, 'landing.benefits.metrics.completionRateLabel');
+    const TIME_TO_PLACEMENT_LABEL = translate(translations, 'landing.benefits.metrics.timeToPlacementLabel');
+    const LANDLORD_SATISFACTION_LABEL = translate(translations, 'landing.benefits.metrics.landlordSatisfactionLabel');
+    const ADMIN_TIME_LABEL = translate(translations, 'landing.benefits.metrics.adminTimeLabel');
 
     const METRICS = [
         { label: COMPLETION_RATE_LABEL, value: '+85%', color: 'text-primary' },
@@ -71,7 +71,7 @@ export function BenefitsSection() {
     const TRIAL_HEADING = translate(translations, 'landing.benefits.trial.heading');
     const PRICING_UNIT = translate(translations, 'landing.benefits.trial.pricing.unit');
     const PRICING_OFFER = translate(translations, 'landing.benefits.trial.pricing.offer');
-    const GET_STARTED_BUTTON = translate(translations, 'landing.benefits.trial.get_started_button');
+    const GET_STARTED_BUTTON = translate(translations, 'landing.benefits.trial.getStartedButton');
 
     const TRIAL_BENEFITS = [
         translate(translations, 'landing.benefits.trial.benefits.0'),

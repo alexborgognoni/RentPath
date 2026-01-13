@@ -45,7 +45,7 @@ function useAmenities() {
         () =>
             AMENITY_KEYS.map((amenity) => ({
                 key: amenity.key,
-                label: t(`wizard.amenitiesStep.amenities.${amenity.translationKey}`),
+                label: t(`wizard.property.amenitiesStep.amenities.${amenity.translationKey}`),
                 icon: amenity.icon,
                 category: amenity.category,
             })),
@@ -59,9 +59,9 @@ function useCategories() {
 
     return useMemo(
         () => [
-            { id: 'kitchen' as const, label: t('wizard.amenitiesStep.categories.kitchen') },
-            { id: 'building' as const, label: t('wizard.amenitiesStep.categories.building') },
-            { id: 'outdoor' as const, label: t('wizard.amenitiesStep.categories.outdoor') },
+            { id: 'kitchen' as const, label: t('wizard.property.amenitiesStep.categories.kitchen') },
+            { id: 'building' as const, label: t('wizard.property.amenitiesStep.categories.building') },
+            { id: 'outdoor' as const, label: t('wizard.property.amenitiesStep.categories.outdoor') },
         ],
         [t],
     );
@@ -77,7 +77,7 @@ export function AmenitiesStep({ data, updateData }: AmenitiesStepProps) {
     };
 
     return (
-        <StepContainer title={t('wizard.amenitiesStep.title')} description={t('wizard.amenitiesStep.description')}>
+        <StepContainer title={t('wizard.property.amenitiesStep.title')} description={t('wizard.property.amenitiesStep.description')}>
             <div className="mx-auto max-w-3xl">
                 {categories.map((category, categoryIndex) => {
                     const categoryAmenities = amenities.filter((a) => a.category === category.id);
@@ -162,7 +162,7 @@ export function AmenitiesStep({ data, updateData }: AmenitiesStepProps) {
                     transition={{ delay: 0.4 }}
                     className="text-center text-sm text-muted-foreground"
                 >
-                    {t('wizard.amenitiesStep.helperText')}
+                    {t('wizard.property.amenitiesStep.helperText')}
                 </motion.p>
             </div>
         </StepContainer>

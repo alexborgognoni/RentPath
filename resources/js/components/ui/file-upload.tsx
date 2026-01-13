@@ -338,7 +338,7 @@ export function FileUpload({
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                             {file.size && <span>{formatFileSize(file.size)}</span>}
                                             {file.size && <span>•</span>}
-                                            <span className="flex items-center gap-1 text-green-600">
+                                            <span className="flex items-center gap-1 text-success">
                                                 <CheckCircle2 className="h-3 w-3" />
                                                 {file.uploadedAt ? formatUploadDate(file.uploadedAt) : 'Uploaded'}
                                             </span>
@@ -400,12 +400,12 @@ export function FileUpload({
                                 {existingFile.size && <span>{formatFileSize(existingFile.size)}</span>}
                                 {(existingFile.size || existingFile.uploadedAt) && <span>•</span>}
                                 {existingFile.uploadedAt ? (
-                                    <span className="flex items-center gap-1 text-green-600">
+                                    <span className="flex items-center gap-1 text-success">
                                         <CheckCircle2 className="h-3 w-3" />
                                         {formatUploadDate(existingFile.uploadedAt)}
                                     </span>
                                 ) : (
-                                    <span className="flex items-center gap-1 text-green-600">
+                                    <span className="flex items-center gap-1 text-success">
                                         <CheckCircle2 className="h-3 w-3" />
                                         Uploaded
                                     </span>
@@ -483,7 +483,7 @@ export function FileUpload({
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 {uploadedFile.size && <span>{formatFileSize(uploadedFile.size)}</span>}
                                 {uploadedFile.size && <span>•</span>}
-                                <span className="flex items-center gap-1 text-green-600">
+                                <span className="flex items-center gap-1 text-success">
                                     <CheckCircle2 className="h-3 w-3" />
                                     {uploadedFile.uploadedAt ? formatUploadDate(uploadedFile.uploadedAt) : 'Just now'}
                                 </span>

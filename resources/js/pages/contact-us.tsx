@@ -120,8 +120,8 @@ export default function ContactUs() {
                             <CardContent className="flex h-full flex-col">
                                 {isSubmitted ? (
                                     <div className="flex flex-1 flex-col justify-center py-8 text-center">
-                                        <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                                            <Mail className="h-8 w-8 text-green-600 dark:text-green-400" />
+                                        <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
+                                            <Mail className="h-8 w-8 text-success" />
                                         </div>
                                         <h3 className="mb-2 text-lg font-semibold text-foreground">
                                             {translate(translations, 'contact-us.success.title')}

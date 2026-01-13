@@ -18,24 +18,24 @@ export default function ForgotPassword({ status }: { status?: string }) {
     const { translations } = page.props;
 
     return (
-        <AuthLayout title={t(translations.auth, 'forgot_password.title')} description={t(translations.auth, 'forgot_password.description')}>
-            <Head title={t(translations.auth, 'forgot_password.head_title')} />
+        <AuthLayout title={t(translations.auth.forgotPassword, 'title')} description={t(translations.auth.forgotPassword, 'description')}>
+            <Head title={t(translations.auth.forgotPassword, 'headTitle')} />
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
+            {status && <div className="mb-4 text-center text-sm font-medium text-success">{status}</div>}
 
             <div className="space-y-6">
                 <Form {...PasswordResetLinkController.store.form()}>
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="email">{t(translations.auth, 'forgot_password.email_label')}</Label>
+                                <Label htmlFor="email">{t(translations.auth.forgotPassword, 'emailLabel')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
                                     name="email"
                                     autoComplete="off"
                                     autoFocus
-                                    placeholder={t(translations.auth, 'forgot_password.email_placeholder')}
+                                    placeholder={t(translations.auth.forgotPassword, 'emailPlaceholder')}
                                 />
 
                                 <InputError message={errors.email} />
@@ -44,7 +44,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             <div className="my-6 flex items-center justify-start">
                                 <Button className="w-full cursor-pointer" disabled={processing}>
                                     {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                    {t(translations.auth, 'forgot_password.send_reset_link_button')}
+                                    {t(translations.auth.forgotPassword, 'sendResetLinkButton')}
                                 </Button>
                             </div>
                         </>
@@ -52,8 +52,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 </Form>
 
                 <div className="space-x-1 text-center text-sm text-muted-foreground">
-                    <span>{t(translations.auth, 'forgot_password.return_to_login_text')}</span>
-                    <TextLink href={login()}>{t(translations.auth, 'forgot_password.return_to_login_link')}</TextLink>
+                    <span>{t(translations.auth.forgotPassword, 'returnToLoginText')}</span>
+                    <TextLink href={login()}>{t(translations.auth.forgotPassword, 'returnToLoginLink')}</TextLink>
                 </div>
             </div>
         </AuthLayout>

@@ -12,52 +12,52 @@ export function DemoCarouselSection() {
     const SLIDES = [
         {
             id: 1,
-            title: translate(translations, `landing.demo_carousel.slides.real_time_dashboard.title` as const),
-            description: translate(translations, `landing.demo_carousel.slides.real_time_dashboard.description` as const),
+            title: translate(translations, `landing.demoCarousel.slides.realTimeDashboard.title` as const),
+            description: translate(translations, `landing.demoCarousel.slides.realTimeDashboard.description` as const),
             features: [
-                translate(translations, `landing.demo_carousel.slides.real_time_dashboard.features[0]` as const),
-                translate(translations, `landing.demo_carousel.slides.real_time_dashboard.features[1]` as const),
-                translate(translations, `landing.demo_carousel.slides.real_time_dashboard.features[2]` as const),
-                translate(translations, `landing.demo_carousel.slides.real_time_dashboard.features[3]` as const),
+                translate(translations, `landing.demoCarousel.slides.realTimeDashboard.features[0]` as const),
+                translate(translations, `landing.demoCarousel.slides.realTimeDashboard.features[1]` as const),
+                translate(translations, `landing.demoCarousel.slides.realTimeDashboard.features[2]` as const),
+                translate(translations, `landing.demoCarousel.slides.realTimeDashboard.features[3]` as const),
             ],
             imagePathLight: '/images/demo_features/light/demo_feature_1.png',
             imagePathDark: '/images/demo_features/dark/demo_feature_1.png',
         },
         {
             id: 2,
-            title: translate(translations, `landing.demo_carousel.slides.guided_applications.title` as const),
-            description: translate(translations, `landing.demo_carousel.slides.guided_applications.description` as const),
+            title: translate(translations, `landing.demoCarousel.slides.guidedApplications.title` as const),
+            description: translate(translations, `landing.demoCarousel.slides.guidedApplications.description` as const),
             features: [
-                translate(translations, `landing.demo_carousel.slides.guided_applications.features[0]` as const),
-                translate(translations, `landing.demo_carousel.slides.guided_applications.features[1]` as const),
-                translate(translations, `landing.demo_carousel.slides.guided_applications.features[2]` as const),
-                translate(translations, `landing.demo_carousel.slides.guided_applications.features[3]` as const),
+                translate(translations, `landing.demoCarousel.slides.guidedApplications.features[0]` as const),
+                translate(translations, `landing.demoCarousel.slides.guidedApplications.features[1]` as const),
+                translate(translations, `landing.demoCarousel.slides.guidedApplications.features[2]` as const),
+                translate(translations, `landing.demoCarousel.slides.guidedApplications.features[3]` as const),
             ],
             imagePathLight: '/images/demo_features/light/demo_feature_2.png',
             imagePathDark: '/images/demo_features/dark/demo_feature_2.png',
         },
         {
             id: 3,
-            title: translate(translations, `landing.demo_carousel.slides.automated_review.title` as const),
-            description: translate(translations, `landing.demo_carousel.slides.automated_review.description` as const),
+            title: translate(translations, `landing.demoCarousel.slides.automatedReview.title` as const),
+            description: translate(translations, `landing.demoCarousel.slides.automatedReview.description` as const),
             features: [
-                translate(translations, `landing.demo_carousel.slides.automated_review.features[0]` as const),
-                translate(translations, `landing.demo_carousel.slides.automated_review.features[1]` as const),
-                translate(translations, `landing.demo_carousel.slides.automated_review.features[2]` as const),
-                translate(translations, `landing.demo_carousel.slides.automated_review.features[3]` as const),
+                translate(translations, `landing.demoCarousel.slides.automatedReview.features[0]` as const),
+                translate(translations, `landing.demoCarousel.slides.automatedReview.features[1]` as const),
+                translate(translations, `landing.demoCarousel.slides.automatedReview.features[2]` as const),
+                translate(translations, `landing.demoCarousel.slides.automatedReview.features[3]` as const),
             ],
             imagePathLight: '/images/demo_features/light/demo_feature_3.png',
             imagePathDark: '/images/demo_features/dark/demo_feature_3.png',
         },
         {
             id: 4,
-            title: translate(translations, `landing.demo_carousel.slides.progress_visibility.title` as const),
-            description: translate(translations, `landing.demo_carousel.slides.progress_visibility.description` as const),
+            title: translate(translations, `landing.demoCarousel.slides.progressVisibility.title` as const),
+            description: translate(translations, `landing.demoCarousel.slides.progressVisibility.description` as const),
             features: [
-                translate(translations, `landing.demo_carousel.slides.progress_visibility.features[0]` as const),
-                translate(translations, `landing.demo_carousel.slides.progress_visibility.features[1]` as const),
-                translate(translations, `landing.demo_carousel.slides.progress_visibility.features[2]` as const),
-                translate(translations, `landing.demo_carousel.slides.progress_visibility.features[3]` as const),
+                translate(translations, `landing.demoCarousel.slides.progressVisibility.features[0]` as const),
+                translate(translations, `landing.demoCarousel.slides.progressVisibility.features[1]` as const),
+                translate(translations, `landing.demoCarousel.slides.progressVisibility.features[2]` as const),
+                translate(translations, `landing.demoCarousel.slides.progressVisibility.features[3]` as const),
             ],
             imagePathLight: '/images/demo_features/light/demo_feature_4.png',
             imagePathDark: '/images/demo_features/dark/demo_feature_4.png',
@@ -245,11 +245,9 @@ export function DemoCarouselSection() {
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="mb-0 text-center xs:mb-20">
-                    <h2 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">
-                        {translate(translations, 'landing.demo_carousel.heading')}
-                    </h2>
+                    <h2 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">{translate(translations, 'landing.demoCarousel.heading')}</h2>
                     <p className="mx-auto mb-8 max-w-4xl text-xl leading-relaxed text-muted-foreground">
-                        {translate(translations, 'landing.demo_carousel.subtitle')}
+                        {translate(translations, 'landing.demoCarousel.subtitle')}
                     </p>
                 </div>
 
@@ -337,7 +335,7 @@ export function DemoCarouselSection() {
                                                                             <Eye className="h-6 w-6 text-white sm:h-7 sm:w-7 md:h-8 md:w-8" />
                                                                         </div>
                                                                         <span className="text-sm font-medium text-primary sm:text-base md:text-lg">
-                                                                            {translate(translations, 'landing.demo_carousel.interactive_demo')}
+                                                                            {translate(translations, 'landing.demoCarousel.interactiveDemo')}
                                                                         </span>
                                                                     </div>
                                                                 </>
@@ -431,7 +429,7 @@ export function DemoCarouselSection() {
                                                                         <Eye className="h-8 w-8 text-white" />
                                                                     </div>
                                                                     <span className="text-lg font-medium text-primary">
-                                                                        {translate(translations, 'landing.demo_carousel.interactive_demo')}
+                                                                        {translate(translations, 'landing.demoCarousel.interactiveDemo')}
                                                                     </span>
                                                                 </div>
                                                             </>

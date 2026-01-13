@@ -30,37 +30,37 @@ export function TestimonialsSection() {
         {
             id: 1,
             name: 'Amar Ramdedovic',
-            role: translate(translations, 'landing.testimonials.testimonials.amar_ramdedovic.role'),
+            role: translate(translations, 'landing.testimonials.testimonials.amarRamdedovic.role'),
             company: 'Valora',
             avatar: 'AR',
             avatarUrl: '/images/reviews/reviews_1.jpg',
             rating: 5,
-            content: translate(translations, 'landing.testimonials.testimonials.amar_ramdedovic.content'),
+            content: translate(translations, 'landing.testimonials.testimonials.amarRamdedovic.content'),
         },
         {
             id: 2,
             name: 'Alessandro Rossi',
-            role: translate(translations, 'landing.testimonials.testimonials.alessandro_rossi.role'),
+            role: translate(translations, 'landing.testimonials.testimonials.alessandroRossi.role'),
             avatar: 'AR',
             rating: 5,
-            content: translate(translations, 'landing.testimonials.testimonials.alessandro_rossi.content'),
+            content: translate(translations, 'landing.testimonials.testimonials.alessandroRossi.content'),
         },
         {
             id: 3,
             name: 'Philippe Hengen',
-            role: translate(translations, 'landing.testimonials.testimonials.philippe_hengen.role'),
+            role: translate(translations, 'landing.testimonials.testimonials.philippeHengen.role'),
             company: 'AXA',
             avatar: 'PH',
             avatarUrl: '/images/reviews/reviews_3.jpeg',
             rating: 5,
-            content: translate(translations, 'landing.testimonials.testimonials.philippe_hengen.content'),
+            content: translate(translations, 'landing.testimonials.testimonials.philippeHengen.content'),
         },
     ];
 
     const STATS = [
-        { value: '4.9/5', label: translate(translations, 'landing.testimonials.stats.rating_label') },
-        { value: '200+', label: translate(translations, 'landing.testimonials.stats.customers_label') },
-        { value: '500+', label: translate(translations, 'landing.testimonials.stats.properties_label') },
+        { value: '4.9/5', label: translate(translations, 'landing.testimonials.stats.ratingLabel') },
+        { value: '200+', label: translate(translations, 'landing.testimonials.stats.customersLabel') },
+        { value: '500+', label: translate(translations, 'landing.testimonials.stats.propertiesLabel') },
     ];
 
     return (
@@ -113,7 +113,7 @@ export function TestimonialsSection() {
                                         <div className="font-semibold text-foreground">{review.name}</div>
                                         <div className="text-sm text-muted-foreground">
                                             {review.role}{' '}
-                                            {review.company && ` ${translate(translations, 'landing.testimonials.at_keyword')} ${review.company}`}
+                                            {review.company && ` ${translate(translations, 'landing.testimonials.atKeyword')} ${review.company}`}
                                         </div>
                                     </div>
                                 </div>

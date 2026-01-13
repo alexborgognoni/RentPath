@@ -40,7 +40,7 @@ const statusConfig: Record<AutosaveStatus, {
     pending: {
         icon: Cloud,
         text: 'Unsaved changes',
-        className: 'text-amber-500',
+        className: 'text-warning',
     },
     saving: {
         icon: Loader2,
@@ -51,7 +51,7 @@ const statusConfig: Record<AutosaveStatus, {
     saved: {
         icon: Check,
         text: 'Saved',
-        className: 'text-emerald-500',
+        className: 'text-success',
     },
     error: {
         icon: AlertCircle,

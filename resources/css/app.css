@@ -6,47 +6,205 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* =============================================================================
+   DESIGN TOKENS - OKLCH Color System
+
+   Format: oklch(lightness chroma hue)
+   - Lightness: 0-1 (0=black, 1=white)
+   - Chroma: 0+ (0=gray, higher=more saturated)
+   - Hue: 0-360 degrees
+
+   Benefits of OKLCH:
+   - Perceptually uniform lightness across all hues
+   - Predictable contrast ratios for accessibility
+   - Smooth gradients without gray-banding
+   - P3 wide gamut support for modern displays
+   ============================================================================= */
+
 @theme {
+    /* Breakpoints */
     --breakpoint-xs: 30rem;
+
+    /* Typography - Font Families */
     --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: 'Merriweather', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
+    /* Border Radius Scale */
+    --radius-none: 0;
+    --radius-xs: 0.25rem;
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
     --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-3xl: 1.5rem;
+    --radius-full: 9999px;
 
-    /* Colors */
+    /* ==========================================================================
+       EXTENDED COLOR PALETTE - OKLCH
+       9 colors × 11 steps (50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950)
+       ========================================================================== */
+
+    /* Gray (Slate-tinted neutral) - Hue: 265 */
+    --color-gray-50: var(--gray-50);
+    --color-gray-100: var(--gray-100);
+    --color-gray-200: var(--gray-200);
+    --color-gray-300: var(--gray-300);
+    --color-gray-400: var(--gray-400);
+    --color-gray-500: var(--gray-500);
+    --color-gray-600: var(--gray-600);
+    --color-gray-700: var(--gray-700);
+    --color-gray-800: var(--gray-800);
+    --color-gray-900: var(--gray-900);
+    --color-gray-950: var(--gray-950);
+
+    /* Red - Hue: 25 */
+    --color-red-50: var(--red-50);
+    --color-red-100: var(--red-100);
+    --color-red-200: var(--red-200);
+    --color-red-300: var(--red-300);
+    --color-red-400: var(--red-400);
+    --color-red-500: var(--red-500);
+    --color-red-600: var(--red-600);
+    --color-red-700: var(--red-700);
+    --color-red-800: var(--red-800);
+    --color-red-900: var(--red-900);
+    --color-red-950: var(--red-950);
+
+    /* Orange - Hue: 55 */
+    --color-orange-50: var(--orange-50);
+    --color-orange-100: var(--orange-100);
+    --color-orange-200: var(--orange-200);
+    --color-orange-300: var(--orange-300);
+    --color-orange-400: var(--orange-400);
+    --color-orange-500: var(--orange-500);
+    --color-orange-600: var(--orange-600);
+    --color-orange-700: var(--orange-700);
+    --color-orange-800: var(--orange-800);
+    --color-orange-900: var(--orange-900);
+    --color-orange-950: var(--orange-950);
+
+    /* Yellow - Hue: 85 */
+    --color-yellow-50: var(--yellow-50);
+    --color-yellow-100: var(--yellow-100);
+    --color-yellow-200: var(--yellow-200);
+    --color-yellow-300: var(--yellow-300);
+    --color-yellow-400: var(--yellow-400);
+    --color-yellow-500: var(--yellow-500);
+    --color-yellow-600: var(--yellow-600);
+    --color-yellow-700: var(--yellow-700);
+    --color-yellow-800: var(--yellow-800);
+    --color-yellow-900: var(--yellow-900);
+    --color-yellow-950: var(--yellow-950);
+
+    /* Green - Hue: 145 */
+    --color-green-50: var(--green-50);
+    --color-green-100: var(--green-100);
+    --color-green-200: var(--green-200);
+    --color-green-300: var(--green-300);
+    --color-green-400: var(--green-400);
+    --color-green-500: var(--green-500);
+    --color-green-600: var(--green-600);
+    --color-green-700: var(--green-700);
+    --color-green-800: var(--green-800);
+    --color-green-900: var(--green-900);
+    --color-green-950: var(--green-950);
+
+    /* Cyan - Hue: 195 (Brand Primary Base) */
+    --color-cyan-50: var(--cyan-50);
+    --color-cyan-100: var(--cyan-100);
+    --color-cyan-200: var(--cyan-200);
+    --color-cyan-300: var(--cyan-300);
+    --color-cyan-400: var(--cyan-400);
+    --color-cyan-500: var(--cyan-500);
+    --color-cyan-600: var(--cyan-600);
+    --color-cyan-700: var(--cyan-700);
+    --color-cyan-800: var(--cyan-800);
+    --color-cyan-900: var(--cyan-900);
+    --color-cyan-950: var(--cyan-950);
+
+    /* Blue - Hue: 250 */
+    --color-blue-50: var(--blue-50);
+    --color-blue-100: var(--blue-100);
+    --color-blue-200: var(--blue-200);
+    --color-blue-300: var(--blue-300);
+    --color-blue-400: var(--blue-400);
+    --color-blue-500: var(--blue-500);
+    --color-blue-600: var(--blue-600);
+    --color-blue-700: var(--blue-700);
+    --color-blue-800: var(--blue-800);
+    --color-blue-900: var(--blue-900);
+    --color-blue-950: var(--blue-950);
+
+    /* Purple/Violet - Hue: 290 (Brand Secondary Base) */
+    --color-purple-50: var(--purple-50);
+    --color-purple-100: var(--purple-100);
+    --color-purple-200: var(--purple-200);
+    --color-purple-300: var(--purple-300);
+    --color-purple-400: var(--purple-400);
+    --color-purple-500: var(--purple-500);
+    --color-purple-600: var(--purple-600);
+    --color-purple-700: var(--purple-700);
+    --color-purple-800: var(--purple-800);
+    --color-purple-900: var(--purple-900);
+    --color-purple-950: var(--purple-950);
+
+    /* Pink - Hue: 350 */
+    --color-pink-50: var(--pink-50);
+    --color-pink-100: var(--pink-100);
+    --color-pink-200: var(--pink-200);
+    --color-pink-300: var(--pink-300);
+    --color-pink-400: var(--pink-400);
+    --color-pink-500: var(--pink-500);
+    --color-pink-600: var(--pink-600);
+    --color-pink-700: var(--pink-700);
+    --color-pink-800: var(--pink-800);
+    --color-pink-900: var(--pink-900);
+    --color-pink-950: var(--pink-950);
+
+    /* ==========================================================================
+       SEMANTIC COLORS - Mapped from palette
+       ========================================================================== */
+
+    /* Core UI Colors */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-
     --color-surface: var(--surface);
     --color-surface-foreground: var(--foreground);
-
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);
-
     --color-popover: var(--popover);
     --color-popover-foreground: var(--popover-foreground);
 
+    /* Brand Colors */
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
-
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
-
     --color-accent: var(--accent);
     --color-accent-foreground: var(--accent-foreground);
 
+    /* Status Colors */
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-error: var(--error);
+    --color-error-foreground: var(--error-foreground);
+    --color-info: var(--info);
+    --color-info-foreground: var(--info-foreground);
+
+    /* Utility Colors */
     --color-destructive: var(--destructive);
     --color-destructive-foreground: var(--destructive-foreground);
-
     --color-muted: var(--muted);
     --color-muted-foreground: var(--muted-foreground);
-
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
 
-    /* Sidebar */
+    /* Sidebar Colors */
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -55,116 +213,501 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* ==========================================================================
+       SHADOWS - Theme-aware with shadow color variable
+       ========================================================================== */
+    --shadow-2xs: 0 1px 2px 0 var(--shadow-color);
+    --shadow-xs: 0 1px 3px 0 var(--shadow-color), 0 1px 2px -1px var(--shadow-color);
+    --shadow-sm: 0 2px 4px -1px var(--shadow-color), 0 1px 3px -1px var(--shadow-color);
+    --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+    --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+    --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
+    --shadow-2xl: 0 25px 50px -12px var(--shadow-color);
 }
 
+/* =============================================================================
+   LIGHT MODE - :root
+   ============================================================================= */
 :root {
-    /* Breakpoints */
-    --bp-xs: 480px; /* small phones */
-    --bp-sm: 640px; /* phones / small tablets */
-    --bp-md: 768px; /* tablets */
-    --bp-lg: 1024px; /* laptops */
-    --bp-xl: 1280px; /* desktops */
-    --bp-2xl: 1536px; /* large desktops */
+    /* -------------------------------------------------------------------------
+       Base Color Palette - OKLCH
+       ------------------------------------------------------------------------- */
+
+    /* Gray - Tailwind Gray palette converted to OKLCH */
+    --gray-50: oklch(0.985 0.002 247); /* #f9fafb */
+    --gray-100: oklch(0.967 0.003 264); /* #f3f4f6 */
+    --gray-200: oklch(0.928 0.006 264); /* #e5e7eb */
+    --gray-300: oklch(0.872 0.01 258); /* #d1d5db */
+    --gray-400: oklch(0.707 0.015 256); /* #9ca3af */
+    --gray-500: oklch(0.551 0.018 256); /* #6b7280 */
+    --gray-600: oklch(0.446 0.018 256); /* #4b5563 */
+    --gray-700: oklch(0.373 0.018 259); /* #374151 */
+    --gray-800: oklch(0.278 0.02 256); /* #1f2937 */
+    --gray-900: oklch(0.21 0.024 265); /* #111827 */
+    --gray-950: oklch(0.13 0.028 261); /* #030712 */
+
+    /* Red - Tailwind Red palette converted to OKLCH */
+    --red-50: oklch(0.971 0.013 17); /* #fef2f2 */
+    --red-100: oklch(0.936 0.032 17); /* #fee2e2 */
+    --red-200: oklch(0.885 0.062 18); /* #fecaca */
+    --red-300: oklch(0.808 0.114 19); /* #fca5a5 */
+    --red-400: oklch(0.704 0.191 22); /* #f87171 */
+    --red-500: oklch(0.628 0.258 29); /* #ef4444 */
+    --red-600: oklch(0.577 0.245 27); /* #dc2626 */
+    --red-700: oklch(0.505 0.213 27); /* #b91c1c */
+    --red-800: oklch(0.444 0.177 26); /* #991b1b */
+    --red-900: oklch(0.396 0.141 25); /* #7f1d1d */
+    --red-950: oklch(0.258 0.092 26); /* #450a0a */
+
+    /* Orange - Tailwind Orange palette converted to OKLCH */
+    --orange-50: oklch(0.98 0.016 73); /* #fff7ed */
+    --orange-100: oklch(0.954 0.038 75); /* #ffedd5 */
+    --orange-200: oklch(0.901 0.076 70); /* #fed7aa */
+    --orange-300: oklch(0.837 0.128 66); /* #fdba74 */
+    --orange-400: oklch(0.75 0.183 55); /* #fb923c */
+    --orange-500: oklch(0.702 0.191 41); /* #f97316 */
+    --orange-600: oklch(0.646 0.222 41); /* #ea580c */
+    --orange-700: oklch(0.553 0.195 38); /* #c2410c */
+    --orange-800: oklch(0.47 0.157 37); /* #9a3412 */
+    --orange-900: oklch(0.408 0.123 38); /* #7c2d12 */
+    --orange-950: oklch(0.266 0.079 36); /* #431407 */
+
+    /* Yellow - Tailwind Yellow palette converted to OKLCH */
+    --yellow-50: oklch(0.987 0.026 102); /* #fefce8 */
+    --yellow-100: oklch(0.973 0.071 103); /* #fef9c3 */
+    --yellow-200: oklch(0.945 0.129 101); /* #fef08a */
+    --yellow-300: oklch(0.905 0.182 98); /* #fde047 */
+    --yellow-400: oklch(0.852 0.199 91); /* #facc15 */
+    --yellow-500: oklch(0.795 0.184 86); /* #eab308 */
+    --yellow-600: oklch(0.681 0.162 75); /* #ca8a04 */
+    --yellow-700: oklch(0.554 0.135 66); /* #a16207 */
+    --yellow-800: oklch(0.476 0.114 61); /* #854d0e */
+    --yellow-900: oklch(0.421 0.095 57); /* #713f12 */
+    --yellow-950: oklch(0.286 0.066 53); /* #422006 */
+
+    /* Green - Tailwind Emerald palette converted to OKLCH */
+    --green-50: oklch(0.979 0.021 166); /* #ecfdf5 */
+    --green-100: oklch(0.95 0.052 163); /* #d1fae5 */
+    --green-200: oklch(0.905 0.093 164); /* #a7f3d0 */
+    --green-300: oklch(0.845 0.143 164); /* #6ee7b7 */
+    --green-400: oklch(0.765 0.177 163); /* #34d399 */
+    --green-500: oklch(0.696 0.17 162); /* #10b981 */
+    --green-600: oklch(0.596 0.145 163); /* #059669 */
+    --green-700: oklch(0.508 0.118 165); /* #047857 */
+    --green-800: oklch(0.432 0.095 166); /* #065f46 */
+    --green-900: oklch(0.378 0.077 168); /* #064e3b */
+    --green-950: oklch(0.262 0.051 172); /* #022c22 */
+
+    /* Cyan - Tailwind Cyan palette converted to OKLCH (Brand Primary) */
+    --cyan-50: oklch(0.984 0.019 200); /* #ecfeff */
+    --cyan-100: oklch(0.956 0.045 203); /* #cffafe */
+    --cyan-200: oklch(0.917 0.08 205); /* #a5f3fc */
+    --cyan-300: oklch(0.865 0.127 207); /* #67e8f9 */
+    --cyan-400: oklch(0.789 0.154 202); /* #22d3ee */
+    --cyan-500: oklch(0.715 0.143 195); /* #06b6d4 */
+    --cyan-600: oklch(0.609 0.126 197); /* #0891b2 */
+    --cyan-700: oklch(0.52 0.105 199); /* #0e7490 */
+    --cyan-800: oklch(0.45 0.082 200); /* #155e75 */
+    --cyan-900: oklch(0.398 0.07 201); /* #164e63 */
+    --cyan-950: oklch(0.302 0.056 210); /* #083344 */
+
+    /* Blue - Tailwind Blue palette converted to OKLCH */
+    --blue-50: oklch(0.97 0.014 254); /* #eff6ff */
+    --blue-100: oklch(0.932 0.032 255); /* #dbeafe */
+    --blue-200: oklch(0.882 0.059 254); /* #bfdbfe */
+    --blue-300: oklch(0.809 0.105 251); /* #93c5fd */
+    --blue-400: oklch(0.707 0.165 254); /* #60a5fa */
+    --blue-500: oklch(0.623 0.214 259); /* #3b82f6 */
+    --blue-600: oklch(0.546 0.245 262); /* #2563eb */
+    --blue-700: oklch(0.488 0.243 264); /* #1d4ed8 */
+    --blue-800: oklch(0.424 0.199 265); /* #1e40af */
+    --blue-900: oklch(0.379 0.146 265); /* #1e3a8a */
+    --blue-950: oklch(0.282 0.091 267); /* #172554 */
+
+    /* Purple/Violet - Tailwind Violet palette converted to OKLCH (Brand Secondary) */
+    --purple-50: oklch(0.969 0.016 293); /* #f5f3ff */
+    --purple-100: oklch(0.943 0.029 294); /* #ede9fe */
+    --purple-200: oklch(0.894 0.057 293); /* #ddd6fe */
+    --purple-300: oklch(0.811 0.111 293); /* #c4b5fd */
+    --purple-400: oklch(0.702 0.183 293); /* #a78bfa */
+    --purple-500: oklch(0.606 0.25 292); /* #8b5cf6 */
+    --purple-600: oklch(0.541 0.281 293); /* #7c3aed */
+    --purple-700: oklch(0.491 0.27 292); /* #6d28d9 */
+    --purple-800: oklch(0.432 0.232 292); /* #5b21b6 */
+    --purple-900: oklch(0.381 0.189 293); /* #4c1d95 */
+    --purple-950: oklch(0.283 0.141 291); /* #2e1065 */
+
+    /* Pink - Tailwind Pink palette converted to OKLCH */
+    --pink-50: oklch(0.971 0.014 343); /* #fdf2f8 */
+    --pink-100: oklch(0.948 0.028 342); /* #fce7f3 */
+    --pink-200: oklch(0.899 0.061 343); /* #fbcfe8 */
+    --pink-300: oklch(0.823 0.12 346); /* #f9a8d4 */
+    --pink-400: oklch(0.718 0.202 349); /* #f472b6 */
+    --pink-500: oklch(0.656 0.241 354); /* #ec4899 */
+    --pink-600: oklch(0.592 0.249 0); /* #db2777 */
+    --pink-700: oklch(0.525 0.223 3); /* #be185d */
+    --pink-800: oklch(0.459 0.187 3); /* #9d174d */
+    --pink-900: oklch(0.408 0.153 2); /* #831843 */
+    --pink-950: oklch(0.284 0.109 3); /* #500724 */
+
+    /* -------------------------------------------------------------------------
+       Semantic Colors - Light Mode
+       ------------------------------------------------------------------------- */
+
+    /* Breakpoints (legacy support) */
+    --bp-xs: 480px;
+    --bp-sm: 640px;
+    --bp-md: 768px;
+    --bp-lg: 1024px;
+    --bp-xl: 1280px;
+    --bp-2xl: 1536px;
 
     /* Backgrounds / Surfaces */
-    --background: #f9fafb; /* main page background */
-    --surface: #ffffff; /* primary surface */
-    --card: #fefefe; /* slightly different from surface for depth */
-    --popover: #fdfdfd; /* subtle distinction for popovers */
+    --background: oklch(0.985 0.002 247); /* #f9fafb */
+    --surface: oklch(1 0 0); /* #ffffff */
+    --card: oklch(0.998 0 0); /* #fefefe */
+    --popover: oklch(0.996 0 0); /* #fdfdfd */
 
     /* Text */
-    --text-primary: #1f2937; /* main text, high contrast */
-    --text-secondary: #374151; /* slightly darker for readability */
+    --text-primary: oklch(0.278 0.02 256); /* #1f2937 */
+    --text-secondary: oklch(0.373 0.018 259); /* #374151 */
     --foreground: var(--text-primary);
     --card-foreground: var(--text-primary);
     --popover-foreground: var(--text-primary);
-    --muted-foreground: #6b7280; /* softer than text-secondary */
+    --muted-foreground: oklch(0.551 0.018 256); /* #6b7280 */
 
-    /* Brand colors */
-    --primary: #06b6d4;
-    --primary-foreground: #ffffff;
-    --secondary: #8b5cf6;
-    --secondary-foreground: #ffffff;
-    --accent: #7c3aed; /* reserved for highlights / links */
-    --accent-foreground: #ffffff;
+    /* Brand Colors */
+    --primary: var(--cyan-500);
+    --primary-foreground: oklch(1 0 0); /* #ffffff */
+    --secondary: var(--purple-500);
+    --secondary-foreground: oklch(1 0 0);
+    --accent: var(--purple-600);
+    --accent-foreground: oklch(1 0 0);
 
-    /* States */
-    --success: #10b981;
-    --warning: #f59e0b;
-    --error: #ef4444;
-    --destructive: #dc2626; /* slightly darker than error for buttons */
-    --destructive-foreground: #ffffff;
-    --muted: #e5e7eb;
+    /* Status Colors */
+    --success: var(--green-500);
+    --success-foreground: oklch(1 0 0);
+    --warning: var(--yellow-500);
+    --warning-foreground: var(--yellow-950);
+    --error: var(--red-500);
+    --error-foreground: oklch(1 0 0);
+    --info: var(--blue-500);
+    --info-foreground: oklch(1 0 0);
+
+    /* Destructive */
+    --destructive: var(--red-600);
+    --destructive-foreground: oklch(1 0 0);
+
+    /* Muted */
+    --muted: oklch(0.928 0.006 264); /* #e5e7eb */
 
     /* Borders & Inputs */
-    --border: #d1d5db; /* slightly darker for better definition */
-    --input: #d1d5db;
-    --ring: #06b6d4;
+    --border: oklch(0.872 0.01 258); /* #d1d5db */
+    --input: oklch(0.872 0.01 258);
+    --ring: var(--primary);
+
+    /* Shadows */
+    --shadow-color: oklch(0.2 0.02 265 / 0.1);
 
     /* Misc */
     --radius: 0.625rem;
 
-    /* Sidebar - use card colors for consistency */
+    /* Sidebar */
     --sidebar: var(--card);
     --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
-    --sidebar-accent: #f1f5f9;
+    --sidebar-accent: oklch(0.968 0.007 247); /* #f1f5f9 */
     --sidebar-accent-foreground: var(--text-primary);
     --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
+
+    /* -------------------------------------------------------------------------
+       Typography Tokens
+       ------------------------------------------------------------------------- */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+    --text-6xl: 3.75rem;
+
+    --font-thin: 100;
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+    --font-black: 900;
+
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+
+    --tracking-tighter: -0.05em;
+    --tracking-tight: -0.025em;
+    --tracking-normal: 0;
+    --tracking-wide: 0.025em;
+    --tracking-wider: 0.05em;
+    --tracking-widest: 0.1em;
+
+    /* -------------------------------------------------------------------------
+       Spacing Tokens
+       ------------------------------------------------------------------------- */
+    --space-px: 1px;
+    --space-0: 0;
+    --space-0-5: 0.125rem;
+    --space-1: 0.25rem;
+    --space-1-5: 0.375rem;
+    --space-2: 0.5rem;
+    --space-2-5: 0.625rem;
+    --space-3: 0.75rem;
+    --space-3-5: 0.875rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-7: 1.75rem;
+    --space-8: 2rem;
+    --space-9: 2.25rem;
+    --space-10: 2.5rem;
+    --space-11: 2.75rem;
+    --space-12: 3rem;
+    --space-14: 3.5rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+    --space-28: 7rem;
+    --space-32: 8rem;
+
+    /* Semantic Spacing */
+    --space-xs: var(--space-1);
+    --space-sm: var(--space-2);
+    --space-md: var(--space-4);
+    --space-lg: var(--space-6);
+    --space-xl: var(--space-8);
+    --space-2xl: var(--space-12);
+    --space-3xl: var(--space-16);
+
+    /* Component Spacing */
+    --card-padding: var(--space-lg);
+    --section-gap: var(--space-2xl);
+    --page-padding-x: var(--space-md);
+    --page-padding-y: var(--space-lg);
+    --input-padding-x: var(--space-3);
+    --input-padding-y: var(--space-2);
 }
 
+/* =============================================================================
+   DARK MODE - .dark
+   ============================================================================= */
 .dark {
-    /* Backgrounds / Surfaces */
-    --background: #0f172a; /* main page background */
-    --surface: #1e293b; /* primary surface */
-    --card: #1c2536; /* subtle differentiation for depth */
-    --popover: #1b2634; /* slightly lighter/darker for layering */
+    /* -------------------------------------------------------------------------
+       Dark Mode Color Palette - Adjusted for dark backgrounds
+
+       Best practice: Create separate dark mode palette with:
+       - Same hue as light mode
+       - Adjusted lightness for visibility on dark backgrounds
+       - Slightly desaturated (reduced chroma) for less eye strain
+
+       Sources:
+       - https://evilmartians.com/chronicles/better-dynamic-themes-in-tailwind-with-oklch-color-magic
+       - https://www.designstudiouiux.com/blog/dark-mode-ui-design-best-practices/
+       ------------------------------------------------------------------------- */
+
+    /* Gray - Lightness inverted for dark mode (dark values become light) */
+    --gray-50: oklch(0.21 0.024 265); /* Was light, now dark */
+    --gray-100: oklch(0.278 0.02 256);
+    --gray-200: oklch(0.373 0.018 259);
+    --gray-300: oklch(0.446 0.018 256);
+    --gray-400: oklch(0.551 0.018 256);
+    --gray-500: oklch(0.707 0.015 256);
+    --gray-600: oklch(0.872 0.01 258);
+    --gray-700: oklch(0.928 0.006 264);
+    --gray-800: oklch(0.967 0.003 264);
+    --gray-900: oklch(0.985 0.002 247);
+    --gray-950: oklch(0.995 0.001 247); /* Was dark, now light */
+
+    /* Red - Brighter for dark mode, same hue */
+    --red-50: oklch(0.258 0.092 26);
+    --red-100: oklch(0.396 0.141 25);
+    --red-200: oklch(0.444 0.177 26);
+    --red-300: oklch(0.505 0.213 27);
+    --red-400: oklch(0.577 0.245 27);
+    --red-500: oklch(0.67 0.23 27); /* Brighter than light mode */
+    --red-600: oklch(0.74 0.18 24);
+    --red-700: oklch(0.83 0.12 20);
+    --red-800: oklch(0.9 0.06 18);
+    --red-900: oklch(0.945 0.03 17);
+    --red-950: oklch(0.975 0.012 17);
+
+    /* Orange - Brighter for dark mode, same hue */
+    --orange-50: oklch(0.266 0.079 36);
+    --orange-100: oklch(0.408 0.123 38);
+    --orange-200: oklch(0.47 0.157 37);
+    --orange-300: oklch(0.553 0.195 38);
+    --orange-400: oklch(0.646 0.2 41);
+    --orange-500: oklch(0.75 0.17 48); /* Brighter */
+    --orange-600: oklch(0.82 0.14 55);
+    --orange-700: oklch(0.88 0.1 65);
+    --orange-800: oklch(0.93 0.06 70);
+    --orange-900: oklch(0.96 0.035 73);
+    --orange-950: oklch(0.982 0.016 73);
+
+    /* Yellow - Brighter for dark mode, same hue */
+    --yellow-50: oklch(0.286 0.066 53);
+    --yellow-100: oklch(0.421 0.095 57);
+    --yellow-200: oklch(0.476 0.114 61);
+    --yellow-300: oklch(0.554 0.135 66);
+    --yellow-400: oklch(0.681 0.162 75);
+    --yellow-500: oklch(0.82 0.17 88); /* Brighter */
+    --yellow-600: oklch(0.88 0.15 95);
+    --yellow-700: oklch(0.93 0.1 100);
+    --yellow-800: oklch(0.96 0.06 102);
+    --yellow-900: oklch(0.978 0.035 103);
+    --yellow-950: oklch(0.99 0.02 102);
+
+    /* Green - Brighter for dark mode, same hue */
+    --green-50: oklch(0.262 0.051 172);
+    --green-100: oklch(0.378 0.077 168);
+    --green-200: oklch(0.432 0.095 166);
+    --green-300: oklch(0.508 0.118 165);
+    --green-400: oklch(0.596 0.145 163);
+    --green-500: oklch(0.73 0.16 162); /* Brighter */
+    --green-600: oklch(0.8 0.14 163);
+    --green-700: oklch(0.87 0.1 164);
+    --green-800: oklch(0.92 0.06 164);
+    --green-900: oklch(0.955 0.04 163);
+    --green-950: oklch(0.98 0.02 166);
+
+    /* Cyan - Brighter for dark mode, same hue (Brand Primary) */
+    --cyan-50: oklch(0.302 0.056 210);
+    --cyan-100: oklch(0.398 0.07 201);
+    --cyan-200: oklch(0.45 0.082 200);
+    --cyan-300: oklch(0.52 0.105 199);
+    --cyan-400: oklch(0.609 0.14 197);
+    --cyan-500: oklch(0.76 0.165 197); /* Higher chroma for vibrancy */
+    --cyan-600: oklch(0.83 0.14 200);
+    --cyan-700: oklch(0.89 0.1 203);
+    --cyan-800: oklch(0.93 0.06 205);
+    --cyan-900: oklch(0.96 0.035 203);
+    --cyan-950: oklch(0.985 0.02 200);
+
+    /* Blue - Brighter for dark mode, same hue */
+    --blue-50: oklch(0.282 0.091 267);
+    --blue-100: oklch(0.379 0.146 265);
+    --blue-200: oklch(0.424 0.199 265);
+    --blue-300: oklch(0.488 0.243 264);
+    --blue-400: oklch(0.546 0.245 262);
+    --blue-500: oklch(0.68 0.2 260); /* Brighter */
+    --blue-600: oklch(0.76 0.15 255);
+    --blue-700: oklch(0.84 0.1 253);
+    --blue-800: oklch(0.9 0.055 254);
+    --blue-900: oklch(0.94 0.03 255);
+    --blue-950: oklch(0.975 0.014 254);
+
+    /* Purple/Violet - Brighter for dark mode, same hue (Brand Secondary) */
+    --purple-50: oklch(0.283 0.141 291);
+    --purple-100: oklch(0.381 0.189 293);
+    --purple-200: oklch(0.432 0.232 292);
+    --purple-300: oklch(0.491 0.27 292);
+    --purple-400: oklch(0.56 0.26 293);
+    --purple-500: oklch(0.7 0.22 293); /* Higher chroma for vibrancy */
+    --purple-600: oklch(0.78 0.18 293);
+    --purple-700: oklch(0.85 0.13 293);
+    --purple-800: oklch(0.905 0.07 293);
+    --purple-900: oklch(0.948 0.035 294);
+    --purple-950: oklch(0.975 0.018 293);
+
+    /* Pink - Brighter for dark mode, same hue */
+    --pink-50: oklch(0.284 0.109 3);
+    --pink-100: oklch(0.408 0.153 2);
+    --pink-200: oklch(0.459 0.187 3);
+    --pink-300: oklch(0.525 0.223 3);
+    --pink-400: oklch(0.592 0.23 0);
+    --pink-500: oklch(0.72 0.2 355); /* Brighter */
+    --pink-600: oklch(0.8 0.15 350);
+    --pink-700: oklch(0.86 0.1 346);
+    --pink-800: oklch(0.91 0.055 343);
+    --pink-900: oklch(0.955 0.026 342);
+    --pink-950: oklch(0.978 0.013 343);
+
+    /* -------------------------------------------------------------------------
+       Semantic Colors - Dark Mode
+       ------------------------------------------------------------------------- */
+
+    /* Backgrounds / Surfaces - Tailwind Slate dark values */
+    --background: oklch(0.208 0.042 265); /* #0f172a - slate-900 */
+    --surface: oklch(0.279 0.041 260); /* #1e293b - slate-800 */
+    --card: oklch(0.257 0.038 261); /* #1c2536 */
+    --popover: oklch(0.25 0.036 259); /* #1b2634 */
 
     /* Text */
-    --text-primary: #f0f9ff; /* main text, high contrast */
-    --text-secondary: #cbd5e1; /* softer, but readable */
+    --text-primary: oklch(0.977 0.013 236); /* #f0f9ff - sky-50 */
+    --text-secondary: oklch(0.869 0.022 252); /* #cbd5e1 - slate-300 */
     --foreground: var(--text-primary);
     --card-foreground: var(--text-primary);
     --popover-foreground: var(--text-primary);
-    --muted-foreground: #94a3b8; /* softer for muted text */
+    --muted-foreground: oklch(0.704 0.024 256); /* #94a3b8 - slate-400 */
 
-    /* Brand colors */
-    --primary: #22d3ee;
-    --primary-foreground: #0f172a;
-    --secondary: #c084fc;
-    --secondary-foreground: #0f172a;
-    --accent: #8b5cf6;
-    --accent-foreground: #0f172a;
+    /* Brand Colors - Use -500 for higher saturation/vibrancy */
+    --primary: var(--cyan-500);
+    --primary-foreground: oklch(0.208 0.042 265); /* matches background */
+    --secondary: var(--purple-500);
+    --secondary-foreground: oklch(0.208 0.042 265);
+    --accent: var(--purple-500);
+    --accent-foreground: oklch(0.208 0.042 265);
 
-    /* States */
-    --success: #22c55e;
-    --warning: #fbbf24;
-    --error: #f87171;
-    --destructive: #ef4444; /* slightly brighter for buttons */
-    --destructive-foreground: #0f172a;
-    --muted: #334155; /* softer background for muted elements */
+    /* Status Colors - Use -600 for slightly muted but visible status indicators */
+    --success: var(--green-600);
+    --success-foreground: oklch(0.208 0.042 265);
+    --warning: var(--yellow-600);
+    --warning-foreground: oklch(0.208 0.042 265);
+    --error: var(--red-600);
+    --error-foreground: oklch(0.208 0.042 265);
+    --info: var(--blue-600);
+    --info-foreground: oklch(0.208 0.042 265);
+
+    /* Destructive */
+    --destructive: var(--red-500);
+    --destructive-foreground: oklch(0.208 0.042 265);
+
+    /* Muted */
+    --muted: oklch(0.372 0.032 257); /* #334155 - slate-700 */
 
     /* Borders & Inputs */
-    --border: #475569; /* more visible against surface */
-    --input: #475569;
-    --ring: #22d3ee;
+    --border: oklch(0.446 0.03 256); /* #475569 - slate-600 */
+    --input: oklch(0.446 0.03 256);
+    --ring: var(--primary);
+
+    /* Shadows - Stronger for dark mode */
+    --shadow-color: oklch(0 0 0 / 0.4);
 
     /* Misc */
     --radius: 0.625rem;
 
-    /* Sidebar - use card colors for consistency */
+    /* Sidebar */
     --sidebar: var(--card);
     --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
-    --sidebar-accent: #334155;
+    --sidebar-accent: oklch(0.372 0.032 257); /* #334155 */
     --sidebar-accent-foreground: var(--text-primary);
     --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
 }
 
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
 @layer base {
     * {
         @apply border-border;
@@ -189,24 +732,21 @@
     }
 
     /* Date picker icon styling - matches ChevronDown in select components (opacity-50) */
-    /* Light mode: black icon → grey (#6b7280 muted-foreground) */
     input[type='date']::-webkit-calendar-picker-indicator,
     input[type='datetime-local']::-webkit-calendar-picker-indicator,
     input[type='month']::-webkit-calendar-picker-indicator,
     input[type='week']::-webkit-calendar-picker-indicator,
     input[type='time']::-webkit-calendar-picker-indicator {
         @apply cursor-pointer;
-        /* Convert black to muted-foreground grey */
         filter: invert(47%) sepia(6%) saturate(622%) hue-rotate(182deg) brightness(90%) contrast(87%);
     }
 
-    /* Dark mode: need lighter grey (#94a3b8 muted-foreground) */
+    /* Dark mode: need lighter grey for calendar picker icon */
     .dark input[type='date']::-webkit-calendar-picker-indicator,
     .dark input[type='datetime-local']::-webkit-calendar-picker-indicator,
     .dark input[type='month']::-webkit-calendar-picker-indicator,
     .dark input[type='week']::-webkit-calendar-picker-indicator,
     .dark input[type='time']::-webkit-calendar-picker-indicator {
-        /* Convert black to light grey for dark mode */
         filter: invert(70%) sepia(10%) saturate(400%) hue-rotate(180deg) brightness(95%) contrast(90%);
     }
 
@@ -236,6 +776,9 @@
     }
 }
 
+/* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
 @keyframes drawUnderline {
     to {
         stroke-dashoffset: 0;

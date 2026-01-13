@@ -295,7 +295,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
 
     return (
         <BaseLayout>
-            <Head title={isEditing ? t(translations.profile, 'setup.edit_title') : t(translations.profile, 'setup.title')} />
+            <Head title={isEditing ? t(translations.manager.profile, 'setup.editTitle') : t(translations.manager.profile, 'setup.title')} />
             <div className="flex-1 overflow-y-auto py-12">
                 <div className="mx-auto max-w-2xl px-6">
                     <motion.div
@@ -306,13 +306,15 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                     >
                         <div className="mb-8 text-center">
                             <h1 className="mb-2 text-3xl font-bold text-foreground">
-                                {isEditing ? t(translations.profile, 'setup.edit_title') : t(translations.profile, 'setup.title')}
+                                {isEditing ? t(translations.manager.profile, 'setup.editTitle') : t(translations.manager.profile, 'setup.title')}
                             </h1>
                             <p className="text-muted-foreground">
-                                {isEditing ? t(translations.profile, 'setup.edit_description') : t(translations.profile, 'setup.description')}
+                                {isEditing
+                                    ? t(translations.manager.profile, 'setup.editDescription')
+                                    : t(translations.manager.profile, 'setup.description')}
                             </p>
                             {!isEditing && (
-                                <p className="mt-2 text-sm text-muted-foreground">{t(translations.profile, 'setup.verification_notice')}</p>
+                                <p className="mt-2 text-sm text-muted-foreground">{t(translations.manager.profile, 'setup.verificationNotice')}</p>
                             )}
 
                             {/* Error Banner */}
@@ -414,7 +416,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     )}
                                 </div>
                                 <p className="mt-2 text-sm text-muted-foreground">
-                                    {t(translations.profile, 'setup.click_upload_text')}
+                                    {t(translations.manager.profile, 'setup.clickUploadText')}
                                     {isFieldRejected('profile_picture') && <span className="text-destructive"> *</span>}
                                 </p>
                                 {errors.profile_picture && <p className="mt-1 text-sm text-destructive">{errors.profile_picture}</p>}
@@ -442,7 +444,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <label htmlFor="first_name" className="block text-sm font-medium text-foreground">
-                                        {t(translations.profile, 'setup.first_name')}
+                                        {t(translations.manager.profile, 'setup.firstName')}
                                     </label>
                                     <input
                                         type="text"
@@ -455,7 +457,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
 
                                 <div>
                                     <label htmlFor="last_name" className="block text-sm font-medium text-foreground">
-                                        {t(translations.profile, 'setup.last_name')}
+                                        {t(translations.manager.profile, 'setup.lastName')}
                                     </label>
                                     <input
                                         type="text"
@@ -469,7 +471,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                             {/* Profile Type Selection */}
                             <div>
                                 <label className="mb-3 block text-sm font-medium text-foreground">
-                                    {t(translations.profile, 'setup.profile_type')}
+                                    {t(translations.manager.profile, 'setup.profileType')}
                                 </label>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <button
@@ -483,8 +485,8 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     >
                                         <UserIcon className="h-6 w-6 text-primary" />
                                         <div className="ml-3 text-left">
-                                            <p className="font-medium text-foreground">{t(translations.profile, 'setup.individual')}</p>
-                                            <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.individual_desc')}</p>
+                                            <p className="font-medium text-foreground">{t(translations.manager.profile, 'setup.individual')}</p>
+                                            <p className="text-xs text-muted-foreground">{t(translations.manager.profile, 'setup.individualDesc')}</p>
                                         </div>
                                     </button>
 
@@ -499,8 +501,10 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     >
                                         <Building className="h-6 w-6 text-primary" />
                                         <div className="ml-3 text-left">
-                                            <p className="font-medium text-foreground">{t(translations.profile, 'setup.professional')}</p>
-                                            <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.professional_desc')}</p>
+                                            <p className="font-medium text-foreground">{t(translations.manager.profile, 'setup.professional')}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {t(translations.manager.profile, 'setup.professionalDesc')}
+                                            </p>
                                         </div>
                                     </button>
                                 </div>
@@ -510,7 +514,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                             {/* Phone Number */}
                             <div>
                                 <label className="block text-sm font-medium text-foreground">
-                                    {t(translations.profile, 'setup.phone_number')} <span className="text-destructive">*</span>
+                                    {t(translations.manager.profile, 'setup.phoneNumber')} <span className="text-destructive">*</span>
                                 </label>
                                 <div className="mt-2">
                                     <PhoneInput
@@ -537,7 +541,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                 <>
                                     <div>
                                         <label htmlFor="company_name" className="block text-sm font-medium text-foreground">
-                                            {t(translations.profile, 'setup.company_name')} <span className="text-destructive">*</span>
+                                            {t(translations.manager.profile, 'setup.companyName')} <span className="text-destructive">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -556,7 +560,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
 
                                     <div>
                                         <label htmlFor="company_website" className="block text-sm font-medium text-foreground">
-                                            {t(translations.profile, 'setup.company_website')}
+                                            {t(translations.manager.profile, 'setup.companyWebsite')}
                                         </label>
                                         <input
                                             type="text"
@@ -585,7 +589,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                     <div>
                                         <label htmlFor="license_number" className="flex items-center gap-2 text-sm font-medium text-foreground">
                                             <span>
-                                                {t(translations.profile, 'setup.license_number')} <span className="text-destructive">*</span>
+                                                {t(translations.manager.profile, 'setup.licenseNumber')} <span className="text-destructive">*</span>
                                             </span>
                                             <div className="group relative inline-block">
                                                 <button
@@ -600,7 +604,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                 <div
                                                     className={`absolute bottom-full left-1/2 z-10 mb-2 w-64 -translate-x-1/2 rounded-lg border border-border bg-popover p-3 text-xs text-popover-foreground shadow-lg transition-opacity duration-200 ${showLicenseTooltip ? 'visible opacity-100' : 'invisible opacity-0'}`}
                                                 >
-                                                    <p className="leading-relaxed">{t(translations.profile, 'setup.license_number_tooltip')}</p>
+                                                    <p className="leading-relaxed">{t(translations.manager.profile, 'setup.licenseNumberTooltip')}</p>
                                                     <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 border-t-4 border-r-4 border-l-4 border-t-border border-r-transparent border-l-transparent"></div>
                                                 </div>
                                             </div>
@@ -627,7 +631,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                 {selectedType === 'individual' && (
                                     <div>
                                         <label htmlFor="id_document" className="block text-sm font-medium text-foreground">
-                                            {t(translations.profile, 'setup.id_document')} <span className="text-destructive">*</span>
+                                            {t(translations.manager.profile, 'setup.idDocument')} <span className="text-destructive">*</span>
                                         </label>
                                         <div
                                             className={`mt-2 flex justify-center rounded-md border border-dashed px-6 pt-5 pb-6 ${isFieldRejected('id_document') || clientErrors.id_document || errors.id_document ? 'border-destructive bg-destructive/5' : 'border-border'}`}
@@ -646,11 +650,11 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         <span>
                                                             {(data.id_document && data.id_document !== 'removed') ||
                                                             (propertyManager?.id_document_path && data.id_document !== 'removed')
-                                                                ? t(translations.profile, 'setup.replace_file')
-                                                                : t(translations.profile, 'setup.upload_file')}
+                                                                ? t(translations.manager.profile, 'setup.replaceFile')
+                                                                : t(translations.manager.profile, 'setup.uploadFile')}
                                                         </span>
                                                     </label>
-                                                    <p className="pl-1">{t(translations.profile, 'setup.drag_drop')}</p>
+                                                    <p className="pl-1">{t(translations.manager.profile, 'setup.dragDrop')}</p>
                                                 </div>
                                                 <input
                                                     id="id_document"
@@ -685,7 +689,9 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         clearFieldError('id_document');
                                                     }}
                                                 />
-                                                <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.file_requirements')}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {t(translations.manager.profile, 'setup.fileRequirements')}
+                                                </p>
                                                 {((data.id_document && data.id_document !== 'removed') ||
                                                     (propertyManager?.id_document_path && data.id_document !== 'removed')) && (
                                                     <div className="mt-3 w-full overflow-hidden px-4">
@@ -734,7 +740,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                 {selectedType === 'professional' && (
                                     <div>
                                         <label htmlFor="license_document" className="block text-sm font-medium text-foreground">
-                                            {t(translations.profile, 'setup.license_document')} <span className="text-destructive">*</span>
+                                            {t(translations.manager.profile, 'setup.licenseDocument')} <span className="text-destructive">*</span>
                                         </label>
                                         <div
                                             className={`mt-2 flex justify-center rounded-md border border-dashed px-6 pt-5 pb-6 ${isFieldRejected('license_document') || clientErrors.license_document || errors.license_document ? 'border-destructive bg-destructive/5' : 'border-border'}`}
@@ -753,11 +759,11 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         <span>
                                                             {(data.license_document && data.license_document !== 'removed') ||
                                                             (propertyManager?.license_document_path && data.license_document !== 'removed')
-                                                                ? t(translations.profile, 'setup.replace_file')
-                                                                : t(translations.profile, 'setup.upload_file')}
+                                                                ? t(translations.manager.profile, 'setup.replaceFile')
+                                                                : t(translations.manager.profile, 'setup.uploadFile')}
                                                         </span>
                                                     </label>
-                                                    <p className="pl-1">{t(translations.profile, 'setup.drag_drop')}</p>
+                                                    <p className="pl-1">{t(translations.manager.profile, 'setup.dragDrop')}</p>
                                                 </div>
                                                 <input
                                                     id="license_document"
@@ -792,7 +798,9 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                                         clearFieldError('license_document');
                                                     }}
                                                 />
-                                                <p className="text-xs text-muted-foreground">{t(translations.profile, 'setup.file_requirements')}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {t(translations.manager.profile, 'setup.fileRequirements')}
+                                                </p>
                                                 {((data.license_document && data.license_document !== 'removed') ||
                                                     (propertyManager?.license_document_path && data.license_document !== 'removed')) && (
                                                     <div className="mt-3 w-full overflow-hidden px-4">
@@ -850,11 +858,11 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                 >
                                     {processing
                                         ? isEditing
-                                            ? t(translations.profile, 'setup.updating')
-                                            : t(translations.profile, 'setup.submitting')
+                                            ? t(translations.manager.profile, 'setup.updating')
+                                            : t(translations.manager.profile, 'setup.submitting')
                                         : isEditing
-                                          ? t(translations.profile, 'setup.update_profile')
-                                          : t(translations.profile, 'setup.submit_profile')}
+                                          ? t(translations.manager.profile, 'setup.updateProfile')
+                                          : t(translations.manager.profile, 'setup.submitProfile')}
                                 </button>
                                 {isEditing && (
                                     <button
@@ -862,7 +870,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         onClick={() => window.history.back()}
                                         className="w-full cursor-pointer rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground shadow-lg transition-all hover:bg-muted"
                                     >
-                                        {t(translations.profile, 'common.cancel')}
+                                        {t(translations.manager.profile, 'common.cancel')}
                                     </button>
                                 )}
                             </div>
@@ -874,7 +882,7 @@ export default function ProfileSetup({ user, propertyManager, isEditing = false,
                                         <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress.percentage}%` }} />
                                     </div>
                                     <p className="mt-1 text-sm text-muted-foreground">
-                                        {t(translations.profile, 'setup.uploading')} {progress.percentage}%
+                                        {t(translations.manager.profile, 'setup.uploading')} {progress.percentage}%
                                     </p>
                                 </div>
                             )}

@@ -145,12 +145,12 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
         );
 
     return (
-        <StepContainer title={t('wizard.mediaStep.title')} description={t('wizard.mediaStep.description')}>
+        <StepContainer title={t('wizard.property.mediaStep.title')} description={t('wizard.property.mediaStep.description')}>
             <div className="mx-auto max-w-3xl">
                 {/* Title Input - Hero style */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
                     <label htmlFor="title" className="mb-2 block text-center text-sm font-medium text-foreground">
-                        {t('wizard.mediaStep.propertyTitle')} <span className="text-destructive">*</span>
+                        {t('wizard.property.mediaStep.propertyTitle')} <span className="text-destructive">*</span>
                     </label>
                     <input
                         type="text"
@@ -159,7 +159,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                         onChange={(e) => updateData('title', e.target.value)}
                         onBlur={() => handleBlur('title')}
                         className={cn(inputClassName(!!errors.title), 'text-center text-lg font-medium')}
-                        placeholder={t('wizard.mediaStep.titlePlaceholder')}
+                        placeholder={t('wizard.property.mediaStep.titlePlaceholder')}
                         maxLength={PROPERTY_CONSTRAINTS.title.maxLength}
                         aria-invalid={!!errors.title}
                         aria-describedby={errors.title ? 'title-error' : undefined}
@@ -181,8 +181,8 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                 {/* Description */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
                     <label htmlFor="description" className="mb-2 block text-center text-sm font-medium text-foreground">
-                        {t('wizard.mediaStep.descriptionLabel')}{' '}
-                        <span className="text-xs text-muted-foreground">({t('wizard.mediaStep.descriptionOptional')})</span>
+                        {t('wizard.property.mediaStep.descriptionLabel')}{' '}
+                        <span className="text-xs text-muted-foreground">({t('wizard.property.mediaStep.descriptionOptional')})</span>
                     </label>
                     <textarea
                         id="description"
@@ -191,7 +191,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                         onBlur={() => handleBlur('description')}
                         rows={4}
                         className={cn(inputClassName(!!errors.description), 'resize-none')}
-                        placeholder={t('wizard.mediaStep.descriptionPlaceholder')}
+                        placeholder={t('wizard.property.mediaStep.descriptionPlaceholder')}
                         maxLength={PROPERTY_CONSTRAINTS.description.maxLength}
                     />
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
@@ -206,7 +206,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                     <h3 className="mb-4 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                         <Camera className="h-5 w-5 text-primary" />
-                        {t('wizard.mediaStep.propertyPhotos')}
+                        {t('wizard.property.mediaStep.propertyPhotos')}
                     </h3>
 
                     <input
@@ -241,7 +241,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                             {isMainImage(image, index) && (
                                                 <div className="flex items-center gap-1 rounded-lg bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
                                                     <Star className="h-3 w-3 fill-current" />
-                                                    {t('wizard.mediaStep.main')}
+                                                    {t('wizard.property.mediaStep.main')}
                                                 </div>
                                             )}
                                         </div>
@@ -264,7 +264,7 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                                     className="flex cursor-pointer items-center gap-1 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-900 transition-colors hover:bg-white"
                                                 >
                                                     <Star className="h-3 w-3" />
-                                                    {t('wizard.mediaStep.setAsMain')}
+                                                    {t('wizard.property.mediaStep.setAsMain')}
                                                 </button>
                                             </div>
                                         )}
@@ -278,13 +278,13 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                                         className="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 transition-all hover:border-primary/50 hover:bg-muted/50"
                                     >
                                         <ImagePlus className="mb-2 h-8 w-8 text-muted-foreground" />
-                                        <span className="text-sm font-medium text-muted-foreground">{t('wizard.mediaStep.addMore')}</span>
+                                        <span className="text-sm font-medium text-muted-foreground">{t('wizard.property.mediaStep.addMore')}</span>
                                     </label>
                                 )}
                             </Reorder.Group>
 
                             <p className="text-center text-xs text-muted-foreground">
-                                {t('wizard.mediaStep.dragToReorder')} ({data.images.length}/{PROPERTY_CONSTRAINTS.images.maxCount})
+                                {t('wizard.property.mediaStep.dragToReorder')} ({data.images.length}/{PROPERTY_CONSTRAINTS.images.maxCount})
                             </p>
                         </div>
                     ) : (
@@ -296,11 +296,11 @@ export function MediaStep({ data, updateData, updateMultipleFields, errors, onBl
                             )}
                         >
                             <Upload className="mb-4 h-12 w-12 text-muted-foreground" />
-                            <p className="mb-1 font-medium text-foreground">{t('wizard.mediaStep.uploadPhotos')}</p>
-                            <p className="text-sm text-muted-foreground">{t('wizard.mediaStep.clickOrDrag')}</p>
+                            <p className="mb-1 font-medium text-foreground">{t('wizard.property.mediaStep.uploadPhotos')}</p>
+                            <p className="text-sm text-muted-foreground">{t('wizard.property.mediaStep.clickOrDrag')}</p>
                             <p className="mt-2 text-xs text-muted-foreground">
-                                {t('wizard.mediaStep.maxSize', { size: PROPERTY_CONSTRAINTS.images.maxSizeBytes / (1024 * 1024) })} •{' '}
-                                {t('wizard.mediaStep.allowedFormats')}
+                                {t('wizard.property.mediaStep.maxSize', { size: PROPERTY_CONSTRAINTS.images.maxSizeBytes / (1024 * 1024) })} •{' '}
+                                {t('wizard.property.mediaStep.allowedFormats')}
                             </p>
                         </label>
                     )}

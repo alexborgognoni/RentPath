@@ -68,27 +68,27 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
             data.city,
             data.state,
             data.postal_code,
-            t(`wizard.locationStep.countries.${data.country}`),
+            t(`wizard.property.locationStep.countries.${data.country}`),
         ].filter(Boolean);
         return parts.join(', ');
     };
 
     const getAmenities = () => {
         const amenities: { icon: React.ElementType; label: string }[] = [];
-        if (data.kitchen_equipped) amenities.push({ icon: ChefHat, label: t('wizard.reviewStep.amenityLabels.equippedKitchen') });
-        if (data.kitchen_separated) amenities.push({ icon: ChefHat, label: t('wizard.reviewStep.amenityLabels.separateKitchen') });
-        if (data.has_cellar) amenities.push({ icon: Package, label: t('wizard.reviewStep.amenityLabels.cellar') });
-        if (data.has_laundry) amenities.push({ icon: WashingMachine, label: t('wizard.reviewStep.amenityLabels.laundry') });
-        if (data.has_fireplace) amenities.push({ icon: Flame, label: t('wizard.reviewStep.amenityLabels.fireplace') });
-        if (data.has_air_conditioning) amenities.push({ icon: AirVent, label: t('wizard.reviewStep.amenityLabels.airConditioning') });
-        if (data.has_garden) amenities.push({ icon: Fence, label: t('wizard.reviewStep.amenityLabels.garden') });
-        if (data.has_rooftop) amenities.push({ icon: Sunrise, label: t('wizard.reviewStep.amenityLabels.rooftop') });
+        if (data.kitchen_equipped) amenities.push({ icon: ChefHat, label: t('wizard.property.reviewStep.amenityLabels.equippedKitchen') });
+        if (data.kitchen_separated) amenities.push({ icon: ChefHat, label: t('wizard.property.reviewStep.amenityLabels.separateKitchen') });
+        if (data.has_cellar) amenities.push({ icon: Package, label: t('wizard.property.reviewStep.amenityLabels.cellar') });
+        if (data.has_laundry) amenities.push({ icon: WashingMachine, label: t('wizard.property.reviewStep.amenityLabels.laundry') });
+        if (data.has_fireplace) amenities.push({ icon: Flame, label: t('wizard.property.reviewStep.amenityLabels.fireplace') });
+        if (data.has_air_conditioning) amenities.push({ icon: AirVent, label: t('wizard.property.reviewStep.amenityLabels.airConditioning') });
+        if (data.has_garden) amenities.push({ icon: Fence, label: t('wizard.property.reviewStep.amenityLabels.garden') });
+        if (data.has_rooftop) amenities.push({ icon: Sunrise, label: t('wizard.property.reviewStep.amenityLabels.rooftop') });
         return amenities;
     };
 
-    const getPropertyTypeLabel = () => t(`wizard.propertyTypeStep.types.${data.type}`);
-    const getSubtypeLabel = () => t(`wizard.propertyTypeStep.subtypes.${data.subtype}`);
-    const getHeatingLabel = () => (data.heating_type ? t(`wizard.energyStep.heatingTypes.${data.heating_type}`) : '');
+    const getPropertyTypeLabel = () => t(`wizard.property.propertyTypeStep.types.${data.type}`);
+    const getSubtypeLabel = () => t(`wizard.property.propertyTypeStep.subtypes.${data.subtype}`);
+    const getHeatingLabel = () => (data.heating_type ? t(`wizard.property.energyStep.heatingTypes.${data.heating_type}`) : '');
 
     const Section = ({ title, step, children, delay = 0 }: { title: string; step: WizardStep; children: React.ReactNode; delay?: number }) => (
         <motion.div
@@ -105,7 +105,7 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                     className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm text-primary transition-colors hover:bg-primary/10"
                 >
                     <Pencil className="h-3.5 w-3.5" />
-                    {t('wizard.reviewStep.edit')}
+                    {t('wizard.property.reviewStep.edit')}
                 </button>
             </div>
             {children}
@@ -114,8 +114,8 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
 
     return (
         <StepContainer
-            title={isEditMode ? t('wizard.reviewStep.titleEdit') : t('wizard.reviewStep.title')}
-            description={isEditMode ? t('wizard.reviewStep.descriptionEdit') : t('wizard.reviewStep.description')}
+            title={isEditMode ? t('wizard.property.reviewStep.titleEdit') : t('wizard.property.reviewStep.title')}
+            description={isEditMode ? t('wizard.property.reviewStep.descriptionEdit') : t('wizard.property.reviewStep.description')}
         >
             <div className="mx-auto max-w-3xl space-y-6">
                 {/* Error banner */}
@@ -125,7 +125,7 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                         animate={{ opacity: 1, y: 0 }}
                         className="rounded-xl border border-destructive bg-destructive/10 p-4"
                     >
-                        <p className="font-medium text-destructive">{t('wizard.reviewStep.fixIssues')}</p>
+                        <p className="font-medium text-destructive">{t('wizard.property.reviewStep.fixIssues')}</p>
                         <ul className="mt-2 list-inside list-disc text-sm text-destructive">
                             {Object.entries(errors).map(([key, message]) => (
                                 <li key={key}>{message}</li>
@@ -146,7 +146,7 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                             <img src={mainImageSrc} alt="Main property image" className="h-full w-full object-cover" />
                             {data.images.length > 1 && (
                                 <div className="absolute right-4 bottom-4 rounded-lg bg-black/60 px-3 py-1.5 text-sm font-medium text-white">
-                                    {t('wizard.reviewStep.morePhotos', { count: data.images.length - 1 })}
+                                    {t('wizard.property.reviewStep.morePhotos', { count: data.images.length - 1 })}
                                 </div>
                             )}
                         </div>
@@ -154,7 +154,7 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                         <div className="flex aspect-video items-center justify-center bg-muted">
                             <div className="text-center text-muted-foreground">
                                 <Building2 className="mx-auto mb-2 h-12 w-12" />
-                                <p>{t('wizard.reviewStep.noPhotos')}</p>
+                                <p>{t('wizard.property.reviewStep.noPhotos')}</p>
                             </div>
                         </div>
                     )}
@@ -163,15 +163,17 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                     <div className="p-6">
                         <div className="flex items-start justify-between gap-4">
                             <div>
-                                <h2 className="text-2xl font-bold text-foreground">{data.title || t('wizard.reviewStep.untitledProperty')}</h2>
+                                <h2 className="text-2xl font-bold text-foreground">
+                                    {data.title || t('wizard.property.reviewStep.untitledProperty')}
+                                </h2>
                                 <p className="mt-1 flex items-center gap-1 text-muted-foreground">
                                     <MapPin className="h-4 w-4" />
-                                    {data.city || t('wizard.reviewStep.locationNotSet')}
+                                    {data.city || t('wizard.property.reviewStep.locationNotSet')}
                                 </p>
                             </div>
                             <div className="text-right">
                                 <p className="text-2xl font-bold text-primary">{formatPrice(data.rent_amount, data.rent_currency)}</p>
-                                <p className="text-sm text-muted-foreground">{t('wizard.reviewStep.perMonth')}</p>
+                                <p className="text-sm text-muted-foreground">{t('wizard.property.reviewStep.perMonth')}</p>
                             </div>
                         </div>
 
@@ -185,22 +187,22 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                                 <span className="flex items-center gap-1">
                                     <Bed className="h-4 w-4" />
                                     {data.bedrooms === 1
-                                        ? t('wizard.reviewStep.labels.bedroom', { count: data.bedrooms })
-                                        : t('wizard.reviewStep.labels.bedrooms', { count: data.bedrooms })}
+                                        ? t('wizard.property.reviewStep.labels.bedroom', { count: data.bedrooms })
+                                        : t('wizard.property.reviewStep.labels.bedrooms', { count: data.bedrooms })}
                                 </span>
                             )}
                             {data.bathrooms > 0 && (
                                 <span className="flex items-center gap-1">
                                     <Bath className="h-4 w-4" />
                                     {data.bathrooms === 1
-                                        ? t('wizard.reviewStep.labels.bathroom', { count: data.bathrooms })
-                                        : t('wizard.reviewStep.labels.bathrooms', { count: data.bathrooms })}
+                                        ? t('wizard.property.reviewStep.labels.bathroom', { count: data.bathrooms })
+                                        : t('wizard.property.reviewStep.labels.bathrooms', { count: data.bathrooms })}
                                 </span>
                             )}
                             {data.size && (
                                 <span className="flex items-center gap-1">
                                     <Expand className="h-4 w-4" />
-                                    {t('wizard.reviewStep.labels.livingSpace', { size: data.size })}
+                                    {t('wizard.property.reviewStep.labels.livingSpace', { size: data.size })}
                                 </span>
                             )}
                         </div>
@@ -208,28 +210,28 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                 </motion.div>
 
                 {/* Details sections */}
-                <Section title={t('wizard.reviewStep.sections.propertyType')} step="property-type" delay={0.1}>
+                <Section title={t('wizard.property.reviewStep.sections.propertyType')} step="property-type" delay={0.1}>
                     <p className="text-foreground">
                         {getPropertyTypeLabel()} — {getSubtypeLabel()}
                     </p>
                 </Section>
 
-                <Section title={t('wizard.reviewStep.sections.location')} step="location" delay={0.15}>
+                <Section title={t('wizard.property.reviewStep.sections.location')} step="location" delay={0.15}>
                     <p className="flex items-start gap-2 text-foreground">
                         <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
                         {formatAddress()}
                     </p>
                 </Section>
 
-                <Section title={t('wizard.reviewStep.sections.specifications')} step="specifications" delay={0.2}>
+                <Section title={t('wizard.property.reviewStep.sections.specifications')} step="specifications" delay={0.2}>
                     <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                         {data.bedrooms > 0 && (
                             <div className="flex items-center gap-2">
                                 <Bed className="h-4 w-4 text-muted-foreground" />
                                 <span>
                                     {data.bedrooms === 1
-                                        ? t('wizard.reviewStep.labels.bedroom', { count: data.bedrooms })
-                                        : t('wizard.reviewStep.labels.bedrooms', { count: data.bedrooms })}
+                                        ? t('wizard.property.reviewStep.labels.bedroom', { count: data.bedrooms })
+                                        : t('wizard.property.reviewStep.labels.bedrooms', { count: data.bedrooms })}
                                 </span>
                             </div>
                         )}
@@ -238,54 +240,56 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                                 <Bath className="h-4 w-4 text-muted-foreground" />
                                 <span>
                                     {data.bathrooms === 1
-                                        ? t('wizard.reviewStep.labels.bathroom', { count: data.bathrooms })
-                                        : t('wizard.reviewStep.labels.bathrooms', { count: data.bathrooms })}
+                                        ? t('wizard.property.reviewStep.labels.bathroom', { count: data.bathrooms })
+                                        : t('wizard.property.reviewStep.labels.bathrooms', { count: data.bathrooms })}
                                 </span>
                             </div>
                         )}
                         {data.size && (
                             <div className="flex items-center gap-2">
                                 <Expand className="h-4 w-4 text-muted-foreground" />
-                                <span>{t('wizard.reviewStep.labels.livingSpace', { size: data.size })}</span>
+                                <span>{t('wizard.property.reviewStep.labels.livingSpace', { size: data.size })}</span>
                             </div>
                         )}
                         {data.balcony_size && (
                             <div className="flex items-center gap-2">
                                 <Layers className="h-4 w-4 text-muted-foreground" />
-                                <span>{t('wizard.reviewStep.labels.balcony', { size: data.balcony_size })}</span>
+                                <span>{t('wizard.property.reviewStep.labels.balcony', { size: data.balcony_size })}</span>
                             </div>
                         )}
                         {data.land_size && (
                             <div className="flex items-center gap-2">
                                 <TreePine className="h-4 w-4 text-muted-foreground" />
-                                <span>{t('wizard.reviewStep.labels.land', { size: data.land_size })}</span>
+                                <span>{t('wizard.property.reviewStep.labels.land', { size: data.land_size })}</span>
                             </div>
                         )}
                         {(data.parking_spots_interior > 0 || data.parking_spots_exterior > 0) && (
                             <div className="flex items-center gap-2">
                                 <Car className="h-4 w-4 text-muted-foreground" />
                                 <span>
-                                    {t('wizard.reviewStep.labels.parking', { count: data.parking_spots_interior + data.parking_spots_exterior })}
+                                    {t('wizard.property.reviewStep.labels.parking', {
+                                        count: data.parking_spots_interior + data.parking_spots_exterior,
+                                    })}
                                 </span>
                             </div>
                         )}
                         {data.floor_level !== undefined && (
                             <div className="flex items-center gap-2">
                                 <Layers className="h-4 w-4 text-muted-foreground" />
-                                <span>{t('wizard.reviewStep.labels.floor', { level: data.floor_level })}</span>
+                                <span>{t('wizard.property.reviewStep.labels.floor', { level: data.floor_level })}</span>
                             </div>
                         )}
                         {data.has_elevator && (
                             <div className="flex items-center gap-2">
                                 <Check className="h-4 w-4 text-primary" />
-                                <span>{t('wizard.reviewStep.labels.elevator')}</span>
+                                <span>{t('wizard.property.reviewStep.labels.elevator')}</span>
                             </div>
                         )}
                     </div>
                 </Section>
 
                 {getAmenities().length > 0 && (
-                    <Section title={t('wizard.reviewStep.sections.amenities')} step="amenities" delay={0.25}>
+                    <Section title={t('wizard.property.reviewStep.sections.amenities')} step="amenities" delay={0.25}>
                         <div className="flex flex-wrap gap-2">
                             {getAmenities().map(({ icon: Icon, label }) => (
                                 <span key={label} className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm text-primary">
@@ -298,13 +302,13 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                 )}
 
                 {(data.energy_class || data.thermal_insulation_class || data.heating_type) && (
-                    <Section title={t('wizard.reviewStep.sections.energy')} step="energy" delay={0.3}>
+                    <Section title={t('wizard.property.reviewStep.sections.energy')} step="energy" delay={0.3}>
                         <div className="flex flex-wrap gap-4 text-sm">
                             {data.energy_class && (
                                 <div className="flex items-center gap-2">
                                     <Zap className="h-4 w-4 text-muted-foreground" />
                                     <span>
-                                        {t('wizard.reviewStep.labels.energyClass')} <strong>{data.energy_class}</strong>
+                                        {t('wizard.property.reviewStep.labels.energyClass')} <strong>{data.energy_class}</strong>
                                     </span>
                                 </div>
                             )}
@@ -312,7 +316,7 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                                 <div className="flex items-center gap-2">
                                     <Thermometer className="h-4 w-4 text-muted-foreground" />
                                     <span>
-                                        {t('wizard.reviewStep.labels.insulation')} <strong>{data.thermal_insulation_class}</strong>
+                                        {t('wizard.property.reviewStep.labels.insulation')} <strong>{data.thermal_insulation_class}</strong>
                                     </span>
                                 </div>
                             )}
@@ -320,7 +324,7 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                                 <div className="flex items-center gap-2">
                                     <Leaf className="h-4 w-4 text-muted-foreground" />
                                     <span>
-                                        {t('wizard.reviewStep.labels.heating')} <strong>{getHeatingLabel()}</strong>
+                                        {t('wizard.property.reviewStep.labels.heating')} <strong>{getHeatingLabel()}</strong>
                                     </span>
                                 </div>
                             )}
@@ -328,14 +332,14 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                     </Section>
                 )}
 
-                <Section title={t('wizard.reviewStep.sections.pricingAvailability')} step="pricing" delay={0.35}>
+                <Section title={t('wizard.property.reviewStep.sections.pricingAvailability')} step="pricing" delay={0.35}>
                     <div className="flex flex-wrap gap-6">
                         <div>
-                            <p className="text-sm text-muted-foreground">{t('wizard.reviewStep.labels.monthlyRent')}</p>
+                            <p className="text-sm text-muted-foreground">{t('wizard.property.reviewStep.labels.monthlyRent')}</p>
                             <p className="text-xl font-bold text-primary">{formatPrice(data.rent_amount, data.rent_currency)}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground">{t('wizard.reviewStep.labels.available')}</p>
+                            <p className="text-sm text-muted-foreground">{t('wizard.property.reviewStep.labels.available')}</p>
                             <p className="flex items-center gap-1 font-medium text-foreground">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
                                 {data.available_date
@@ -344,14 +348,14 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                                           day: 'numeric',
                                           year: 'numeric',
                                       })
-                                    : t('wizard.reviewStep.immediately')}
+                                    : t('wizard.property.reviewStep.immediately')}
                             </p>
                         </div>
                     </div>
                 </Section>
 
                 {data.description && (
-                    <Section title={t('wizard.reviewStep.sections.description')} step="media" delay={0.4}>
+                    <Section title={t('wizard.property.reviewStep.sections.description')} step="media" delay={0.4}>
                         <p className="whitespace-pre-wrap text-foreground">{data.description}</p>
                     </Section>
                 )}
@@ -364,7 +368,7 @@ export function ReviewStep({ data, errors, onEditStep, isEditMode = false }: Rev
                         transition={{ delay: 0.5 }}
                         className="text-center text-sm text-muted-foreground"
                     >
-                        {t('wizard.reviewStep.finalNote')}
+                        {t('wizard.property.reviewStep.finalNote')}
                     </motion.p>
                 )}
             </div>

@@ -135,7 +135,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
     let sectionIndex = 0;
 
     return (
-        <StepContainer title={t('wizard.specificationsStep.title')} description={t('wizard.specificationsStep.description')}>
+        <StepContainer title={t('wizard.property.specificationsStep.title')} description={t('wizard.property.specificationsStep.description')}>
             <div className="mx-auto max-w-4xl space-y-6">
                 {/* Section 1: Rooms */}
                 {showRoomsSection && (
@@ -147,7 +147,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                     >
                         <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                             <Bed className="h-5 w-5 text-primary" />
-                            {t('wizard.specificationsStep.sections.rooms')}
+                            {t('wizard.property.specificationsStep.sections.rooms')}
                         </h3>
                         <div className="flex flex-wrap justify-center gap-8">
                             {showBedrooms && (
@@ -156,7 +156,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                     onChange={(v) => updateData('bedrooms', v)}
                                     min={0}
                                     max={20}
-                                    label={t('wizard.specificationsStep.fields.bedrooms')}
+                                    label={t('wizard.property.specificationsStep.fields.bedrooms')}
                                     icon={<Bed className="h-4 w-4" />}
                                     integerOnly
                                     error={errors.bedrooms}
@@ -169,7 +169,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                     min={0}
                                     max={10}
                                     step={0.5}
-                                    label={t('wizard.specificationsStep.fields.bathrooms')}
+                                    label={t('wizard.property.specificationsStep.fields.bathrooms')}
                                     icon={<Bath className="h-4 w-4" />}
                                     error={errors.bathrooms}
                                 />
@@ -188,14 +188,14 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                     >
                         <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                             <Expand className="h-5 w-5 text-primary" />
-                            {t('wizard.specificationsStep.sections.space')}
+                            {t('wizard.property.specificationsStep.sections.space')}
                         </h3>
                         <div className={cn('grid grid-cols-1 gap-4', spaceGridCols)}>
                             {showSize && (
                                 <div>
                                     <label htmlFor="size" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                         <Expand className="h-4 w-4 text-muted-foreground" />
-                                        {t('wizard.specificationsStep.fields.livingSpace')}
+                                        {t('wizard.property.specificationsStep.fields.livingSpace')}
                                     </label>
                                     <div className="flex">
                                         <AreaUnitSelect
@@ -226,7 +226,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 <div>
                                     <label htmlFor="balcony_size" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                         <Layers className="h-4 w-4 text-muted-foreground" />
-                                        {t('wizard.specificationsStep.fields.balconyTerrace')}
+                                        {t('wizard.property.specificationsStep.fields.balconyTerrace')}
                                     </label>
                                     <div className="relative">
                                         <input
@@ -255,7 +255,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 <div>
                                     <label htmlFor="land_size" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                         <TreePine className="h-4 w-4 text-muted-foreground" />
-                                        {t('wizard.specificationsStep.fields.landSize')}
+                                        {t('wizard.property.specificationsStep.fields.landSize')}
                                     </label>
                                     <div className="relative">
                                         <input
@@ -293,7 +293,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                     >
                         <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                             <Car className="h-5 w-5 text-primary" />
-                            {t('wizard.specificationsStep.sections.parking')}
+                            {t('wizard.property.specificationsStep.sections.parking')}
                         </h3>
                         <div className="flex flex-wrap justify-center gap-8">
                             <NumberStepper
@@ -301,7 +301,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 onChange={(v) => updateData('parking_spots_interior', v)}
                                 min={0}
                                 max={10}
-                                label={t('wizard.specificationsStep.fields.indoorSpots')}
+                                label={t('wizard.property.specificationsStep.fields.indoorSpots')}
                                 icon={<Car className="h-4 w-4" />}
                                 integerOnly
                                 error={errors.parking_spots_interior}
@@ -311,7 +311,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 onChange={(v) => updateData('parking_spots_exterior', v)}
                                 min={0}
                                 max={10}
-                                label={t('wizard.specificationsStep.fields.outdoorSpots')}
+                                label={t('wizard.property.specificationsStep.fields.outdoorSpots')}
                                 icon={<Car className="h-4 w-4" />}
                                 integerOnly
                                 error={errors.parking_spots_exterior}
@@ -330,14 +330,14 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                     >
                         <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                             <Building2 className="h-5 w-5 text-primary" />
-                            {t('wizard.specificationsStep.sections.building')}
+                            {t('wizard.property.specificationsStep.sections.building')}
                         </h3>
                         <div className="flex flex-wrap items-end justify-center gap-6">
                             {showFloor && (
                                 <div className="w-40">
                                     <label htmlFor="floor_level" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                         <Layers className="h-4 w-4 text-muted-foreground" />
-                                        {t('wizard.specificationsStep.fields.floorLevel')}
+                                        {t('wizard.property.specificationsStep.fields.floorLevel')}
                                     </label>
                                     <input
                                         type="number"
@@ -359,7 +359,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                 <div className="w-40">
                                     <label htmlFor="year_built" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                                        {t('wizard.specificationsStep.fields.yearBuilt')}
+                                        {t('wizard.property.specificationsStep.fields.yearBuilt')}
                                     </label>
                                     <input
                                         type="number"
@@ -385,7 +385,7 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                                         onChange={(e) => updateData('has_elevator', e.target.checked)}
                                         className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
                                     />
-                                    <span className="font-medium text-foreground">{t('wizard.specificationsStep.fields.hasElevator')}</span>
+                                    <span className="font-medium text-foreground">{t('wizard.property.specificationsStep.fields.hasElevator')}</span>
                                 </label>
                             )}
                         </div>
@@ -402,12 +402,12 @@ export function SpecificationsStep({ data, updateData, errors, onBlur }: Specifi
                     >
                         <h3 className="mb-6 flex items-center justify-center gap-2 text-lg font-medium text-foreground">
                             <Expand className="h-5 w-5 text-primary" />
-                            {t('wizard.specificationsStep.sections.space')}
+                            {t('wizard.property.specificationsStep.sections.space')}
                         </h3>
                         <div className="mx-auto max-w-xs">
                             <label htmlFor="parking_size" className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                 <Expand className="h-4 w-4 text-muted-foreground" />
-                                {t('wizard.specificationsStep.fields.parkingSpaceSize')}
+                                {t('wizard.property.specificationsStep.fields.parkingSpaceSize')}
                             </label>
                             <div className="flex">
                                 <AreaUnitSelect

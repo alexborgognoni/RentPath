@@ -115,7 +115,7 @@ Show validation errors only after user interacts with a field:
     aria-invalid={!!errors.house_number}
 />;
 {
-    touchedFields.house_number && errors.house_number && <p className="text-sm text-red-500">{errors.house_number}</p>;
+    touchedFields.house_number && errors.house_number && <p className="text-sm text-error">{errors.house_number}</p>;
 }
 ```
 
@@ -178,7 +178,7 @@ const handleOccupantFieldBlur = (index: number, field: keyof OccupantDetails) =>
 />;
 {
     touchedFields[`occupants_details.${index}.first_name`] && errors[`occupants_details.${index}.first_name`] && (
-        <p className="text-sm text-red-500">{errors[`occupants_details.${index}.first_name`]}</p>
+        <p className="text-sm text-error">{errors[`occupants_details.${index}.first_name`]}</p>
     );
 }
 ```

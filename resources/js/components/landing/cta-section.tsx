@@ -9,7 +9,7 @@ export function CtaSection() {
 
     const HEADING = translate(translations, 'landing.cta.heading');
     const SUBTITLE = translate(translations, 'landing.cta.subtitle');
-    const CTA_BUTTON_TEXT = translate(translations, 'landing.cta.button_text');
+    const CTA_BUTTON_TEXT = translate(translations, 'landing.cta.buttonText');
     const CTA_BUTTON_HREF = route('register');
 
     return (

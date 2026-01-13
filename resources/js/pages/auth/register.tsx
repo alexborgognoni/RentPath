@@ -62,8 +62,8 @@ export default function Register() {
     };
 
     return (
-        <AuthLayout title={t(translations.auth, 'register.title')} description={t(translations.auth, 'register.description')}>
-            <Head title={t(translations.auth, 'register.head_title')} />
+        <AuthLayout title={t(translations.auth.register, 'title')} description={t(translations.auth.register, 'description')}>
+            <Head title={t(translations.auth.register, 'head_title')} />
             <Form
                 {...RegisteredUserController.store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -78,7 +78,7 @@ export default function Register() {
 
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="first_name">{t(translations.auth, 'register.first_name_label')}</Label>
+                                <Label htmlFor="first_name">{t(translations.auth.register, 'firstNameLabel')}</Label>
                                 <Input
                                     id="first_name"
                                     type="text"
@@ -87,13 +87,13 @@ export default function Register() {
                                     tabIndex={1}
                                     autoComplete="given-name"
                                     name="first_name"
-                                    placeholder={t(translations.auth, 'register.first_name_placeholder')}
+                                    placeholder={t(translations.auth.register, 'firstNamePlaceholder')}
                                 />
                                 <InputError message={errors.first_name} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="last_name">{t(translations.auth, 'register.last_name_label')}</Label>
+                                <Label htmlFor="last_name">{t(translations.auth.register, 'lastNameLabel')}</Label>
                                 <Input
                                     id="last_name"
                                     type="text"
@@ -101,13 +101,13 @@ export default function Register() {
                                     tabIndex={2}
                                     autoComplete="family-name"
                                     name="last_name"
-                                    placeholder={t(translations.auth, 'register.last_name_placeholder')}
+                                    placeholder={t(translations.auth.register, 'lastNamePlaceholder')}
                                 />
                                 <InputError message={errors.last_name} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">{t(translations.auth, 'register.email_label')}</Label>
+                                <Label htmlFor="email">{t(translations.auth.register, 'emailLabel')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -115,13 +115,13 @@ export default function Register() {
                                     tabIndex={3}
                                     autoComplete="email"
                                     name="email"
-                                    placeholder={t(translations.auth, 'register.email_placeholder')}
+                                    placeholder={t(translations.auth.register, 'emailPlaceholder')}
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">{t(translations.auth, 'register.password_label')}</Label>
+                                <Label htmlFor="password">{t(translations.auth.register, 'passwordLabel')}</Label>
                                 <Input
                                     id="password"
                                     type="password"
@@ -129,7 +129,7 @@ export default function Register() {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder={t(translations.auth, 'register.password_placeholder')}
+                                    placeholder={t(translations.auth.register, 'passwordPlaceholder')}
                                 />
                                 <input
                                     type="password"
@@ -143,7 +143,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">{t(translations.auth, 'register.password_confirmation_label')}</Label>
+                                <Label htmlFor="password_confirmation">{t(translations.auth.register, 'passwordConfirmationLabel')}</Label>
                                 <Input
                                     id="password_confirmation"
                                     type="password"
@@ -151,7 +151,7 @@ export default function Register() {
                                     tabIndex={5}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder={t(translations.auth, 'register.password_confirmation_placeholder')}
+                                    placeholder={t(translations.auth.register, 'passwordConfirmationPlaceholder')}
                                 />
                                 <input
                                     type="password"
@@ -166,14 +166,14 @@ export default function Register() {
 
                             <Button type="submit" className="mt-2 w-full cursor-pointer" tabIndex={6}>
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                {t(translations.auth, 'register.create_account_button')}
+                                {t(translations.auth.register, 'createAccountButton')}
                             </Button>
                         </div>
 
                         <div className="text-text-secondary text-center text-sm">
-                            {t(translations.auth, 'register.already_have_account')}{' '}
+                            {t(translations.auth.register, 'alreadyHaveAccount')}{' '}
                             <TextLink href={login()} tabIndex={7}>
-                                {t(translations.auth, 'register.log_in_link')}
+                                {t(translations.auth.register, 'logInLink')}
                             </TextLink>
                         </div>
                     </>

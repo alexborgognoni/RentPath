@@ -26,7 +26,7 @@ function useCountries() {
         () =>
             COUNTRY_CODES.map((code) => ({
                 value: code,
-                label: t(`wizard.locationStep.countries.${code}`),
+                label: t(`wizard.property.locationStep.countries.${code}`),
             })),
         [t],
     );
@@ -52,7 +52,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
     };
 
     return (
-        <StepContainer title={t('wizard.locationStep.title')} description={t('wizard.locationStep.description')}>
+        <StepContainer title={t('wizard.property.locationStep.title')} description={t('wizard.property.locationStep.description')}>
             <div className="mx-auto max-w-2xl">
                 {/* Location icon decoration */}
                 <motion.div
@@ -74,7 +74,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                     >
                         <div>
                             <label htmlFor="house_number" className="mb-2 block text-sm font-medium text-foreground">
-                                {t('wizard.locationStep.number')} <span className="text-destructive">*</span>
+                                {t('wizard.property.locationStep.number')} <span className="text-destructive">*</span>
                             </label>
                             <input
                                 type="text"
@@ -84,7 +84,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                                 onBlur={() => handleBlur('house_number')}
                                 maxLength={PROPERTY_CONSTRAINTS.house_number.maxLength}
                                 className={inputClassName('house_number')}
-                                placeholder={t('wizard.locationStep.placeholders.number')}
+                                placeholder={t('wizard.property.locationStep.placeholders.number')}
                                 aria-invalid={!!errors.house_number}
                                 aria-describedby={errors.house_number ? 'house_number-error' : undefined}
                             />
@@ -97,7 +97,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
 
                         <div className="col-span-2">
                             <label htmlFor="street_name" className="mb-2 block text-sm font-medium text-foreground">
-                                {t('wizard.locationStep.streetName')} <span className="text-destructive">*</span>
+                                {t('wizard.property.locationStep.streetName')} <span className="text-destructive">*</span>
                             </label>
                             <input
                                 type="text"
@@ -107,7 +107,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                                 onBlur={() => handleBlur('street_name')}
                                 maxLength={PROPERTY_CONSTRAINTS.street_name.maxLength}
                                 className={inputClassName('street_name')}
-                                placeholder={t('wizard.locationStep.placeholders.streetName')}
+                                placeholder={t('wizard.property.locationStep.placeholders.streetName')}
                                 aria-invalid={!!errors.street_name}
                                 aria-describedby={errors.street_name ? 'street_name-error' : undefined}
                             />
@@ -122,8 +122,8 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                     {/* Address Line 2 */}
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
                         <label htmlFor="street_line2" className="mb-2 block text-sm font-medium text-foreground">
-                            {t('wizard.locationStep.apartmentSuite')}{' '}
-                            <span className="text-xs text-muted-foreground">({t('wizard.locationStep.optional')})</span>
+                            {t('wizard.property.locationStep.apartmentSuite')}{' '}
+                            <span className="text-xs text-muted-foreground">({t('wizard.property.locationStep.optional')})</span>
                         </label>
                         <input
                             type="text"
@@ -133,7 +133,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                             onBlur={() => handleBlur('street_line2')}
                             maxLength={PROPERTY_CONSTRAINTS.street_line2.maxLength}
                             className={inputClassName('street_line2')}
-                            placeholder={t('wizard.locationStep.placeholders.apartmentSuite')}
+                            placeholder={t('wizard.property.locationStep.placeholders.apartmentSuite')}
                         />
                     </motion.div>
 
@@ -146,7 +146,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                     >
                         <div>
                             <label htmlFor="city" className="mb-2 block text-sm font-medium text-foreground">
-                                {t('wizard.locationStep.city')} <span className="text-destructive">*</span>
+                                {t('wizard.property.locationStep.city')} <span className="text-destructive">*</span>
                             </label>
                             <input
                                 type="text"
@@ -156,7 +156,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                                 onBlur={() => handleBlur('city')}
                                 maxLength={PROPERTY_CONSTRAINTS.city.maxLength}
                                 className={inputClassName('city')}
-                                placeholder={t('wizard.locationStep.placeholders.city')}
+                                placeholder={t('wizard.property.locationStep.placeholders.city')}
                                 aria-invalid={!!errors.city}
                                 aria-describedby={errors.city ? 'city-error' : undefined}
                             />
@@ -169,7 +169,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
 
                         <div>
                             <label htmlFor="postal_code" className="mb-2 block text-sm font-medium text-foreground">
-                                {t('wizard.locationStep.postalCode')} <span className="text-destructive">*</span>
+                                {t('wizard.property.locationStep.postalCode')} <span className="text-destructive">*</span>
                             </label>
                             <input
                                 type="text"
@@ -179,7 +179,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                                 onBlur={() => handleBlur('postal_code')}
                                 maxLength={PROPERTY_CONSTRAINTS.postal_code.maxLength}
                                 className={inputClassName('postal_code')}
-                                placeholder={t('wizard.locationStep.placeholders.postalCode')}
+                                placeholder={t('wizard.property.locationStep.placeholders.postalCode')}
                                 aria-invalid={!!errors.postal_code}
                                 aria-describedby={errors.postal_code ? 'postal_code-error' : undefined}
                             />
@@ -200,8 +200,8 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                     >
                         <div>
                             <label htmlFor="state" className="mb-2 block text-sm font-medium text-foreground">
-                                {t('wizard.locationStep.stateRegion')}{' '}
-                                <span className="text-xs text-muted-foreground">({t('wizard.locationStep.optional')})</span>
+                                {t('wizard.property.locationStep.stateRegion')}{' '}
+                                <span className="text-xs text-muted-foreground">({t('wizard.property.locationStep.optional')})</span>
                             </label>
                             <input
                                 type="text"
@@ -211,13 +211,13 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                                 onBlur={() => handleBlur('state')}
                                 maxLength={PROPERTY_CONSTRAINTS.state.maxLength}
                                 className={inputClassName('state')}
-                                placeholder={t('wizard.locationStep.placeholders.stateRegion')}
+                                placeholder={t('wizard.property.locationStep.placeholders.stateRegion')}
                             />
                         </div>
 
                         <div>
                             <label htmlFor="country" className="mb-2 block text-sm font-medium text-foreground">
-                                {t('wizard.locationStep.country')} <span className="text-destructive">*</span>
+                                {t('wizard.property.locationStep.country')} <span className="text-destructive">*</span>
                             </label>
                             <select
                                 id="country"
@@ -249,7 +249,7 @@ export function LocationStep({ data, updateData, errors, onBlur }: LocationStepP
                         transition={{ delay: 0.3 }}
                         className="text-center text-sm text-muted-foreground"
                     >
-                        {t('wizard.locationStep.privacyNote')}
+                        {t('wizard.property.locationStep.privacyNote')}
                     </motion.p>
                 </div>
             </div>

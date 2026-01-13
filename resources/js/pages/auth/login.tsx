@@ -68,8 +68,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <AuthLayout title={t(translations.auth, 'login.title')} description={t(translations.auth, 'login.description')}>
-            <Head title={t(translations.auth, 'login.head_title')} />
+        <AuthLayout title={t(translations.auth.login, 'title')} description={t(translations.auth.login, 'description')}>
+            <Head title={t(translations.auth.login, 'headTitle')} />
 
             <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
                 {({ processing, errors }) => (
@@ -80,7 +80,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">{t(translations.auth, 'login.email_label')}</Label>
+                                <Label htmlFor="email">{t(translations.auth.login, 'emailLabel')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -89,17 +89,17 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder={t(translations.auth, 'login.email_placeholder')}
+                                    placeholder={t(translations.auth.login, 'emailPlaceholder')}
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">{t(translations.auth, 'login.password_label')}</Label>
+                                    <Label htmlFor="password">{t(translations.auth.login, 'passwordLabel')}</Label>
                                     {canResetPassword && (
                                         <TextLink href={request()} className="ml-auto text-sm" tabIndex={5}>
-                                            {t(translations.auth, 'login.forgot_password')}
+                                            {t(translations.auth.login, 'forgotPassword')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -110,33 +110,33 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder={t(translations.auth, 'login.password_placeholder')}
+                                    placeholder={t(translations.auth.login, 'passwordPlaceholder')}
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="flex items-center space-x-3">
                                 <Checkbox id="remember" name="remember" tabIndex={3} />
-                                <Label htmlFor="remember">{t(translations.auth, 'login.remember_me')}</Label>
+                                <Label htmlFor="remember">{t(translations.auth.login, 'rememberMe')}</Label>
                             </div>
 
                             <Button type="submit" className="mt-4 w-full cursor-pointer" tabIndex={4} disabled={processing}>
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                {t(translations.auth, 'login.login_button')}
+                                {t(translations.auth.login, 'loginButton')}
                             </Button>
                         </div>
 
                         <div className="text-text-secondary text-center text-sm">
-                            {t(translations.auth, 'login.no_account')}{' '}
+                            {t(translations.auth.login, 'noAccount')}{' '}
                             <TextLink href={register()} tabIndex={5}>
-                                {t(translations.auth, 'login.sign_up_link')}
+                                {t(translations.auth.login, 'signUpLink')}
                             </TextLink>
                         </div>
                     </>
                 )}
             </Form>
 
-            {status && <div className="text-success mb-4 text-center text-sm font-medium">{status}</div>}
+            {status && <div className="mb-4 text-center text-sm font-medium text-success">{status}</div>}
         </AuthLayout>
     );
 }

@@ -36,75 +36,75 @@ function useCountAnimation(target: number, duration: number = 2000) {
 export function ValuePropositionSection() {
     const { translations } = usePage<SharedData>().props;
 
-    const HEADER_TITLE = translate(translations, 'landing.value_proposition.heading_primary');
-    const HEADER_HIGHLIGHT = translate(translations, 'landing.value_proposition.heading_highlighted');
-    const HEADER_DESCRIPTION = translate(translations, 'landing.value_proposition.subtitle');
+    const HEADER_TITLE = translate(translations, 'landing.valueProposition.headingPrimary');
+    const HEADER_HIGHLIGHT = translate(translations, 'landing.valueProposition.headingHighlighted');
+    const HEADER_DESCRIPTION = translate(translations, 'landing.valueProposition.subtitle');
 
     const STATS = [
-        { id: 1, value: 5, suffix: ',000+', label: translate(translations, 'landing.value_proposition.stats.applications') },
-        { id: 2, value: 97, suffix: '%', label: translate(translations, 'landing.value_proposition.stats.conversion_rate') },
-        { id: 3, value: 24, suffix: '/7', label: translate(translations, 'landing.value_proposition.stats.support') },
+        { id: 1, value: 5, suffix: ',000+', label: translate(translations, 'landing.valueProposition.stats.applications') },
+        { id: 2, value: 97, suffix: '%', label: translate(translations, 'landing.valueProposition.stats.conversionRate') },
+        { id: 3, value: 24, suffix: '/7', label: translate(translations, 'landing.valueProposition.stats.support') },
     ];
 
     const FEATURES = [
         {
             id: 1,
-            title: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.title'),
-            description: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.description'),
+            title: translate(translations, 'landing.valueProposition.features.simpleTenantInvitation.title'),
+            description: translate(translations, 'landing.valueProposition.features.simpleTenantInvitation.description'),
             icon: <Mail className="h-8 w-8 text-white" />,
             iconBg: 'bg-blue-600',
             stats: {
                 percentage: '1-Click',
-                label: translate(translations, 'landing.value_proposition.features.simple_tenant_invitation.stats_label'),
+                label: translate(translations, 'landing.valueProposition.features.simpleTenantInvitation.statsLabel'),
             },
         },
         {
             id: 2,
-            title: translate(translations, 'landing.value_proposition.features.document_collection.title'),
-            description: translate(translations, 'landing.value_proposition.features.document_collection.description'),
+            title: translate(translations, 'landing.valueProposition.features.documentCollection.title'),
+            description: translate(translations, 'landing.valueProposition.features.documentCollection.description'),
             icon: <FileText className="h-8 w-8 text-white" />,
             iconBg: 'bg-purple-600',
-            stats: { percentage: '100%', label: translate(translations, 'landing.value_proposition.features.document_collection.stats_label') },
+            stats: { percentage: '100%', label: translate(translations, 'landing.valueProposition.features.documentCollection.statsLabel') },
         },
         {
             id: 3,
-            title: translate(translations, 'landing.value_proposition.features.complete_visibility.title'),
-            description: translate(translations, 'landing.value_proposition.features.complete_visibility.description'),
+            title: translate(translations, 'landing.valueProposition.features.completeVisibility.title'),
+            description: translate(translations, 'landing.valueProposition.features.completeVisibility.description'),
             icon: <Eye className="h-8 w-8 text-white" />,
             iconBg: 'bg-green-600',
             stats: {
-                percentage: translate(translations, 'landing.value_proposition.stats_percentages.real_time'),
-                label: translate(translations, 'landing.value_proposition.features.complete_visibility.stats_label'),
+                percentage: translate(translations, 'landing.valueProposition.statsPercentages.realTime'),
+                label: translate(translations, 'landing.valueProposition.features.completeVisibility.statsLabel'),
             },
         },
         {
             id: 4,
-            title: translate(translations, 'landing.value_proposition.features.secure_document_storage.title'),
-            description: translate(translations, 'landing.value_proposition.features.secure_document_storage.description'),
+            title: translate(translations, 'landing.valueProposition.features.secureDocumentStorage.title'),
+            description: translate(translations, 'landing.valueProposition.features.secureDocumentStorage.description'),
             icon: <Shield className="h-8 w-8 text-white" />,
             iconBg: 'bg-teal-600',
             stats: {
-                percentage: translate(translations, 'landing.value_proposition.stats_percentages.bank_level'),
-                label: translate(translations, 'landing.value_proposition.features.secure_document_storage.stats_label'),
+                percentage: translate(translations, 'landing.valueProposition.statsPercentages.bankLevel'),
+                label: translate(translations, 'landing.valueProposition.features.secureDocumentStorage.statsLabel'),
             },
         },
         {
             id: 5,
-            title: translate(translations, 'landing.value_proposition.features.intelligent_notifications.title'),
-            description: translate(translations, 'landing.value_proposition.features.intelligent_notifications.description'),
+            title: translate(translations, 'landing.valueProposition.features.intelligentNotifications.title'),
+            description: translate(translations, 'landing.valueProposition.features.intelligentNotifications.description'),
             icon: <Bell className="h-8 w-8 text-white" />,
             iconBg: 'bg-orange-500',
-            stats: { percentage: '24/7', label: translate(translations, 'landing.value_proposition.features.intelligent_notifications.stats_label') },
+            stats: { percentage: '24/7', label: translate(translations, 'landing.valueProposition.features.intelligentNotifications.statsLabel') },
         },
         {
             id: 6,
-            title: translate(translations, 'landing.value_proposition.features.digital_inspection_features.title'),
-            description: translate(translations, 'landing.value_proposition.features.digital_inspection_features.description'),
+            title: translate(translations, 'landing.valueProposition.features.digitalInspectionFeatures.title'),
+            description: translate(translations, 'landing.valueProposition.features.digitalInspectionFeatures.description'),
             icon: <Camera className="h-8 w-8 text-white" />,
             iconBg: 'bg-red-500',
             stats: {
                 percentage: '60%',
-                label: translate(translations, 'landing.value_proposition.features.digital_inspection_features.stats_label'),
+                label: translate(translations, 'landing.valueProposition.features.digitalInspectionFeatures.statsLabel'),
             },
         },
     ];
@@ -221,13 +221,13 @@ export function ValuePropositionSection() {
                     <div className="relative inline-block">
                         <motion.button className="relative transform cursor-pointer rounded-2xl bg-gradient-to-r from-primary to-secondary px-12 py-4 font-bold text-white shadow-lg md:transition-all md:duration-300 md:hover:scale-105 md:hover:from-primary md:hover:to-secondary md:hover:shadow-2xl">
                             <span className="flex items-center space-x-3">
-                                <span>{translate(translations, 'landing.cta.button_text')}</span>
+                                <span>{translate(translations, 'landing.cta.buttonText')}</span>
                                 <ArrowRight className="h-5 w-5" />
                             </span>
                         </motion.button>
                     </div>
 
-                    <p className="mt-6 text-sm text-muted-foreground">{translate(translations, 'landing.value_proposition.cta_subtitle')}</p>
+                    <p className="mt-6 text-sm text-muted-foreground">{translate(translations, 'landing.valueProposition.ctaSubtitle')}</p>
                 </motion.div>
             </div>
         </section>

@@ -119,6 +119,7 @@ $applications = Application::with('property')->get();
 [ ] TypeScript types correct and complete
 [ ] Components follow existing patterns
 [ ] Tailwind classes (no inline styles)
+[ ] Semantic colors used (text-error, text-success, not text-red-500)
 [ ] Proper error handling
 [ ] Loading states present
 [ ] Accessibility considered (labels, ARIA)
@@ -131,8 +132,13 @@ $applications = Application::with('property')->get();
 // BAD: Inline styles
 <div style={{ color: 'red' }}>Error</div>
 
-// GOOD: Tailwind
+// BAD: Hardcoded colors
 <div className="text-red-500">Error</div>
+
+// GOOD: Semantic colors
+<div className="text-error">Error</div>
+<div className="text-success">Success</div>
+<div className="text-warning">Warning</div>
 
 // BAD: Hardcoded string
 <label>Email Address</label>
@@ -140,6 +146,8 @@ $applications = Application::with('property')->get();
 // GOOD: i18n
 <label>{translate(translations, 'form.email')}</label>
 ```
+
+**Note**: Status badges (application states like submitted, approved, rejected) may intentionally use hardcoded colors for visual differentiation.
 
 ### 5. Testing Review
 

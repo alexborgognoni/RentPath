@@ -168,7 +168,7 @@ export function AppHeader() {
                                                     className="text-text-secondary flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm transition-colors duration-150 hover:bg-background"
                                                 >
                                                     <Settings size={16} />
-                                                    <span>{t(translations?.header, 'settings')}</span>
+                                                    <span>{t(translations?.layout?.header, 'settings')}</span>
                                                 </Link>
                                                 <div className="mb-1 border-t border-border"></div>
                                                 <button
@@ -176,7 +176,7 @@ export function AppHeader() {
                                                     className="flex w-full cursor-pointer items-center space-x-3 px-4 py-2 text-left text-sm text-destructive transition-colors duration-150 hover:bg-destructive/10"
                                                 >
                                                     <LogOut size={16} />
-                                                    <span>{t(translations?.header, 'sign_out')}</span>
+                                                    <span>{t(translations?.layout?.header, 'signOut')}</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -188,7 +188,7 @@ export function AppHeader() {
                                 href={route('login')}
                                 className="rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
                             >
-                                {t(translations?.header, 'login') || 'Log In'}
+                                {t(translations?.layout?.header, 'login') || 'Log In'}
                             </Link>
                         )}
                     </div>

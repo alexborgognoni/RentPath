@@ -177,7 +177,7 @@ export function IdentityStep({ data, errors, touchedFields, updateField, markFie
             {/* New field */}
             <div className="space-y-2">
                 <Label htmlFor="new_field">
-                    New Field <span className="text-red-500">*</span>
+                    New Field <span className="text-error">*</span>
                 </Label>
                 <Input
                     id="new_field"
@@ -185,9 +185,9 @@ export function IdentityStep({ data, errors, touchedFields, updateField, markFie
                     onChange={(e) => updateField('new_field', e.target.value)}
                     onBlur={() => onFieldBlur('new_field')}
                     aria-invalid={touchedFields.new_field && !!errors.new_field}
-                    className={touchedFields.new_field && errors.new_field ? 'border-red-500' : ''}
+                    className={touchedFields.new_field && errors.new_field ? 'border-error' : ''}
                 />
-                {touchedFields.new_field && errors.new_field && <p className="text-sm text-red-500">{errors.new_field}</p>}
+                {touchedFields.new_field && errors.new_field && <p className="text-sm text-error">{errors.new_field}</p>}
             </div>
         </div>
     );

@@ -41,11 +41,11 @@ export function WizardNavigation({
     const t = (key: string) => translate(translations, key);
 
     // Use provided labels or fall back to translations
-    const resolvedBackLabel = backLabel ?? t('wizard.nav.back');
-    const resolvedSkipLabel = skipLabel ?? t('wizard.nav.skip');
-    const resolvedSubmitLabel = submitLabel ?? t('wizard.nav.submit');
-    const resolvedSubmittingLabel = submittingLabel ?? t('wizard.nav.submitting');
-    const continueLabel = t('wizard.nav.continue');
+    const resolvedBackLabel = backLabel ?? t('wizard.common.nav.back');
+    const resolvedSkipLabel = skipLabel ?? t('wizard.common.nav.skip');
+    const resolvedSubmitLabel = submitLabel ?? t('wizard.common.nav.submit');
+    const resolvedSubmittingLabel = submittingLabel ?? t('wizard.common.nav.submitting');
+    const continueLabel = t('wizard.common.nav.continue');
 
     const shakeAnimation = useAnimation();
 

@@ -277,7 +277,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                         className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-base font-semibold text-white shadow-xs transition-all hover:scale-105"
                                         onClick={() => setIsOpen(false)}
                                     >
-                                        {t(translations.header, 'login')}
+                                        {t(translations.layout.header, 'login')}
                                     </a>
 
                                     <div className="border-t border-border" />
@@ -380,7 +380,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                     <>
                                         <div className="space-y-1">
                                             <label className="mb-2 block text-xs font-medium text-muted-foreground">
-                                                {t(translations.header, 'nav.navigation') || 'Navigation'}
+                                                {t(translations.layout.header, 'nav.navigation') || 'Navigation'}
                                             </label>
                                             <TenantNavMobile unreadMessages={unreadMessages} onNavigate={() => setIsOpen(false)} />
                                         </div>
@@ -391,20 +391,20 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                 {/* Profile & Settings */}
                                 <div className="space-y-1">
                                     <label className="mb-2 block text-xs font-medium text-muted-foreground">
-                                        {t(translations.header, 'nav.account') || 'Account'}
+                                        {t(translations.layout.header, 'nav.account') || 'Account'}
                                     </label>
                                     {isTenantPortal && (
                                         <Button variant="ghost" className="h-11 w-full justify-start text-base" asChild>
                                             <a href={route('tenant.profile.show')} onClick={() => setIsOpen(false)}>
                                                 <User size={20} />
-                                                <span>{t(translations.header, 'nav.my_profile') || 'My Profile'}</span>
+                                                <span>{t(translations.layout.header, 'nav.myProfile') || 'My Profile'}</span>
                                             </a>
                                         </Button>
                                     )}
                                     <Button variant="ghost" className="h-11 w-full justify-start text-base" asChild>
                                         <a href={settingsRoute('profile', subdomain, managerSubdomain)} onClick={() => setIsOpen(false)}>
                                             <Settings size={20} />
-                                            <span>{t(translations.header, 'settings')}</span>
+                                            <span>{t(translations.layout.header, 'settings')}</span>
                                         </a>
                                     </Button>
                                 </div>
@@ -414,7 +414,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                 {/* Logout */}
                                 <Button variant="destructive" className="h-11 w-full justify-start text-base" onClick={handleLogoutClick}>
                                     <LogOut size={20} />
-                                    <span>{t(translations.header, 'sign_out')}</span>
+                                    <span>{t(translations.layout.header, 'signOut')}</span>
                                 </Button>
                             </div>
                         )}

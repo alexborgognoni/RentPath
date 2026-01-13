@@ -38,14 +38,21 @@ SESSION_DOMAIN=.rentpath.test | .rentpath.app  # Leading dot for subdomain auth
 
 ## Technology Stack
 
-| Layer | Technology |
-|-------|------------|
-| Backend | Laravel 12 (PHP 8.3) + Inertia.js |
-| Frontend | React 19 + TypeScript + Tailwind CSS 4 |
-| Database | MySQL 8.0 |
-| Storage | S3 + CloudFront (signed URLs) |
+| Layer          | Technology                               |
+| -------------- | ---------------------------------------- |
+| Backend        | Laravel 12 (PHP 8.3) + Inertia.js        |
+| Frontend       | React 19 + TypeScript + Tailwind CSS 4   |
+| Database       | MySQL 8.0                                |
+| Storage        | S3 + CloudFront (signed URLs)            |
 | Infrastructure | AWS Elastic Beanstalk, RDS, CodePipeline |
-| IaC | Terraform |
+| IaC            | Terraform                                |
+
+### Frontend Styling
+
+- **Tailwind CSS 4** with OKLCH color system (CSS-first configuration via `@theme` directive)
+- **Semantic color tokens**: `text-error`, `text-success`, `text-warning`, `bg-primary`, `bg-destructive`
+- Theme colors defined in `resources/css/app.css`
+- See `.claude/agents/frontend.md` for detailed color guidelines
 
 ## Key Design Principles
 

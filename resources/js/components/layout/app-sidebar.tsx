@@ -112,7 +112,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                                     <PanelLeftOpen className="h-5 w-5" />
                                 </button>
                             </TooltipTrigger>
-                            <TooltipContent side="right">{t(translations.sidebar, 'expandSidebar')}</TooltipContent>
+                            <TooltipContent side="right">{t(translations.layout.sidebar, 'expandSidebar')}</TooltipContent>
                         </Tooltip>
                     ) : (
                         <div className="flex w-full items-center justify-between">
@@ -131,7 +131,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                                         <PanelLeftClose className="h-5 w-5" />
                                     </button>
                                 </TooltipTrigger>
-                                <TooltipContent side="right">{t(translations.sidebar, 'collapseSidebar')}</TooltipContent>
+                                <TooltipContent side="right">{t(translations.layout.sidebar, 'collapseSidebar')}</TooltipContent>
                             </Tooltip>
                         </div>
                     )}
@@ -142,28 +142,28 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                     <NavItem
                         href={route('manager.properties.index')}
                         icon={<Building2 className="h-5 w-5" />}
-                        label={t(translations.sidebar, 'properties')}
+                        label={t(translations.layout.sidebar, 'properties')}
                         isActive={isPropertiesActive}
                         isCollapsed={isCollapsed}
                     />
                     <NavItem
                         href={route('manager.applications.index')}
                         icon={<FileText className="h-5 w-5" />}
-                        label={t(translations.sidebar, 'applications')}
+                        label={t(translations.layout.sidebar, 'applications')}
                         isActive={isApplicationsActive}
                         isCollapsed={isCollapsed}
                     />
                     <NavItem
                         href={route('manager.leads.index')}
                         icon={<Users className="h-5 w-5" />}
-                        label={t(translations.sidebar, 'leads')}
+                        label={t(translations.layout.sidebar, 'leads')}
                         isActive={isLeadsActive}
                         isCollapsed={isCollapsed}
                     />
                     <NavItem
                         href={route('manager.messages.index')}
                         icon={<MessageCircle className="h-5 w-5" />}
-                        label={t(translations.sidebar, 'messages') || 'Messages'}
+                        label={t(translations.layout.sidebar, 'messages') || 'Messages'}
                         isActive={isMessagesActive}
                         isCollapsed={isCollapsed}
                     />
@@ -190,10 +190,10 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                                     </button>
                                 </DropdownMenuTrigger>
                             </TooltipTrigger>
-                            {isCollapsed && <TooltipContent side="right">{t(translations.sidebar, 'currency')}</TooltipContent>}
+                            {isCollapsed && <TooltipContent side="right">{t(translations.layout.sidebar, 'currency')}</TooltipContent>}
                         </Tooltip>
                         <DropdownMenuContent side="right" align="start" className="w-48">
-                            <DropdownMenuLabel>{t(translations.sidebar, 'selectCurrency')}</DropdownMenuLabel>
+                            <DropdownMenuLabel>{t(translations.layout.sidebar, 'selectCurrency')}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             {currencies.map((currency) => (
                                 <DropdownMenuItem
@@ -228,10 +228,10 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                                     </button>
                                 </DropdownMenuTrigger>
                             </TooltipTrigger>
-                            {isCollapsed && <TooltipContent side="right">{t(translations.sidebar, 'language')}</TooltipContent>}
+                            {isCollapsed && <TooltipContent side="right">{t(translations.layout.sidebar, 'language')}</TooltipContent>}
                         </Tooltip>
                         <DropdownMenuContent side="right" align="start" className="w-48">
-                            <DropdownMenuLabel>{t(translations.sidebar, 'selectLanguage')}</DropdownMenuLabel>
+                            <DropdownMenuLabel>{t(translations.layout.sidebar, 'selectLanguage')}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             {languages.map((lang) => (
                                 <DropdownMenuItem
@@ -255,10 +255,10 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                                 }`}
                             >
                                 <Settings className="h-5 w-5 shrink-0" />
-                                {!isCollapsed && <span>{t(translations.sidebar, 'settings')}</span>}
+                                {!isCollapsed && <span>{t(translations.layout.sidebar, 'settings')}</span>}
                             </button>
                         </TooltipTrigger>
-                        {isCollapsed && <TooltipContent side="right">{t(translations.sidebar, 'settings')}</TooltipContent>}
+                        {isCollapsed && <TooltipContent side="right">{t(translations.layout.sidebar, 'settings')}</TooltipContent>}
                     </Tooltip>
                 </div>
 
@@ -311,13 +311,13 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
                             <DropdownMenuGroup>
                                 <DropdownMenuItem>
                                     <Settings className="h-4 w-4" />
-                                    <span>{t(translations.sidebar, 'settings')}</span>
+                                    <span>{t(translations.layout.sidebar, 'settings')}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem variant="destructive" onClick={handleLogout}>
                                 <LogOut className="h-4 w-4" />
-                                <span>{t(translations.sidebar, 'signOut')}</span>
+                                <span>{t(translations.layout.sidebar, 'signOut')}</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
