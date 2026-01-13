@@ -8,23 +8,23 @@ export function Footer() {
     const { translations } = usePage<SharedData>().props;
 
     const BRAND_NAME = 'RentPath';
-    const BRAND_DESCRIPTION = translate(translations, 'landing.footer.description');
-    const PRODUCT_HEADING = translate(translations, 'landing.footer.product');
-    const SUPPORT_HEADING = translate(translations, 'landing.footer.support');
+    const BRAND_DESCRIPTION = translate(translations.public.landing, 'footer.description');
+    const PRODUCT_HEADING = translate(translations.public.landing, 'footer.product');
+    const SUPPORT_HEADING = translate(translations.public.landing, 'footer.support');
 
     const PRODUCT_LINKS = [
-        { href: '#features', label: translate(translations, 'landing.footer.links.features') },
-        { href: route('register'), label: translate(translations, 'landing.footer.links.pricing') },
-        { href: route('register'), label: translate(translations, 'landing.footer.links.free_trial') },
+        { href: '#features', label: translate(translations.public.landing, 'footer.links.features') },
+        { href: route('register'), label: translate(translations.public.landing, 'footer.links.pricing') },
+        { href: route('register'), label: translate(translations.public.landing, 'footer.links.freeTrial') },
     ];
 
     const SUPPORT_LINKS = [
-        { href: route('contact.us'), label: translate(translations, 'landing.footer.links.contact_us') },
-        { href: route('privacy.policy'), label: translate(translations, 'landing.footer.links.privacy_policy') },
-        { href: route('terms.of.use'), label: translate(translations, 'landing.footer.links.terms_of_use') },
+        { href: route('contact.us'), label: translate(translations.public.landing, 'footer.links.contactUs') },
+        { href: route('privacy.policy'), label: translate(translations.public.landing, 'footer.links.privacyPolicy') },
+        { href: route('terms.of.use'), label: translate(translations.public.landing, 'footer.links.termsOfUse') },
     ];
 
-    const COPYRIGHT_TEXT = `© 2025 ${BRAND_NAME}. ${translate(translations, 'landing.footer.all_rights_reserved')}`;
+    const COPYRIGHT_TEXT = `© 2025 ${BRAND_NAME}. ${translate(translations.public.landing, 'footer.allRightsReserved')}`;
 
     return (
         <footer className="border-t border-border bg-surface py-16">

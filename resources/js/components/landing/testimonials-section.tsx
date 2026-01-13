@@ -23,44 +23,44 @@ const renderStars = (rating: number) =>
 export function TestimonialsSection() {
     const { translations } = usePage<SharedData>().props;
 
-    const HEADER_TITLE = translate(translations, 'landing.testimonials.heading');
-    const HEADER_DESCRIPTION = translate(translations, 'landing.testimonials.subtitle');
+    const HEADER_TITLE = translate(translations.public.landing, 'testimonials.heading');
+    const HEADER_DESCRIPTION = translate(translations.public.landing, 'testimonials.subtitle');
 
     const REVIEWS: Review[] = [
         {
             id: 1,
             name: 'Amar Ramdedovic',
-            role: translate(translations, 'landing.testimonials.testimonials.amarRamdedovic.role'),
+            role: translate(translations.public.landing, 'testimonials.testimonials.amarRamdedovic.role'),
             company: 'Valora',
             avatar: 'AR',
             avatarUrl: '/images/reviews/reviews_1.jpg',
             rating: 5,
-            content: translate(translations, 'landing.testimonials.testimonials.amarRamdedovic.content'),
+            content: translate(translations.public.landing, 'testimonials.testimonials.amarRamdedovic.content'),
         },
         {
             id: 2,
             name: 'Alessandro Rossi',
-            role: translate(translations, 'landing.testimonials.testimonials.alessandroRossi.role'),
+            role: translate(translations.public.landing, 'testimonials.testimonials.alessandroRossi.role'),
             avatar: 'AR',
             rating: 5,
-            content: translate(translations, 'landing.testimonials.testimonials.alessandroRossi.content'),
+            content: translate(translations.public.landing, 'testimonials.testimonials.alessandroRossi.content'),
         },
         {
             id: 3,
             name: 'Philippe Hengen',
-            role: translate(translations, 'landing.testimonials.testimonials.philippeHengen.role'),
+            role: translate(translations.public.landing, 'testimonials.testimonials.philippeHengen.role'),
             company: 'AXA',
             avatar: 'PH',
             avatarUrl: '/images/reviews/reviews_3.jpeg',
             rating: 5,
-            content: translate(translations, 'landing.testimonials.testimonials.philippeHengen.content'),
+            content: translate(translations.public.landing, 'testimonials.testimonials.philippeHengen.content'),
         },
     ];
 
     const STATS = [
-        { value: '4.9/5', label: translate(translations, 'landing.testimonials.stats.ratingLabel') },
-        { value: '200+', label: translate(translations, 'landing.testimonials.stats.customersLabel') },
-        { value: '500+', label: translate(translations, 'landing.testimonials.stats.propertiesLabel') },
+        { value: '4.9/5', label: translate(translations.public.landing, 'testimonials.stats.ratingLabel') },
+        { value: '200+', label: translate(translations.public.landing, 'testimonials.stats.customersLabel') },
+        { value: '500+', label: translate(translations.public.landing, 'testimonials.stats.propertiesLabel') },
     ];
 
     return (
@@ -113,7 +113,8 @@ export function TestimonialsSection() {
                                         <div className="font-semibold text-foreground">{review.name}</div>
                                         <div className="text-sm text-muted-foreground">
                                             {review.role}{' '}
-                                            {review.company && ` ${translate(translations, 'landing.testimonials.atKeyword')} ${review.company}`}
+                                            {review.company &&
+                                                ` ${translate(translations.public.landing, 'testimonials.atKeyword')} ${review.company}`}
                                         </div>
                                     </div>
                                 </div>

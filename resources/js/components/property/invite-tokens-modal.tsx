@@ -26,7 +26,7 @@ interface InviteTokensModalProps {
 
 export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensModalProps) {
     const { appUrlScheme, appDomain, appPort, translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = (key: string) => translate(translations.manager.properties, key);
     const [tokens, setTokens] = useState<InviteToken[]>([]);
     const [loading, setLoading] = useState(false);
     const [copiedTokenId, setCopiedTokenId] = useState<number | null>(null);
@@ -79,7 +79,7 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
     };
 
     const handleDeleteToken = async (tokenId: number, skipConfirmation = false) => {
-        if (!skipConfirmation && !confirm(t('properties.inviteTokens.deleteConfirm'))) {
+        if (!skipConfirmation && !confirm(t('inviteTokens.deleteConfirm'))) {
             return;
         }
 
@@ -101,10 +101,10 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
     };
 
     const formatExpiry = (expiresAt: string | null) => {
-        if (!expiresAt) return t('properties.inviteTokens.never');
+        if (!expiresAt) return t('inviteTokens.never');
         const date = new Date(expiresAt);
         const now = new Date();
-        if (date < now) return t('properties.inviteTokens.expired');
+        if (date < now) return t('inviteTokens.expired');
         return date.toLocaleDateString();
     };
 
@@ -115,7 +115,7 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
             <div className="w-full max-w-2xl rounded-2xl border border-border bg-card shadow-xl">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-border p-6">
-                    <h2 className="text-xl font-semibold text-foreground">{t('properties.inviteTokens.title')}</h2>
+                    <h2 className="text-xl font-semibold text-foreground">{t('inviteTokens.title')}</h2>
                     <button
                         onClick={onClose}
                         className="cursor-pointer rounded-lg p-2 text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
@@ -151,14 +151,14 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
                                     className="mb-4 flex w-full cursor-pointer items-center justify-center rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm font-medium text-primary transition-all hover:bg-primary/20"
                                 >
                                     <Plus className="mr-2" size={16} />
-                                    {t('properties.inviteTokens.createCustomLink')}
+                                    {t('inviteTokens.createCustomLink')}
                                 </button>
                             )}
 
                             {/* Tokens List */}
                             {tokens.length === 0 ? (
                                 <div className="py-12 text-center">
-                                    <p className="text-sm text-muted-foreground">{t('properties.inviteTokens.noCustomLinks')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('inviteTokens.noCustomLinks')}</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
@@ -174,30 +174,26 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
                                                     <div className="mb-3 flex items-start justify-between">
                                                         <div className="opacity-50">
                                                             <h3 className="font-medium text-foreground">
-                                                                {token.name || t('properties.inviteTokens.unnamedLink')}
+                                                                {token.name || t('inviteTokens.unnamedLink')}
                                                             </h3>
                                                             {token.type === 'invite' && token.email && (
                                                                 <p className="text-xs text-muted-foreground">
-                                                                    {t('properties.inviteTokens.email')}: {token.email}
+                                                                    {t('inviteTokens.email')}: {token.email}
                                                                 </p>
                                                             )}
                                                         </div>
                                                         <span className="rounded-full bg-destructive/20 px-2 py-1 text-xs font-medium text-destructive">
-                                                            {isExpired
-                                                                ? t('properties.inviteTokens.expired')
-                                                                : t('properties.inviteTokens.maxUsesReached')}
+                                                            {isExpired ? t('inviteTokens.expired') : t('inviteTokens.maxUsesReached')}
                                                         </span>
                                                     </div>
 
                                                     <div className="mb-3 flex items-center gap-4 text-xs text-muted-foreground opacity-50">
                                                         <span>
-                                                            {t('properties.inviteTokens.used')}: {token.used_count}
-                                                            {token.max_uses !== null
-                                                                ? ` / ${token.max_uses}`
-                                                                : ` (${t('properties.inviteTokens.unlimited')})`}
+                                                            {t('inviteTokens.used')}: {token.used_count}
+                                                            {token.max_uses !== null ? ` / ${token.max_uses}` : ` (${t('inviteTokens.unlimited')})`}
                                                         </span>
                                                         <span>
-                                                            {t('properties.inviteTokens.expires')}: {formatExpiry(token.expires_at)}
+                                                            {t('inviteTokens.expires')}: {formatExpiry(token.expires_at)}
                                                         </span>
                                                     </div>
 
@@ -206,7 +202,7 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
                                                         className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-destructive/50 bg-destructive/15 px-3 py-2 text-xs font-medium text-destructive transition-all hover:bg-destructive/25"
                                                     >
                                                         <Trash2 size={14} />
-                                                        {t('properties.inviteTokens.deleteExpiredLink')}
+                                                        {t('inviteTokens.deleteExpiredLink')}
                                                     </button>
                                                 </div>
                                             );
@@ -217,12 +213,10 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
                                             <div key={token.id} className="rounded-lg border border-border bg-background/50 p-4">
                                                 <div className="mb-3 flex items-start justify-between">
                                                     <div>
-                                                        <h3 className="font-medium text-foreground">
-                                                            {token.name || t('properties.inviteTokens.unnamedLink')}
-                                                        </h3>
+                                                        <h3 className="font-medium text-foreground">{token.name || t('inviteTokens.unnamedLink')}</h3>
                                                         {token.type === 'invite' && token.email && (
                                                             <p className="text-xs text-muted-foreground">
-                                                                {t('properties.inviteTokens.email')}: {token.email}
+                                                                {t('inviteTokens.email')}: {token.email}
                                                             </p>
                                                         )}
                                                     </div>
@@ -230,13 +224,11 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
 
                                                 <div className="mb-3 flex items-center gap-4 text-xs text-muted-foreground">
                                                     <span>
-                                                        {t('properties.inviteTokens.used')}: {token.used_count}
-                                                        {token.max_uses !== null
-                                                            ? ` / ${token.max_uses}`
-                                                            : ` (${t('properties.inviteTokens.unlimited')})`}
+                                                        {t('inviteTokens.used')}: {token.used_count}
+                                                        {token.max_uses !== null ? ` / ${token.max_uses}` : ` (${t('inviteTokens.unlimited')})`}
                                                     </span>
                                                     <span>
-                                                        {t('properties.inviteTokens.expires')}: {formatExpiry(token.expires_at)}
+                                                        {t('inviteTokens.expires')}: {formatExpiry(token.expires_at)}
                                                     </span>
                                                 </div>
 
@@ -248,12 +240,12 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
                                                         {copiedTokenId === token.id ? (
                                                             <>
                                                                 <Check className="mr-1" size={14} />
-                                                                {t('properties.sidebar.copied')}
+                                                                {t('sidebar.copied')}
                                                             </>
                                                         ) : (
                                                             <>
                                                                 <Copy className="mr-1" size={14} />
-                                                                {t('properties.sidebar.copyLink')}
+                                                                {t('sidebar.copyLink')}
                                                             </>
                                                         )}
                                                     </button>
@@ -279,7 +271,7 @@ export function InviteTokensModal({ propertyId, isOpen, onClose }: InviteTokensM
                         onClick={onClose}
                         className="w-full cursor-pointer rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-all hover:bg-background/80"
                     >
-                        {t('properties.inviteTokens.close')}
+                        {t('inviteTokens.close')}
                     </button>
                 </div>
             </div>

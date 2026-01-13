@@ -6,6 +6,7 @@ import { usePage } from '@inertiajs/react';
 export default function TermsOfUse() {
     const page = usePage<SharedData>();
     const { translations } = page.props;
+    const t = (key: string) => translate(translations.public.termsOfUse, key);
 
     // Company information constants
     const COMPANY_INFO = {
@@ -25,177 +26,121 @@ export default function TermsOfUse() {
         <PublicLayout>
             <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
                 <div className="prose prose-neutral dark:prose-invert mx-auto max-w-none">
-                    <h1 className="mb-4 text-4xl font-bold text-foreground">{translate(translations, 'terms-of-use.page_title')}</h1>
-                    <p className="mb-8 text-sm text-muted-foreground">{translate(translations, 'terms-of-use.last_updated')}</p>
+                    <h1 className="mb-4 text-4xl font-bold text-foreground">{t('pageTitle')}</h1>
+                    <p className="mb-8 text-sm text-muted-foreground">{t('lastUpdated')}</p>
 
                     <div className="space-y-8 text-foreground">
                         <section>
-                            <p className="text-lg leading-relaxed">{translate(translations, 'terms-of-use.introduction')}</p>
+                            <p className="text-lg leading-relaxed">{t('introduction')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.who_we_are.title')}
-                            </h2>
-                            <p>{translate(translations, 'terms-of-use.sections.who_we_are.content')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.whoWeAre.title')}</h2>
+                            <p>{t('sections.whoWeAre.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.eligibility.title')}
-                            </h2>
-                            <p>{translate(translations, 'terms-of-use.sections.eligibility.content')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.eligibility.title')}</h2>
+                            <p>{t('sections.eligibility.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.accounts.title')}
-                            </h2>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.accounts.title')}</h2>
                             <ul className="space-y-3">
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.accounts.items[0]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.accounts.items[1]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.accounts.items[2]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.accounts.items[3]')}</span>
-                                </li>
+                                {(translations.public.termsOfUse?.sections?.accounts?.items || []).map((item: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-3">
+                                        <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
                             </ul>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.services_provided.title')}
-                            </h2>
-                            <p className="mb-4">{translate(translations, 'terms-of-use.sections.services_provided.intro')}</p>
-                            <p>{translate(translations, 'terms-of-use.sections.services_provided.note')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.servicesProvided.title')}</h2>
+                            <p className="mb-4">{t('sections.servicesProvided.intro')}</p>
+                            <p>{t('sections.servicesProvided.note')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.acceptable_use.title')}
-                            </h2>
-                            <p className="mb-4">{translate(translations, 'terms-of-use.sections.acceptable_use.intro')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.acceptableUse.title')}</h2>
+                            <p className="mb-4">{t('sections.acceptableUse.intro')}</p>
                             <ul className="space-y-3">
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.acceptable_use.items[0]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.acceptable_use.items[1]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.acceptable_use.items[2]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.acceptable_use.items[3]')}</span>
-                                </li>
+                                {(translations.public.termsOfUse?.sections?.acceptableUse?.items || []).map((item: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-3">
+                                        <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
                             </ul>
-                            <p className="mt-4">{translate(translations, 'terms-of-use.sections.acceptable_use.note')}</p>
+                            <p className="mt-4">{t('sections.acceptableUse.note')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.payments.title')}
-                            </h2>
-                            <p className="mb-4">{translate(translations, 'terms-of-use.sections.payments.intro')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.payments.title')}</h2>
+                            <p className="mb-4">{t('sections.payments.intro')}</p>
                             <ul className="space-y-3">
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.payments.items[0]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.payments.items[1]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.payments.items[2]')}</span>
-                                </li>
+                                {(translations.public.termsOfUse?.sections?.payments?.items || []).map((item: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-3">
+                                        <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
                             </ul>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.intellectual_property.title')}
-                            </h2>
-                            <p>{translate(translations, 'terms-of-use.sections.intellectual_property.content')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.intellectualProperty.title')}</h2>
+                            <p>{t('sections.intellectualProperty.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.data_privacy.title')}
-                            </h2>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.dataPrivacy.title')}</h2>
                             <p>
-                                {translate(translations, 'terms-of-use.sections.data_privacy.content')}{' '}
+                                {t('sections.dataPrivacy.content')}{' '}
                                 <a href={LINKS.privacyPolicy} className="text-primary hover:underline">
-                                    {translate(translations, 'terms-of-use.sections.data_privacy.link_text')}
+                                    {t('sections.dataPrivacy.linkText')}
                                 </a>
                                 .
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.disclaimer_warranties.title')}
-                            </h2>
-                            <p>{translate(translations, 'terms-of-use.sections.disclaimer_warranties.content')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.disclaimerWarranties.title')}</h2>
+                            <p>{t('sections.disclaimerWarranties.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.limitation_liability.title')}
-                            </h2>
-                            <p className="mb-4">{translate(translations, 'terms-of-use.sections.limitation_liability.intro')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.limitationLiability.title')}</h2>
+                            <p className="mb-4">{t('sections.limitationLiability.intro')}</p>
                             <ul className="space-y-3">
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.limitation_liability.items[0]')}</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
-                                    <span>{translate(translations, 'terms-of-use.sections.limitation_liability.items[1]')}</span>
-                                </li>
+                                {(translations.public.termsOfUse?.sections?.limitationLiability?.items || []).map((item: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-3">
+                                        <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
                             </ul>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.termination.title')}
-                            </h2>
-                            <p>{translate(translations, 'terms-of-use.sections.termination.content')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.termination.title')}</h2>
+                            <p>{t('sections.termination.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.changes_terms.title')}
-                            </h2>
-                            <p>{translate(translations, 'terms-of-use.sections.changes_terms.content')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.changesTerms.title')}</h2>
+                            <p>{t('sections.changesTerms.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.governing_law.title')}
-                            </h2>
-                            <p>{translate(translations, 'terms-of-use.sections.governing_law.content')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.governingLaw.title')}</h2>
+                            <p>{t('sections.governingLaw.content')}</p>
                         </section>
 
                         <section>
-                            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-                                {translate(translations, 'terms-of-use.sections.contact_us.title')}
-                            </h2>
-                            <p className="mb-4">{translate(translations, 'terms-of-use.sections.contact_us.intro')}</p>
+                            <h2 className="mb-4 text-2xl font-semibold text-foreground">{t('sections.contactUs.title')}</h2>
+                            <p className="mb-4">{t('sections.contactUs.intro')}</p>
                             <div className="rounded-lg bg-muted/30 p-4">
                                 <p>
                                     {COMPANY_INFO.name}

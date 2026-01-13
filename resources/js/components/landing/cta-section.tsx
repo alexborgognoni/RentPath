@@ -7,9 +7,9 @@ import { ArrowRight } from 'lucide-react';
 export function CtaSection() {
     const { translations } = usePage<SharedData>().props;
 
-    const HEADING = translate(translations, 'landing.cta.heading');
-    const SUBTITLE = translate(translations, 'landing.cta.subtitle');
-    const CTA_BUTTON_TEXT = translate(translations, 'landing.cta.buttonText');
+    const HEADING = translate(translations.public.landing, 'cta.heading');
+    const SUBTITLE = translate(translations.public.landing, 'cta.subtitle');
+    const CTA_BUTTON_TEXT = translate(translations.public.landing, 'cta.buttonText');
     const CTA_BUTTON_HREF = route('register');
 
     return (

@@ -15,7 +15,7 @@ interface PropertySidebarProps {
 
 export function PropertySidebar({ property, tenantCount }: PropertySidebarProps) {
     const { appUrlScheme, appDomain, appPort, translations } = usePage<SharedData>().props;
-    const t = (key: string, params?: Record<string, string | number>) => translate(translations, key, params);
+    const t = (key: string, params?: Record<string, string | number>) => translate(translations.manager.properties, key, params);
     // Application access: 'link_required' = needs invite token, 'open' = anyone can apply
     const [applicationAccess, setApplicationAccess] = useState<'open' | 'link_required' | 'invite_only'>(property.application_access ?? 'open');
     const requiresToken = applicationAccess === 'link_required' || applicationAccess === 'invite_only';
@@ -64,7 +64,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
     };
 
     const handleDelete = () => {
-        if (confirm(t('properties.sidebar.deletePropertyConfirm'))) {
+        if (confirm(t('sidebar.deletePropertyConfirm'))) {
             router.delete(route('properties.destroy', { property: property.id }), {
                 onSuccess: () => {
                     router.visit(route('manager.properties.index'));
@@ -147,23 +147,23 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
         // Property lifecycle status (simplified)
         const statusConfig: Record<string, { labelKey: string; className: string }> = {
             draft: {
-                labelKey: 'properties.statusDraft',
+                labelKey: 'statusDraft',
                 className: 'bg-muted/50 text-muted-foreground',
             },
             vacant: {
-                labelKey: 'properties.statusVacant',
+                labelKey: 'statusVacant',
                 className: 'bg-success/10 text-success',
             },
             leased: {
-                labelKey: 'properties.statusLeased',
+                labelKey: 'statusLeased',
                 className: 'bg-cyan-500/10 text-cyan-400',
             },
             maintenance: {
-                labelKey: 'properties.statusMaintenance',
+                labelKey: 'statusMaintenance',
                 className: 'bg-orange-500/10 text-orange-400',
             },
             archived: {
-                labelKey: 'properties.statusArchived',
+                labelKey: 'statusArchived',
                 className: 'bg-muted/50 text-muted-foreground',
             },
         };
@@ -179,17 +179,17 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
                     <FileText className="mr-2 text-primary" size={18} />
-                    {t('properties.sidebar.quickStats')}
+                    {t('sidebar.quickStats')}
                 </h3>
 
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">{t('properties.sidebar.monthlyRent')}</span>
+                        <span className="text-sm text-muted-foreground">{t('sidebar.monthlyRent')}</span>
                         <span className="text-sm font-semibold text-foreground">{formatCurrency(property.rent_amount, property.rent_currency)}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">{t('properties.sidebar.applications')}</span>
+                        <span className="text-sm text-muted-foreground">{t('sidebar.applications')}</span>
                         <span className="flex items-center text-sm font-semibold text-foreground">
                             <Users className="mr-1" size={14} />
                             {tenantCount}
@@ -197,7 +197,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">{t('properties.sidebar.status')}</span>
+                        <span className="text-sm text-muted-foreground">{t('sidebar.status')}</span>
                         {getStatusBadge()}
                     </div>
                 </div>
@@ -207,7 +207,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
                     <Settings className="mr-2 text-primary" size={18} />
-                    {t('properties.sidebar.actions')}
+                    {t('sidebar.actions')}
                 </h3>
 
                 <div className="space-y-2">
@@ -216,7 +216,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                         className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
                     >
                         <Edit className="mr-3" size={16} />
-                        {t('properties.sidebar.editProperty')}
+                        {t('sidebar.editProperty')}
                     </button>
 
                     <button
@@ -224,7 +224,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                         className="flex w-full cursor-pointer items-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:scale-105 hover:bg-background"
                     >
                         <Users className="mr-3" size={16} />
-                        {t('applications.viewApplications')} ({tenantCount})
+                        {t('sidebar.viewApplications')} ({tenantCount})
                     </button>
                 </div>
             </div>
@@ -233,14 +233,14 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <h3 className="mb-3 flex items-center text-base font-semibold text-foreground">
                     <Share className="mr-2 text-primary" size={18} />
-                    {t('properties.sidebar.applicationAccess')}
+                    {t('sidebar.applicationAccess')}
                 </h3>
 
                 {/* Application Access Toggle */}
                 <div className="mb-3 flex items-center justify-between rounded-lg border border-border bg-background/50 p-3">
                     <div className="flex items-center">
                         <Link2 className="mr-2 text-muted-foreground" size={16} />
-                        <span className="text-sm font-medium">{t('properties.sidebar.requireInvite')}</span>
+                        <span className="text-sm font-medium">{t('sidebar.requireInvite')}</span>
                     </div>
                     <button
                         onClick={handleToggleApplicationAccess}
@@ -256,18 +256,18 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
                 {requiresToken && (
                     <>
-                        <p className="mb-3 text-sm text-muted-foreground">{t('properties.sidebar.inviteRequiredDesc')}</p>
+                        <p className="mb-3 text-sm text-muted-foreground">{t('sidebar.inviteRequiredDesc')}</p>
 
                         {defaultToken && (
                             <div className="space-y-3">
                                 {/* Default Token Info */}
                                 <div className="rounded-lg border border-border bg-background/30 p-3">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-muted-foreground">{t('properties.sidebar.defaultInviteLink')}</span>
+                                        <span className="text-sm font-medium text-muted-foreground">{t('sidebar.defaultInviteLink')}</span>
                                         <span className="text-sm text-muted-foreground">
                                             {defaultToken.used_count === 1
-                                                ? t('properties.sidebar.usedTime', { count: defaultToken.used_count })
-                                                : t('properties.sidebar.usedTimes', { count: defaultToken.used_count })}
+                                                ? t('sidebar.usedTime', { count: defaultToken.used_count })
+                                                : t('sidebar.usedTimes', { count: defaultToken.used_count })}
                                         </span>
                                     </div>
                                 </div>
@@ -280,12 +280,12 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     {copiedToken ? (
                                         <>
                                             <Check className="mr-2" size={16} />
-                                            {t('properties.sidebar.copied')}
+                                            {t('sidebar.copied')}
                                         </>
                                     ) : (
                                         <>
                                             <Copy className="mr-2" size={16} />
-                                            {t('properties.sidebar.copyInviteLink')}
+                                            {t('sidebar.copyInviteLink')}
                                         </>
                                     )}
                                 </button>
@@ -297,7 +297,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-border bg-background/50 px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-background disabled:opacity-50"
                                 >
                                     <RefreshCw className={`mr-2 ${regeneratingToken ? 'animate-spin' : ''}`} size={16} />
-                                    {t('properties.sidebar.regenerateLink')}
+                                    {t('sidebar.regenerateLink')}
                                 </button>
 
                                 {/* Manage Custom Tokens Button */}
@@ -306,7 +306,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                                     className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition-all hover:bg-primary/20"
                                 >
                                     <Settings className="mr-2" size={16} />
-                                    {t('properties.sidebar.manageCustomLinks')}
+                                    {t('sidebar.manageCustomLinks')}
                                 </button>
                             </div>
                         )}
@@ -315,7 +315,7 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
 
                 {!requiresToken && (
                     <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground">{t('properties.sidebar.publicAccessDesc')}</p>
+                        <p className="text-sm text-muted-foreground">{t('sidebar.publicAccessDesc')}</p>
 
                         {/* Copy Public Link Button */}
                         <button
@@ -325,12 +325,12 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
                             {copiedToken ? (
                                 <>
                                     <Check className="mr-2" size={16} />
-                                    {t('properties.sidebar.copied')}
+                                    {t('sidebar.copied')}
                                 </>
                             ) : (
                                 <>
                                     <Copy className="mr-2" size={16} />
-                                    {t('properties.sidebar.copyLink')}
+                                    {t('sidebar.copyLink')}
                                 </>
                             )}
                         </button>
@@ -342,17 +342,17 @@ export function PropertySidebar({ property, tenantCount }: PropertySidebarProps)
             <div className="rounded-2xl border border-destructive/20 bg-card p-4 shadow-sm">
                 <h3 className="mb-3 flex items-center text-base font-semibold text-destructive">
                     <Trash2 className="mr-2" size={18} />
-                    {t('properties.sidebar.dangerZone')}
+                    {t('sidebar.dangerZone')}
                 </h3>
 
-                <p className="mb-3 text-sm text-muted-foreground">{t('properties.sidebar.deleteWarning')}</p>
+                <p className="mb-3 text-sm text-muted-foreground">{t('sidebar.deleteWarning')}</p>
 
                 <button
                     onClick={handleDelete}
                     className="flex w-full cursor-pointer items-center justify-center rounded-lg border border-destructive bg-destructive/10 px-4 py-2.5 text-sm font-medium text-destructive transition-all hover:bg-destructive/20"
                 >
                     <Trash2 className="mr-2" size={16} />
-                    {t('properties.sidebar.deleteProperty')}
+                    {t('sidebar.deleteProperty')}
                 </button>
             </div>
 

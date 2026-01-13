@@ -10,18 +10,18 @@ import { useEffect, useState } from 'react';
 export function BenefitsSection() {
     const { translations } = usePage<SharedData>().props;
 
-    const HEADING = translate(translations, 'landing.benefits.heading');
+    const HEADING = translate(translations.public.landing, 'benefits.heading');
 
-    const FASTER_PLACEMENTS_TITLE = translate(translations, 'landing.benefits.benefits.fasterPlacements.title');
-    const FASTER_PLACEMENTS_DESCRIPTION = translate(translations, 'landing.benefits.benefits.fasterPlacements.description');
-    const CENTRALIZED_DATA_TITLE = translate(translations, 'landing.benefits.benefits.centralizedData.title');
-    const CENTRALIZED_DATA_DESCRIPTION = translate(translations, 'landing.benefits.benefits.centralizedData.description');
-    const AUTOMATED_UPDATES_TITLE = translate(translations, 'landing.benefits.benefits.automatedUpdates.title');
-    const AUTOMATED_UPDATES_DESCRIPTION = translate(translations, 'landing.benefits.benefits.automatedUpdates.description');
-    const REDUCED_OVERHEAD_TITLE = translate(translations, 'landing.benefits.benefits.reducedOverhead.title');
-    const REDUCED_OVERHEAD_DESCRIPTION = translate(translations, 'landing.benefits.benefits.reducedOverhead.description');
-    const HIGHER_CONVERSION_TITLE = translate(translations, 'landing.benefits.benefits.higherConversion.title');
-    const HIGHER_CONVERSION_DESCRIPTION = translate(translations, 'landing.benefits.benefits.higherConversion.description');
+    const FASTER_PLACEMENTS_TITLE = translate(translations.public.landing, 'benefits.benefits.fasterPlacements.title');
+    const FASTER_PLACEMENTS_DESCRIPTION = translate(translations.public.landing, 'benefits.benefits.fasterPlacements.description');
+    const CENTRALIZED_DATA_TITLE = translate(translations.public.landing, 'benefits.benefits.centralizedData.title');
+    const CENTRALIZED_DATA_DESCRIPTION = translate(translations.public.landing, 'benefits.benefits.centralizedData.description');
+    const AUTOMATED_UPDATES_TITLE = translate(translations.public.landing, 'benefits.benefits.automatedUpdates.title');
+    const AUTOMATED_UPDATES_DESCRIPTION = translate(translations.public.landing, 'benefits.benefits.automatedUpdates.description');
+    const REDUCED_OVERHEAD_TITLE = translate(translations.public.landing, 'benefits.benefits.reducedOverhead.title');
+    const REDUCED_OVERHEAD_DESCRIPTION = translate(translations.public.landing, 'benefits.benefits.reducedOverhead.description');
+    const HIGHER_CONVERSION_TITLE = translate(translations.public.landing, 'benefits.benefits.higherConversion.title');
+    const HIGHER_CONVERSION_DESCRIPTION = translate(translations.public.landing, 'benefits.benefits.higherConversion.description');
 
     const BENEFITS = [
         {
@@ -56,10 +56,10 @@ export function BenefitsSection() {
         },
     ];
 
-    const COMPLETION_RATE_LABEL = translate(translations, 'landing.benefits.metrics.completionRateLabel');
-    const TIME_TO_PLACEMENT_LABEL = translate(translations, 'landing.benefits.metrics.timeToPlacementLabel');
-    const LANDLORD_SATISFACTION_LABEL = translate(translations, 'landing.benefits.metrics.landlordSatisfactionLabel');
-    const ADMIN_TIME_LABEL = translate(translations, 'landing.benefits.metrics.adminTimeLabel');
+    const COMPLETION_RATE_LABEL = translate(translations.public.landing, 'benefits.metrics.completionRateLabel');
+    const TIME_TO_PLACEMENT_LABEL = translate(translations.public.landing, 'benefits.metrics.timeToPlacementLabel');
+    const LANDLORD_SATISFACTION_LABEL = translate(translations.public.landing, 'benefits.metrics.landlordSatisfactionLabel');
+    const ADMIN_TIME_LABEL = translate(translations.public.landing, 'benefits.metrics.adminTimeLabel');
 
     const METRICS = [
         { label: COMPLETION_RATE_LABEL, value: '+85%', color: 'text-primary' },
@@ -68,15 +68,15 @@ export function BenefitsSection() {
         { label: ADMIN_TIME_LABEL, value: '-75%', color: 'text-secondary' },
     ];
 
-    const TRIAL_HEADING = translate(translations, 'landing.benefits.trial.heading');
-    const PRICING_UNIT = translate(translations, 'landing.benefits.trial.pricing.unit');
-    const PRICING_OFFER = translate(translations, 'landing.benefits.trial.pricing.offer');
-    const GET_STARTED_BUTTON = translate(translations, 'landing.benefits.trial.getStartedButton');
+    const TRIAL_HEADING = translate(translations.public.landing, 'benefits.trial.heading');
+    const PRICING_UNIT = translate(translations.public.landing, 'benefits.trial.pricing.unit');
+    const PRICING_OFFER = translate(translations.public.landing, 'benefits.trial.pricing.offer');
+    const GET_STARTED_BUTTON = translate(translations.public.landing, 'benefits.trial.getStartedButton');
 
     const TRIAL_BENEFITS = [
-        translate(translations, 'landing.benefits.trial.benefits.0'),
-        translate(translations, 'landing.benefits.trial.benefits.1'),
-        translate(translations, 'landing.benefits.trial.benefits.2'),
+        translate(translations.public.landing, 'benefits.trial.benefits.0'),
+        translate(translations.public.landing, 'benefits.trial.benefits.1'),
+        translate(translations.public.landing, 'benefits.trial.benefits.2'),
     ];
 
     // Dynamic pricing based on selected currency
@@ -169,7 +169,7 @@ export function BenefitsSection() {
                             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5"></div>
                             <div className="relative">
                                 <h3 className="mb-6 text-2xl font-bold text-foreground">
-                                    {translate(translations, 'landing.benefits.metrics.heading')}
+                                    {translate(translations.public.landing, 'benefits.metrics.heading')}
                                 </h3>
                                 <div className="space-y-6">
                                     {METRICS.map((metric, idx) => (

@@ -66,7 +66,7 @@ const sourceConfig: Record<string, { labelKey: string; className: string }> = {
 
 export function LeadsTable({ leads, onRowClick }: LeadsTableProps) {
     const { translations, locale } = usePage<SharedData>().props;
-    const t = useCallback((key: string) => translate(translations.leads, key), [translations.leads]);
+    const t = useCallback((key: string) => translate(translations.manager.leads, key), [translations.manager.leads]);
 
     const columns = useMemo(
         () => [

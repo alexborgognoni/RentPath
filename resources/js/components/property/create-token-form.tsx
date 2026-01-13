@@ -13,7 +13,7 @@ interface CreateTokenFormProps {
 
 export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateTokenFormProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = (key: string) => translate(translations.manager.properties, key);
     const [formData, setFormData] = useState({
         name: '',
         type: 'private' as 'private' | 'invite',
@@ -54,7 +54,7 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
 
             if (formData.type === 'invite') {
                 if (!formData.email.trim()) {
-                    setError(t('properties.createToken.emailRequired'));
+                    setError(t('createToken.emailRequired'));
                     setCreating(false);
                     return;
                 }
@@ -85,11 +85,11 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                 onSuccess();
             } else {
                 const data = await response.json();
-                setError(data.message || t('properties.createToken.createFailed'));
+                setError(data.message || t('createToken.createFailed'));
             }
         } catch (err) {
             console.error('Failed to create token:', err);
-            setError(t('properties.createToken.errorOccurred'));
+            setError(t('createToken.errorOccurred'));
         } finally {
             setCreating(false);
         }
@@ -98,7 +98,7 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
     return (
         <div className="rounded-lg border border-border bg-background/80 p-4">
             <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">{t('properties.createToken.title')}</h3>
+                <h3 className="font-semibold text-foreground">{t('createToken.title')}</h3>
                 <button
                     onClick={onCancel}
                     className="cursor-pointer rounded-lg p-1 text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
@@ -111,14 +111,14 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                 {/* Name */}
                 <div>
                     <label htmlFor="name" className="mb-1 block text-sm font-medium text-foreground">
-                        {t('properties.createToken.nameLabel')}
+                        {t('createToken.nameLabel')}
                     </label>
                     <input
                         type="text"
                         id="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder={t('properties.createToken.namePlaceholder')}
+                        placeholder={t('createToken.namePlaceholder')}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:outline-none"
                     />
                 </div>
@@ -126,7 +126,7 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                 {/* Type */}
                 <div>
                     <label htmlFor="type" className="mb-1 block text-sm font-medium text-foreground">
-                        {t('properties.createToken.linkType')}
+                        {t('createToken.linkType')}
                     </label>
                     <select
                         id="type"
@@ -134,8 +134,8 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                         onChange={(e) => setFormData({ ...formData, type: e.target.value as 'private' | 'invite' })}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
                     >
-                        <option value="private">{t('properties.createToken.typePrivate')}</option>
-                        <option value="invite">{t('properties.createToken.typeInvite')}</option>
+                        <option value="private">{t('createToken.typePrivate')}</option>
+                        <option value="invite">{t('createToken.typeInvite')}</option>
                     </select>
                 </div>
 
@@ -143,32 +143,32 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                 {formData.type === 'invite' && (
                     <div>
                         <label htmlFor="email" className="mb-1 block text-sm font-medium text-foreground">
-                            {t('properties.createToken.emailLabel')} <span className="text-destructive">*</span>
+                            {t('createToken.emailLabel')} <span className="text-destructive">*</span>
                         </label>
                         <input
                             type="email"
                             id="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            placeholder={t('properties.createToken.emailPlaceholder')}
+                            placeholder={t('createToken.emailPlaceholder')}
                             required={formData.type === 'invite'}
                             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:outline-none"
                         />
-                        <p className="mt-1 text-xs text-muted-foreground">{t('properties.createToken.emailHint')}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{t('createToken.emailHint')}</p>
                     </div>
                 )}
 
                 {/* Max Uses */}
                 <div>
                     <label htmlFor="max_uses" className="mb-1 block text-sm font-medium text-foreground">
-                        {t('properties.createToken.maxUsesLabel')}
+                        {t('createToken.maxUsesLabel')}
                     </label>
                     <input
                         type="number"
                         id="max_uses"
                         value={formData.max_uses}
                         onChange={(e) => setFormData({ ...formData, max_uses: e.target.value })}
-                        placeholder={t('properties.createToken.maxUsesPlaceholder')}
+                        placeholder={t('createToken.maxUsesPlaceholder')}
                         min="1"
                         className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:outline-none"
                     />
@@ -177,7 +177,7 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                 {/* Expiration */}
                 <div>
                     <label htmlFor="expires_at" className="mb-1 block text-sm font-medium text-foreground">
-                        {t('properties.createToken.expirationLabel')}
+                        {t('createToken.expirationLabel')}
                     </label>
 
                     {/* Quick preset buttons */}
@@ -187,28 +187,28 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                             onClick={() => setExpiryDaysFromNow(7)}
                             className="cursor-pointer rounded bg-muted px-2 py-1 text-xs text-foreground transition-colors hover:bg-muted/80"
                         >
-                            {t('properties.createToken.days7')}
+                            {t('createToken.days7')}
                         </button>
                         <button
                             type="button"
                             onClick={() => setExpiryDaysFromNow(30)}
                             className="cursor-pointer rounded bg-muted px-2 py-1 text-xs text-foreground transition-colors hover:bg-muted/80"
                         >
-                            {t('properties.createToken.days30')}
+                            {t('createToken.days30')}
                         </button>
                         <button
                             type="button"
                             onClick={() => setExpiryDaysFromNow(90)}
                             className="cursor-pointer rounded bg-muted px-2 py-1 text-xs text-foreground transition-colors hover:bg-muted/80"
                         >
-                            {t('properties.createToken.days90')}
+                            {t('createToken.days90')}
                         </button>
                         <button
                             type="button"
                             onClick={() => setFormData({ ...formData, expires_at: '' })}
                             className="cursor-pointer rounded bg-muted px-2 py-1 text-xs text-foreground transition-colors hover:bg-muted/80"
                         >
-                            {t('properties.inviteTokens.never')}
+                            {t('inviteTokens.never')}
                         </button>
                     </div>
 
@@ -220,7 +220,7 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                         min={new Date().toISOString().split('T')[0]}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:outline-none"
                     />
-                    <p className="mt-1 text-xs text-muted-foreground">{t('properties.createToken.noExpiration')}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{t('createToken.noExpiration')}</p>
                 </div>
 
                 {/* Error Message */}
@@ -233,14 +233,14 @@ export function CreateTokenForm({ propertyId, onSuccess, onCancel }: CreateToken
                         onClick={onCancel}
                         className="flex-1 cursor-pointer rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-all hover:bg-background/80"
                     >
-                        {t('properties.createToken.cancel')}
+                        {t('createToken.cancel')}
                     </button>
                     <button
                         type="submit"
                         disabled={creating}
                         className="flex-1 cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {creating ? t('properties.createToken.creating') : t('properties.createToken.create')}
+                        {creating ? t('createToken.creating') : t('createToken.create')}
                     </button>
                 </div>
             </form>

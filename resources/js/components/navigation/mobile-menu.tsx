@@ -267,7 +267,7 @@ export function MobileMenu({ getUserInitials }: MobileMenuProps) {
                                         <Button variant="outline" className="h-11 w-full justify-start text-base" asChild>
                                             <a href={route('properties.index')} onClick={() => setIsOpen(false)}>
                                                 <Building2 size={20} />
-                                                <span>{t(translations, 'nav.properties') || 'Browse Properties'}</span>
+                                                <span>{t(translations.layout.header, 'nav.properties')}</span>
                                             </a>
                                         </Button>
                                     )}

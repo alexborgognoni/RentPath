@@ -21,7 +21,7 @@ interface LeadsPageProps {
 
 export default function LeadsPage({ leads = [], properties = [], filters: initialFilters }: LeadsPageProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations.leads, key);
+    const t = (key: string) => translate(translations.manager.leads, key);
 
     const [filtersOpen, setFiltersOpen] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

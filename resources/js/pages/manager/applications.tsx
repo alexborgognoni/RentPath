@@ -15,7 +15,7 @@ interface ApplicationsPageProps {
 
 export default function ApplicationsPage({ applications = [], properties = [], selectedPropertyId }: ApplicationsPageProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations.applications, key);
+    const t = (key: string) => translate(translations.manager.applications, key);
 
     const [filtersOpen, setFiltersOpen] = useState(true);
     const [filters, setFilters] = useState({

@@ -30,7 +30,7 @@ export function HeroSection() {
                         })}
                         className="text-text-primary dark:text-text-primary mb-6 text-center text-4xl leading-tight font-bold xs:mb-8 xs:text-5xl"
                     >
-                        {translate(translations, 'landing.hero.headingPrimary')}
+                        {translate(translations.public.landing, 'hero.headingPrimary')}
                         <br />
                         <HighlightedText
                             {...(!isMobile && {
@@ -41,7 +41,7 @@ export function HeroSection() {
                             })}
                             className="inline-block bg-gradient-to-r from-primary to-secondary bg-[length:200%_100%] bg-clip-text text-transparent"
                         >
-                            {translate(translations, 'landing.hero.headingHighlighted')}
+                            {translate(translations.public.landing, 'hero.headingHighlighted')}
                         </HighlightedText>
                     </Heading>
 
@@ -69,7 +69,7 @@ export function HeroSection() {
                         })}
                         className="mb-8 text-center text-lg text-muted-foreground xs:mb-12 xs:text-xl"
                     >
-                        {translate(translations, 'landing.hero.subtitle')}
+                        {translate(translations.public.landing, 'hero.subtitle')}
                     </Subtitle>
 
                     {/* CTAs */}
@@ -86,13 +86,13 @@ export function HeroSection() {
                             href={route('register')}
                             className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center text-base font-semibold whitespace-nowrap shadow-lg xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:scale-105"
                         >
-                            {translate(translations, 'landing.hero.ctaPrimaryGuest')}
+                            {translate(translations.public.landing, 'hero.ctaPrimaryGuest')}
                         </a>
                         <a
                             href="#problems"
                             className="min-w-[200px] rounded-lg border border-border bg-surface px-6 py-3 text-center text-base font-semibold whitespace-nowrap text-foreground xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:bg-surface/80"
                         >
-                            {translate(translations, 'landing.hero.ctaSecondary')}
+                            {translate(translations.public.landing, 'hero.ctaSecondary')}
                         </a>
                     </CTAWrapper>
                 </div>
@@ -111,7 +111,7 @@ export function HeroSection() {
                             })}
                             className="text-text-primary dark:text-text-primary flex items-center text-4xl leading-tight font-bold xs:text-5xl lg:text-6xl xl:text-7xl"
                         >
-                            {translate(translations, 'landing.hero.headingPrimary')}
+                            {translate(translations.public.landing, 'hero.headingPrimary')}
                         </Heading>
 
                         {/* Row 1, Col 2: Image */}
@@ -137,7 +137,7 @@ export function HeroSection() {
                                 href={route('register')}
                                 className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary text-center font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
                             >
-                                {translate(translations, 'landing.hero.ctaPrimaryGuest')}
+                                {translate(translations.public.landing, 'hero.ctaPrimaryGuest')}
                             </a>
 
                             <Subtitle
@@ -149,7 +149,7 @@ export function HeroSection() {
                                 })}
                                 className="text-lg text-muted-foreground xs:text-xl lg:text-xl xl:text-2xl"
                             >
-                                {translate(translations, 'landing.hero.subtitle')}
+                                {translate(translations.public.landing, 'hero.subtitle')}
                             </Subtitle>
                         </div>
 
@@ -164,14 +164,14 @@ export function HeroSection() {
                                 })}
                                 className="flex inline-block items-center justify-center bg-gradient-to-r from-primary to-secondary bg-[length:200%_100%] bg-clip-text text-3xl leading-tight font-bold text-transparent xs:text-4xl lg:text-5xl xl:text-6xl"
                             >
-                                {translate(translations, 'landing.hero.headingHighlighted')}
+                                {translate(translations.public.landing, 'hero.headingHighlighted')}
                             </HighlightedText>
 
                             <a
                                 href="#problems"
                                 className="min-w-[200px] rounded-lg border border-border bg-surface text-center font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
                             >
-                                {translate(translations, 'landing.hero.ctaSecondary')}
+                                {translate(translations.public.landing, 'hero.ctaSecondary')}
                             </a>
                         </div>
                     </div>

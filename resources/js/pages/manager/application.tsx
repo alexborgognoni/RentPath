@@ -13,7 +13,7 @@ interface ApplicationPageProps {
 
 export default function ApplicationPage({ application, allowedTransitions = [] }: ApplicationPageProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations.applications, key);
+    const t = (key: string) => translate(translations.manager.applications, key);
 
     const breadcrumbs = [
         { title: t('title'), href: route('manager.applications.index') },

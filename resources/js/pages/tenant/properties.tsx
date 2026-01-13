@@ -13,28 +13,28 @@ interface PropertiesPageProps {
 
 export default function PropertiesPage({ properties }: PropertiesPageProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = (key: string) => translate(translations.tenant.properties, key);
     const { formatRent } = useReactiveCurrency();
 
     return (
         <TenantLayout>
-            <Head title={t('properties.browse.title')} />
+            <Head title={t('title')} />
 
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center gap-3">
                     <Building2 className="h-8 w-8 text-primary" />
                     <div>
-                        <h1 className="text-2xl font-bold text-foreground">{t('properties.browse.title') || 'Browse Properties'}</h1>
-                        <p className="text-muted-foreground">{t('properties.browse.subtitle') || 'Discover available rental properties'}</p>
+                        <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+                        <p className="text-muted-foreground">{t('subtitle')}</p>
                     </div>
                 </div>
 
                 {properties.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-12 text-center">
                         <Home className="mb-4 h-16 w-16 text-muted-foreground opacity-50" />
-                        <h2 className="mb-2 text-xl font-semibold text-foreground">{t('properties.browse.empty_title')}</h2>
-                        <p className="max-w-md text-muted-foreground">{t('properties.browse.empty_description')}</p>
+                        <h2 className="mb-2 text-xl font-semibold text-foreground">{t('emptyTitle')}</h2>
+                        <p className="max-w-md text-muted-foreground">{t('emptyDescription')}</p>
                     </div>
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -112,9 +112,9 @@ export default function PropertiesPage({ properties }: PropertiesPageProps) {
                                                 <div className="text-2xl font-bold text-foreground">
                                                     {formatRent(property.rent_amount, property.rent_currency)}
                                                 </div>
-                                                <div className="text-xs text-muted-foreground">{t('properties.perMonth')}</div>
+                                                <div className="text-xs text-muted-foreground">{t('perMonth')}</div>
                                             </div>
-                                            <span className="text-sm font-medium text-primary">{t('properties.browse.view_details')}</span>
+                                            <span className="text-sm font-medium text-primary">{t('viewDetails')}</span>
                                         </div>
                                     </div>
                                 </Link>

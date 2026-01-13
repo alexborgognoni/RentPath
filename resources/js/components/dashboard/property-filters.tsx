@@ -153,7 +153,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         <Search className="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" size={18} />
                         <input
                             type="text"
-                            placeholder={translate(translations, 'properties.searchPlaceholder')}
+                            placeholder={translate(translations.manager.properties, 'searchPlaceholder')}
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             className="w-full rounded-lg border border-border bg-background px-10 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
@@ -168,12 +168,12 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         onChange={(e) => handleFilterChange('status', e.target.value)}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
-                        <option value="">{translate(translations, 'properties.allStatuses')}</option>
-                        <option value="draft">{translate(translations, 'properties.statusDraft')}</option>
-                        <option value="vacant">{translate(translations, 'properties.statusVacant')}</option>
-                        <option value="leased">{translate(translations, 'properties.statusLeased')}</option>
-                        <option value="maintenance">{translate(translations, 'properties.statusMaintenance')}</option>
-                        <option value="archived">{translate(translations, 'properties.statusArchived')}</option>
+                        <option value="">{translate(translations.manager.properties, 'allStatuses')}</option>
+                        <option value="draft">{translate(translations.manager.properties, 'statusDraft')}</option>
+                        <option value="vacant">{translate(translations.manager.properties, 'statusVacant')}</option>
+                        <option value="leased">{translate(translations.manager.properties, 'statusLeased')}</option>
+                        <option value="maintenance">{translate(translations.manager.properties, 'statusMaintenance')}</option>
+                        <option value="archived">{translate(translations.manager.properties, 'statusArchived')}</option>
                     </select>
                 </div>
 
@@ -184,13 +184,13 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         onChange={(e) => handleFilterChange('type', e.target.value)}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
-                        <option value="">{translate(translations, 'properties.allTypes')}</option>
-                        <option value="apartment">{translate(translations, 'properties.types.apartment')}</option>
-                        <option value="house">{translate(translations, 'properties.types.house')}</option>
-                        <option value="room">{translate(translations, 'properties.types.room')}</option>
-                        <option value="commercial">{translate(translations, 'properties.types.commercial')}</option>
-                        <option value="industrial">{translate(translations, 'properties.types.industrial')}</option>
-                        <option value="parking">{translate(translations, 'properties.types.parking')}</option>
+                        <option value="">{translate(translations.manager.properties, 'allTypes')}</option>
+                        <option value="apartment">{translate(translations.manager.properties, 'types.apartment')}</option>
+                        <option value="house">{translate(translations.manager.properties, 'types.house')}</option>
+                        <option value="room">{translate(translations.manager.properties, 'types.room')}</option>
+                        <option value="commercial">{translate(translations.manager.properties, 'types.commercial')}</option>
+                        <option value="industrial">{translate(translations.manager.properties, 'types.industrial')}</option>
+                        <option value="parking">{translate(translations.manager.properties, 'types.parking')}</option>
                     </select>
                 </div>
 
@@ -201,12 +201,12 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
-                        <option value="">{translate(translations, 'properties.anyBeds')}</option>
-                        <option value="1">{translate(translations, 'properties.atLeastBed', { count: 1 })}</option>
-                        <option value="2">{translate(translations, 'properties.atLeastBeds', { count: 2 })}</option>
-                        <option value="3">{translate(translations, 'properties.atLeastBeds', { count: 3 })}</option>
-                        <option value="4">{translate(translations, 'properties.atLeastBeds', { count: 4 })}</option>
-                        <option value="5">{translate(translations, 'properties.atLeastBeds', { count: 5 })}</option>
+                        <option value="">{translate(translations.manager.properties, 'anyBeds')}</option>
+                        <option value="1">{translate(translations.manager.properties, 'atLeastBed', { count: 1 })}</option>
+                        <option value="2">{translate(translations.manager.properties, 'atLeastBeds', { count: 2 })}</option>
+                        <option value="3">{translate(translations.manager.properties, 'atLeastBeds', { count: 3 })}</option>
+                        <option value="4">{translate(translations.manager.properties, 'atLeastBeds', { count: 4 })}</option>
+                        <option value="5">{translate(translations.manager.properties, 'atLeastBeds', { count: 5 })}</option>
                     </select>
                 </div>
 
@@ -217,7 +217,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         onChange={(e) => handleFilterChange('city', e.target.value)}
                         className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                     >
-                        <option value="">{translate(translations, 'properties.allCities')}</option>
+                        <option value="">{translate(translations.manager.properties, 'allCities')}</option>
                         {cities.map((city) => (
                             <option key={city} value={city}>
                                 {city}
@@ -229,23 +229,23 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
 
             {/* Rent Range */}
             <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-muted-foreground">{translate(translations, 'properties.rent')}</span>
+                <span className="text-sm font-medium text-muted-foreground">{translate(translations.manager.properties, 'rent')}</span>
                 <input
                     type="number"
-                    placeholder={translate(translations, 'properties.min')}
+                    placeholder={translate(translations.manager.properties, 'min')}
                     value={filters.minRent}
                     onChange={(e) => handleFilterChange('minRent', e.target.value)}
                     className="w-32 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                 />
-                <span className="text-sm text-muted-foreground">{translate(translations, 'properties.to')}</span>
+                <span className="text-sm text-muted-foreground">{translate(translations.manager.properties, 'to')}</span>
                 <input
                     type="number"
-                    placeholder={translate(translations, 'properties.max')}
+                    placeholder={translate(translations.manager.properties, 'max')}
                     value={filters.maxRent}
                     onChange={(e) => handleFilterChange('maxRent', e.target.value)}
                     className="w-32 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
                 />
-                <span className="text-sm text-muted-foreground">{translate(translations, 'properties.euroPerMonth')}</span>
+                <span className="text-sm text-muted-foreground">{translate(translations.manager.properties, 'euroPerMonth')}</span>
             </div>
 
             {/* More Filters Button */}
@@ -255,9 +255,11 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     className="flex cursor-pointer items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <SlidersHorizontal size={16} />
-                    {translate(translations, 'properties.moreFilters')}
+                    {translate(translations.manager.properties, 'moreFilters')}
                     {hasActiveMoreFilters && (
-                        <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-white">{translate(translations, 'properties.active')}</span>
+                        <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-white">
+                            {translate(translations.manager.properties, 'active')}
+                        </span>
                     )}
                     <ChevronDown size={16} className={`transition-transform ${moreFiltersOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -267,7 +269,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                         className="flex cursor-pointer items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <X size={14} />
-                        {translate(translations, 'properties.clearAdvancedFilters')}
+                        {translate(translations.manager.properties, 'clearAdvancedFilters')}
                     </button>
                 )}
             </div>
@@ -278,12 +280,12 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     {/* Building Details */}
                     <div className="space-y-3">
                         <h3 className="text-sm font-semibold text-foreground">
-                            {translate(translations, 'properties.filterSections.buildingDetails')}
+                            {translate(translations.manager.properties, 'filterSections.buildingDetails')}
                         </h3>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.minSize')}
+                                    {translate(translations.manager.properties, 'filterSections.minSize')}
                                 </label>
                                 <input
                                     type="number"
@@ -294,7 +296,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                             </div>
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.maxSize')}
+                                    {translate(translations.manager.properties, 'filterSections.maxSize')}
                                 </label>
                                 <input
                                     type="number"
@@ -305,7 +307,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                             </div>
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.floorLevel')}
+                                    {translate(translations.manager.properties, 'filterSections.floorLevel')}
                                 </label>
                                 <input
                                     type="number"
@@ -316,21 +318,21 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                             </div>
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.hasElevator')}
+                                    {translate(translations.manager.properties, 'filterSections.hasElevator')}
                                 </label>
                                 <select
                                     value={filters.hasElevator === null ? '' : filters.hasElevator.toString()}
                                     onChange={(e) => handleFilterChange('hasElevator', e.target.value === '' ? null : e.target.value === 'true')}
                                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                                 >
-                                    <option value="">{translate(translations, 'properties.filterSections.any')}</option>
-                                    <option value="true">{translate(translations, 'properties.filterSections.yes')}</option>
-                                    <option value="false">{translate(translations, 'properties.filterSections.no')}</option>
+                                    <option value="">{translate(translations.manager.properties, 'filterSections.any')}</option>
+                                    <option value="true">{translate(translations.manager.properties, 'filterSections.yes')}</option>
+                                    <option value="false">{translate(translations.manager.properties, 'filterSections.no')}</option>
                                 </select>
                             </div>
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.yearBuiltMin')}
+                                    {translate(translations.manager.properties, 'filterSections.yearBuiltMin')}
                                 </label>
                                 <input
                                     type="number"
@@ -341,7 +343,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                             </div>
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.yearBuiltMax')}
+                                    {translate(translations.manager.properties, 'filterSections.yearBuiltMax')}
                                 </label>
                                 <input
                                     type="number"
@@ -355,7 +357,9 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
 
                     {/* Amenities */}
                     <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-foreground">{translate(translations, 'properties.filterSections.amenities')}</h3>
+                        <h3 className="text-sm font-semibold text-foreground">
+                            {translate(translations.manager.properties, 'filterSections.amenities')}
+                        </h3>
                         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
                             {[
                                 { key: 'hasGarden', labelKey: 'properties.filterSections.garden' },
@@ -381,19 +385,19 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                     {/* Energy & Heating */}
                     <div className="space-y-3">
                         <h3 className="text-sm font-semibold text-foreground">
-                            {translate(translations, 'properties.filterSections.energyHeating')}
+                            {translate(translations.manager.properties, 'filterSections.energyHeating')}
                         </h3>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.energyClass')}
+                                    {translate(translations.manager.properties, 'filterSections.energyClass')}
                                 </label>
                                 <select
                                     value={filters.energyClass}
                                     onChange={(e) => handleFilterChange('energyClass', e.target.value)}
                                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                                 >
-                                    <option value="">{translate(translations, 'properties.filterSections.any')}</option>
+                                    <option value="">{translate(translations.manager.properties, 'filterSections.any')}</option>
                                     <option value="A+">A+</option>
                                     <option value="A">A</option>
                                     <option value="B">B</option>
@@ -406,20 +410,20 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                             </div>
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.heatingType')}
+                                    {translate(translations.manager.properties, 'filterSections.heatingType')}
                                 </label>
                                 <select
                                     value={filters.heatingType}
                                     onChange={(e) => handleFilterChange('heatingType', e.target.value)}
                                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                                 >
-                                    <option value="">{translate(translations, 'properties.filterSections.any')}</option>
-                                    <option value="gas">{translate(translations, 'properties.heatingTypes.gas')}</option>
-                                    <option value="electric">{translate(translations, 'properties.heatingTypes.electric')}</option>
-                                    <option value="district">{translate(translations, 'properties.heatingTypes.district')}</option>
-                                    <option value="wood">{translate(translations, 'properties.heatingTypes.wood')}</option>
-                                    <option value="heat_pump">{translate(translations, 'properties.heatingTypes.heat_pump')}</option>
-                                    <option value="other">{translate(translations, 'properties.heatingTypes.other')}</option>
+                                    <option value="">{translate(translations.manager.properties, 'filterSections.any')}</option>
+                                    <option value="gas">{translate(translations.manager.properties, 'heatingTypes.gas')}</option>
+                                    <option value="electric">{translate(translations.manager.properties, 'heatingTypes.electric')}</option>
+                                    <option value="district">{translate(translations.manager.properties, 'heatingTypes.district')}</option>
+                                    <option value="wood">{translate(translations.manager.properties, 'heatingTypes.wood')}</option>
+                                    <option value="heat_pump">{translate(translations.manager.properties, 'heatingTypes.heat_pump')}</option>
+                                    <option value="other">{translate(translations.manager.properties, 'heatingTypes.other')}</option>
                                 </select>
                             </div>
                         </div>
@@ -427,11 +431,13 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
 
                     {/* Parking */}
                     <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-foreground">{translate(translations, 'properties.filterSections.parking')}</h3>
+                        <h3 className="text-sm font-semibold text-foreground">
+                            {translate(translations.manager.properties, 'filterSections.parking')}
+                        </h3>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.interiorSpots')}
+                                    {translate(translations.manager.properties, 'filterSections.interiorSpots')}
                                 </label>
                                 <input
                                     type="number"
@@ -443,7 +449,7 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                             </div>
                             <div>
                                 <label className="mb-1 block text-xs text-muted-foreground">
-                                    {translate(translations, 'properties.filterSections.exteriorSpots')}
+                                    {translate(translations.manager.properties, 'filterSections.exteriorSpots')}
                                 </label>
                                 <input
                                     type="number"
@@ -458,7 +464,9 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
 
                     {/* Kitchen */}
                     <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-foreground">{translate(translations, 'properties.filterSections.kitchen')}</h3>
+                        <h3 className="text-sm font-semibold text-foreground">
+                            {translate(translations.manager.properties, 'filterSections.kitchen')}
+                        </h3>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <label className="flex cursor-pointer items-center gap-2">
                                 <input
@@ -467,7 +475,9 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                     onChange={(e) => handleFilterChange('kitchenEquipped', e.target.checked ? true : null)}
                                     className="rounded border-border text-primary focus:ring-primary"
                                 />
-                                <span className="text-sm text-foreground">{translate(translations, 'properties.filterSections.equipped')}</span>
+                                <span className="text-sm text-foreground">
+                                    {translate(translations.manager.properties, 'filterSections.equipped')}
+                                </span>
                             </label>
                             <label className="flex cursor-pointer items-center gap-2">
                                 <input
@@ -476,17 +486,21 @@ export function PropertyFilters({ onFilterChange, cities }: PropertyFiltersProps
                                     onChange={(e) => handleFilterChange('kitchenSeparated', e.target.checked ? true : null)}
                                     className="rounded border-border text-primary focus:ring-primary"
                                 />
-                                <span className="text-sm text-foreground">{translate(translations, 'properties.filterSections.separated')}</span>
+                                <span className="text-sm text-foreground">
+                                    {translate(translations.manager.properties, 'filterSections.separated')}
+                                </span>
                             </label>
                         </div>
                     </div>
 
                     {/* Availability */}
                     <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-foreground">{translate(translations, 'properties.filterSections.availability')}</h3>
+                        <h3 className="text-sm font-semibold text-foreground">
+                            {translate(translations.manager.properties, 'filterSections.availability')}
+                        </h3>
                         <div>
                             <label className="mb-1 block text-xs text-muted-foreground">
-                                {translate(translations, 'properties.filterSections.availableFrom')}
+                                {translate(translations.manager.properties, 'filterSections.availableFrom')}
                             </label>
                             <input
                                 type="date"

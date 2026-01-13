@@ -65,7 +65,7 @@ const statusConfig: Record<string, { labelKey: string; className: string; icon: 
 export function ApplicationsTable({ applications, onRowClick }: ApplicationsTableProps) {
     const { translations, locale } = usePage<SharedData>().props;
     const { formatAmount } = useReactiveCurrency();
-    const t = useCallback((key: string) => translate(translations.applications, key), [translations.applications]);
+    const t = useCallback((key: string) => translate(translations.manager.applications, key), [translations.manager.applications]);
 
     const columns = useMemo(
         () => [

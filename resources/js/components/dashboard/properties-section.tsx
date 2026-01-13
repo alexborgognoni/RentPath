@@ -84,18 +84,18 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
 
     // Handle deleting a draft
     const handleDeleteDraft = async (draft: Property) => {
-        if (!confirm(translate(translations, 'properties.deleteDraftConfirm'))) {
+        if (!confirm(translate(translations.manager.properties, 'deleteDraftConfirm'))) {
             return;
         }
 
         try {
             await axios.delete(`/properties/${draft.id}/draft`);
-            toast.success(translate(translations, 'properties.draftDeleted'));
+            toast.success(translate(translations.manager.properties, 'draftDeleted'));
             // Refresh the page to update the list
             router.reload();
         } catch (error) {
             console.error('Failed to delete draft:', error);
-            toast.error(translate(translations, 'properties.draftDeleteFailed'));
+            toast.error(translate(translations.manager.properties, 'draftDeleteFailed'));
         }
     };
 
@@ -224,7 +224,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                 <h1 className="flex items-center gap-3 text-2xl font-bold text-foreground">
                     <Home className="text-primary" size={32} />
                     <span>
-                        {translate(translations, 'properties.properties')} <span className="text-2xl">({filteredProperties.length})</span>
+                        {translate(translations.manager.properties, 'properties')} <span className="text-2xl">({filteredProperties.length})</span>
                     </span>
                 </h1>
                 <button
@@ -232,7 +232,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                     className="flex cursor-pointer items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
                 >
                     <Plus size={18} />
-                    <span>{translate(translations, 'properties.addProperty')}</span>
+                    <span>{translate(translations.manager.properties, 'addProperty')}</span>
                 </button>
             </div>
 
@@ -247,7 +247,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                         <div className="flex items-center gap-2">
                             <FileEdit size={18} className="text-orange-400" />
                             <span className="font-medium text-foreground">
-                                {translate(translations, 'properties.drafts')} ({drafts.length})
+                                {translate(translations.manager.properties, 'drafts')} ({drafts.length})
                             </span>
                         </div>
                         <ChevronDown size={18} className={`text-orange-400 transition-transform duration-200 ${draftsOpen ? 'rotate-180' : ''}`} />
@@ -274,12 +274,12 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                                         )}
                                         <div>
                                             <div className="font-medium text-foreground">
-                                                {draft.title || translate(translations, 'properties.untitledDraft')}
+                                                {draft.title || translate(translations.manager.properties, 'untitledDraft')}
                                             </div>
                                             <div className="text-sm text-muted-foreground">
                                                 {draft.type && draft.city
                                                     ? `${draft.type} in ${draft.city}`
-                                                    : draft.type || translate(translations, 'properties.draftIncomplete')}
+                                                    : draft.type || translate(translations.manager.properties, 'draftIncomplete')}
                                             </div>
                                         </div>
                                     </div>
@@ -289,13 +289,13 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                                             className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                                         >
                                             <Trash2 size={14} />
-                                            <span>{translate(translations, 'properties.delete')}</span>
+                                            <span>{translate(translations.manager.properties, 'delete')}</span>
                                         </button>
                                         <button
                                             onClick={() => handleContinueDraft(draft)}
                                             className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
                                         >
-                                            <span>{translate(translations, 'properties.continue')}</span>
+                                            <span>{translate(translations.manager.properties, 'continue')}</span>
                                             <ArrowRight size={14} />
                                         </button>
                                     </div>
@@ -318,7 +318,7 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                             className="transition-transform duration-300"
                             style={{ transform: filtersOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
                         />
-                        <span>{translate(translations, 'properties.filters')}</span>
+                        <span>{translate(translations.manager.properties, 'filters')}</span>
                     </div>
                 </div>
                 {filtersOpen && (
@@ -334,16 +334,16 @@ export function PropertiesSection({ properties = [], onAddProperty, onEditProper
                     <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
                         <Building size={40} className="text-muted-foreground" />
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-foreground">{translate(translations, 'properties.noPropertiesYet')}</h3>
-                    <p className="mx-auto max-w-md text-muted-foreground">{translate(translations, 'properties.noPropertiesDesc')}</p>
+                    <h3 className="mb-2 text-xl font-semibold text-foreground">{translate(translations.manager.properties, 'noPropertiesYet')}</h3>
+                    <p className="mx-auto max-w-md text-muted-foreground">{translate(translations.manager.properties, 'noPropertiesDesc')}</p>
                 </div>
             ) : filteredProperties.length === 0 ? (
                 <div className="rounded-2xl border border-border bg-card py-16 text-center">
                     <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-muted">
                         <Building size={40} className="text-muted-foreground" />
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-foreground">{translate(translations, 'properties.noMatchingFilters')}</h3>
-                    <p className="mx-auto max-w-md text-muted-foreground">{translate(translations, 'properties.adjustFilters')}</p>
+                    <h3 className="mb-2 text-xl font-semibold text-foreground">{translate(translations.manager.properties, 'noMatchingFilters')}</h3>
+                    <p className="mx-auto max-w-md text-muted-foreground">{translate(translations.manager.properties, 'adjustFilters')}</p>
                 </div>
             ) : (
                 <PropertyTable properties={filteredProperties} onEditProperty={onEditProperty} />

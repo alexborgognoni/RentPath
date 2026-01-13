@@ -67,7 +67,9 @@ export function CookieBanner() {
                 <div className="relative rounded-2xl border border-border bg-card shadow-2xl">
                     <div className="p-6 sm:p-8">
                         <div className="mb-4 flex items-start justify-between">
-                            <h3 className="text-xl font-bold text-foreground sm:text-2xl">{translate(translations, 'cookie-banner.banner.title')}</h3>
+                            <h3 className="text-xl font-bold text-foreground sm:text-2xl">
+                                {translate(translations.layout.cookieBanner, 'banner.title')}
+                            </h3>
                             <button
                                 onClick={acceptNecessary}
                                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors hover:bg-muted"
@@ -78,7 +80,7 @@ export function CookieBanner() {
                         </div>
 
                         <p className="mb-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
-                            {translate(translations, 'cookie-banner.banner.description')}
+                            {translate(translations.layout.cookieBanner, 'banner.description')}
                         </p>
 
                         <div className="flex flex-col gap-3 sm:flex-row">
@@ -86,19 +88,19 @@ export function CookieBanner() {
                                 onClick={acceptAll}
                                 className="flex-1 cursor-pointer rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                             >
-                                {translate(translations, 'cookie-banner.banner.accept_all')}
+                                {translate(translations.layout.cookieBanner, 'banner.accept_all')}
                             </button>
                             <button
                                 onClick={acceptNecessary}
                                 className="flex-1 cursor-pointer rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80"
                             >
-                                {translate(translations, 'cookie-banner.banner.necessary_only')}
+                                {translate(translations.layout.cookieBanner, 'banner.necessary_only')}
                             </button>
                             <button
                                 onClick={() => setShowPreferences(true)}
                                 className="flex-1 cursor-pointer rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80"
                             >
-                                {translate(translations, 'cookie-banner.banner.customize')}
+                                {translate(translations.layout.cookieBanner, 'banner.customize')}
                             </button>
                         </div>
                     </div>
@@ -137,7 +139,7 @@ function CookiePreferences({
                     <div className="p-6 sm:p-8">
                         <div className="mb-6 flex items-start justify-between">
                             <h3 className="text-xl font-bold text-foreground sm:text-2xl">
-                                {translate(translations, 'cookie-banner.preferences.title')}
+                                {translate(translations.layout.cookieBanner, 'preferences.title')}
                             </h3>
                             <button
                                 onClick={onBack}
@@ -153,14 +155,14 @@ function CookiePreferences({
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
                                 <div className="mb-2 flex items-center justify-between">
                                     <h4 className="font-semibold text-foreground">
-                                        {translate(translations, 'cookie-banner.preferences.necessary.title')}
+                                        {translate(translations.layout.cookieBanner, 'preferences.necessary.title')}
                                     </h4>
                                     <span className="text-sm text-muted-foreground">
-                                        {translate(translations, 'cookie-banner.preferences.necessary.always_active')}
+                                        {translate(translations.layout.cookieBanner, 'preferences.necessary.always_active')}
                                     </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    {translate(translations, 'cookie-banner.preferences.necessary.description')}
+                                    {translate(translations.layout.cookieBanner, 'preferences.necessary.description')}
                                 </p>
                             </div>
 
@@ -168,7 +170,7 @@ function CookiePreferences({
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
                                 <div className="mb-2 flex items-center justify-between">
                                     <h4 className="font-semibold text-foreground">
-                                        {translate(translations, 'cookie-banner.preferences.analytics.title')}
+                                        {translate(translations.layout.cookieBanner, 'preferences.analytics.title')}
                                     </h4>
                                     <button
                                         onClick={() => togglePreference('analytics')}
@@ -186,7 +188,7 @@ function CookiePreferences({
                                     </button>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    {translate(translations, 'cookie-banner.preferences.analytics.description')}
+                                    {translate(translations.layout.cookieBanner, 'preferences.analytics.description')}
                                 </p>
                             </div>
 
@@ -194,7 +196,7 @@ function CookiePreferences({
                             <div className="rounded-xl border border-border bg-surface/50 p-4">
                                 <div className="mb-2 flex items-center justify-between">
                                     <h4 className="font-semibold text-foreground">
-                                        {translate(translations, 'cookie-banner.preferences.marketing.title')}
+                                        {translate(translations.layout.cookieBanner, 'preferences.marketing.title')}
                                     </h4>
                                     <button
                                         onClick={() => togglePreference('marketing')}
@@ -212,7 +214,7 @@ function CookiePreferences({
                                     </button>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    {translate(translations, 'cookie-banner.preferences.marketing.description')}
+                                    {translate(translations.layout.cookieBanner, 'preferences.marketing.description')}
                                 </p>
                             </div>
                         </div>
@@ -222,13 +224,13 @@ function CookiePreferences({
                                 onClick={() => onSave(preferences)}
                                 className="flex-1 cursor-pointer rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                             >
-                                {translate(translations, 'cookie-banner.preferences.save_preferences')}
+                                {translate(translations.layout.cookieBanner, 'preferences.save_preferences')}
                             </button>
                             <button
                                 onClick={onBack}
                                 className="flex-1 cursor-pointer rounded-lg border border-border bg-surface px-6 py-3 text-center font-semibold text-foreground transition-all hover:bg-surface/80"
                             >
-                                {translate(translations, 'cookie-banner.preferences.back')}
+                                {translate(translations.layout.cookieBanner, 'preferences.back')}
                             </button>
                         </div>
                     </div>

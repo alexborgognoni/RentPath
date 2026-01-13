@@ -41,11 +41,11 @@ export default function PropertyCreateWizard({ property, isEditing = false, isDr
     const breadcrumbs: BreadcrumbItem[] =
         isEditing && property
             ? [
-                  { title: t('properties.title'), href: route('manager.properties.index') },
-                  { title: property.title || t('properties.property'), href: route('properties.show', { property: property.id }) },
+                  { title: t('manager.properties.title'), href: route('manager.properties.index') },
+                  { title: property.title || t('manager.properties.property'), href: route('properties.show', { property: property.id }) },
                   { title: t('wizard.property.reviewStep.edit') },
               ]
-            : [{ title: t('properties.title'), href: route('manager.properties.index') }, { title: t('wizard.property.page.addProperty') }];
+            : [{ title: t('manager.properties.title'), href: route('manager.properties.index') }, { title: t('wizard.property.page.addProperty') }];
 
     const handleSubmit = useCallback(async () => {
         const isValid = await wizard.validateForPublish();

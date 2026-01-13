@@ -12,7 +12,7 @@ interface LeadPageProps {
 
 export default function LeadPage({ lead }: LeadPageProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations.leads, key);
+    const t = (key: string) => translate(translations.manager.leads, key);
 
     const leadName = lead.full_name || `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || lead.email;
 

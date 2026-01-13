@@ -2,11 +2,16 @@ interface HeaderTranslations {
     login: string;
     dashboard: string;
     settings: string;
-    sign_out: string;
-    logout_confirmation: {
+    signOut: string;
+    logoutConfirmation: {
         title: string;
         message: string;
         cancel: string;
         confirm: string;
+    };
+    nav: {
+        navigation: string;
+        account: string;
+        myProfile: string;
     };
 }

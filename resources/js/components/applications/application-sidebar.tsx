@@ -69,7 +69,7 @@ const actionConfig: Record<string, { labelKey: string; titleKey: string; descKey
 export function ApplicationSidebar({ application, allowedTransitions }: ApplicationSidebarProps) {
     const { translations, locale } = usePage<SharedData>().props;
     const { formatAmount } = useReactiveCurrency();
-    const t = (key: string) => translate(translations.applications, key);
+    const t = (key: string) => translate(translations.manager.applications, key);
 
     const [actionDialog, setActionDialog] = useState<{ status: string; notes: string } | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);

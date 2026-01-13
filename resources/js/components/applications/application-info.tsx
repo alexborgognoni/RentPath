@@ -29,7 +29,7 @@ interface ApplicationInfoProps {
 export function ApplicationInfo({ application }: ApplicationInfoProps) {
     const { translations, locale } = usePage<SharedData>().props;
     const { formatAmount } = useReactiveCurrency();
-    const t = (key: string) => translate(translations.applications, key);
+    const t = (key: string) => translate(translations.manager.applications, key);
 
     const formatDate = (date: string | undefined) => {
         if (!date) return t('notProvided');
@@ -58,7 +58,7 @@ export function ApplicationInfo({ application }: ApplicationInfoProps) {
                             className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
                         >
                             <Eye className="h-3 w-3" />
-                            {translate(translations.properties, 'viewProperty')}
+                            {translate(translations.manager.properties, 'viewProperty')}
                         </Link>
                     )}
                 </div>
@@ -299,7 +299,7 @@ export function ApplicationInfo({ application }: ApplicationInfoProps) {
 
 function DocumentLink({ url, label, noDocLabel }: { url?: string; label: string; noDocLabel: string }) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations.applications, key);
+    const t = (key: string) => translate(translations.manager.applications, key);
 
     if (!url) {
         return (

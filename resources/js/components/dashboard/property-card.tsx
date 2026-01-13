@@ -73,14 +73,14 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
             <h3 className="mb-2 text-xl font-bold text-foreground">{property.title}</h3>
             <p className="mb-3 text-muted-foreground">{formatAddress(property)}</p>
             <p className="mb-4 text-lg font-bold text-primary">
-                {formatRent(property.rent_amount, property.rent_currency)}/{translate(translations, 'properties.month')}
+                {formatRent(property.rent_amount, property.rent_currency)}/{translate(translations.manager.properties, 'month')}
             </p>
 
             <div className="mb-6 flex items-center justify-between text-sm text-muted-foreground">
                 <div className="flex flex-col space-y-1">
                     <span className="font-medium">
-                        {property.bedrooms || 'N/A'} {translate(translations, 'properties.bedrooms')} • {property.bathrooms || 'N/A'}{' '}
-                        {translate(translations, 'properties.bathrooms')}
+                        {property.bedrooms || 'N/A'} {translate(translations.manager.properties, 'bedrooms')} • {property.bathrooms || 'N/A'}{' '}
+                        {translate(translations.manager.properties, 'bathrooms')}
                     </span>
                     {property.size && <span className="font-medium text-muted-foreground/70">{property.size} m²</span>}
                 </div>
@@ -97,13 +97,13 @@ export function PropertyCard({ property, onEdit }: PropertyCardProps) {
                         className="flex flex-1 items-center justify-center space-x-2 rounded-xl border border-border bg-muted py-3 font-medium text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/80"
                     >
                         <Copy size={16} />
-                        <span>{translate(translations, 'properties.copyApplicationLink')}</span>
+                        <span>{translate(translations.manager.properties, 'copyApplicationLink')}</span>
                     </button>
                     {onEdit && (
                         <button
                             onClick={handleEditClick}
                             className="flex items-center justify-center rounded-xl border border-border bg-muted p-3 text-muted-foreground transition-all hover:border-primary/50 hover:bg-muted/80"
-                            title={translate(translations, 'properties.editProperty')}
+                            title={translate(translations.manager.properties, 'editProperty')}
                         >
                             <ExternalLink size={16} />
                         </button>

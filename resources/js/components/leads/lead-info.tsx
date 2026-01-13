@@ -39,7 +39,7 @@ const statusConfig: Record<string, { labelKey: string; className: string; icon: 
 
 export function LeadInfo({ lead }: LeadInfoProps) {
     const { translations, locale } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations.leads, key);
+    const t = (key: string) => translate(translations.manager.leads, key);
 
     const [notes, setNotes] = useState(lead.notes || '');
     const [isEditingNotes, setIsEditingNotes] = useState(false);

@@ -1,0 +1,16 @@
+<?php
+
+return [
+    'title' => 'Log in to your account',
+    'description' => 'Enter your email and password below to log in',
+    'headTitle' => 'Log in',
+    'emailLabel' => 'Email address',
+    'emailPlaceholder' => 'email@example.com',
+    'passwordLabel' => 'Password',
+    'passwordPlaceholder' => 'Password',
+    'forgotPassword' => 'Forgot password?',
+    'rememberMe' => 'Remember me',
+    'loginButton' => 'Log in',
+    'noAccount' => 'Don\'t have an account?',
+    'signUpLink' => 'Sign up',
+];

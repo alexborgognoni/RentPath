@@ -1,44 +1,48 @@
 interface AuthTranslations {
+    userTypes: {
+        tenant: string;
+        propertyManager: string;
+    };
     login: {
         title: string;
         description: string;
-        email_label: string;
-        email_placeholder: string;
-        password_label: string;
-        password_placeholder: string;
-        remember_me: string;
-        forgot_password: string;
-        login_button: string;
-        logging_in: string;
-        no_account: string;
-        register_link: string;
+        headTitle: string;
+        emailLabel: string;
+        emailPlaceholder: string;
+        passwordLabel: string;
+        passwordPlaceholder: string;
+        rememberMe: string;
+        forgotPassword: string;
+        loginButton: string;
+        noAccount: string;
+        signUpLink: string;
     };
     register: {
         title: string;
         description: string;
-        first_name_label: string;
-        first_name_placeholder: string;
-        last_name_label: string;
-        last_name_placeholder: string;
-        email_label: string;
-        email_placeholder: string;
-        password_label: string;
-        password_placeholder: string;
-        confirm_password_label: string;
-        confirm_password_placeholder: string;
-        register_button: string;
-        registering: string;
-        already_have_account: string;
-        login_link: string;
+        headTitle: string;
+        firstNameLabel: string;
+        firstNamePlaceholder: string;
+        lastNameLabel: string;
+        lastNamePlaceholder: string;
+        emailLabel: string;
+        emailPlaceholder: string;
+        passwordLabel: string;
+        passwordPlaceholder: string;
+        passwordConfirmationLabel: string;
+        passwordConfirmationPlaceholder: string;
+        createAccountButton: string;
+        alreadyHaveAccount: string;
+        logInLink: string;
     };
-    forgot_password: {
+    forgotPassword: {
         title: string;
         description: string;
-        email_label: string;
-        email_placeholder: string;
-        send_reset_link: string;
-        sending: string;
-        back_to_login: string;
-        success_message: string;
+        headTitle: string;
+        emailLabel: string;
+        emailPlaceholder: string;
+        sendResetLinkButton: string;
+        returnToLoginText: string;
+        returnToLoginLink: string;
     };
 }

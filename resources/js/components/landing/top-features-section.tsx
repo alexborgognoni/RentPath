@@ -6,24 +6,24 @@ import { ArrowRight, Clock, Zap } from 'lucide-react';
 export function TopFeaturesSection() {
     const { translations } = usePage<SharedData>().props;
 
-    const HEADING = translate(translations, 'landing.topFeatures.heading');
-    const SUBTITLE = translate(translations, 'landing.topFeatures.subtitle');
+    const HEADING = translate(translations.public.landing, 'topFeatures.heading');
+    const SUBTITLE = translate(translations.public.landing, 'topFeatures.subtitle');
 
     const FEATURES = [
         {
             icon: Zap,
-            title: translate(translations, 'landing.topFeatures.completeApplications.title'),
-            description: translate(translations, 'landing.topFeatures.completeApplications.description'),
+            title: translate(translations.public.landing, 'topFeatures.completeApplications.title'),
+            description: translate(translations.public.landing, 'topFeatures.completeApplications.description'),
         },
         {
             icon: ArrowRight,
-            title: translate(translations, 'landing.topFeatures.streamlinedLeasing.title'),
-            description: translate(translations, 'landing.topFeatures.streamlinedLeasing.description'),
+            title: translate(translations.public.landing, 'topFeatures.streamlinedLeasing.title'),
+            description: translate(translations.public.landing, 'topFeatures.streamlinedLeasing.description'),
         },
         {
             icon: Clock,
-            title: translate(translations, 'landing.topFeatures.occupancyOverview.title'),
-            description: translate(translations, 'landing.topFeatures.occupancyOverview.description'),
+            title: translate(translations.public.landing, 'topFeatures.occupancyOverview.title'),
+            description: translate(translations.public.landing, 'topFeatures.occupancyOverview.description'),
         },
     ];
 

@@ -14,7 +14,7 @@ interface CreateLeadModalProps {
 
 export function CreateLeadModal({ properties, isOpen, onClose, preselectedPropertyId }: CreateLeadModalProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations.leads, key);
+    const t = (key: string) => translate(translations.manager.leads, key);
 
     const [form, setForm] = useState({
         property_id: preselectedPropertyId?.toString() || '',

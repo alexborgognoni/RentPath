@@ -30,27 +30,27 @@ export function TenantNav({ unreadMessages = 0, className }: TenantNavProps) {
         return null;
     }
 
-    const t = (key: string) => translate(translations, key);
+    const t = (key: string) => translate(translations.tenant.common, key);
 
     const navItems: NavItem[] = [
         {
             href: route('applications.index'),
             label: 'Applications',
-            translationKey: 'tenant.nav.applications',
+            translationKey: 'nav.applications',
             icon: FileText,
             matchPaths: ['/applications'],
         },
         {
             href: route('properties.index'),
             label: 'Properties',
-            translationKey: 'tenant.nav.properties',
+            translationKey: 'nav.properties',
             icon: Building2,
             matchPaths: ['/properties'],
         },
         {
             href: route('tenant.messages.index'),
             label: 'Messages',
-            translationKey: 'tenant.nav.messages',
+            translationKey: 'nav.messages',
             icon: MessageCircle,
             badge: unreadMessages,
             matchPaths: ['/messages'],
@@ -58,7 +58,7 @@ export function TenantNav({ unreadMessages = 0, className }: TenantNavProps) {
         {
             href: route('tenant.profile.show'),
             label: 'Profile',
-            translationKey: 'tenant.nav.profile',
+            translationKey: 'nav.profile',
             icon: User,
             matchPaths: ['/profile'],
         },
@@ -108,27 +108,27 @@ export function TenantNavMobile({ unreadMessages = 0, onNavigate }: TenantNavPro
         return null;
     }
 
-    const t = (key: string) => translate(translations, key);
+    const t = (key: string) => translate(translations.tenant.common, key);
 
     const navItems: NavItem[] = [
         {
             href: route('applications.index'),
             label: 'Applications',
-            translationKey: 'tenant.nav.applications',
+            translationKey: 'nav.applications',
             icon: FileText,
             matchPaths: ['/applications'],
         },
         {
             href: route('properties.index'),
             label: 'Properties',
-            translationKey: 'tenant.nav.properties',
+            translationKey: 'nav.properties',
             icon: Building2,
             matchPaths: ['/properties'],
         },
         {
             href: route('tenant.messages.index'),
             label: 'Messages',
-            translationKey: 'tenant.nav.messages',
+            translationKey: 'nav.messages',
             icon: MessageCircle,
             badge: unreadMessages,
             matchPaths: ['/messages'],
@@ -136,7 +136,7 @@ export function TenantNavMobile({ unreadMessages = 0, onNavigate }: TenantNavPro
         {
             href: route('tenant.profile.show'),
             label: 'Profile',
-            translationKey: 'tenant.nav.profile',
+            translationKey: 'nav.profile',
             icon: User,
             matchPaths: ['/profile'],
         },

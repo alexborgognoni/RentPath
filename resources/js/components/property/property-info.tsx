@@ -30,7 +30,7 @@ interface PropertyInfoProps {
 
 export function PropertyInfo({ property }: PropertyInfoProps) {
     const { translations } = usePage<SharedData>().props;
-    const t = (key: string) => translate(translations, key);
+    const t = (key: string) => translate(translations.manager.properties, key);
     const { formatRent } = useReactiveCurrency();
     const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -87,10 +87,10 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                     </div>
 
                     {/* Rent Price Box */}
-                    <div className="border-success/30 bg-success/10 ml-6 rounded-xl border p-4">
+                    <div className="ml-6 rounded-xl border border-success/30 bg-success/10 p-4">
                         <div className="text-center">
-                            <div className="text-success text-2xl font-bold">{formatRent(property.rent_amount, property.rent_currency)}</div>
-                            <div className="text-success/80 text-xs font-medium">{t('properties.perMonth')}</div>
+                            <div className="text-2xl font-bold text-success">{formatRent(property.rent_amount, property.rent_currency)}</div>
+                            <div className="text-xs font-medium text-success/80">{t('perMonth')}</div>
                         </div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <Home size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground capitalize">{property.type || 'N/A'}</p>
-                                <p className="text-xs text-muted-foreground">{t('properties.details.type')}</p>
+                                <p className="text-xs text-muted-foreground">{t('details.type')}</p>
                             </div>
                         </div>
                     </div>
@@ -112,7 +112,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <Bed size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground">{property.bedrooms || 0}</p>
-                                <p className="text-xs text-muted-foreground">{t('properties.details.bedrooms')}</p>
+                                <p className="text-xs text-muted-foreground">{t('details.bedrooms')}</p>
                             </div>
                         </div>
                     </div>
@@ -122,7 +122,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <Bath size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground">{property.bathrooms || 0}</p>
-                                <p className="text-xs text-muted-foreground">{t('properties.details.bathrooms')}</p>
+                                <p className="text-xs text-muted-foreground">{t('details.bathrooms')}</p>
                             </div>
                         </div>
                     </div>
@@ -132,7 +132,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <Grid2X2 size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground">{property.size ? `${property.size} m²` : 'N/A'}</p>
-                                <p className="text-xs text-muted-foreground">{t('properties.details.size')}</p>
+                                <p className="text-xs text-muted-foreground">{t('details.size')}</p>
                             </div>
                         </div>
                     </div>
@@ -142,11 +142,9 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                             <Calendar size={18} className="text-primary" />
                             <div className="min-w-0 flex-1 text-center">
                                 <p className="mb-1 text-sm font-bold text-foreground">
-                                    {property.available_date
-                                        ? new Date(property.available_date).toLocaleDateString()
-                                        : t('properties.details.immediately')}
+                                    {property.available_date ? new Date(property.available_date).toLocaleDateString() : t('details.immediately')}
                                 </p>
-                                <p className="text-xs text-muted-foreground">{t('properties.details.available')}</p>
+                                <p className="text-xs text-muted-foreground">{t('details.available')}</p>
                             </div>
                         </div>
                     </div>
@@ -159,7 +157,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                     <div className="border-b border-border p-6">
                         <h2 className="flex items-center text-xl font-bold text-foreground">
                             <FileText className="mr-3 text-primary" size={24} />
-                            {t('properties.details.description')}
+                            {t('details.description')}
                         </h2>
                     </div>
 
@@ -176,7 +174,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                 <div className="border-b border-border p-6">
                     <h2 className="flex items-center text-xl font-bold text-foreground">
                         <Building className="mr-3 text-primary" size={24} />
-                        {t('properties.details.propertyDetails')}
+                        {t('details.propertyDetails')}
                     </h2>
                 </div>
 
@@ -186,11 +184,11 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <Car size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.parking')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.parking')}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    {property.parking_spots_interior > 0 && `${property.parking_spots_interior} ${t('properties.details.indoor')}`}
+                                    {property.parking_spots_interior > 0 && `${property.parking_spots_interior} ${t('details.indoor')}`}
                                     {property.parking_spots_interior > 0 && property.parking_spots_exterior > 0 && ', '}
-                                    {property.parking_spots_exterior > 0 && `${property.parking_spots_exterior} ${t('properties.details.outdoor')}`}
+                                    {property.parking_spots_exterior > 0 && `${property.parking_spots_exterior} ${t('details.outdoor')}`}
                                 </p>
                             </div>
                         </div>
@@ -201,7 +199,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <Grid2X2 size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.balcony')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.balcony')}</p>
                                 <p className="text-sm text-muted-foreground">{property.balcony_size} m²</p>
                             </div>
                         </div>
@@ -212,7 +210,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <Trees size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.landSize')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.landSize')}</p>
                                 <p className="text-sm text-muted-foreground">{property.land_size} m²</p>
                             </div>
                         </div>
@@ -223,10 +221,10 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <Building size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.floor')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.floor')}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    {t('properties.details.level')} {property.floor_level}
-                                    {property.has_elevator && ` ${t('properties.details.elevatorAvailable')}`}
+                                    {t('details.level')} {property.floor_level}
+                                    {property.has_elevator && ` ${t('details.elevatorAvailable')}`}
                                 </p>
                             </div>
                         </div>
@@ -237,7 +235,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <Calendar size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.yearBuilt')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.yearBuilt')}</p>
                                 <p className="text-sm text-muted-foreground">{property.year_built}</p>
                             </div>
                         </div>
@@ -248,7 +246,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <Zap size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.energyClass')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.energyClass')}</p>
                                 <p className="text-sm text-muted-foreground">{property.energy_class}</p>
                             </div>
                         </div>
@@ -259,7 +257,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <Wind size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.thermalInsulation')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.thermalInsulation')}</p>
                                 <p className="text-sm text-muted-foreground">{property.thermal_insulation_class}</p>
                             </div>
                         </div>
@@ -270,7 +268,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <Flame size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.heating')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.heating')}</p>
                                 <p className="text-sm text-muted-foreground capitalize">{property.heating_type.replace('_', ' ')}</p>
                             </div>
                         </div>
@@ -281,11 +279,11 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="flex items-start space-x-3">
                             <UtensilsCrossed size={18} className="mt-1 text-primary" />
                             <div>
-                                <p className="text-sm font-semibold text-foreground">{t('properties.details.kitchen')}</p>
+                                <p className="text-sm font-semibold text-foreground">{t('details.kitchen')}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    {property.kitchen_equipped && t('properties.details.equipped')}
+                                    {property.kitchen_equipped && t('details.equipped')}
                                     {property.kitchen_equipped && property.kitchen_separated && ', '}
-                                    {property.kitchen_separated && t('properties.details.separated')}
+                                    {property.kitchen_separated && t('details.separated')}
                                 </p>
                             </div>
                         </div>
@@ -304,7 +302,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                     <div className="border-b border-border p-6">
                         <h2 className="flex items-center text-xl font-bold text-foreground">
                             <Warehouse className="mr-3 text-primary" size={24} />
-                            {t('properties.details.amenities')}
+                            {t('details.amenities')}
                         </h2>
                     </div>
 
@@ -312,38 +310,38 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                             {property.has_cellar && (
                                 <div className="flex items-center space-x-2">
-                                    <div className="bg-success h-2 w-2 rounded-full"></div>
-                                    <span className="text-sm text-foreground">{t('properties.details.cellar')}</span>
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">{t('details.cellar')}</span>
                                 </div>
                             )}
                             {property.has_laundry && (
                                 <div className="flex items-center space-x-2">
-                                    <div className="bg-success h-2 w-2 rounded-full"></div>
-                                    <span className="text-sm text-foreground">{t('properties.details.laundry')}</span>
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">{t('details.laundry')}</span>
                                 </div>
                             )}
                             {property.has_fireplace && (
                                 <div className="flex items-center space-x-2">
-                                    <div className="bg-success h-2 w-2 rounded-full"></div>
-                                    <span className="text-sm text-foreground">{t('properties.details.fireplace')}</span>
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">{t('details.fireplace')}</span>
                                 </div>
                             )}
                             {property.has_air_conditioning && (
                                 <div className="flex items-center space-x-2">
-                                    <div className="bg-success h-2 w-2 rounded-full"></div>
-                                    <span className="text-sm text-foreground">{t('properties.details.airConditioning')}</span>
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">{t('details.airConditioning')}</span>
                                 </div>
                             )}
                             {property.has_garden && (
                                 <div className="flex items-center space-x-2">
-                                    <div className="bg-success h-2 w-2 rounded-full"></div>
-                                    <span className="text-sm text-foreground">{t('properties.details.garden')}</span>
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">{t('details.garden')}</span>
                                 </div>
                             )}
                             {property.has_rooftop && (
                                 <div className="flex items-center space-x-2">
-                                    <div className="bg-success h-2 w-2 rounded-full"></div>
-                                    <span className="text-sm text-foreground">{t('properties.details.rooftopAccess')}</span>
+                                    <div className="h-2 w-2 rounded-full bg-success"></div>
+                                    <span className="text-sm text-foreground">{t('details.rooftopAccess')}</span>
                                 </div>
                             )}
                         </div>
@@ -357,7 +355,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                     <div className="border-b border-border p-6">
                         <h2 className="flex items-center text-xl font-bold text-foreground">
                             <Camera className="mr-3 text-primary" size={24} />
-                            {t('properties.details.propertyImages')}
+                            {t('details.propertyImages')}
                         </h2>
                     </div>
 
@@ -379,7 +377,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
                                     />
                                     {image.is_main && (
                                         <div className="absolute top-2 left-2 rounded bg-primary px-2 py-1 text-xs font-medium text-white">
-                                            {t('properties.details.mainImage')}
+                                            {t('details.mainImage')}
                                         </div>
                                     )}
                                     <div className="absolute inset-0 flex items-center justify-center bg-background/0 transition-colors group-hover:bg-background/10">
