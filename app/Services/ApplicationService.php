@@ -245,12 +245,6 @@ class ApplicationService
             'receiving_unemployment_benefits', 'unemployment_benefits_amount', 'unemployed_income_source', 'unemployed_income_source_other',
             'other_employment_situation', 'other_employment_situation_details', 'expected_return_to_work',
             'other_situation_monthly_income', 'other_situation_income_source',
-            'has_guarantor', 'guarantor_first_name', 'guarantor_last_name', 'guarantor_relationship',
-            'guarantor_phone_country_code', 'guarantor_phone_number', 'guarantor_email',
-            'guarantor_street_name', 'guarantor_house_number', 'guarantor_address_line_2',
-            'guarantor_city', 'guarantor_state_province', 'guarantor_postal_code', 'guarantor_country',
-            'guarantor_employment_status', 'guarantor_employer_name', 'guarantor_job_title',
-            'guarantor_monthly_income', 'guarantor_income_currency',
             // History step fields (Credit & Rental History)
             'authorize_credit_check', 'authorize_background_check', 'credit_check_provider_preference',
             'has_ccjs_or_bankruptcies', 'ccj_bankruptcy_details', 'has_eviction_history', 'eviction_details',
@@ -262,7 +256,7 @@ class ApplicationService
         ];
 
         $booleanFields = [
-            'has_guarantor', 'authorize_credit_check', 'authorize_background_check',
+            'authorize_credit_check', 'authorize_background_check',
             'has_ccjs_or_bankruptcies', 'has_eviction_history',
         ];
 
@@ -313,12 +307,6 @@ class ApplicationService
             'receiving_unemployment_benefits', 'unemployment_benefits_amount', 'unemployed_income_source', 'unemployed_income_source_other',
             'other_employment_situation', 'other_employment_situation_details', 'expected_return_to_work',
             'other_situation_monthly_income', 'other_situation_income_source',
-            'has_guarantor', 'guarantor_first_name', 'guarantor_last_name', 'guarantor_relationship',
-            'guarantor_phone_country_code', 'guarantor_phone_number', 'guarantor_email',
-            'guarantor_street_name', 'guarantor_house_number', 'guarantor_address_line_2',
-            'guarantor_city', 'guarantor_state_province', 'guarantor_postal_code', 'guarantor_country',
-            'guarantor_employment_status', 'guarantor_employer_name', 'guarantor_job_title',
-            'guarantor_monthly_income', 'guarantor_income_currency',
             // Document paths
             'id_document_front_path', 'id_document_back_path', 'residence_permit_document_path',
             'right_to_rent_document_path', 'employment_contract_path', 'payslip_1_path',
@@ -422,7 +410,6 @@ class ApplicationService
             'snapshot_employer_name' => $profile->employer_name,
             'snapshot_job_title' => $profile->job_title,
             'snapshot_monthly_income' => $profile->monthly_income ?? $profile->net_monthly_income,
-            'snapshot_has_guarantor' => $profile->has_guarantor,
         ];
     }
 

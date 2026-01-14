@@ -74,7 +74,6 @@ export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
         fields: [
             'profile_employment_status',
             'profile_income_currency',
-            'profile_has_guarantor',
             'profile_employer_name',
             'profile_job_title',
             'profile_employment_type',
@@ -96,34 +95,7 @@ export const APPLICATION_STEPS: WizardStepConfig<ApplicationStep>[] = [
         id: 'support',
         title: 'Financial Support',
         shortTitle: 'Support',
-        fields: [
-            'co_signers',
-            'guarantors',
-            'interested_in_rent_insurance',
-            'existing_insurance_provider',
-            'existing_insurance_policy_number',
-            'profile_guarantor_first_name',
-            'profile_guarantor_last_name',
-            'profile_guarantor_relationship',
-            'profile_guarantor_relationship_other',
-            'profile_guarantor_phone_country_code',
-            'profile_guarantor_phone_number',
-            'profile_guarantor_email',
-            'profile_guarantor_street_name',
-            'profile_guarantor_house_number',
-            'profile_guarantor_address_line_2',
-            'profile_guarantor_city',
-            'profile_guarantor_state_province',
-            'profile_guarantor_postal_code',
-            'profile_guarantor_country',
-            'profile_guarantor_employment_status',
-            'profile_guarantor_employer_name',
-            'profile_guarantor_job_title',
-            'profile_guarantor_employment_type',
-            'profile_guarantor_employment_start_date',
-            'profile_guarantor_monthly_income',
-            'profile_guarantor_income_currency',
-        ],
+        fields: ['co_signers', 'guarantors', 'interested_in_rent_insurance', 'existing_insurance_provider', 'existing_insurance_policy_number'],
     },
     {
         id: 'history',
@@ -614,7 +586,6 @@ export interface ApplicationWizardData {
     invited_via_token: string;
 
     // ===== Legacy fields (kept for backwards compatibility) =====
-    profile_has_guarantor: boolean;
     profile_monthly_income: string;
     profile_student_proof: File | null;
     profile_current_house_number: string;
@@ -631,41 +602,6 @@ export interface ApplicationWizardData {
     previous_landlord_name: string;
     previous_landlord_phone: string;
     previous_landlord_email: string;
-    // Legacy guarantor fields (now in guarantors array)
-    profile_guarantor_first_name: string;
-    profile_guarantor_last_name: string;
-    profile_guarantor_relationship: string;
-    profile_guarantor_relationship_other: string;
-    profile_guarantor_phone_country_code: string;
-    profile_guarantor_phone_number: string;
-    profile_guarantor_email: string;
-    profile_guarantor_street_name: string;
-    profile_guarantor_house_number: string;
-    profile_guarantor_address_line_2: string;
-    profile_guarantor_city: string;
-    profile_guarantor_state_province: string;
-    profile_guarantor_postal_code: string;
-    profile_guarantor_country: string;
-    profile_guarantor_employment_status: string;
-    profile_guarantor_employer_name: string;
-    profile_guarantor_job_title: string;
-    profile_guarantor_employment_type: string;
-    profile_guarantor_employment_start_date: string;
-    profile_guarantor_monthly_income: string;
-    profile_guarantor_income_currency: string;
-    profile_guarantor_university_name: string;
-    profile_guarantor_program_of_study: string;
-    profile_guarantor_expected_graduation_date: string;
-    profile_guarantor_student_income_source: string;
-    profile_guarantor_id_front: File | null;
-    profile_guarantor_id_back: File | null;
-    profile_guarantor_proof_income: File | null;
-    profile_guarantor_employment_contract: File | null;
-    profile_guarantor_payslip_1: File | null;
-    profile_guarantor_payslip_2: File | null;
-    profile_guarantor_payslip_3: File | null;
-    profile_guarantor_student_proof: File | null;
-    profile_guarantor_other_income_proof: File | null;
     // Old consent fields (replaced by new structure)
     consent_accurate_info: boolean;
     consent_background_check: boolean;
@@ -1050,7 +986,6 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         invited_via_token: token || '',
 
         // ===== Legacy fields (backwards compatibility) =====
-        profile_has_guarantor: tenantProfile?.has_guarantor ?? false,
         profile_monthly_income: tenantProfile?.monthly_income?.toString() || '',
         profile_student_proof: null,
         profile_current_house_number: tenantProfile?.current_house_number || '',
@@ -1062,46 +997,11 @@ function getInitialData(draft?: DraftApplication | null, tenantProfile?: TenantP
         profile_current_country: tenantProfile?.current_country || '',
         message_to_landlord: draft?.message_to_landlord || '',
         references: draft?.references || [],
-        emergency_contact_name: tenantProfile?.emergency_contact_name || '',
-        emergency_contact_phone: tenantProfile?.emergency_contact_phone || '',
+        emergency_contact_name: draft?.emergency_contact_first_name || '',
+        emergency_contact_phone: draft?.emergency_contact_phone_number || '',
         previous_landlord_name: draft?.previous_landlord_name || '',
         previous_landlord_phone: draft?.previous_landlord_phone || '',
         previous_landlord_email: draft?.previous_landlord_email || '',
-        // Legacy guarantor fields
-        profile_guarantor_first_name: tenantProfile?.guarantor_first_name || '',
-        profile_guarantor_last_name: tenantProfile?.guarantor_last_name || '',
-        profile_guarantor_relationship: tenantProfile?.guarantor_relationship || '',
-        profile_guarantor_relationship_other: tenantProfile?.guarantor_relationship_other || '',
-        profile_guarantor_phone_country_code: tenantProfile?.guarantor_phone_country_code || '+31',
-        profile_guarantor_phone_number: tenantProfile?.guarantor_phone_number || '',
-        profile_guarantor_email: tenantProfile?.guarantor_email || '',
-        profile_guarantor_street_name: tenantProfile?.guarantor_street_name || '',
-        profile_guarantor_house_number: tenantProfile?.guarantor_house_number || '',
-        profile_guarantor_address_line_2: tenantProfile?.guarantor_address_line_2 || '',
-        profile_guarantor_city: tenantProfile?.guarantor_city || '',
-        profile_guarantor_state_province: tenantProfile?.guarantor_state_province || '',
-        profile_guarantor_postal_code: tenantProfile?.guarantor_postal_code || '',
-        profile_guarantor_country: tenantProfile?.guarantor_country || '',
-        profile_guarantor_employment_status: tenantProfile?.guarantor_employment_status || '',
-        profile_guarantor_employer_name: tenantProfile?.guarantor_employer_name || '',
-        profile_guarantor_job_title: tenantProfile?.guarantor_job_title || '',
-        profile_guarantor_employment_type: tenantProfile?.guarantor_employment_type || '',
-        profile_guarantor_employment_start_date: formatDateForInput(tenantProfile?.guarantor_employment_start_date),
-        profile_guarantor_monthly_income: tenantProfile?.guarantor_monthly_income?.toString() || '',
-        profile_guarantor_income_currency: tenantProfile?.guarantor_income_currency || 'eur',
-        profile_guarantor_university_name: tenantProfile?.guarantor_university_name || '',
-        profile_guarantor_program_of_study: tenantProfile?.guarantor_program_of_study || '',
-        profile_guarantor_expected_graduation_date: formatDateForInput(tenantProfile?.guarantor_expected_graduation_date),
-        profile_guarantor_student_income_source: tenantProfile?.guarantor_student_income_source || '',
-        profile_guarantor_id_front: null,
-        profile_guarantor_id_back: null,
-        profile_guarantor_proof_income: null,
-        profile_guarantor_employment_contract: null,
-        profile_guarantor_payslip_1: null,
-        profile_guarantor_payslip_2: null,
-        profile_guarantor_payslip_3: null,
-        profile_guarantor_student_proof: null,
-        profile_guarantor_other_income_proof: null,
         // Old consent/additional fields
         consent_accurate_info: false,
         consent_background_check: false,

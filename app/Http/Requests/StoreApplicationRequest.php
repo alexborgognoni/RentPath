@@ -26,7 +26,6 @@ class StoreApplicationRequest extends FormRequest
     public function rules(): array
     {
         $employmentStatus = $this->input('profile_employment_status');
-        $hasGuarantor = $this->boolean('profile_has_guarantor');
         $tenantProfile = Auth::user()?->tenantProfile;
 
         $rules = [
@@ -73,7 +72,6 @@ class StoreApplicationRequest extends FormRequest
             // =====================================
             'profile_employment_status' => 'required|in:employed,self_employed,student,unemployed,retired',
             'profile_income_currency' => 'required|in:eur,usd,gbp,chf',
-            'profile_has_guarantor' => 'required|boolean',
 
             // Base nullable fields (will be overridden with required for specific statuses)
             'profile_employer_name' => 'nullable|string|max:255',
@@ -85,34 +83,6 @@ class StoreApplicationRequest extends FormRequest
             'profile_program_of_study' => 'nullable|string|max:255',
             'profile_expected_graduation_date' => 'nullable|date|after:today',
             'profile_student_income_source' => 'nullable|string|max:255',
-            // Guarantor - Basic Info
-            'profile_guarantor_first_name' => 'nullable|string|max:100',
-            'profile_guarantor_last_name' => 'nullable|string|max:100',
-            'profile_guarantor_relationship' => 'nullable|string|max:100',
-            'profile_guarantor_relationship_other' => 'nullable|string|max:100',
-            'profile_guarantor_phone_country_code' => 'nullable|string|max:5',
-            'profile_guarantor_phone_number' => 'nullable|string|max:20',
-            'profile_guarantor_email' => 'nullable|email|max:255',
-            'profile_guarantor_street_name' => 'nullable|string|max:255',
-            'profile_guarantor_house_number' => 'nullable|string|max:20',
-            'profile_guarantor_address_line_2' => 'nullable|string|max:100',
-            'profile_guarantor_city' => 'nullable|string|max:100',
-            'profile_guarantor_state_province' => 'nullable|string|max:100',
-            'profile_guarantor_postal_code' => 'nullable|string|max:20',
-            'profile_guarantor_country' => ['nullable', 'string', 'max:2', new ValidCountryCode],
-            // Guarantor - Employment
-            'profile_guarantor_employment_status' => 'nullable|in:employed,self_employed,student,unemployed,retired',
-            'profile_guarantor_employer_name' => 'nullable|string|max:255',
-            'profile_guarantor_job_title' => 'nullable|string|max:255',
-            'profile_guarantor_employment_type' => 'nullable|in:full_time,part_time,contract,temporary',
-            'profile_guarantor_employment_start_date' => 'nullable|date|before_or_equal:today',
-            'profile_guarantor_monthly_income' => 'nullable|numeric|min:0',
-            'profile_guarantor_income_currency' => 'nullable|in:eur,usd,gbp,chf',
-            // Guarantor - Student Info
-            'profile_guarantor_university_name' => 'nullable|string|max:255',
-            'profile_guarantor_program_of_study' => 'nullable|string|max:255',
-            'profile_guarantor_expected_graduation_date' => 'nullable|date|after:today',
-            'profile_guarantor_student_income_source' => 'nullable|string|max:255',
 
             // Document base rules (nullable by default, will be overridden conditionally)
             // Note: With immediate uploads, documents are already in tenant profile
@@ -125,16 +95,6 @@ class StoreApplicationRequest extends FormRequest
             'profile_payslip_3' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
             'profile_student_proof' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
             'profile_other_income_proof' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            // Guarantor Documents
-            'profile_guarantor_id_front' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'profile_guarantor_id_back' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'profile_guarantor_proof_income' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'profile_guarantor_employment_contract' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'profile_guarantor_payslip_1' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'profile_guarantor_payslip_2' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'profile_guarantor_payslip_3' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'profile_guarantor_student_proof' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-            'profile_guarantor_other_income_proof' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
 
             // =====================================
             // STEP 2: Household Composition
@@ -403,86 +363,6 @@ class StoreApplicationRequest extends FormRequest
         // resources/js/utils/state-province-data.ts (COUNTRIES_REQUIRING_STATE)
         $countriesRequiringState = ['US', 'CA', 'AU', 'BR', 'MX', 'IN'];
 
-        // Guarantor: Require all guarantor fields and documents if has_guarantor is true
-        if ($hasGuarantor) {
-            $guarantorEmploymentStatus = $this->input('profile_guarantor_employment_status');
-
-            // Basic info - always required
-            $rules['profile_guarantor_first_name'] = 'required|string|max:100';
-            $rules['profile_guarantor_last_name'] = 'required|string|max:100';
-            $rules['profile_guarantor_relationship'] = 'required|string|max:100';
-            $rules['profile_guarantor_phone_country_code'] = 'required|string|max:5';
-            $rules['profile_guarantor_phone_number'] = 'required|string|max:20';
-            $rules['profile_guarantor_email'] = 'required|email|max:255';
-            $rules['profile_guarantor_street_name'] = 'required|string|max:255';
-            $rules['profile_guarantor_house_number'] = 'required|string|max:20';
-            $rules['profile_guarantor_city'] = 'required|string|max:100';
-            $rules['profile_guarantor_postal_code'] = 'required|string|max:20';
-            $rules['profile_guarantor_country'] = ['required', 'string', 'max:2', new ValidCountryCode];
-            $rules['profile_guarantor_employment_status'] = 'required|in:employed,self_employed,student,unemployed,retired';
-            $rules['profile_guarantor_monthly_income'] = 'required|numeric|min:0';
-            $rules['profile_guarantor_income_currency'] = 'required|in:eur,usd,gbp,chf';
-
-            // Relationship "Other" requires specification
-            $guarantorRelationship = $this->input('profile_guarantor_relationship');
-            if ($guarantorRelationship === 'Other') {
-                $rules['profile_guarantor_relationship_other'] = 'required|string|max:100';
-            }
-
-            // Guarantor state/province required for certain countries
-            $guarantorCountryCode = $this->input('profile_guarantor_country');
-            if ($guarantorCountryCode && in_array(strtoupper($guarantorCountryCode), $countriesRequiringState)) {
-                $rules['profile_guarantor_state_province'] = 'required|string|max:100';
-            }
-
-            // ID Documents (always required for guarantor)
-            if (! $tenantProfile?->guarantor_id_front_path) {
-                $rules['profile_guarantor_id_front'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-            }
-            if (! $tenantProfile?->guarantor_id_back_path) {
-                $rules['profile_guarantor_id_back'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-            }
-
-            // Employment-specific rules for guarantor
-            if (in_array($guarantorEmploymentStatus, ['employed', 'self_employed'])) {
-                $rules['profile_guarantor_employer_name'] = 'required|string|max:255';
-                $rules['profile_guarantor_job_title'] = 'required|string|max:255';
-                $rules['profile_guarantor_employment_type'] = 'required|in:full_time,part_time,contract,temporary';
-                $rules['profile_guarantor_employment_start_date'] = 'required|date|before_or_equal:today';
-
-                // Employment documents required for guarantor if not in profile
-                if (! $tenantProfile?->guarantor_employment_contract_path) {
-                    $rules['profile_guarantor_employment_contract'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-                }
-                if (! $tenantProfile?->guarantor_payslip_1_path) {
-                    $rules['profile_guarantor_payslip_1'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-                }
-                if (! $tenantProfile?->guarantor_payslip_2_path) {
-                    $rules['profile_guarantor_payslip_2'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-                }
-                if (! $tenantProfile?->guarantor_payslip_3_path) {
-                    $rules['profile_guarantor_payslip_3'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-                }
-            }
-
-            // Student-specific rules for guarantor
-            if ($guarantorEmploymentStatus === 'student') {
-                $rules['profile_guarantor_university_name'] = 'required|string|max:255';
-                $rules['profile_guarantor_program_of_study'] = 'required|string|max:255';
-
-                if (! $tenantProfile?->guarantor_student_proof_path) {
-                    $rules['profile_guarantor_student_proof'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-                }
-            }
-
-            // Unemployed/Retired: Require other income proof for guarantor
-            if (in_array($guarantorEmploymentStatus, ['unemployed', 'retired'])) {
-                if (! $tenantProfile?->guarantor_other_income_proof_path) {
-                    $rules['profile_guarantor_other_income_proof'] = 'required|file|mimes:pdf,jpeg,png,jpg|max:20480';
-                }
-            }
-        }
-
         // State/Province: Required for current address in countries that mandate it
         $countryCode = $this->input('profile_current_country');
         if ($countryCode && in_array(strtoupper($countryCode), $countriesRequiringState)) {
@@ -526,33 +406,6 @@ class StoreApplicationRequest extends FormRequest
             'profile_monthly_income.min' => 'Income must be a positive number',
             'profile_university_name.required' => 'University name is required',
             'profile_program_of_study.required' => 'Program of study is required',
-            // Guarantor - Basic Info
-            'profile_guarantor_first_name.required' => 'Guarantor first name is required',
-            'profile_guarantor_last_name.required' => 'Guarantor last name is required',
-            'profile_guarantor_relationship.required' => 'Guarantor relationship is required',
-            'profile_guarantor_relationship_other.required' => 'Please specify the relationship',
-            'profile_guarantor_phone_country_code.required' => 'Phone country code is required',
-            'profile_guarantor_phone_number.required' => 'Guarantor phone number is required',
-            'profile_guarantor_email.required' => 'Guarantor email is required',
-            'profile_guarantor_email.email' => 'Please enter a valid email address',
-            'profile_guarantor_street_name.required' => 'Street name is required',
-            'profile_guarantor_house_number.required' => 'House number is required',
-            'profile_guarantor_city.required' => 'City is required',
-            'profile_guarantor_postal_code.required' => 'Postal code is required',
-            'profile_guarantor_country.required' => 'Country is required',
-            'profile_guarantor_state_province.required' => 'State/Province is required for this country',
-            // Guarantor - Employment
-            'profile_guarantor_employment_status.required' => 'Guarantor employment status is required',
-            'profile_guarantor_employer_name.required' => 'Guarantor employer is required',
-            'profile_guarantor_job_title.required' => 'Guarantor job title is required',
-            'profile_guarantor_employment_type.required' => 'Employment type is required',
-            'profile_guarantor_employment_start_date.required' => 'Employment start date is required',
-            'profile_guarantor_monthly_income.required' => 'Guarantor income is required',
-            'profile_guarantor_monthly_income.min' => 'Income must be a positive number',
-            'profile_guarantor_income_currency.required' => 'Guarantor income currency is required',
-            // Guarantor - Student
-            'profile_guarantor_university_name.required' => 'University name is required',
-            'profile_guarantor_program_of_study.required' => 'Program of study is required',
 
             // Documents - must match APPLICATION_MESSAGES
             'profile_id_document_front.required' => 'Front side of ID document is required',
@@ -563,15 +416,6 @@ class StoreApplicationRequest extends FormRequest
             'profile_payslip_3.required' => 'Payslip is required',
             'profile_student_proof.required' => 'Proof of student status is required',
             'profile_other_income_proof.required' => 'Proof of income source is required',
-            // Guarantor Documents
-            'profile_guarantor_id_front.required' => 'Guarantor ID document (front) is required',
-            'profile_guarantor_id_back.required' => 'Guarantor ID document (back) is required',
-            'profile_guarantor_employment_contract.required' => 'Guarantor employment contract is required',
-            'profile_guarantor_payslip_1.required' => 'Guarantor payslip is required',
-            'profile_guarantor_payslip_2.required' => 'Guarantor payslip is required',
-            'profile_guarantor_payslip_3.required' => 'Guarantor payslip is required',
-            'profile_guarantor_student_proof.required' => 'Guarantor student proof is required',
-            'profile_guarantor_other_income_proof.required' => 'Guarantor proof of income is required',
 
             // Details - must match APPLICATION_MESSAGES
             'desired_move_in_date.required' => 'Move-in date is required',

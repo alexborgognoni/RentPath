@@ -30,7 +30,6 @@ class FinancialStepRequest extends FormRequest
             // Common fields
             'profile_employment_status' => ['required', Rule::in($this->employmentStatuses())],
             'profile_income_currency' => ['required', Rule::in($this->currencies())],
-            'profile_has_guarantor' => 'required|boolean',
 
             // Base fields (nullable by default)
             'profile_employer_name' => 'nullable|string|max:255',

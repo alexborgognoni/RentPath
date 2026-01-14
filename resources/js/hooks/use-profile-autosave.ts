@@ -94,42 +94,29 @@ const PROFILE_FIELDS = new Set([
     'profile_has_additional_income',
     'profile_additional_income_sources',
 
-    // ===== Guarantor =====
-    'profile_has_guarantor',
-    'profile_guarantor_first_name',
-    'profile_guarantor_last_name',
-    'profile_guarantor_name', // Legacy
-    'profile_guarantor_relationship',
-    'profile_guarantor_relationship_other',
-    'profile_guarantor_phone_country_code',
-    'profile_guarantor_phone_number',
-    'profile_guarantor_phone', // Legacy
-    'profile_guarantor_email',
-    'profile_guarantor_street_name',
-    'profile_guarantor_house_number',
-    'profile_guarantor_address_line_2',
-    'profile_guarantor_city',
-    'profile_guarantor_state_province',
-    'profile_guarantor_postal_code',
-    'profile_guarantor_country',
-    'profile_guarantor_address', // Legacy
-    'profile_guarantor_employment_status',
-    'profile_guarantor_employer_name',
-    'profile_guarantor_employer', // Legacy
-    'profile_guarantor_job_title',
-    'profile_guarantor_employment_type',
-    'profile_guarantor_employment_start_date',
-    'profile_guarantor_monthly_income',
-    'profile_guarantor_income_currency',
-    'profile_guarantor_university_name',
-    'profile_guarantor_program_of_study',
-    'profile_guarantor_expected_graduation_date',
-    'profile_guarantor_student_income_source',
+    // Rental History (Credit & Background)
+    'profile_authorize_credit_check',
+    'profile_authorize_background_check',
+    'profile_credit_check_provider_preference',
+    'profile_has_ccjs_or_bankruptcies',
+    'profile_ccj_bankruptcy_details',
+    'profile_has_eviction_history',
+    'profile_eviction_details',
 
-    // Emergency Contact
-    'profile_emergency_contact_name',
-    'profile_emergency_contact_phone',
-    'profile_emergency_contact_relationship',
+    // Rental History (Current Situation)
+    'profile_current_living_situation',
+    'profile_current_address_move_in_date',
+    'profile_current_monthly_rent',
+    'profile_current_rent_currency',
+    'profile_current_landlord_name',
+    'profile_current_landlord_contact',
+    'profile_reason_for_moving',
+    'profile_reason_for_moving_other',
+
+    // Previous Addresses & References
+    'profile_previous_addresses',
+    'profile_landlord_references',
+    'profile_other_references',
 ]);
 
 export function isProfileField(fieldName: string): boolean {

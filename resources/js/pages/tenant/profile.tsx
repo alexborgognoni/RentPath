@@ -21,7 +21,7 @@ import {
 import { translate } from '@/utils/translate-utils';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Briefcase, CheckCircle, ChevronDown, Circle, FileText, GraduationCap, Home, Phone, Shield, User, UserCheck } from 'lucide-react';
+import { Briefcase, CheckCircle, ChevronDown, Circle, FileText, GraduationCap, Home, Shield, User, UserCheck } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 interface DocumentMetadata {
@@ -40,8 +40,6 @@ interface ProfileDocuments {
     payslip_3?: DocumentMetadata | null;
     student_proof?: DocumentMetadata | null;
     other_income_proof?: DocumentMetadata | null;
-    guarantor_id?: DocumentMetadata | null;
-    guarantor_proof_income?: DocumentMetadata | null;
 }
 
 interface ProfilePageProps {
@@ -56,7 +54,7 @@ interface ProfilePageProps {
     profileDocuments?: ProfileDocuments;
 }
 
-type SectionId = 'personal' | 'address' | 'identity' | 'employment' | 'documents' | 'guarantor' | 'emergency';
+type SectionId = 'personal' | 'address' | 'identity' | 'employment' | 'documents';
 
 interface SectionConfig {
     id: SectionId;
@@ -113,36 +111,6 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
         program_of_study: profile?.program_of_study || '',
         expected_graduation_date: profile?.expected_graduation_date || '',
         student_income_source: profile?.student_income_source || '',
-        // Guarantor
-        has_guarantor: profile?.has_guarantor || false,
-        guarantor_first_name: profile?.guarantor_first_name || '',
-        guarantor_last_name: profile?.guarantor_last_name || '',
-        guarantor_relationship: profile?.guarantor_relationship || '',
-        guarantor_relationship_other: profile?.guarantor_relationship_other || '',
-        guarantor_phone_country_code: profile?.guarantor_phone_country_code || '',
-        guarantor_phone_number: profile?.guarantor_phone_number || '',
-        guarantor_email: profile?.guarantor_email || '',
-        guarantor_street_name: profile?.guarantor_street_name || '',
-        guarantor_house_number: profile?.guarantor_house_number || '',
-        guarantor_address_line_2: profile?.guarantor_address_line_2 || '',
-        guarantor_city: profile?.guarantor_city || '',
-        guarantor_postal_code: profile?.guarantor_postal_code || '',
-        guarantor_country: profile?.guarantor_country || '',
-        guarantor_employment_status: profile?.guarantor_employment_status || '',
-        guarantor_employer_name: profile?.guarantor_employer_name || '',
-        guarantor_job_title: profile?.guarantor_job_title || '',
-        guarantor_employment_type: profile?.guarantor_employment_type || '',
-        guarantor_employment_start_date: profile?.guarantor_employment_start_date || '',
-        guarantor_university_name: profile?.guarantor_university_name || '',
-        guarantor_program_of_study: profile?.guarantor_program_of_study || '',
-        guarantor_expected_graduation_date: profile?.guarantor_expected_graduation_date || '',
-        guarantor_student_income_source: profile?.guarantor_student_income_source || '',
-        guarantor_monthly_income: profile?.guarantor_monthly_income?.toString() || '',
-        guarantor_income_currency: profile?.guarantor_income_currency || 'eur',
-        // Emergency contact
-        emergency_contact_name: profile?.emergency_contact_name || '',
-        emergency_contact_phone: profile?.emergency_contact_phone || '',
-        emergency_contact_relationship: profile?.emergency_contact_relationship || '',
     }));
 
     // Autosave debounce
@@ -195,23 +163,6 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                 },
                 isVisible: (p) => !!p?.employment_status,
             },
-            {
-                id: 'guarantor',
-                title: tEdit('guarantor_info') || 'Guarantor Information',
-                icon: UserCheck,
-                isComplete: (p) => {
-                    if (!p?.has_guarantor) return true;
-                    return !!(p?.guarantor_first_name && p?.guarantor_last_name && p?.guarantor_relationship);
-                },
-                isVisible: () => true,
-            },
-            {
-                id: 'emergency',
-                title: tEdit('emergency_contact') || 'Emergency Contact',
-                icon: Phone,
-                isComplete: (p) => !!(p?.emergency_contact_name && p?.emergency_contact_phone),
-                isVisible: () => true,
-            },
         ],
         [t, tEdit],
     );
@@ -242,21 +193,6 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
             { value: 'part_time', label: tEdit('employment_types.part_time') || 'Part Time' },
             { value: 'contract', label: tEdit('employment_types.contract') || 'Contract' },
             { value: 'temporary', label: tEdit('employment_types.temporary') || 'Temporary' },
-        ],
-        [tEdit],
-    );
-
-    const GUARANTOR_RELATIONSHIPS = useMemo(
-        () => [
-            { value: 'Parent', label: tEdit('guarantor.relationships.parent') || 'Parent' },
-            { value: 'Grandparent', label: tEdit('guarantor.relationships.grandparent') || 'Grandparent' },
-            { value: 'Sibling', label: tEdit('guarantor.relationships.sibling') || 'Sibling' },
-            { value: 'Spouse', label: tEdit('guarantor.relationships.spouse') || 'Spouse' },
-            { value: 'Partner', label: tEdit('guarantor.relationships.partner') || 'Partner' },
-            { value: 'Other Family', label: tEdit('guarantor.relationships.other_family') || 'Other Family' },
-            { value: 'Friend', label: tEdit('guarantor.relationships.friend') || 'Friend' },
-            { value: 'Employer', label: tEdit('guarantor.relationships.employer') || 'Employer' },
-            { value: 'Other', label: tEdit('guarantor.relationships.other') || 'Other' },
         ],
         [tEdit],
     );
@@ -1105,260 +1041,6 @@ export default function ProfilePage({ profile, hasProfile, completeness, profile
                             )}
                         </Section>
                     )}
-
-                    {/* Guarantor Section */}
-                    <Section section={sections[5]}>
-                        {(isEditing) =>
-                            isEditing ? (
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            id="has_guarantor"
-                                            checked={formData.has_guarantor}
-                                            onChange={(e) => updateField('has_guarantor', e.target.checked)}
-                                            className="h-4 w-4"
-                                        />
-                                        <label htmlFor="has_guarantor" className="text-sm font-medium">
-                                            {tEdit('guarantor.has_guarantor') || 'I have a guarantor'}
-                                        </label>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">
-                                        {tEdit('guarantor.description') ||
-                                            'A guarantor can strengthen your application by providing additional financial security.'}
-                                    </p>
-
-                                    {formData.has_guarantor && (
-                                        <div className="space-y-4 pt-4">
-                                            <div className="grid gap-4 md:grid-cols-2">
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium">
-                                                        {tEdit('guarantor.first_name') || 'First Name'}
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        value={formData.guarantor_first_name}
-                                                        onChange={(e) => updateField('guarantor_first_name', e.target.value)}
-                                                        className={getInputClass()}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium">
-                                                        {tEdit('guarantor.last_name') || 'Last Name'}
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        value={formData.guarantor_last_name}
-                                                        onChange={(e) => updateField('guarantor_last_name', e.target.value)}
-                                                        className={getInputClass()}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium">
-                                                        {tEdit('guarantor.relationship') || 'Relationship'}
-                                                    </label>
-                                                    <Select
-                                                        value={formData.guarantor_relationship}
-                                                        onChange={(value) => updateField('guarantor_relationship', value)}
-                                                        options={GUARANTOR_RELATIONSHIPS}
-                                                        placeholder="Select relationship..."
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium">{tEdit('guarantor.phone') || 'Phone'}</label>
-                                                    <input
-                                                        type="tel"
-                                                        value={formData.guarantor_phone_number}
-                                                        onChange={(e) => updateField('guarantor_phone_number', e.target.value)}
-                                                        className={getInputClass()}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium">{tEdit('guarantor.email') || 'Email'}</label>
-                                                    <input
-                                                        type="email"
-                                                        value={formData.guarantor_email}
-                                                        onChange={(e) => updateField('guarantor_email', e.target.value)}
-                                                        className={getInputClass()}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium">{tEdit('guarantor.city') || 'City'}</label>
-                                                    <input
-                                                        type="text"
-                                                        value={formData.guarantor_city}
-                                                        onChange={(e) => updateField('guarantor_city', e.target.value)}
-                                                        className={getInputClass()}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium">
-                                                        {tEdit('guarantor.employer') || 'Employer'}
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        value={formData.guarantor_employer_name}
-                                                        onChange={(e) => updateField('guarantor_employer_name', e.target.value)}
-                                                        className={getInputClass()}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium">
-                                                        {tEdit('guarantor.monthly_income') || 'Monthly Income'}
-                                                    </label>
-                                                    <div className="flex">
-                                                        <CurrencySelect
-                                                            value={formData.guarantor_income_currency}
-                                                            onChange={(value) =>
-                                                                updateField(
-                                                                    'guarantor_income_currency',
-                                                                    value as typeof formData.guarantor_income_currency,
-                                                                )
-                                                            }
-                                                            compact
-                                                        />
-                                                        <input
-                                                            type="number"
-                                                            value={formData.guarantor_monthly_income}
-                                                            onChange={(e) => updateField('guarantor_monthly_income', e.target.value)}
-                                                            min="0"
-                                                            step="100"
-                                                            className={`w-full rounded-l-none rounded-r-lg ${getInputClass()}`}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Guarantor Documents */}
-                                            <div className="grid gap-4 pt-4 md:grid-cols-2">
-                                                <FileUpload
-                                                    label={tEdit('documents.guarantor_id') || 'Guarantor ID'}
-                                                    required
-                                                    documentType="guarantor_id"
-                                                    uploadUrl="/tenant-profile/document/upload"
-                                                    accept={fileUploadAccept}
-                                                    maxSize={20 * 1024 * 1024}
-                                                    description={fileUploadDescription}
-                                                    existingFile={
-                                                        profileDocuments?.guarantor_id
-                                                            ? {
-                                                                  originalName: profileDocuments.guarantor_id.originalName,
-                                                                  previewUrl: profileDocuments.guarantor_id.url,
-                                                                  size: profileDocuments.guarantor_id.size,
-                                                                  uploadedAt: profileDocuments.guarantor_id.uploadedAt,
-                                                              }
-                                                            : null
-                                                    }
-                                                    onUploadSuccess={handleUploadSuccess}
-                                                />
-                                                <FileUpload
-                                                    label={tEdit('documents.guarantor_income') || 'Guarantor Income Proof'}
-                                                    required
-                                                    documentType="guarantor_proof_income"
-                                                    uploadUrl="/tenant-profile/document/upload"
-                                                    accept={fileUploadAccept}
-                                                    maxSize={20 * 1024 * 1024}
-                                                    description={fileUploadDescription}
-                                                    existingFile={
-                                                        profileDocuments?.guarantor_proof_income
-                                                            ? {
-                                                                  originalName: profileDocuments.guarantor_proof_income.originalName,
-                                                                  previewUrl: profileDocuments.guarantor_proof_income.url,
-                                                                  size: profileDocuments.guarantor_proof_income.size,
-                                                                  uploadedAt: profileDocuments.guarantor_proof_income.uploadedAt,
-                                                              }
-                                                            : null
-                                                    }
-                                                    onUploadSuccess={handleUploadSuccess}
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div>
-                                    {profile?.has_guarantor ? (
-                                        <dl className="grid gap-4 md:grid-cols-3">
-                                            <DisplayField
-                                                label={tEdit('guarantor.name') || 'Name'}
-                                                value={
-                                                    profile?.guarantor_first_name || profile?.guarantor_last_name
-                                                        ? `${profile.guarantor_first_name || ''} ${profile.guarantor_last_name || ''}`.trim()
-                                                        : null
-                                                }
-                                            />
-                                            <DisplayField
-                                                label={tEdit('guarantor.relationship') || 'Relationship'}
-                                                value={profile?.guarantor_relationship}
-                                            />
-                                            <DisplayField
-                                                label={tEdit('guarantor.monthly_income') || 'Monthly Income'}
-                                                value={
-                                                    profile?.guarantor_monthly_income
-                                                        ? `${(profile.guarantor_income_currency || 'EUR').toUpperCase()} ${profile.guarantor_monthly_income.toLocaleString()}`
-                                                        : null
-                                                }
-                                            />
-                                        </dl>
-                                    ) : (
-                                        <p className="text-muted-foreground">{tEdit('guarantor.none') || 'No guarantor added'}</p>
-                                    )}
-                                </div>
-                            )
-                        }
-                    </Section>
-
-                    {/* Emergency Contact Section */}
-                    <Section section={sections[6]}>
-                        {(isEditing) =>
-                            isEditing ? (
-                                <div className="grid gap-4 md:grid-cols-3">
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium">{tEdit('emergency.name') || 'Contact Name'}</label>
-                                        <input
-                                            type="text"
-                                            value={formData.emergency_contact_name}
-                                            onChange={(e) => updateField('emergency_contact_name', e.target.value)}
-                                            className={getInputClass()}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium">{tEdit('emergency.phone') || 'Phone'}</label>
-                                        <input
-                                            type="tel"
-                                            value={formData.emergency_contact_phone}
-                                            onChange={(e) => updateField('emergency_contact_phone', e.target.value)}
-                                            className={getInputClass()}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium">{tEdit('emergency.relationship') || 'Relationship'}</label>
-                                        <input
-                                            type="text"
-                                            value={formData.emergency_contact_relationship}
-                                            onChange={(e) => updateField('emergency_contact_relationship', e.target.value)}
-                                            className={getInputClass()}
-                                        />
-                                    </div>
-                                </div>
-                            ) : (
-                                <div>
-                                    {profile?.emergency_contact_name ? (
-                                        <dl className="grid gap-4 md:grid-cols-3">
-                                            <DisplayField label={tEdit('emergency.name') || 'Name'} value={profile?.emergency_contact_name} />
-                                            <DisplayField label={tEdit('emergency.phone') || 'Phone'} value={profile?.emergency_contact_phone} />
-                                            <DisplayField
-                                                label={tEdit('emergency.relationship') || 'Relationship'}
-                                                value={profile?.emergency_contact_relationship}
-                                            />
-                                        </dl>
-                                    ) : (
-                                        <p className="text-muted-foreground">{tEdit('emergency.none') || 'No emergency contact added'}</p>
-                                    )}
-                                </div>
-                            )
-                        }
-                    </Section>
                 </div>
             </div>
         </TenantLayout>

@@ -104,35 +104,47 @@ export interface TenantProfile {
     expected_graduation_date?: string;
     student_income_source?: string;
 
-    // Guarantor - Basic Info
-    has_guarantor: boolean;
-    guarantor_first_name?: string;
-    guarantor_last_name?: string;
-    guarantor_relationship?: string;
-    guarantor_relationship_other?: string;
-    guarantor_phone_country_code?: string;
-    guarantor_phone_number?: string;
-    guarantor_email?: string;
-    guarantor_street_name?: string;
-    guarantor_house_number?: string;
-    guarantor_address_line_2?: string;
-    guarantor_city?: string;
-    guarantor_state_province?: string;
-    guarantor_postal_code?: string;
-    guarantor_country?: string;
-    // Guarantor - Employment
-    guarantor_employment_status?: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired';
-    guarantor_employer_name?: string;
-    guarantor_job_title?: string;
-    guarantor_employment_type?: 'full_time' | 'part_time' | 'contract' | 'temporary';
-    guarantor_employment_start_date?: string;
-    guarantor_monthly_income?: number;
-    guarantor_income_currency?: string;
-    // Guarantor - Student Info
-    guarantor_university_name?: string;
-    guarantor_program_of_study?: string;
-    guarantor_expected_graduation_date?: string;
-    guarantor_student_income_source?: string;
+    // Rental History (Credit & Background)
+    authorize_credit_check?: boolean;
+    authorize_background_check?: boolean;
+    credit_check_provider_preference?: string;
+    has_ccjs_or_bankruptcies?: boolean;
+    ccj_bankruptcy_details?: string;
+    has_eviction_history?: boolean;
+    eviction_details?: string;
+
+    // Rental History (Current Living Situation)
+    current_living_situation?: 'owner' | 'renting' | 'living_with_family' | 'student_housing' | 'other';
+    current_address_move_in_date?: string;
+    current_monthly_rent?: number;
+    current_rent_currency?: string;
+    current_landlord_name?: string;
+    current_landlord_contact?: string;
+    reason_for_moving?: string;
+    reason_for_moving_other?: string;
+
+    // Previous Addresses & References (JSON)
+    previous_addresses?: Array<{
+        street_name: string;
+        house_number: string;
+        city: string;
+        postal_code: string;
+        country: string;
+        from_date: string;
+        to_date: string;
+    }>;
+    landlord_references?: Array<{
+        name: string;
+        email: string;
+        phone: string;
+        property_address?: string;
+    }>;
+    other_references?: Array<{
+        name: string;
+        email: string;
+        phone: string;
+        relationship: string;
+    }>;
 
     // Documents
     id_document_front_path?: string;
@@ -155,40 +167,9 @@ export interface TenantProfile {
     student_proof_original_name?: string;
     other_income_proof_path?: string;
     other_income_proof_original_name?: string;
-    // Guarantor Documents
-    guarantor_id_front_path?: string;
-    guarantor_id_front_original_name?: string;
-    guarantor_id_back_path?: string;
-    guarantor_id_back_original_name?: string;
-    guarantor_proof_income_path?: string;
-    guarantor_proof_income_original_name?: string;
-    guarantor_employment_contract_path?: string;
-    guarantor_employment_contract_original_name?: string;
-    guarantor_payslip_1_path?: string;
-    guarantor_payslip_1_original_name?: string;
-    guarantor_payslip_2_path?: string;
-    guarantor_payslip_2_original_name?: string;
-    guarantor_payslip_3_path?: string;
-    guarantor_payslip_3_original_name?: string;
-    guarantor_student_proof_path?: string;
-    guarantor_student_proof_original_name?: string;
-    guarantor_other_income_proof_path?: string;
-    guarantor_other_income_proof_original_name?: string;
     reference_letter_path?: string;
     reference_letter_original_name?: string;
     profile_picture_path?: string;
-
-    // Emergency contact
-    emergency_contact_name?: string;
-    emergency_contact_phone?: string;
-    emergency_contact_relationship?: string;
-
-    // Preferences
-    preferred_move_in_date?: string;
-    occupants_count: number;
-    has_pets: boolean;
-    pets_description?: string;
-    is_smoker: boolean;
 
     // Verification
     profile_verified_at?: string;
@@ -212,17 +193,6 @@ export interface TenantProfile {
     payslip_3_url?: string;
     student_proof_url?: string;
     other_income_proof_url?: string;
-    // Guarantor computed URLs
-    guarantor_full_name?: string;
-    guarantor_id_front_url?: string;
-    guarantor_id_back_url?: string;
-    guarantor_proof_income_url?: string;
-    guarantor_employment_contract_url?: string;
-    guarantor_payslip_1_url?: string;
-    guarantor_payslip_2_url?: string;
-    guarantor_payslip_3_url?: string;
-    guarantor_student_proof_url?: string;
-    guarantor_other_income_proof_url?: string;
     documents_metadata?: Record<string, { size?: number; lastModified?: number } | null>;
 }
 
@@ -355,10 +325,6 @@ export interface Application {
     snapshot_university_name?: string;
     snapshot_program_of_study?: string;
     snapshot_expected_graduation_date?: string;
-    snapshot_has_guarantor?: boolean;
-    snapshot_guarantor_name?: string;
-    snapshot_guarantor_relationship?: string;
-    snapshot_guarantor_monthly_income?: number;
     snapshot_id_document_front_path?: string;
     snapshot_id_document_back_path?: string;
     snapshot_employment_contract_path?: string;
@@ -367,8 +333,6 @@ export interface Application {
     snapshot_payslip_3_path?: string;
     snapshot_student_proof_path?: string;
     snapshot_other_income_proof_path?: string;
-    snapshot_guarantor_id_path?: string;
-    snapshot_guarantor_proof_income_path?: string;
 
     // Document URLs (generated by backend)
     snapshot_id_document_front_url?: string;
@@ -379,8 +343,6 @@ export interface Application {
     snapshot_payslip_3_url?: string;
     snapshot_student_proof_url?: string;
     snapshot_other_income_proof_url?: string;
-    snapshot_guarantor_id_url?: string;
-    snapshot_guarantor_proof_income_url?: string;
     application_id_document_url?: string;
     application_proof_of_income_url?: string;
     application_reference_letter_url?: string;

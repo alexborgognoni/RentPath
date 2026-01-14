@@ -60,6 +60,8 @@ SESSION_DOMAIN=.rentpath.test | .rentpath.app  # Leading dot for subdomain auth
 - **Storage**: `app/Helpers/StorageHelper.php` - Environment-aware S3/CloudFront URLs
 - **Services**: `app/Services/PropertyService.php`, `app/Services/ApplicationService.php` - Wizard business logic
 - **Validation**: `app/Http/Requests/Property/Steps/`, `app/Http/Requests/Application/Steps/` - Per-step FormRequests
+- **Data Layer**: `app/Data/` - Spatie Laravel Data classes (auto-generates TypeScript types)
+- **Types**: `resources/js/types/generated.d.ts` - Auto-generated from Data classes
 - **Infrastructure**: `infrastructure/README.md` - AWS deployment guide
 
 ## Instructions for Claude

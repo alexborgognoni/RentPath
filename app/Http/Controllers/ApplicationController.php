@@ -351,16 +351,7 @@ class ApplicationController extends Controller
             'profile_expected_return_to_work' => $tenantProfile->expected_return_to_work,
             'profile_other_situation_monthly_income' => $tenantProfile->other_situation_monthly_income,
             'profile_other_situation_income_source' => $tenantProfile->other_situation_income_source,
-            // Guarantor
-            'profile_has_guarantor' => $tenantProfile->has_guarantor,
-            'profile_guarantor_first_name' => $tenantProfile->guarantor_first_name,
-            'profile_guarantor_last_name' => $tenantProfile->guarantor_last_name,
-            'profile_guarantor_relationship' => $tenantProfile->guarantor_relationship,
-            'profile_guarantor_phone_country_code' => $tenantProfile->guarantor_phone_country_code,
-            'profile_guarantor_phone_number' => $tenantProfile->guarantor_phone_number,
-            'profile_guarantor_email' => $tenantProfile->guarantor_email,
-            'profile_guarantor_monthly_income' => $tenantProfile->guarantor_monthly_income,
-            // Document paths for guarantor
+            // Document paths
             'profile_employment_contract_path' => $tenantProfile->employment_contract_path,
             'profile_payslip_1_path' => $tenantProfile->payslip_1_path,
             'profile_payslip_2_path' => $tenantProfile->payslip_2_path,
@@ -1061,16 +1052,6 @@ class ApplicationController extends Controller
             'expected_return_to_work' => $request->input('profile_expected_return_to_work'),
             'other_situation_monthly_income' => $request->input('profile_other_situation_monthly_income'),
             'other_situation_income_source' => $request->input('profile_other_situation_income_source'),
-
-            // Guarantor
-            'has_guarantor' => $request->boolean('profile_has_guarantor'),
-            'guarantor_name' => $request->input('profile_guarantor_name'),
-            'guarantor_relationship' => $request->input('profile_guarantor_relationship'),
-            'guarantor_phone' => $request->input('profile_guarantor_phone'),
-            'guarantor_email' => $request->input('profile_guarantor_email'),
-            'guarantor_address' => $request->input('profile_guarantor_address'),
-            'guarantor_employer' => $request->input('profile_guarantor_employer'),
-            'guarantor_monthly_income' => $request->input('profile_guarantor_monthly_income'),
         ];
 
         // Handle profile document uploads
@@ -1141,16 +1122,6 @@ class ApplicationController extends Controller
             'snapshot_expected_graduation_date' => $tenantProfile->expected_graduation_date,
             'snapshot_student_income_source' => $tenantProfile->student_income_source,
 
-            // Guarantor snapshot
-            'snapshot_has_guarantor' => $tenantProfile->has_guarantor,
-            'snapshot_guarantor_name' => $tenantProfile->guarantor_name,
-            'snapshot_guarantor_relationship' => $tenantProfile->guarantor_relationship,
-            'snapshot_guarantor_phone' => $tenantProfile->guarantor_phone,
-            'snapshot_guarantor_email' => $tenantProfile->guarantor_email,
-            'snapshot_guarantor_address' => $tenantProfile->guarantor_address,
-            'snapshot_guarantor_employer' => $tenantProfile->guarantor_employer,
-            'snapshot_guarantor_monthly_income' => $tenantProfile->guarantor_monthly_income,
-
             // Document paths snapshot
             'snapshot_id_document_front_path' => $tenantProfile->id_document_front_path,
             'snapshot_id_document_back_path' => $tenantProfile->id_document_back_path,
@@ -1160,8 +1131,6 @@ class ApplicationController extends Controller
             'snapshot_payslip_3_path' => $tenantProfile->payslip_3_path,
             'snapshot_student_proof_path' => $tenantProfile->student_proof_path,
             'snapshot_other_income_proof_path' => $tenantProfile->other_income_proof_path,
-            'snapshot_guarantor_id_path' => $tenantProfile->guarantor_id_path,
-            'snapshot_guarantor_proof_income_path' => $tenantProfile->guarantor_proof_income_path,
         ];
     }
 
@@ -1197,42 +1166,10 @@ class ApplicationController extends Controller
 
     /**
      * Sync application data back to TenantProfile after submission.
-     * This saves references, emergency contact, pets, and occupants for reuse.
+     * Syncs references to the tenant_references table for reuse in future applications.
      */
     private function syncApplicationToProfile(Application $application, $tenantProfile): void
     {
-        $profileUpdates = [];
-
-        // Sync Emergency Contact
-        if ($application->emergency_contact_name) {
-            $profileUpdates['emergency_contact_name'] = $application->emergency_contact_name;
-            $profileUpdates['emergency_contact_phone'] = $application->emergency_contact_phone;
-            $profileUpdates['emergency_contact_relationship'] = $application->emergency_contact_relationship;
-        }
-
-        // Sync Pets
-        if ($application->pets_details !== null) {
-            $profileUpdates['pets_details'] = $application->pets_details;
-            // Generate description from details
-            if ($application->pets_details && is_array($application->pets_details)) {
-                $descriptions = array_map(function ($pet) {
-                    return trim(($pet['breed'] ?? '').' '.($pet['type'] ?? ''));
-                }, $application->pets_details);
-                $profileUpdates['pets_description'] = implode(', ', array_filter($descriptions));
-            }
-        }
-
-        // Sync Occupants
-        if ($application->additional_occupants !== null) {
-            $profileUpdates['occupants_count'] = $application->additional_occupants + 1; // +1 for applicant
-            $profileUpdates['occupants_details'] = $application->occupants_details;
-        }
-
-        // Apply profile updates
-        if (! empty($profileUpdates)) {
-            $tenantProfile->update($profileUpdates);
-        }
-
         // Sync References to tenant_references table
         $this->syncReferencesToProfile($application, $tenantProfile);
     }
@@ -1729,8 +1666,6 @@ class ApplicationController extends Controller
             'snapshot_payslip_2_path',
             'snapshot_payslip_3_path',
             'snapshot_student_proof_path',
-            'snapshot_guarantor_id_path',
-            'snapshot_guarantor_proof_income_path',
             'application_id_document_path',
             'application_proof_of_income_path',
             'application_reference_letter_path',

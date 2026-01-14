@@ -87,16 +87,6 @@ class TenantProfileController extends Controller
             'payslip_3',
             'student_proof',
             'other_income_proof',
-            // Guarantor documents
-            'guarantor_id_front',
-            'guarantor_id_back',
-            'guarantor_proof_income',
-            'guarantor_employment_contract',
-            'guarantor_payslip_1',
-            'guarantor_payslip_2',
-            'guarantor_payslip_3',
-            'guarantor_student_proof',
-            'guarantor_other_income_proof',
         ];
 
         $documents = [];
@@ -159,16 +149,6 @@ class TenantProfileController extends Controller
                 'university_name',
                 'program_of_study',
                 'student_proof_path',
-            ]);
-        }
-
-        // Add guarantor fields if has_guarantor is true
-        if ($profile->has_guarantor) {
-            $fields = array_merge($fields, [
-                'guarantor_first_name',
-                'guarantor_last_name',
-                'guarantor_relationship',
-                'guarantor_employment_status',
             ]);
         }
 
@@ -235,17 +215,6 @@ class TenantProfileController extends Controller
 
             'profile_picture' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
             'id_document' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480',
-
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_phone' => 'nullable|string|max:20',
-            'emergency_contact_relationship' => 'nullable|string|max:100',
-
-            'occupants_count' => 'nullable|integer|min:1|max:20',
-            'has_pets' => 'nullable|boolean',
-            'pets_description' => 'nullable|string|max:500',
-            'is_smoker' => 'nullable|boolean',
-
-            'has_guarantor' => 'nullable|boolean',
         ];
 
         $employmentStatus = $request->input('employment_status');
@@ -276,18 +245,6 @@ class TenantProfileController extends Controller
             $rules['monthly_income'] = 'required|numeric|min:0';
             $rules['income_currency'] = ['required', Rule::in(['eur', 'usd', 'gbp', 'chf'])];
             $rules['student_proof'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
-        }
-
-        if ($request->boolean('has_guarantor')) {
-            $rules['guarantor_name'] = 'required|string|max:255';
-            $rules['guarantor_relationship'] = 'required|string|max:100';
-            $rules['guarantor_phone'] = 'required|string|max:20';
-            $rules['guarantor_email'] = 'required|email|max:255';
-            $rules['guarantor_address'] = 'required|string|max:500';
-            $rules['guarantor_employer'] = 'required|string|max:255';
-            $rules['guarantor_monthly_income'] = 'required|numeric|min:0';
-            $rules['guarantor_id'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
-            $rules['guarantor_proof_income'] = 'nullable|file|mimes:pdf,jpeg,png,jpg|max:20480';
         }
 
         $validated = $request->validate($rules);
@@ -378,30 +335,6 @@ class TenantProfileController extends Controller
             $validated['student_proof_original_name'] = $request->file('student_proof')->getClientOriginalName();
         }
 
-        if ($request->hasFile('guarantor_id')) {
-            if ($tenantProfile->guarantor_id_path) {
-                StorageHelper::delete($tenantProfile->guarantor_id_path, 'private');
-            }
-            $validated['guarantor_id_path'] = StorageHelper::store(
-                $request->file('guarantor_id'),
-                'tenants/guarantor-documents',
-                'private'
-            );
-            $validated['guarantor_id_original_name'] = $request->file('guarantor_id')->getClientOriginalName();
-        }
-
-        if ($request->hasFile('guarantor_proof_income')) {
-            if ($tenantProfile->guarantor_proof_income_path) {
-                StorageHelper::delete($tenantProfile->guarantor_proof_income_path, 'private');
-            }
-            $validated['guarantor_proof_income_path'] = StorageHelper::store(
-                $request->file('guarantor_proof_income'),
-                'tenants/guarantor-documents',
-                'private'
-            );
-            $validated['guarantor_proof_income_original_name'] = $request->file('guarantor_proof_income')->getClientOriginalName();
-        }
-
         // Remove file fields and clear rejection data on resubmission
         unset(
             $validated['profile_picture'],
@@ -410,9 +343,7 @@ class TenantProfileController extends Controller
             $validated['payslip_1'],
             $validated['payslip_2'],
             $validated['payslip_3'],
-            $validated['student_proof'],
-            $validated['guarantor_id'],
-            $validated['guarantor_proof_income']
+            $validated['student_proof']
         );
 
         // Clear rejection data when resubmitting
@@ -468,7 +399,6 @@ class TenantProfileController extends Controller
 
         // Define allowed document types and their storage config
         $documentTypes = [
-            // Main tenant documents
             'id_document_front' => ['folder' => 'profiles/id-documents', 'disk' => 'private'],
             'id_document_back' => ['folder' => 'profiles/id-documents', 'disk' => 'private'],
             'residence_permit_document' => ['folder' => 'profiles/residence-permits', 'disk' => 'private'],
@@ -479,16 +409,6 @@ class TenantProfileController extends Controller
             'payslip_3' => ['folder' => 'profiles/payslips', 'disk' => 'private'],
             'student_proof' => ['folder' => 'profiles/student-proofs', 'disk' => 'private'],
             'other_income_proof' => ['folder' => 'profiles/other-income-proofs', 'disk' => 'private'],
-            // Guarantor documents
-            'guarantor_id_front' => ['folder' => 'profiles/guarantor-ids', 'disk' => 'private'],
-            'guarantor_id_back' => ['folder' => 'profiles/guarantor-ids', 'disk' => 'private'],
-            'guarantor_proof_income' => ['folder' => 'profiles/guarantor-income-proofs', 'disk' => 'private'],
-            'guarantor_employment_contract' => ['folder' => 'profiles/guarantor-employment-contracts', 'disk' => 'private'],
-            'guarantor_payslip_1' => ['folder' => 'profiles/guarantor-payslips', 'disk' => 'private'],
-            'guarantor_payslip_2' => ['folder' => 'profiles/guarantor-payslips', 'disk' => 'private'],
-            'guarantor_payslip_3' => ['folder' => 'profiles/guarantor-payslips', 'disk' => 'private'],
-            'guarantor_student_proof' => ['folder' => 'profiles/guarantor-student-proofs', 'disk' => 'private'],
-            'guarantor_other_income_proof' => ['folder' => 'profiles/guarantor-other-income-proofs', 'disk' => 'private'],
         ];
 
         $validated = $request->validate([
@@ -540,13 +460,8 @@ class TenantProfileController extends Controller
         }
 
         $documentTypes = [
-            // Main tenant documents
             'id_document_front', 'id_document_back', 'residence_permit_document', 'right_to_rent_document',
             'employment_contract', 'payslip_1', 'payslip_2', 'payslip_3', 'student_proof', 'other_income_proof',
-            // Guarantor documents
-            'guarantor_id_front', 'guarantor_id_back', 'guarantor_proof_income',
-            'guarantor_employment_contract', 'guarantor_payslip_1', 'guarantor_payslip_2',
-            'guarantor_payslip_3', 'guarantor_student_proof', 'guarantor_other_income_proof',
         ];
 
         $validated = $request->validate([
@@ -681,43 +596,6 @@ class TenantProfileController extends Controller
             // Additional income
             'has_additional_income',
             'additional_income_sources',
-
-            // ===== Guarantor =====
-            'has_guarantor',
-            'guarantor_first_name',
-            'guarantor_last_name',
-            'guarantor_name', // Legacy
-            'guarantor_relationship',
-            'guarantor_relationship_other',
-            'guarantor_phone_country_code',
-            'guarantor_phone_number',
-            'guarantor_phone', // Legacy
-            'guarantor_email',
-            'guarantor_street_name',
-            'guarantor_house_number',
-            'guarantor_address_line_2',
-            'guarantor_city',
-            'guarantor_state_province',
-            'guarantor_postal_code',
-            'guarantor_country',
-            'guarantor_address', // Legacy
-            'guarantor_employment_status',
-            'guarantor_employer_name',
-            'guarantor_employer', // Legacy
-            'guarantor_job_title',
-            'guarantor_employment_type',
-            'guarantor_employment_start_date',
-            'guarantor_monthly_income',
-            'guarantor_income_currency',
-            'guarantor_university_name',
-            'guarantor_program_of_study',
-            'guarantor_expected_graduation_date',
-            'guarantor_student_income_source',
-
-            // Emergency Contact
-            'emergency_contact_name',
-            'emergency_contact_phone',
-            'emergency_contact_relationship',
         ];
 
         // Only accept allowed fields from the request
@@ -727,12 +605,7 @@ class TenantProfileController extends Controller
             $fieldName = str_starts_with($key, 'profile_') ? substr($key, 8) : $key;
 
             if (in_array($fieldName, $allowedFields)) {
-                // Handle boolean conversion for has_guarantor
-                if ($fieldName === 'has_guarantor') {
-                    $data[$fieldName] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                } else {
-                    $data[$fieldName] = $value === '' ? null : $value;
-                }
+                $data[$fieldName] = $value === '' ? null : $value;
             }
         }
 

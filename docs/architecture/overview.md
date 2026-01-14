@@ -54,6 +54,21 @@ SESSION_DOMAIN=.rentpath.test | .rentpath.app  # Leading dot for subdomain auth
 - Theme colors defined in `resources/css/app.css`
 - See `.claude/agents/frontend.md` for detailed color guidelines
 
+## Data Layer
+
+**Spatie Laravel Data** classes serve as the single source of truth for:
+
+- Type definitions (PHP → auto-generated TypeScript via `spatie/laravel-typescript-transformer`)
+- API responses (consistent data structure)
+
+**Key locations:**
+
+- Data classes: `app/Data/`
+- Generated TypeScript types: `resources/js/types/generated.d.ts`
+- Run `php artisan typescript:transform` to regenerate types
+
+**Note:** Validation still uses Laravel FormRequests (PHP 8.4 required for Data class validation attributes).
+
 ## Key Design Principles
 
 1. **Flexible Role System**: Users can be both tenant and property manager

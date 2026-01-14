@@ -166,7 +166,9 @@ php artisan make:migration add_field_to_table --no-interaction
 
 ### 4. Frontend Types
 
-- `resources/js/types/index.d.ts`: Add to interface
+- Run `php artisan typescript:transform` to regenerate types from Data classes
+- Check `resources/js/types/generated.d.ts` for the new types
+- Update `resources/js/types/index.d.ts` if manual types needed
 - Wizard hook: Add to data type and initial state
 
 ### 5. Frontend Step Config

@@ -9,6 +9,7 @@
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
         "types": "tsgo --noEmit",
+        "types:generate": "php artisan typescript:transform",
         "prepare": "husky"
     },
     "devDependencies": {

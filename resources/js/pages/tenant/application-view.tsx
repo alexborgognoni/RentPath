@@ -23,7 +23,6 @@ import {
     MapPin,
     MessageCircle,
     Phone,
-    Shield,
     User,
     Users,
     XCircle,
@@ -467,49 +466,6 @@ export default function ApplicationView() {
                                                             {t('tenant.application.program') || 'Program'}
                                                         </p>
                                                         <p className="font-medium text-foreground">{application.snapshot_program_of_study}</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Guarantor Info */}
-                                    {application.snapshot_has_guarantor && (
-                                        <div className="mt-4 border-t border-border pt-4">
-                                            <div className="mb-2 flex items-center gap-2">
-                                                <Shield className="h-4 w-4 text-muted-foreground" />
-                                                <span className="text-sm font-medium text-foreground">
-                                                    {t('tenant.application.guarantor_info') || 'Guarantor Information'}
-                                                </span>
-                                            </div>
-                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                {application.snapshot_guarantor_name && (
-                                                    <div>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {t('tenant.application.guarantor_name') || 'Name'}
-                                                        </p>
-                                                        <p className="font-medium text-foreground">{application.snapshot_guarantor_name}</p>
-                                                    </div>
-                                                )}
-                                                {application.snapshot_guarantor_relationship && (
-                                                    <div>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {t('tenant.application.relationship') || 'Relationship'}
-                                                        </p>
-                                                        <p className="font-medium text-foreground">{application.snapshot_guarantor_relationship}</p>
-                                                    </div>
-                                                )}
-                                                {application.snapshot_guarantor_monthly_income && (
-                                                    <div>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {t('tenant.application.monthly_income') || 'Monthly Income'}
-                                                        </p>
-                                                        <p className="font-medium text-foreground">
-                                                            {formatAmount(
-                                                                application.snapshot_guarantor_monthly_income,
-                                                                application.snapshot_income_currency || 'eur',
-                                                            )}
-                                                        </p>
                                                     </div>
                                                 )}
                                             </div>

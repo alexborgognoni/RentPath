@@ -188,19 +188,6 @@ class TestUserSeeder extends Seeder
             'employer_contact_phone' => '+1-555-9876543',
             'employer_contact_email' => 'hr@techsolutions.com',
 
-            // Emergency contact
-            'emergency_contact_name' => 'Robert Johnson',
-            'emergency_contact_phone' => '+1-555-7654321',
-            'emergency_contact_relationship' => 'Father',
-
-            // Preferences
-            'occupants_count' => 1,
-            'has_pets' => false,
-            'is_smoker' => false,
-
-            // Guarantor
-            'has_guarantor' => false,
-
             // Verification - VERIFIED
             'profile_verified_at' => now(),
         ]);

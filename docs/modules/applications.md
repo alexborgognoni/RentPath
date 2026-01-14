@@ -16,44 +16,52 @@ draft -> submitted -> under_review -> visit_scheduled -> visit_completed
     -> approved/rejected/withdrawn -> leased -> archived/deleted
 ```
 
-| Status | Description | Next States |
-|--------|-------------|-------------|
-| `draft` | Started, not submitted | submitted, deleted |
-| `submitted` | Awaiting review | under_review, withdrawn, archived |
-| `under_review` | Being reviewed | visit_scheduled, approved, rejected, archived |
-| `visit_scheduled` | Visit agreed | visit_completed, withdrawn, archived |
-| `visit_completed` | Visit done | approved, rejected, withdrawn, archived |
-| `approved` | Tenant approved | leased, withdrawn, archived |
-| `rejected` | Application declined | archived |
-| `withdrawn` | Tenant withdrew | archived |
-| `leased` | Lease signed | archived |
-| `archived` | Closed, kept for records | - |
-| `deleted` | Draft cleanup | - |
+| Status            | Description              | Next States                                   |
+| ----------------- | ------------------------ | --------------------------------------------- |
+| `draft`           | Started, not submitted   | submitted, deleted                            |
+| `submitted`       | Awaiting review          | under_review, withdrawn, archived             |
+| `under_review`    | Being reviewed           | visit_scheduled, approved, rejected, archived |
+| `visit_scheduled` | Visit agreed             | visit_completed, withdrawn, archived          |
+| `visit_completed` | Visit done               | approved, rejected, withdrawn, archived       |
+| `approved`        | Tenant approved          | leased, withdrawn, archived                   |
+| `rejected`        | Application declined     | archived                                      |
+| `withdrawn`       | Tenant withdrew          | archived                                      |
+| `leased`          | Lease signed             | archived                                      |
+| `archived`        | Closed, kept for records | -                                             |
+| `deleted`         | Draft cleanup            | -                                             |
 
 ## Key Fields
 
-| Category | Fields |
-|----------|--------|
-| Intent | desired_move_in_date, lease_duration_months, is_flexible_* |
-| Message | message_to_landlord |
-| Occupants | additional_occupants, occupants_details (JSON) |
-| Pets | has_pets, pets_details (JSON) |
-| Rental History | current_living_situation, current_address_*, reason_for_moving |
-| References | Via `application_references` table |
-| Background | authorize_credit_check, has_ccjs_or_bankruptcies, has_eviction_history |
-| Consent | declaration_accuracy_at, consent_screening_at, consent_data_processing_at |
-| Review | reviewed_by_user_id, reviewed_at |
-| Visit | visit_scheduled_at, visit_completed_at, visit_notes |
-| Approval | approved_by_user_id, approved_at, approval_notes |
-| Lease | lease_start_date, lease_end_date, agreed_rent_amount, deposit_amount |
+| Category       | Fields                                                                    |
+| -------------- | ------------------------------------------------------------------------- |
+| Intent         | desired*move_in_date, lease_duration_months, is_flexible*\*               |
+| Message        | message_to_landlord                                                       |
+| Occupants      | additional_occupants, occupants_details (JSON)                            |
+| Pets           | has_pets, pets_details (JSON)                                             |
+| Rental History | current*living_situation, current_address*\*, reason_for_moving           |
+| References     | Via `application_references` table                                        |
+| Background     | authorize_credit_check, has_ccjs_or_bankruptcies, has_eviction_history    |
+| Consent        | declaration_accuracy_at, consent_screening_at, consent_data_processing_at |
+| Review         | reviewed_by_user_id, reviewed_at                                          |
+| Visit          | visit_scheduled_at, visit_completed_at, visit_notes                       |
+| Approval       | approved_by_user_id, approved_at, approval_notes                          |
+| Lease          | lease_start_date, lease_end_date, agreed_rent_amount, deposit_amount      |
 
 ## Data Separation Strategy
 
 **Profile Fields** (stored in `tenant_profiles`, reusable):
-- Personal info, ID documents, employment, income, guarantor
+
+- Personal info, ID documents, employment, income, rental history
 
 **Application Fields** (stored in `applications`, per-application):
-- Move-in date, message, occupants, pets, emergency contact
+
+- Move-in date, message, occupants, pets, emergency contact, is_smoker
+
+**Related Tables** (per-application):
+
+- `application_guarantors` - Guarantors for the tenant or co-signers
+- `application_references` - Landlord/personal references
+- `application_co_signers` - Additional lease signers
 
 ## Snapshot Pattern
 
@@ -65,15 +73,10 @@ On submit:     Profile data -> snapshot_* fields on Application
 ```
 
 **Why?**
+
 - Tenant may update profile after submission
 - Manager sees data as it was at application time
 - Legal/audit trail preservation
-
-## Related Tables
-
-- `application_co_signers` - Additional signers on the lease
-- `application_guarantors` - Guarantors for signers
-- `application_references` - Landlord and other references
 
 ## Uniqueness
 

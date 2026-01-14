@@ -58,20 +58,6 @@ class TenantProfileFactory extends Factory
             'expected_graduation_date' => $isStudent ? fake()->date('Y-m-d', '+2 years') : null,
             'student_income_source' => $isStudent ? fake()->randomElement(['Parents', 'Scholarship', 'Part-time job', 'Student loan']) : null,
 
-            // Guarantor (30% chance)
-            'has_guarantor' => false,
-
-            // Emergency contact
-            'emergency_contact_name' => fake()->name(),
-            'emergency_contact_phone' => fake()->phoneNumber(),
-            'emergency_contact_relationship' => fake()->randomElement(['Parent', 'Sibling', 'Friend', 'Spouse']),
-
-            // Preferences
-            'occupants_count' => fake()->numberBetween(1, 3),
-            'has_pets' => fake()->boolean(30),
-            'pets_description' => fake()->boolean(30) ? fake()->randomElement(['1 cat', '1 dog (small breed)', '2 cats']) : null,
-            'is_smoker' => fake()->boolean(10),
-
             // Verification - not verified by default
             'profile_verified_at' => null,
             'verification_rejection_reason' => null,
@@ -142,23 +128,6 @@ class TenantProfileFactory extends Factory
             'program_of_study' => fake()->randomElement(['Computer Science', 'Business Administration', 'Engineering', 'Medicine']),
             'expected_graduation_date' => fake()->date('Y-m-d', '+2 years'),
             'student_income_source' => fake()->randomElement(['Parents', 'Scholarship', 'Part-time job']),
-        ]);
-    }
-
-    /**
-     * Create a tenant profile with a guarantor.
-     */
-    public function withGuarantor(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'has_guarantor' => true,
-            'guarantor_name' => fake()->name(),
-            'guarantor_relationship' => fake()->randomElement(['Parent', 'Sibling', 'Friend', 'Relative']),
-            'guarantor_phone' => fake()->phoneNumber(),
-            'guarantor_email' => fake()->safeEmail(),
-            'guarantor_address' => fake()->address(),
-            'guarantor_employer' => fake()->company(),
-            'guarantor_monthly_income' => fake()->numberBetween(4000, 10000),
         ]);
     }
 }

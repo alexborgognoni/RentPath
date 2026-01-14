@@ -167,23 +167,12 @@ class Application extends Model
         'snapshot_program_of_study',
         'snapshot_expected_graduation_date',
         'snapshot_student_income_source',
-        'snapshot_has_guarantor',
-        'snapshot_guarantor_name',
-        'snapshot_guarantor_relationship',
-        'snapshot_guarantor_phone',
-        'snapshot_guarantor_email',
-        'snapshot_guarantor_address',
-        'snapshot_guarantor_employer',
-        'snapshot_guarantor_monthly_income',
-        'snapshot_guarantor_income_currency',
         'snapshot_id_document_path',
         'snapshot_employment_contract_path',
         'snapshot_payslip_1_path',
         'snapshot_payslip_2_path',
         'snapshot_payslip_3_path',
         'snapshot_student_proof_path',
-        'snapshot_guarantor_id_path',
-        'snapshot_guarantor_proof_income_path',
     ];
 
     /**
@@ -234,8 +223,6 @@ class Application extends Model
         'snapshot_employment_start_date' => 'date',
         'snapshot_expected_graduation_date' => 'date',
         'snapshot_monthly_income' => 'decimal:2',
-        'snapshot_guarantor_monthly_income' => 'decimal:2',
-        'snapshot_has_guarantor' => 'boolean',
     ];
 
     /**
