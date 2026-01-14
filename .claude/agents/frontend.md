@@ -2,6 +2,8 @@
 name: frontend
 description: React component development, UI/UX implementation, state management, form handling, and frontend architecture.
 model: sonnet
+skills:
+    - wizard-field
 ---
 
 Use this agent for React component development, UI/UX implementation, state management, form handling, and frontend architecture decisions. This agent is expert in the RentPath frontend stack (React 19, Inertia v2, Tailwind v4, TypeScript).

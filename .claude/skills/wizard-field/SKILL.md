@@ -7,6 +7,26 @@ description: Guide for adding new fields to application or property wizards. Use
 
 You are helping add new fields to RentPath's multi-step wizard forms (Application Wizard or Property Wizard).
 
+## Arguments
+
+This skill accepts optional arguments to specify the field and wizard:
+
+| Usage                                            | Behavior                               |
+| ------------------------------------------------ | -------------------------------------- |
+| `/wizard-field`                                  | Interactive - ask for field details    |
+| `/wizard-field emergency_contact`                | Add field named emergency_contact      |
+| `/wizard-field application emergency_contact`    | Add to application wizard specifically |
+| `/wizard-field property energy_rating`           | Add to property wizard specifically    |
+| `/wizard-field application.identity nationality` | Add to specific step                   |
+| `/wizard-field --step=financial`                 | Focus on the financial step            |
+
+**Argument interpretation:**
+
+- **Field name** - The database/form field to add
+- **Wizard type** (`application`, `property`) - Which wizard to modify
+- **Step** (`identity`, `financial`, `specs`, etc.) - Which step the field belongs to
+- **wizard.step** format - Explicit wizard and step specification
+
 ## Before You Start
 
 1. **Read the validation pattern**: `docs/patterns/validation.md`

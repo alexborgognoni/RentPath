@@ -85,6 +85,7 @@ Laravel Boost is an MCP server that comes with powerful tools designed specifica
 - Do not add package names to queries - package information is already shared.
 
 **Search Syntax:**
+
 1. Simple Word Searches with auto-stemming - `authentication` finds 'authenticate' and 'auth'
 2. Multiple Words (AND Logic) - `rate limit` finds knowledge containing both terms
 3. Quoted Phrases (Exact Position) - `"infinite scroll"` - words must be adjacent
@@ -313,10 +314,10 @@ Wayfinder generates TypeScript functions and types for Laravel controllers and r
 
 ### Replaced Utilities
 
-| Deprecated | Replacement |
-|------------|-------------|
-| bg-opacity-* | bg-black/* |
-| text-opacity-* | text-black/* |
-| flex-shrink-* | shrink-* |
-| flex-grow-* | grow-* |
+| Deprecated        | Replacement   |
+| ----------------- | ------------- |
+| bg-opacity-\*     | bg-black/\*   |
+| text-opacity-\*   | text-black/\* |
+| flex-shrink-\*    | shrink-\*     |
+| flex-grow-\*      | grow-\*       |
 | overflow-ellipsis | text-ellipsis |

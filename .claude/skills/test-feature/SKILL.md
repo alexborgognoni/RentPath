@@ -7,6 +7,28 @@ description: Write Pest PHP feature tests following RentPath conventions. Use fo
 
 You are helping write Pest PHP tests following RentPath conventions.
 
+## Arguments
+
+This skill accepts optional arguments to specify what to test:
+
+| Usage                                    | Behavior                                |
+| ---------------------------------------- | --------------------------------------- |
+| `/test-feature`                          | Interactive - ask what to test          |
+| `/test-feature ApplicationController`    | Write tests for that controller         |
+| `/test-feature application submission`   | Write tests for that workflow           |
+| `/test-feature Application model`        | Write tests for model logic             |
+| `/test-feature the changes we just made` | Test recent implementation              |
+| `/test-feature authorization`            | Focus on auth/policy tests              |
+| `/test-feature validation`               | Focus on validation tests               |
+| `/test-feature edge cases`               | Focus on edge cases for current feature |
+
+**Argument interpretation:**
+
+- **Controller/Model name** - Write tests for that class
+- **Workflow description** - Write tests covering that flow
+- **Focus area** (`authorization`, `validation`, `edge cases`) - Specific test type
+- **Context reference** (`the changes`, `what we did`) - Test recent work
+
 ## Before You Start
 
 1. **Check existing tests**: Look at `tests/Feature/` for patterns
@@ -23,16 +45,15 @@ You are helping write Pest PHP tests following RentPath conventions.
 | Run specific file | `Bash` | `php artisan test tests/Feature/[File].php` |
 | Check coverage    | `Bash` | `php artisan test --coverage`               |
 
-## Test Structure
+## Quick Start
 
-### Basic Feature Test
+### Basic Test Structure
 
 ```php
 <?php
 
 use App\Models\User;
 use App\Models\Property;
-use App\Models\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -52,292 +73,6 @@ test('user can view property list', function () {
         ->component('properties/index')
         ->has('properties', 3)
     );
-});
-```
-
-### Describe Block Pattern
-
-```php
-describe('Application Submission', function () {
-    beforeEach(function () {
-        $this->tenant = User::factory()->withTenantProfile()->create();
-        $this->property = Property::factory()->vacant()->public()->create();
-    });
-
-    test('tenant can submit application', function () {
-        $application = Application::factory()
-            ->for($this->property)
-            ->for($this->tenant->tenantProfile)
-            ->draft()
-            ->create();
-
-        $response = $this->actingAs($this->tenant)
-            ->post("/applications/{$application->id}/submit");
-
-        $response->assertRedirect();
-        expect($application->fresh()->status)->toBe('submitted');
-    });
-
-    test('cannot submit already submitted application', function () {
-        $application = Application::factory()
-            ->for($this->property)
-            ->for($this->tenant->tenantProfile)
-            ->submitted()
-            ->create();
-
-        $response = $this->actingAs($this->tenant)
-            ->post("/applications/{$application->id}/submit");
-
-        $response->assertForbidden();
-    });
-});
-```
-
-## Factory Reference
-
-### UserFactory
-
-```php
-User::factory()->create();                           // Verified user
-User::factory()->unverified()->create();             // Unverified
-User::factory()->withTenantProfile()->create();      // With tenant profile
-User::factory()->withPropertyManager()->create();    // With PM profile
-User::factory()
-    ->withTenantProfile(verified: true)
-    ->create();                                      // Verified tenant
-```
-
-### TenantProfileFactory
-
-```php
-TenantProfile::factory()->create();                  // Basic profile
-TenantProfile::factory()->verified()->create();      // Verified
-TenantProfile::factory()->rejected('reason')->create();
-TenantProfile::factory()->employed()->create();
-TenantProfile::factory()->student()->create();
-TenantProfile::factory()->withGuarantor()->create();
-```
-
-### PropertyFactory
-
-```php
-Property::factory()->create();                       // Public, vacant
-Property::factory()->draft()->create();
-Property::factory()->vacant()->create();
-Property::factory()->leased()->create();
-Property::factory()->public()->create();
-Property::factory()->unlisted()->create();
-Property::factory()->private()->create();
-Property::factory()->requiresToken()->create();
-Property::factory()->inviteOnly()->create();
-Property::factory()->notAcceptingApplications()->create();
-```
-
-### ApplicationFactory
-
-```php
-Application::factory()->create();                    // Draft
-Application::factory()->draft()->create();
-Application::factory()->submitted()->create();
-Application::factory()->underReview()->create();
-Application::factory()->visitScheduled()->create();
-Application::factory()->approved()->create();
-Application::factory()->rejected()->create();
-Application::factory()->withdrawn()->create();
-```
-
-### Relationship Factories
-
-```php
-// Create with specific relationships
-Application::factory()
-    ->for($property)
-    ->for($tenantProfile)
-    ->create();
-
-// Create with nested relationships
-$user = User::factory()
-    ->has(TenantProfile::factory()->verified())
-    ->create();
-
-// Create multiple
-Property::factory()
-    ->count(5)
-    ->for($propertyManager)
-    ->create();
-```
-
-## Common Test Patterns
-
-### Testing Authentication
-
-```php
-test('guest is redirected to login', function () {
-    $response = $this->get('/dashboard');
-    $response->assertRedirect('/login');
-});
-
-test('authenticated user can access dashboard', function () {
-    $response = $this->actingAs($this->user)
-        ->get('/dashboard');
-    $response->assertOk();
-});
-```
-
-### Testing Authorization
-
-```php
-test('user cannot view other user\'s application', function () {
-    $otherUser = User::factory()->withTenantProfile()->create();
-    $application = Application::factory()
-        ->for($otherUser->tenantProfile)
-        ->create();
-
-    $response = $this->actingAs($this->user)
-        ->get("/applications/{$application->id}");
-
-    $response->assertForbidden();
-});
-
-test('owner can view their application', function () {
-    $application = Application::factory()
-        ->for($this->user->tenantProfile)
-        ->create();
-
-    $response = $this->actingAs($this->user)
-        ->get("/applications/{$application->id}");
-
-    $response->assertOk();
-});
-```
-
-### Testing Validation
-
-```php
-test('validates required fields', function () {
-    $response = $this->actingAs($this->user)
-        ->post('/properties', [
-            'title' => '',  // Required field empty
-        ]);
-
-    $response->assertSessionHasErrors('title');
-});
-
-test('validates field format', function () {
-    $response = $this->actingAs($this->user)
-        ->post('/properties', [
-            'rent_amount' => 'not-a-number',
-        ]);
-
-    $response->assertSessionHasErrors('rent_amount');
-});
-```
-
-### Testing Subdomain Routes
-
-```php
-test('manager can access manager portal', function () {
-    $user = User::factory()->withPropertyManager(verified: true)->create();
-    $managerUrl = 'http://manager.' . config('app.domain');
-
-    $response = $this->actingAs($user)
-        ->get("{$managerUrl}/properties");
-
-    $response->assertOk();
-});
-
-test('tenant cannot access manager portal', function () {
-    $user = User::factory()->withTenantProfile()->create();
-    $managerUrl = 'http://manager.' . config('app.domain');
-
-    $response = $this->actingAs($user)
-        ->get("{$managerUrl}/properties");
-
-    $response->assertForbidden();
-});
-```
-
-### Testing Inertia Responses
-
-```php
-use Inertia\Testing\AssertableInertia as Assert;
-
-test('returns correct page component', function () {
-    $response = $this->actingAs($this->user)
-        ->get('/properties');
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('properties/index')
-    );
-});
-
-test('passes expected props', function () {
-    Property::factory()->count(3)->create();
-
-    $response = $this->actingAs($this->user)
-        ->get('/properties');
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('properties', 3)
-        ->has('properties.0', fn (Assert $prop) => $prop
-            ->has('id')
-            ->has('title')
-            ->has('status')
-            ->etc()
-        )
-    );
-});
-```
-
-### Testing File Uploads
-
-```php
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-
-test('user can upload document', function () {
-    Storage::fake('s3-private');
-
-    $file = UploadedFile::fake()->create('document.pdf', 1024);
-
-    $response = $this->actingAs($this->user)
-        ->post('/profile/documents', [
-            'id_document' => $file,
-        ]);
-
-    $response->assertOk();
-    Storage::disk('s3-private')->assertExists('documents/' . $file->hashName());
-});
-```
-
-### Testing Database State
-
-```php
-test('creates application in database', function () {
-    $response = $this->actingAs($this->tenant)
-        ->post("/properties/{$this->property->id}/apply", [
-            'message' => 'I am interested',
-        ]);
-
-    $this->assertDatabaseHas('applications', [
-        'property_id' => $this->property->id,
-        'tenant_profile_id' => $this->tenant->tenantProfile->id,
-        'status' => 'draft',
-    ]);
-});
-
-test('deletes application from database', function () {
-    $application = Application::factory()
-        ->for($this->tenant->tenantProfile)
-        ->draft()
-        ->create();
-
-    $response = $this->actingAs($this->tenant)
-        ->delete("/applications/{$application->id}");
-
-    $this->assertDatabaseMissing('applications', [
-        'id' => $application->id,
-    ]);
 });
 ```
 
@@ -404,6 +139,13 @@ php artisan test --parallel
 # Stop on first failure
 php artisan test --stop-on-failure
 ```
+
+## Detailed Guides
+
+For comprehensive patterns and examples, see the supporting files:
+
+- **[FACTORIES.md](FACTORIES.md)** - Factory states and relationship patterns
+- **[PATTERNS.md](PATTERNS.md)** - Test patterns, assertions, describe blocks
 
 ## Documentation References
 

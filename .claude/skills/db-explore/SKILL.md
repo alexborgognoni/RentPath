@@ -7,6 +7,28 @@ description: Safe database exploration using Laravel Boost tools. Use for queryi
 
 You are helping explore the RentPath database safely using Laravel Boost tools.
 
+## Arguments
+
+This skill accepts optional arguments to specify what to explore:
+
+| Usage                                | Behavior                                 |
+| ------------------------------------ | ---------------------------------------- |
+| `/db-explore`                        | Show schema overview, common queries     |
+| `/db-explore applications`           | Focus on applications table/model        |
+| `/db-explore users with profiles`    | Explore users and related profile tables |
+| `/db-explore Application::submitted` | Query applications with submitted status |
+| `/db-explore "status = 'draft'"`     | Run specific condition                   |
+| `/db-explore schema`                 | Show full database schema                |
+| `/db-explore relationships`          | Map model relationships                  |
+
+**Argument interpretation:**
+
+- **Table/model name** - Focus exploration on that entity
+- **Model::scope** - Use Eloquent scope to filter
+- **Condition string** - Apply as WHERE clause
+- **Keywords** (`schema`, `relationships`) - Specific exploration mode
+- **Multiple tables** - Explore relationships between them
+
 ## Tools to Use
 
 | Task              | Tool                                      | Why                             |

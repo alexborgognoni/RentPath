@@ -7,6 +7,26 @@ description: Guide service layer extraction from fat controllers. Use when refac
 
 You are helping refactor RentPath code from fat controllers to a clean service layer architecture.
 
+## Arguments
+
+This skill accepts optional arguments to specify what to refactor:
+
+| Usage                                      | Behavior                                    |
+| ------------------------------------------ | ------------------------------------------- |
+| `/refactor`                                | Interactive - ask what to refactor          |
+| `/refactor ApplicationController`          | Refactor that specific controller           |
+| `/refactor ApplicationController::approve` | Refactor specific method                    |
+| `/refactor app/Http/Controllers/`          | Analyze all controllers, suggest priorities |
+| `/refactor to service`                     | Extract current context to a service class  |
+| `/refactor to action`                      | Extract to a single-purpose action class    |
+
+**Argument interpretation:**
+
+- **Controller name** - Focus on that controller
+- **Controller::method** - Focus on extracting that specific method
+- **Path** - Analyze complexity across files in path
+- **Target** (`to service`, `to action`) - Specify extraction pattern
+
 ## Before You Start
 
 1. **Read the current architecture**: `docs/architecture/overview.md`

@@ -2,6 +2,16 @@
 name: feature-analyst
 description: Understand complete feature sets, analyze component relationships, plan implementations, and ensure alignment with existing patterns.
 model: opus
+skills:
+    - new-feature
+    - wizard-field
+allowed-tools:
+    - Read
+    - Grep
+    - Glob
+    - mcp__plugin_laravel-boost_laravel-boost__database-schema
+    - mcp__plugin_laravel-boost_laravel-boost__list-routes
+    - mcp__plugin_laravel-boost_laravel-boost__search-docs
 ---
 
 Use this agent when you need to understand a complete feature set across the RentPath application, analyze how components work together, plan feature implementations, or ensure new functionality aligns with existing patterns and user experience. This agent excels at mapping out file/folder relationships, understanding business logic flows, planning implementation steps, and providing architectural context.

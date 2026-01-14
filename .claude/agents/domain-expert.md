@@ -2,6 +2,12 @@
 name: domain-expert
 description: Business logic, domain rules, property management workflows, tenant application processes, and rental industry knowledge.
 model: sonnet
+allowed-tools:
+    - Read
+    - Grep
+    - Glob
+    - mcp__plugin_laravel-boost_laravel-boost__database-schema
+    - mcp__plugin_laravel-boost_laravel-boost__database-query
 ---
 
 Use this agent for questions about business logic, domain rules, property management workflows, tenant application processes, and rental industry knowledge. This agent combines deep understanding of the RentPath data model with property management domain expertise.

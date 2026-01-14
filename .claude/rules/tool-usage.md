@@ -30,12 +30,13 @@ Efficient tool selection for common tasks.
 
 ## Git & GitHub
 
-| Task                | Tool                    | Why                          |
-| ------------------- | ----------------------- | ---------------------------- |
-| Create commits      | `/commit` skill         | Follows project conventions  |
-| Commit + push + PR  | `/commit-push-pr` skill | Full workflow in one command |
-| Clean gone branches | `/clean_gone` skill     | Removes stale local branches |
-| GitHub operations   | `github` plugin         | PR reviews, issues, etc.     |
+| Task                | Tool                    | Why                                   |
+| ------------------- | ----------------------- | ------------------------------------- |
+| Create commits      | `/commit` skill         | Session-scoped, no AI attribution     |
+| Commit + push + PR  | `/commit-push-pr` skill | Full workflow in one command          |
+| Clean gone branches | `/clean_gone` skill     | Removes stale local branches          |
+| Update docs         | `/update-docs` skill    | Sync docs with implementation changes |
+| GitHub operations   | `github` plugin         | PR reviews, issues, etc.              |
 
 ## Frontend
 
@@ -46,14 +47,14 @@ Efficient tool selection for common tasks.
 
 ## Browser Automation
 
-| Task               | Tool                                  | Why                                  |
-| ------------------ | ------------------------------------- | ------------------------------------ |
-| Navigate to URL    | `browsermcp` → `browser_navigate`     | Direct browser control               |
-| Take screenshot    | `browsermcp` → `browser_screenshot`   | Visual verification                  |
-| Click elements     | `browsermcp` → `browser_click`        | Interact with page                   |
-| Type into fields   | `browsermcp` → `browser_type`         | Form filling                         |
-| Get page snapshot  | `browsermcp` → `browser_snapshot`     | Accessibility tree for element refs  |
-| Check console logs | `browsermcp` → `browser_console_logs` | Debug JS errors                      |
+| Task               | Tool                                  | Why                                 |
+| ------------------ | ------------------------------------- | ----------------------------------- |
+| Navigate to URL    | `browsermcp` → `browser_navigate`     | Direct browser control              |
+| Take screenshot    | `browsermcp` → `browser_screenshot`   | Visual verification                 |
+| Click elements     | `browsermcp` → `browser_click`        | Interact with page                  |
+| Type into fields   | `browsermcp` → `browser_type`         | Form filling                        |
+| Get page snapshot  | `browsermcp` → `browser_snapshot`     | Accessibility tree for element refs |
+| Check console logs | `browsermcp` → `browser_console_logs` | Debug JS errors                     |
 
 Use `browser_snapshot` first to get element references, then interact with `browser_click`/`browser_type`.
 
@@ -64,6 +65,20 @@ Use `browser_snapshot` first to get element references, then interact with `brow
 | Guided feature dev          | `/feature-dev` skill    | Structured approach with codebase understanding |
 | Understand existing feature | `feature-analyst` agent | Maps files, flows, patterns before changes      |
 
+## Agent Selection
+
+| Agent             | When to Use                                   |
+| ----------------- | --------------------------------------------- |
+| `feature-analyst` | Map features, plan implementations            |
+| `architect`       | System design, module boundaries, refactoring |
+| `domain-expert`   | Business rules, workflows, requirements       |
+| `frontend`        | React components, UI/UX, state management     |
+| `testing-expert`  | Test strategy, Pest patterns, debugging tests |
+| `code-reviewer`   | Quality review, security, pre-merge checks    |
+| `infrastructure`  | AWS, Terraform, deployment, DevOps            |
+
+See **[agent-pipelines.md](agent-pipelines.md)** for multi-agent coordination patterns.
+
 ## General Principles
 
 1. **LSP before grep** - Use language servers for type/error checking instead of searching
@@ -71,3 +86,4 @@ Use `browser_snapshot` first to get element references, then interact with `brow
 3. **Skills for workflows** - Use slash commands for multi-step operations
 4. **Agents for exploration** - Use specialized agents for understanding codebase
 5. **Docs before guessing** - Search docs with `context7` or `search-docs` before implementing
+6. **Pipeline for complex work** - Chain agents for multi-step tasks (see agent-pipelines.md)

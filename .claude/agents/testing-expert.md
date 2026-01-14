@@ -2,6 +2,8 @@
 name: testing-expert
 description: Test strategy, Pest PHP testing patterns, factory design, test coverage planning, and debugging test failures.
 model: sonnet
+skills:
+    - test-feature
 ---
 
 Use this agent for test strategy, Pest PHP testing patterns, factory design, test coverage planning, and debugging test failures. This agent is expert in the RentPath testing conventions.

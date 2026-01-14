@@ -2,6 +2,12 @@
 name: infrastructure
 description: AWS infrastructure, Terraform configuration, deployment pipelines, environment management, and DevOps concerns.
 model: sonnet
+allowed-tools:
+    - Read
+    - Grep
+    - Glob
+    - WebFetch
+    - WebSearch
 ---
 
 Use this agent for AWS infrastructure questions, Terraform configuration, deployment pipelines, environment management, and DevOps concerns. This agent understands the complete RentPath infrastructure stack.

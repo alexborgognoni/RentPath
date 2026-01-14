@@ -2,6 +2,8 @@
 name: architect
 description: System design decisions, architectural questions, module boundaries, data flow analysis, and refactoring strategies.
 model: sonnet
+skills:
+    - refactor
 ---
 
 Use this agent for system design decisions, architectural questions, module boundary discussions, data flow analysis, refactoring strategies, and evaluating technical approaches. This agent understands the complete RentPath architecture and can guide decisions about structure, patterns, service layers, and component relationships.
