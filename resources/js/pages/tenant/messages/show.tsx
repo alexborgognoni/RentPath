@@ -38,8 +38,8 @@ export default function MessagesShow({ conversation, messages }: MessagesShowPro
         <TenantLayout>
             <Head title={`Chat with ${conversation.manager_name}`} />
 
-            <div className="mx-auto max-w-4xl">
-                <div className="flex h-[calc(100vh-200px)] flex-col rounded-xl border border-border bg-card shadow-sm">
+            <div className="space-y-6">
+                <div className="mx-auto flex h-[calc(100vh-200px)] max-w-4xl flex-col rounded-xl border border-border bg-card shadow-sm">
                     {/* Header */}
                     <div className="flex items-center gap-4 border-b border-border p-4">
                         <Link href={route('tenant.messages.index')}>

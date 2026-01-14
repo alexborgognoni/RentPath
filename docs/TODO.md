@@ -13,7 +13,16 @@
 #### Phase 1: Profile System (Weeks 1-2, ~45-50h)
 
 - [ ] [feature] Property manager profile creation flow refinements - ~10h
-- [ ] [feature] Tenant profile creation page (personal info, employment, documents, preferences) - ~20h
+- [x] [feature] Tenant profile creation page (personal info, employment, documents, preferences) - ~20h ✅ _(2026-01-14)_
+    - Redesigned from 1048-line monolithic component to modular architecture (~170 lines)
+    - Components: ProfileHeader, ProfileCompleteness (progress ring), ProfileSection (collapsible), section wrappers
+    - New hook: `use-profile-form.ts` with autosave, Precognition validation, completeness calculation
+    - Reuses shared wizard sections: PersonalDetailsSection, FinancialInfoSection, AddressForm
+    - Backend: ValidateProfileRequest + Precognition endpoint (`/tenant-profile/draft`)
+    - **Remaining work**:
+        - [ ] Translations for /profile page (currently English only)
+        - [ ] Fix DOB field save bug (date not persisting correctly)
+        - [ ] Pest feature tests for validation flow
 - [ ] [feature] Basic profile verification system (admin review, approve/reject) - ~15h
 
 #### Phase 2: Application Flow (Weeks 2-3, ~45-50h)

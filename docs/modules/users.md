@@ -52,6 +52,48 @@ Both profile types require verification before full access.
 - Property Managers: Must verify before creating properties
 - Tenants: Must verify before submitting applications
 
+## Tenant Profile Page Architecture
+
+The `/profile` page was redesigned from a 1048-line monolithic component to a modular architecture.
+
+### Component Structure
+
+```
+pages/tenant/profile.tsx (~170 lines)
+├── ProfileHeader                    # Avatar, name, verification status
+├── ProfileCompleteness              # Progress ring with gamification milestones
+│   └── ProgressRing                 # SVG animated ring (0-100%)
+└── ProfileSection (×5)              # Collapsible section wrapper
+    ├── PersonalSection              # → PersonalDetailsSection (reused from wizard)
+    ├── AddressSection               # → AddressForm (reused)
+    ├── IdentitySection              # → IdDocumentSection
+    ├── EmploymentSection            # → FinancialInfoSection (1100 lines, reused)
+    └── DocumentsSection             # Immigration documents
+```
+
+### Key Files
+
+| File                                                       | Purpose                                                     |
+| ---------------------------------------------------------- | ----------------------------------------------------------- |
+| `resources/js/hooks/use-profile-form.ts`                   | Form state, autosave, Precognition validation, completeness |
+| `resources/js/components/profile/profile-completeness.tsx` | Progress ring with milestones (25/50/75/100%)               |
+| `resources/js/components/profile/profile-section.tsx`      | Collapsible section with status badges                      |
+| `resources/js/components/profile/sections/*.tsx`           | Thin wrappers mapping data to shared sections               |
+| `app/Http/Requests/Profile/ValidateProfileRequest.php`     | Precognition validation rules                               |
+
+### Features
+
+- **Autosave**: 500ms debounced saves to `/tenant-profile/autosave`
+- **Precognition validation**: Per-field blur validation via `/tenant-profile/draft`
+- **Completeness calculation**: Frontend mirrors backend logic with weighted fields
+- **Progressive disclosure**: Employment-specific fields based on status selection
+- **Sticky sidebar**: Right-aligned progress card with header offset (`top-[5.5rem]`)
+
+### Known Issues
+
+- Translations not yet implemented (English only)
+- DOB field has a save bug (date not persisting correctly)
+
 ## Related Models
 
 - `app/Models/User.php`

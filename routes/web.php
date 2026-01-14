@@ -480,6 +480,11 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
     Route::post('tenant-profile/autosave', [\App\Http\Controllers\TenantProfileController::class, 'autosave'])
         ->name('tenant.profile.autosave');
 
+    // Profile validation with Precognition for real-time validation
+    Route::patch('tenant-profile/draft', [\App\Http\Controllers\TenantProfileController::class, 'validateDraft'])
+        ->middleware(\Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class)
+        ->name('tenant.profile.draft');
+
     // Applications list route
     Route::get('applications', [\App\Http\Controllers\ApplicationController::class, 'index'])
         ->name('applications.index');

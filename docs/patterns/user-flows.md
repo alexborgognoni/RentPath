@@ -19,6 +19,7 @@ Create property -> Add details via wizard -> Add images -> Configure visibility
 ```
 
 **Wizard Steps**:
+
 1. Basic Info (type, title, description)
 2. Location (address)
 3. Specifications (bedrooms, bathrooms, size, etc.)
@@ -63,17 +64,29 @@ Click property link (from external listing or email)
 
 ```
 Click "Apply" -> Register/Login (if needed)
--> Create tenant profile via wizard
+-> Complete tenant profile (collapsible sections)
 -> Upload required documents
 -> Wait for verification (optional)
 ```
 
-**Profile Wizard Steps**:
-1. Identity (personal info, ID document)
-2. Financial (employment, income, documents)
-3. History (rental history, references)
-4. Additional (guarantor if needed)
-5. Review
+**Profile Page** (`/profile`):
+
+Single-page form with collapsible sections and real-time autosave:
+
+| Section    | Content                             | Reuses                   |
+| ---------- | ----------------------------------- | ------------------------ |
+| Personal   | DOB, nationality, phone, bio        | `PersonalDetailsSection` |
+| Address    | Current residence                   | `AddressForm`            |
+| Identity   | ID document, immigration status     | `IdDocumentSection`      |
+| Employment | Status-specific fields (1100 lines) | `FinancialInfoSection`   |
+| Documents  | Immigration documents               | Custom                   |
+
+**Features**:
+
+- Progress ring with gamification (25/50/75/100% milestones)
+- 500ms debounced autosave
+- Precognition validation on blur
+- Sticky sidebar (desktop), stacked (mobile)
 
 ### 3. Application
 
@@ -83,6 +96,7 @@ Fill application wizard -> Save as draft (anytime)
 ```
 
 **Application Wizard Steps**:
+
 1. Identity (pre-filled from profile, can modify)
 2. Financial (pre-filled from profile, can modify)
 3. History (rental history, references)

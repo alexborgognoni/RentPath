@@ -21,9 +21,9 @@ export default function MessagesIndex({ conversations }: MessagesIndexProps) {
         <TenantLayout>
             <Head title="Messages" />
 
-            <div className="mx-auto max-w-4xl">
+            <div className="space-y-6">
                 {/* Header */}
-                <div className="mb-6 flex items-center gap-3">
+                <div className="flex items-center gap-3">
                     <MessageCircle className="h-7 w-7 text-primary" />
                     <h1 className="text-2xl font-bold text-foreground">Messages ({conversations.length})</h1>
                 </div>

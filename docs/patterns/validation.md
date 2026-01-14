@@ -51,7 +51,7 @@ const headers = {
 // Backend responds with 204 (valid) or 422 (validation errors)
 ```
 
-### Both Wizards (Precognition-based)
+### Wizards (Precognition-based)
 
 Both Property and Application wizards use `use-wizard-precognition` hook which:
 
@@ -61,6 +61,16 @@ Both Property and Application wizards use `use-wizard-precognition` hook which:
     - **Precognition requests**: Strict step validation rules
     - **Normal autosave**: Relaxed rules (preserves user data)
 - Uses full validation on publish/submit
+
+### Profile Page (Precognition-based)
+
+The tenant profile page uses `use-profile-form` hook which:
+
+- Makes axios requests with Precognition headers to `/tenant-profile/draft`
+- Validates against `ValidateProfileRequest` rules
+- Provides per-field blur validation
+- 500ms debounced autosave to `/tenant-profile/autosave`
+- Calculates completeness percentage matching backend logic
 
 ### Draft Request Pattern
 
@@ -107,6 +117,8 @@ app/Http/Requests/
 │   │   └── ...
 │   ├── SaveApplicationDraftRequest.php # Dual-mode: Precognition strict, autosave relaxed
 │   └── SubmitApplicationRequest.php    # Combines all step rules
+├── Profile/
+│   └── ValidateProfileRequest.php      # Precognition validation for /tenant-profile/draft
 └── Traits/
     ├── PropertyValidationRules.php     # Shared constraints & helpers
     └── ApplicationValidationRules.php
@@ -118,7 +130,8 @@ app/Http/Requests/
 resources/js/hooks/
 ├── use-wizard-precognition.ts    # Base wizard hook with Precognition
 ├── use-property-wizard.ts        # Property-specific wrapper
-└── use-application-wizard.ts     # Application-specific wrapper
+├── use-application-wizard.ts     # Application-specific wrapper
+└── use-profile-form.ts           # Profile form with autosave + Precognition
 ```
 
 ### Constraints (UI display)

@@ -621,4 +621,15 @@ class TenantProfileController extends Controller
             'updated_fields' => array_keys($data),
         ]);
     }
+
+    /**
+     * Validate profile data using Precognition.
+     * Returns 204 if valid, 422 with errors if invalid.
+     */
+    public function validateDraft(\App\Http\Requests\Profile\ValidateProfileRequest $request)
+    {
+        // Precognition middleware handles validation automatically
+        // If we reach here, validation passed
+        return response()->noContent();
+    }
 }
