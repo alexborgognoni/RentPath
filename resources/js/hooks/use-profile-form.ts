@@ -449,6 +449,23 @@ export function useProfileForm({
         return new Set([firstIncomplete?.id || 'personal']);
     });
 
+    // Sync form data when initialProfile changes (e.g., after clearing data)
+    useEffect(() => {
+        const newData = flattenProfileData(initialProfile);
+        setData(newData);
+        setExistingDocuments(profileDocuments);
+        setErrors({});
+        setTouchedFields({});
+        setAutosaveStatus('idle');
+        setLastSavedAt(null);
+        setHasUserInteracted(false);
+
+        // Reset expanded sections to first incomplete
+        const { sectionStatuses } = calculateCompleteness(newData, profileDocuments);
+        const firstIncomplete = sectionStatuses.find((s) => !s.isComplete && s.isRequired);
+        setExpandedSections(new Set([firstIncomplete?.id || 'personal']));
+    }, [initialProfile, profileDocuments]);
+
     // Precognition validation for single field
     const validateField = useCallback(
         async (field: string) => {

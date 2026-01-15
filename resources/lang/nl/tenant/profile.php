@@ -151,4 +151,22 @@ return [
             'none' => 'Geen noodcontact toegevoegd',
         ],
     ],
+
+    // Privacy & Data
+    'privacy' => [
+        'title' => 'Uw gegevens & privacy',
+        'description' => 'Uw profielgegevens worden gebruikt om huuraanvragen te vereenvoudigen. U kunt alle opgeslagen gegevens op elk moment wissen.',
+        'clearAllData' => 'Alle gegevens wissen',
+        'privacyPolicy' => 'Privacybeleid',
+        'clearConfirmation' => [
+            'title' => 'Alle profielgegevens wissen?',
+            'message' => 'Dit zal permanent al uw opgeslagen profielinformatie en geüploade documenten verwijderen.',
+            'warning1' => 'Alle persoonlijke informatie wordt verwijderd',
+            'warning2' => 'Alle geüploade documenten worden verwijderd',
+            'warning3' => 'Deze actie kan niet ongedaan worden gemaakt',
+            'cancel' => 'Annuleren',
+            'confirm' => 'Alle gegevens wissen',
+            'clearing' => 'Bezig met wissen...',
+        ],
+    ],
 ];

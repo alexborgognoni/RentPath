@@ -151,4 +151,22 @@ return [
             'none' => 'Aucun contact d\'urgence ajouté',
         ],
     ],
+
+    // Privacy & Data
+    'privacy' => [
+        'title' => 'Vos données & confidentialité',
+        'description' => 'Vos données de profil sont utilisées pour simplifier les demandes de location. Vous pouvez effacer toutes les données enregistrées à tout moment.',
+        'clearAllData' => 'Effacer toutes les données',
+        'privacyPolicy' => 'Politique de confidentialité',
+        'clearConfirmation' => [
+            'title' => 'Effacer toutes les données du profil ?',
+            'message' => 'Cela supprimera définitivement toutes vos informations de profil enregistrées et documents téléchargés.',
+            'warning1' => 'Toutes les informations personnelles seront supprimées',
+            'warning2' => 'Tous les documents téléchargés seront supprimés',
+            'warning3' => 'Cette action ne peut pas être annulée',
+            'cancel' => 'Annuler',
+            'confirm' => 'Effacer toutes les données',
+            'clearing' => 'Suppression en cours...',
+        ],
+    ],
 ];

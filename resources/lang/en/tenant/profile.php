@@ -171,4 +171,22 @@ return [
             'none' => 'No emergency contact added',
         ],
     ],
+
+    // Privacy & Data
+    'privacy' => [
+        'title' => 'Your Data & Privacy',
+        'description' => 'Your profile data is used to streamline rental applications. You can clear all saved data at any time.',
+        'clearAllData' => 'Clear All Data',
+        'privacyPolicy' => 'Privacy Policy',
+        'clearConfirmation' => [
+            'title' => 'Clear All Profile Data?',
+            'message' => 'This will permanently delete all your saved profile information and uploaded documents.',
+            'warning1' => 'All personal information will be removed',
+            'warning2' => 'All uploaded documents will be deleted',
+            'warning3' => 'This action cannot be undone',
+            'cancel' => 'Cancel',
+            'confirm' => 'Clear All Data',
+            'clearing' => 'Clearing...',
+        ],
+    ],
 ];

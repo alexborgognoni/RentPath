@@ -485,6 +485,10 @@ Route::domain(config('app.domain'))->middleware(['auth', 'verified'])->group(fun
         ->middleware(\Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class)
         ->name('tenant.profile.draft');
 
+    // Clear all profile data (GDPR right to erasure)
+    Route::delete('tenant-profile/clear-all', [\App\Http\Controllers\TenantProfileController::class, 'clearAllData'])
+        ->name('tenant.profile.clear-all');
+
     // Applications list route
     Route::get('applications', [\App\Http\Controllers\ApplicationController::class, 'index'])
         ->name('applications.index');

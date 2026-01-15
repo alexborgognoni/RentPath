@@ -4,6 +4,7 @@ import {
     EmploymentSection,
     IdentitySection,
     PersonalSection,
+    PrivacyDataCard,
     ProfileCompleteness,
     ProfileHeader,
     ProfileSection,
@@ -50,10 +51,14 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
     // Section click handler for completeness meter
     const handleSectionClick = useCallback(
         (sectionId: SectionId) => {
+            // First expand the section
             form.expandSection(sectionId);
-            // Scroll to section smoothly
-            const element = document.getElementById(`section-${sectionId}`);
-            element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Wait for the expand animation to start, then scroll to center of section
+            setTimeout(() => {
+                const element = document.getElementById(`section-${sectionId}`);
+                element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 50);
         },
         [form],
     );
@@ -151,7 +156,7 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                     </main>
 
                     {/* Completeness Sidebar - Right side, sticky on desktop */}
-                    <aside className="order-1 lg:sticky lg:top-[5.5rem] lg:order-2 lg:self-start">
+                    <aside className="order-1 space-y-4 lg:sticky lg:top-[5.5rem] lg:order-2 lg:self-start">
                         <ProfileCompleteness
                             completeness={form.completeness}
                             sections={form.sectionStatuses}
@@ -159,6 +164,7 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                             onSectionClick={handleSectionClick}
                             translations={t}
                         />
+                        <PrivacyDataCard translations={t} />
                     </aside>
                 </div>
             </div>

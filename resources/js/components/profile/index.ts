@@ -1,4 +1,5 @@
 // Profile components
+export { PrivacyDataCard } from './privacy-data-card';
 export { ProfileCompleteness, ProfileCompletenessCompact, type ProfileCompletenessProps } from './profile-completeness';
 export { ProfileHeader } from './profile-header';
 export { ProfileSection, type ProfileSectionProps } from './profile-section';

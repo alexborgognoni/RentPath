@@ -151,4 +151,22 @@ return [
             'none' => 'Kein Notfallkontakt hinzugefügt',
         ],
     ],
+
+    // Privacy & Data
+    'privacy' => [
+        'title' => 'Ihre Daten & Datenschutz',
+        'description' => 'Ihre Profildaten werden verwendet, um Mietanträge zu vereinfachen. Sie können alle gespeicherten Daten jederzeit löschen.',
+        'clearAllData' => 'Alle Daten löschen',
+        'privacyPolicy' => 'Datenschutzrichtlinie',
+        'clearConfirmation' => [
+            'title' => 'Alle Profildaten löschen?',
+            'message' => 'Dies löscht dauerhaft alle Ihre gespeicherten Profilinformationen und hochgeladenen Dokumente.',
+            'warning1' => 'Alle persönlichen Informationen werden entfernt',
+            'warning2' => 'Alle hochgeladenen Dokumente werden gelöscht',
+            'warning3' => 'Diese Aktion kann nicht rückgängig gemacht werden',
+            'cancel' => 'Abbrechen',
+            'confirm' => 'Alle Daten löschen',
+            'clearing' => 'Wird gelöscht...',
+        ],
+    ],
 ];

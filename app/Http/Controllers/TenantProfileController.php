@@ -632,4 +632,80 @@ class TenantProfileController extends Controller
         // If we reach here, validation passed
         return response()->noContent();
     }
+
+    /**
+     * Clear all profile data (GDPR right to erasure).
+     * Deletes all documents from storage and resets all profile fields.
+     */
+    public function clearAllData()
+    {
+        $user = Auth::user();
+        $tenantProfile = $user->tenantProfile;
+
+        if (! $tenantProfile) {
+            return response()->json(['success' => false, 'error' => 'Profile not found'], 404);
+        }
+
+        // Define all document path fields and their storage disk
+        $documentFields = [
+            'id_document_front_path' => 'private',
+            'id_document_back_path' => 'private',
+            'residence_permit_document_path' => 'private',
+            'right_to_rent_document_path' => 'private',
+            'employment_contract_path' => 'private',
+            'payslip_1_path' => 'private',
+            'payslip_2_path' => 'private',
+            'payslip_3_path' => 'private',
+            'student_proof_path' => 'private',
+            'pension_statement_path' => 'private',
+            'benefits_statement_path' => 'private',
+            'other_income_proof_path' => 'private',
+            'reference_letter_path' => 'private',
+            'profile_picture_path' => 'public',
+        ];
+
+        // Delete all documents from storage
+        foreach ($documentFields as $pathField => $disk) {
+            $path = $tenantProfile->$pathField;
+            if ($path) {
+                StorageHelper::delete($path, $disk);
+            }
+        }
+
+        // Boolean fields that have NOT NULL constraints with default false
+        $booleanFieldsWithDefaults = [
+            'authorize_credit_check',
+            'authorize_background_check',
+            'has_ccjs_or_bankruptcies',
+            'has_eviction_history',
+            'has_additional_income',
+            'receiving_unemployment_benefits',
+        ];
+
+        // Fields to exclude from clearing (system/verification fields)
+        $excludedFields = [
+            'user_id',
+            'profile_verified_at',
+            'verification_rejection_reason',
+            'verification_rejected_fields',
+        ];
+
+        // Get all fillable fields and set appropriate values
+        $fieldsToReset = collect($tenantProfile->getFillable())
+            ->reject(fn ($field) => in_array($field, $excludedFields))
+            ->mapWithKeys(function ($field) use ($booleanFieldsWithDefaults) {
+                // Boolean fields with NOT NULL defaults should be set to false, not null
+                if (in_array($field, $booleanFieldsWithDefaults)) {
+                    return [$field => false];
+                }
+
+                return [$field => null];
+            })
+            ->all();
+
+        // Reset all profile fields
+        $tenantProfile->update($fieldsToReset);
+
+        return redirect()->back()->with('success', 'All profile data has been cleared.');
+    }
 }
