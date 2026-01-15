@@ -4,8 +4,8 @@ return [
     'banner' => [
         'title' => 'Cookie Settings',
         'description' => 'We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. By clicking "Accept All", you consent to our use of cookies.',
-        'acceptAll' => 'Accept All',
-        'necessaryOnly' => 'Necessary Only',
+        'accept_all' => 'Accept All',
+        'necessary_only' => 'Necessary Only',
         'customize' => 'Customize',
     ],
 
@@ -13,7 +13,7 @@ return [
         'title' => 'Cookie Preferences',
         'necessary' => [
             'title' => 'Necessary Cookies',
-            'alwaysActive' => 'Always Active',
+            'always_active' => 'Always Active',
             'description' => 'Required for the website to function properly. These cannot be disabled.',
         ],
         'analytics' => [
@@ -24,7 +24,7 @@ return [
             'title' => 'Marketing Cookies',
             'description' => 'Used to track visitors across websites to display relevant advertisements.',
         ],
-        'savePreferences' => 'Save Preferences',
+        'save_preferences' => 'Save Preferences',
         'back' => 'Back',
     ],
 ];

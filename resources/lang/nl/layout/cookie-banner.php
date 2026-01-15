@@ -4,8 +4,8 @@ return [
     'banner' => [
         'title' => 'Cookie-instellingen',
         'description' => 'We gebruiken cookies om uw browse-ervaring te verbeteren, siteverkeer te analyseren en inhoud te personaliseren. Door op "Alles accepteren" te klikken, stemt u in met ons gebruik van cookies.',
-        'acceptAll' => 'Alles accepteren',
-        'necessaryOnly' => 'Alleen noodzakelijk',
+        'accept_all' => 'Alles accepteren',
+        'necessary_only' => 'Alleen noodzakelijk',
         'customize' => 'Aanpassen',
     ],
 
@@ -13,7 +13,7 @@ return [
         'title' => 'Cookie-voorkeuren',
         'necessary' => [
             'title' => 'Noodzakelijke cookies',
-            'alwaysActive' => 'Altijd actief',
+            'always_active' => 'Altijd actief',
             'description' => 'Vereist om de website goed te laten functioneren. Deze kunnen niet worden uitgeschakeld.',
         ],
         'analytics' => [
@@ -24,7 +24,7 @@ return [
             'title' => 'Marketing-cookies',
             'description' => 'Gebruikt om bezoekers over websites te volgen om relevante advertenties weer te geven.',
         ],
-        'savePreferences' => 'Voorkeuren opslaan',
+        'save_preferences' => 'Voorkeuren opslaan',
         'back' => 'Terug',
     ],
 ];
