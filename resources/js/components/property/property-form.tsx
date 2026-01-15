@@ -564,7 +564,7 @@ export function PropertyForm({ onClose }: PropertyFormProps) {
                                 id="description-editor"
                                 contentEditable
                                 onInput={handleContentChange}
-                                className="min-h-[168px] w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none [&_a]:text-primary [&_a]:hover:underline"
+                                className="min-h-44 w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none [&_a]:text-primary [&_a]:hover:underline"
                                 style={{
                                     overflowWrap: 'break-word',
                                     wordWrap: 'break-word',

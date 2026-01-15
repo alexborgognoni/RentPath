@@ -64,7 +64,7 @@ export function PropertyInfo({ property }: PropertyInfoProps) {
             {/* Hero Image */}
             {mainImage && (
                 <div className="relative overflow-hidden rounded-2xl shadow-xl">
-                    <img src={mainImage.image_url || ''} alt={property.title} className="h-[480px] w-full object-cover" />
+                    <img src={mainImage.image_url || ''} alt={property.title} className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]" />
                     <button
                         onClick={toggleFullscreen}
                         className="absolute right-4 bottom-4 rounded-lg bg-background/80 p-2 text-foreground backdrop-blur-sm transition-all hover:scale-105 hover:bg-background/90"
