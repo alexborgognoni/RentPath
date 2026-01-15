@@ -110,7 +110,7 @@ export function AddressForm({
 
     // Get field class based on error state
     const getFieldClass = (field: keyof AddressData) => {
-        return `w-full rounded-lg border px-4 py-2 ${hasError(field) ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
+        return `w-full h-9 rounded-md border px-3 text-sm ${hasError(field) ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
 
     // Country-specific address field info

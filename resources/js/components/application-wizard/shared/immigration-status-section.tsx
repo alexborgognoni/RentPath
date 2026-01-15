@@ -106,7 +106,7 @@ export function ImmigrationStatusSection({
     // Get field styling based on error state
     const getFieldClass = (field: string) => {
         const error = hasError(field);
-        return `w-full rounded-lg border px-4 py-2 ${error ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
+        return `w-full h-9 rounded-md border px-3 text-sm ${error ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
 
     // Get property country name for display
