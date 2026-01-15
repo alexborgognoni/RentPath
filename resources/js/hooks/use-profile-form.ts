@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export type AutosaveStatus = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
 
-export type SectionId = 'personal' | 'address' | 'identity' | 'employment' | 'documents';
+export type SectionId = 'personal' | 'address' | 'identity' | 'employment';
 
 export interface SectionStatus {
     id: SectionId;
@@ -183,7 +183,6 @@ const SECTION_TITLES: Record<SectionId, string> = {
     address: 'Current Address',
     identity: 'Identity Documents',
     employment: 'Employment & Income',
-    documents: 'Supporting Documents',
 };
 
 // Helper to safely get a string property from profile
@@ -382,24 +381,6 @@ function calculateCompleteness(
         isRequired: true,
         fieldCount: employmentFields.length,
         completedFields: employmentCompleted,
-    });
-
-    // Documents section - based on employment status
-    let requiredDocs: (keyof ProfileDocuments)[] = [];
-    if (status === 'employed' || status === 'self_employed') {
-        requiredDocs = ['employment_contract', 'payslip_1'];
-    } else if (status === 'student') {
-        requiredDocs = ['student_proof'];
-    }
-
-    const docsCompleted = requiredDocs.filter((d) => documents[d]).length;
-    sectionStatuses.push({
-        id: 'documents',
-        title: SECTION_TITLES.documents,
-        isComplete: requiredDocs.length === 0 || docsCompleted === requiredDocs.length,
-        isRequired: requiredDocs.length > 0,
-        fieldCount: requiredDocs.length,
-        completedFields: docsCompleted,
     });
 
     // Calculate overall completeness

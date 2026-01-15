@@ -1,6 +1,5 @@
 import {
     AddressSection,
-    DocumentsSection,
     EmploymentSection,
     IdentitySection,
     PersonalSection,
@@ -15,7 +14,7 @@ import { TenantLayout } from '@/layouts/tenant-layout';
 import type { SharedData, TenantProfile } from '@/types';
 import { translate } from '@/utils/translate-utils';
 import { Head, usePage } from '@inertiajs/react';
-import { Briefcase, FileText, Home, Shield, User } from 'lucide-react';
+import { Briefcase, Home, Shield, User } from 'lucide-react';
 import { useCallback } from 'react';
 
 interface ProfilePageProps {
@@ -35,7 +34,6 @@ const SECTION_ICONS: Record<SectionId, React.ComponentType<{ className?: string 
     address: Home,
     identity: Shield,
     employment: Briefcase,
-    documents: FileText,
 };
 
 export default function ProfilePage({ profile, profileDocuments }: ProfilePageProps) {
@@ -135,22 +133,6 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                                 translations={t}
                             >
                                 <EmploymentSection form={form} />
-                            </ProfileSection>
-                        </div>
-
-                        {/* Documents Section */}
-                        <div id="section-documents">
-                            <ProfileSection
-                                id="documents"
-                                title={translate(t, 'sections.documents.title')}
-                                icon={SECTION_ICONS.documents}
-                                isComplete={form.sectionStatuses.find((s) => s.id === 'documents')?.isComplete ?? false}
-                                isRequired={form.sectionStatuses.find((s) => s.id === 'documents')?.isRequired ?? false}
-                                isExpanded={form.expandedSections.has('documents')}
-                                onToggle={() => form.toggleSection('documents')}
-                                translations={t}
-                            >
-                                <DocumentsSection form={form} translations={t} />
                             </ProfileSection>
                         </div>
                     </main>

@@ -87,11 +87,6 @@ class TenantProfile extends Model
         'has_additional_income',
         'additional_income_sources',
 
-        // Additional Documents
-        'tax_returns_paths',
-        'bank_statements_paths',
-        'business_bank_statements_paths',
-
         // Student info
         'university_name',
         'program_of_study',
@@ -211,9 +206,6 @@ class TenantProfile extends Model
         'identity_points_documents' => 'array',
         'identity_points_total' => 'integer',
         'additional_income_sources' => 'array',
-        'tax_returns_paths' => 'array',
-        'bank_statements_paths' => 'array',
-        'business_bank_statements_paths' => 'array',
         // History Step casts
         'authorize_credit_check' => 'boolean',
         'authorize_background_check' => 'boolean',
