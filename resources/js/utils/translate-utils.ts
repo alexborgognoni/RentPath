@@ -1,6 +1,11 @@
-import type { Translations } from '@/types/translations';
+/**
+ * Generic translations type that works with any translations object.
+ * This allows passing the full Translations object or any subsection.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TranslationsObject = Record<string, any>;
 
-export const translate = (translations: Translations, key: string, params?: Record<string, string | number>): string => {
+export const translate = (translations: TranslationsObject, key: string, params?: Record<string, string | number>): string => {
     // Safety check: ensure both parameters are provided
     if (!translations || typeof translations !== 'object') {
         console.error('translate() called without translations object. Did you forget to pass translations as the first argument?');

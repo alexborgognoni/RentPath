@@ -1,22 +1,24 @@
 import type { SectionId, SectionStatus } from '@/hooks/use-profile-form';
 import { cn } from '@/lib/utils';
+import type { TenantProfileTranslations } from '@/types/translations';
+import { translate } from '@/utils/translate-utils';
 import { motion } from 'framer-motion';
 import { Check, Rocket, Target, TrendingUp, Trophy } from 'lucide-react';
 
 interface ProgressMilestone {
     threshold: number;
-    label: string;
+    labelKey: string;
     color: string;
     bgColor: string;
     icon: React.ComponentType<{ className?: string }>;
 }
 
 const MILESTONES: ProgressMilestone[] = [
-    { threshold: 0, label: 'Getting started', color: 'text-orange-500', bgColor: 'bg-orange-500', icon: Rocket },
-    { threshold: 25, label: 'Making progress', color: 'text-yellow-500', bgColor: 'bg-yellow-500', icon: TrendingUp },
-    { threshold: 50, label: 'Halfway there', color: 'text-blue-500', bgColor: 'bg-blue-500', icon: Target },
-    { threshold: 75, label: 'Almost done', color: 'text-purple-500', bgColor: 'bg-purple-500', icon: Target },
-    { threshold: 100, label: 'Profile complete!', color: 'text-green-500', bgColor: 'bg-green-500', icon: Trophy },
+    { threshold: 0, labelKey: 'completeness_meter.getting_started', color: 'text-orange-500', bgColor: 'bg-orange-500', icon: Rocket },
+    { threshold: 25, labelKey: 'completeness_meter.making_progress', color: 'text-yellow-500', bgColor: 'bg-yellow-500', icon: TrendingUp },
+    { threshold: 50, labelKey: 'completeness_meter.halfway_there', color: 'text-blue-500', bgColor: 'bg-blue-500', icon: Target },
+    { threshold: 75, labelKey: 'completeness_meter.almost_done', color: 'text-purple-500', bgColor: 'bg-purple-500', icon: Target },
+    { threshold: 100, labelKey: 'completeness_meter.profile_complete', color: 'text-green-500', bgColor: 'bg-green-500', icon: Trophy },
 ];
 
 interface ProgressRingProps {
@@ -70,10 +72,11 @@ export interface ProfileCompletenessProps {
     sections: SectionStatus[];
     nextSuggestion?: string | null;
     onSectionClick?: (sectionId: SectionId) => void;
+    translations: TenantProfileTranslations;
     className?: string;
 }
 
-export function ProfileCompleteness({ completeness, sections, onSectionClick, className }: ProfileCompletenessProps) {
+export function ProfileCompleteness({ completeness, sections, onSectionClick, translations, className }: ProfileCompletenessProps) {
     const milestone = [...MILESTONES].reverse().find((m) => completeness >= m.threshold) || MILESTONES[0];
     const MilestoneIcon = milestone.icon;
 
@@ -85,10 +88,12 @@ export function ProfileCompleteness({ completeness, sections, onSectionClick, cl
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
                         <MilestoneIcon className={cn('h-5 w-5', milestone.color)} />
-                        <span className={cn('font-semibold', milestone.color)}>{milestone.label}</span>
+                        <span className={cn('font-semibold', milestone.color)}>{translate(translations, milestone.labelKey)}</span>
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        {completeness === 100 ? 'Your profile is ready for applications' : `${100 - completeness}% more to complete`}
+                        {completeness === 100
+                            ? translate(translations, 'completeness_meter.ready_message')
+                            : translate(translations, 'completeness_meter.more_to_complete', { percent: 100 - completeness })}
                     </p>
                 </div>
             </div>

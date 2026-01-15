@@ -5,6 +5,44 @@ return [
     'subtitle' => 'Ihre Mieterdaten für Bewerbungen',
     'editButton' => 'Bearbeiten',
     'completeness' => 'Profilvollständigkeit',
+
+    // Header
+    'header' => [
+        'unnamed_user' => 'Unbenannter Benutzer',
+        'status' => [
+            'verified' => 'Verifiziert',
+            'pending' => 'In Prüfung',
+            'needs_attention' => 'Aufmerksamkeit erforderlich',
+        ],
+        'rejection_reason' => 'Grund:',
+    ],
+
+    // Completeness meter
+    'completeness_meter' => [
+        'getting_started' => 'Erste Schritte',
+        'making_progress' => 'Fortschritte',
+        'halfway_there' => 'Zur Hälfte',
+        'almost_done' => 'Fast fertig',
+        'profile_complete' => 'Profil vollständig!',
+        'ready_message' => 'Ihr Profil ist bereit für Bewerbungen',
+        'more_to_complete' => 'Noch :percent% zu vervollständigen',
+    ],
+
+    // Section titles
+    'sections' => [
+        'personal' => 'Persönliche Informationen',
+        'address' => 'Aktuelle Adresse',
+        'identity' => 'Identitätsdokumente',
+        'employment' => 'Beschäftigung & Einkommen',
+        'documents' => [
+            'title' => 'Zusätzliche Dokumente',
+            'no_additional_required' => 'Keine zusätzlichen Dokumente erforderlich. Beschäftigungsdokumente können im Bereich Beschäftigung hochgeladen werden.',
+            'immigration_hint' => 'Da Sie sich in einem anderen Land als Ihrer Nationalität bewerben, müssen Sie möglicherweise zusätzliche Dokumente vorlegen.',
+            'residence_permit' => 'Aufenthaltserlaubnis',
+            'right_to_rent' => 'Mietberechtigung',
+        ],
+    ],
+
     'personalInfo' => 'Persönliche Informationen',
     'dateOfBirth' => 'Geburtsdatum',
     'nationality' => 'Nationalität',

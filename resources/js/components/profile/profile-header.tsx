@@ -1,5 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import type { TenantProfileTranslations } from '@/types/translations';
+import { translate } from '@/utils/translate-utils';
 import { AlertCircle, CheckCircle, Clock, User } from 'lucide-react';
 
 interface ProfileHeaderProps {
@@ -11,26 +13,27 @@ interface ProfileHeaderProps {
     profilePictureUrl?: string;
     verificationStatus?: 'pending' | 'verified' | 'rejected' | null;
     rejectionReason?: string;
+    translations: TenantProfileTranslations;
     className?: string;
 }
 
-export function ProfileHeader({ user, profilePictureUrl, verificationStatus, rejectionReason, className }: ProfileHeaderProps) {
-    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Unnamed User';
+export function ProfileHeader({ user, profilePictureUrl, verificationStatus, rejectionReason, translations, className }: ProfileHeaderProps) {
+    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || translate(translations, 'header.unnamed_user');
 
     const statusConfig = {
         verified: {
             icon: CheckCircle,
-            label: 'Verified',
+            label: translate(translations, 'header.status.verified'),
             className: 'bg-green-100 text-green-700 border-green-200',
         },
         pending: {
             icon: Clock,
-            label: 'Pending Review',
+            label: translate(translations, 'header.status.pending'),
             className: 'bg-yellow-100 text-yellow-700 border-yellow-200',
         },
         rejected: {
             icon: AlertCircle,
-            label: 'Needs Attention',
+            label: translate(translations, 'header.status.needs_attention'),
             className: 'bg-red-100 text-red-700 border-red-200',
         },
     };
@@ -66,7 +69,7 @@ export function ProfileHeader({ user, profilePictureUrl, verificationStatus, rej
                 {/* Rejection reason */}
                 {verificationStatus === 'rejected' && rejectionReason && (
                     <div className="mt-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                        <strong>Reason:</strong> {rejectionReason}
+                        <strong>{translate(translations, 'header.rejection_reason')}</strong> {rejectionReason}
                     </div>
                 )}
             </div>

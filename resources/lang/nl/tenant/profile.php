@@ -5,6 +5,44 @@ return [
     'subtitle' => 'Uw huurdersinformatie voor aanvragen',
     'editButton' => 'Bewerken',
     'completeness' => 'Profiel volledigheid',
+
+    // Header
+    'header' => [
+        'unnamed_user' => 'Naamloze gebruiker',
+        'status' => [
+            'verified' => 'Geverifieerd',
+            'pending' => 'In behandeling',
+            'needs_attention' => 'Aandacht vereist',
+        ],
+        'rejection_reason' => 'Reden:',
+    ],
+
+    // Completeness meter
+    'completeness_meter' => [
+        'getting_started' => 'Aan de slag',
+        'making_progress' => 'Vooruitgang',
+        'halfway_there' => 'Halverwege',
+        'almost_done' => 'Bijna klaar',
+        'profile_complete' => 'Profiel compleet!',
+        'ready_message' => 'Uw profiel is klaar voor aanvragen',
+        'more_to_complete' => 'Nog :percent% te voltooien',
+    ],
+
+    // Section titles
+    'sections' => [
+        'personal' => 'Persoonlijke informatie',
+        'address' => 'Huidig adres',
+        'identity' => 'Identiteitsdocumenten',
+        'employment' => 'Werk & Inkomen',
+        'documents' => [
+            'title' => 'Aanvullende documenten',
+            'no_additional_required' => 'Geen aanvullende documenten vereist. Werkdocumenten kunnen worden geüpload in het onderdeel Werk.',
+            'immigration_hint' => 'Aangezien u aanvraagt in een ander land dan uw nationaliteit, moet u mogelijk aanvullende documenten verstrekken.',
+            'residence_permit' => 'Verblijfsvergunning',
+            'right_to_rent' => 'Huurrecht document',
+        ],
+    ],
+
     'personalInfo' => 'Persoonlijke informatie',
     'dateOfBirth' => 'Geboortedatum',
     'nationality' => 'Nationaliteit',

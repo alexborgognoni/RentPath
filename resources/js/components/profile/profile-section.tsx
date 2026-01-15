@@ -3,6 +3,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { SaveStatusCompact } from '@/components/ui/save-status';
 import type { AutosaveStatus, SectionId } from '@/hooks/use-profile-form';
 import { cn } from '@/lib/utils';
+import type { TenantProfileTranslations } from '@/types/translations';
+import { translate } from '@/utils/translate-utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ChevronDown } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -18,6 +20,7 @@ export interface ProfileSectionProps {
     children: ReactNode;
     // Optional save status display in header
     autosaveStatus?: AutosaveStatus;
+    translations: TenantProfileTranslations;
     className?: string;
 }
 
@@ -30,6 +33,7 @@ export function ProfileSection({
     onToggle,
     children,
     autosaveStatus,
+    translations,
     className,
 }: ProfileSectionProps) {
     return (
@@ -54,12 +58,12 @@ export function ProfileSection({
                                 <h3 className="font-semibold">{title}</h3>
                                 <div className="flex items-center gap-2">
                                     {isComplete ? (
-                                        <span className="text-xs text-green-600">Complete</span>
+                                        <span className="text-xs text-green-600">{translate(translations, 'edit.complete')}</span>
                                     ) : isRequired ? (
-                                        <span className="text-xs text-muted-foreground">Incomplete</span>
+                                        <span className="text-xs text-muted-foreground">{translate(translations, 'edit.incomplete')}</span>
                                     ) : (
                                         <Badge variant="secondary" className="text-xs">
-                                            Optional
+                                            {translate(translations, 'edit.optional')}
                                         </Badge>
                                     )}
                                 </div>

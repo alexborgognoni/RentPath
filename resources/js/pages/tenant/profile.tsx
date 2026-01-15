@@ -12,6 +12,7 @@ import { SaveStatus } from '@/components/ui/save-status';
 import { useProfileForm, type ProfileDocuments, type SectionId } from '@/hooks/use-profile-form';
 import { TenantLayout } from '@/layouts/tenant-layout';
 import type { SharedData, TenantProfile } from '@/types';
+import { translate } from '@/utils/translate-utils';
 import { Head, usePage } from '@inertiajs/react';
 import { Briefcase, FileText, Home, Shield, User } from 'lucide-react';
 import { useCallback } from 'react';
@@ -37,7 +38,8 @@ const SECTION_ICONS: Record<SectionId, React.ComponentType<{ className?: string 
 };
 
 export default function ProfilePage({ profile, profileDocuments }: ProfilePageProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, translations } = usePage<SharedData>().props;
+    const t = translations.tenant.profile;
 
     // Initialize the profile form hook
     const form = useProfileForm({
@@ -58,12 +60,12 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
 
     return (
         <TenantLayout>
-            <Head title="My Profile" />
+            <Head title={translate(t, 'title')} />
 
             <div className="space-y-6">
                 {/* Header with inline save status */}
                 <div className="flex items-start justify-between gap-4">
-                    <ProfileHeader user={auth.user} verificationStatus={profile?.profile_verified_at ? 'verified' : null} />
+                    <ProfileHeader user={auth.user} verificationStatus={profile?.profile_verified_at ? 'verified' : null} translations={t} />
                     <SaveStatus status={form.autosaveStatus} lastSavedAt={form.lastSavedAt} onSave={form.saveNow} className="shrink-0" />
                 </div>
 
@@ -75,11 +77,12 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                         <div id="section-personal">
                             <ProfileSection
                                 id="personal"
-                                title="Personal Information"
+                                title={translate(t, 'sections.personal')}
                                 icon={SECTION_ICONS.personal}
                                 isComplete={form.sectionStatuses.find((s) => s.id === 'personal')?.isComplete ?? false}
                                 isExpanded={form.expandedSections.has('personal')}
                                 onToggle={() => form.toggleSection('personal')}
+                                translations={t}
                             >
                                 <PersonalSection form={form} user={auth.user} />
                             </ProfileSection>
@@ -89,11 +92,12 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                         <div id="section-address">
                             <ProfileSection
                                 id="address"
-                                title="Current Address"
+                                title={translate(t, 'sections.address')}
                                 icon={SECTION_ICONS.address}
                                 isComplete={form.sectionStatuses.find((s) => s.id === 'address')?.isComplete ?? false}
                                 isExpanded={form.expandedSections.has('address')}
                                 onToggle={() => form.toggleSection('address')}
+                                translations={t}
                             >
                                 <AddressSection form={form} />
                             </ProfileSection>
@@ -103,11 +107,12 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                         <div id="section-identity">
                             <ProfileSection
                                 id="identity"
-                                title="Identity Documents"
+                                title={translate(t, 'sections.identity')}
                                 icon={SECTION_ICONS.identity}
                                 isComplete={form.sectionStatuses.find((s) => s.id === 'identity')?.isComplete ?? false}
                                 isExpanded={form.expandedSections.has('identity')}
                                 onToggle={() => form.toggleSection('identity')}
+                                translations={t}
                             >
                                 <IdentitySection form={form} />
                             </ProfileSection>
@@ -117,11 +122,12 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                         <div id="section-employment">
                             <ProfileSection
                                 id="employment"
-                                title="Employment & Income"
+                                title={translate(t, 'sections.employment')}
                                 icon={SECTION_ICONS.employment}
                                 isComplete={form.sectionStatuses.find((s) => s.id === 'employment')?.isComplete ?? false}
                                 isExpanded={form.expandedSections.has('employment')}
                                 onToggle={() => form.toggleSection('employment')}
+                                translations={t}
                             >
                                 <EmploymentSection form={form} />
                             </ProfileSection>
@@ -131,14 +137,15 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                         <div id="section-documents">
                             <ProfileSection
                                 id="documents"
-                                title="Additional Documents"
+                                title={translate(t, 'sections.documents.title')}
                                 icon={SECTION_ICONS.documents}
                                 isComplete={form.sectionStatuses.find((s) => s.id === 'documents')?.isComplete ?? false}
                                 isRequired={form.sectionStatuses.find((s) => s.id === 'documents')?.isRequired ?? false}
                                 isExpanded={form.expandedSections.has('documents')}
                                 onToggle={() => form.toggleSection('documents')}
+                                translations={t}
                             >
-                                <DocumentsSection form={form} />
+                                <DocumentsSection form={form} translations={t} />
                             </ProfileSection>
                         </div>
                     </main>
@@ -150,6 +157,7 @@ export default function ProfilePage({ profile, profileDocuments }: ProfilePagePr
                             sections={form.sectionStatuses}
                             nextSuggestion={form.nextSuggestion}
                             onSectionClick={handleSectionClick}
+                            translations={t}
                         />
                     </aside>
                 </div>

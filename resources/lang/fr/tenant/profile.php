@@ -5,6 +5,44 @@ return [
     'subtitle' => 'Vos informations de locataire pour les candidatures',
     'editButton' => 'Modifier',
     'completeness' => 'Complétude du profil',
+
+    // Header
+    'header' => [
+        'unnamed_user' => 'Utilisateur anonyme',
+        'status' => [
+            'verified' => 'Vérifié',
+            'pending' => 'En attente',
+            'needs_attention' => 'Attention requise',
+        ],
+        'rejection_reason' => 'Raison :',
+    ],
+
+    // Completeness meter
+    'completeness_meter' => [
+        'getting_started' => 'Démarrage',
+        'making_progress' => 'En progression',
+        'halfway_there' => 'À mi-chemin',
+        'almost_done' => 'Presque terminé',
+        'profile_complete' => 'Profil complet !',
+        'ready_message' => 'Votre profil est prêt pour les candidatures',
+        'more_to_complete' => 'Encore :percent% à compléter',
+    ],
+
+    // Section titles
+    'sections' => [
+        'personal' => 'Informations personnelles',
+        'address' => 'Adresse actuelle',
+        'identity' => 'Documents d\'identité',
+        'employment' => 'Emploi & Revenus',
+        'documents' => [
+            'title' => 'Documents supplémentaires',
+            'no_additional_required' => 'Aucun document supplémentaire requis. Les documents d\'emploi peuvent être téléchargés dans la section Emploi.',
+            'immigration_hint' => 'Comme vous postulez dans un pays différent de votre nationalité, vous devrez peut-être fournir des documents supplémentaires.',
+            'residence_permit' => 'Titre de séjour',
+            'right_to_rent' => 'Droit de location',
+        ],
+    ],
+
     'personalInfo' => 'Informations personnelles',
     'dateOfBirth' => 'Date de naissance',
     'nationality' => 'Nationalité',

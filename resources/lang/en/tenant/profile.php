@@ -6,6 +6,43 @@ return [
     'editButton' => 'Edit',
     'completeness' => 'Profile Completeness',
 
+    // Header
+    'header' => [
+        'unnamed_user' => 'Unnamed User',
+        'status' => [
+            'verified' => 'Verified',
+            'pending' => 'Pending Review',
+            'needs_attention' => 'Needs Attention',
+        ],
+        'rejection_reason' => 'Reason:',
+    ],
+
+    // Completeness meter
+    'completeness_meter' => [
+        'getting_started' => 'Getting started',
+        'making_progress' => 'Making progress',
+        'halfway_there' => 'Halfway there',
+        'almost_done' => 'Almost done',
+        'profile_complete' => 'Profile complete!',
+        'ready_message' => 'Your profile is ready for applications',
+        'more_to_complete' => ':percent% more to complete',
+    ],
+
+    // Section titles
+    'sections' => [
+        'personal' => 'Personal Information',
+        'address' => 'Current Address',
+        'identity' => 'Identity Documents',
+        'employment' => 'Employment & Income',
+        'documents' => [
+            'title' => 'Additional Documents',
+            'no_additional_required' => 'No additional documents required. Employment documents can be uploaded in the Employment section.',
+            'immigration_hint' => 'Since you\'re applying in a different country from your nationality, you may need to provide additional documents.',
+            'residence_permit' => 'Residence Permit',
+            'right_to_rent' => 'Right to Rent Document',
+        ],
+    ],
+
     // Personal info
     'personalInfo' => 'Personal Information',
     'dateOfBirth' => 'Date of Birth',
