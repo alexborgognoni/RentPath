@@ -6,13 +6,16 @@ use App\Http\Requests\Traits\ApplicationValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Validates profile data with the same rules as the application wizard.
+ *
+ * Uses conditional validation based on employment_status and immigration_status
+ * to match the wizard's per-field onBlur validation pattern.
+ */
 class ValidateProfileRequest extends FormRequest
 {
     use ApplicationValidationRules;
 
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
@@ -21,50 +24,57 @@ class ValidateProfileRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
+     * Rules match IdentityStepRequest and FinancialStepRequest from the wizard,
+     * but without the 'profile_' prefix since this is the profile page.
+     *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
+        $employmentStatus = $this->input('employment_status');
+        $immigrationStatus = $this->input('immigration_status');
+        $countryCode = $this->input('current_country');
+
         $rules = [
-            // Personal info
-            'date_of_birth' => ['nullable', 'date', 'before:today', 'after:'.now()->subYears(120)->toDateString()],
+            // ===== Personal Info (matches IdentityStepRequest) =====
+            'date_of_birth' => ['required', 'date', 'before:-18 years'],
             'middle_name' => ['nullable', 'string', 'max:100'],
-            'nationality' => ['nullable', 'string', 'size:2'],
-            'phone_country_code' => ['nullable', 'string', 'max:10'],
-            'phone_number' => ['nullable', 'string', 'max:20'],
+            'nationality' => $this->countryCodeRules(),
+            'phone_country_code' => ['required', 'string', 'max:5'],
+            'phone_number' => $this->phoneRules('phone_country_code'),
             'bio' => ['nullable', 'string', 'max:1000'],
 
-            // ID Document
-            'id_document_type' => ['nullable', Rule::in(['passport', 'national_id', 'drivers_license'])],
-            'id_number' => ['nullable', 'string', 'max:50'],
-            'id_issuing_country' => ['nullable', 'string', 'size:2'],
-            'id_expiry_date' => ['nullable', 'date', 'after:today'],
+            // ===== ID Document (matches IdentityStepRequest) =====
+            'id_document_type' => ['required', Rule::in($this->idDocumentTypes())],
+            'id_number' => ['required', 'string', 'max:100'],
+            'id_issuing_country' => $this->countryCodeRules(),
+            'id_expiry_date' => ['required', 'date', 'after:today'],
 
-            // Immigration Status
+            // ===== Immigration Status (conditional) =====
             'immigration_status' => ['nullable', Rule::in($this->immigrationStatuses())],
             'immigration_status_other' => ['nullable', 'string', 'max:100', 'required_if:immigration_status,other'],
-            'visa_type' => ['nullable', Rule::in($this->visaTypes())],
+            'visa_type' => ['nullable', 'string', 'max:100', 'required_if:immigration_status,visa_holder'],
             'visa_type_other' => ['nullable', 'string', 'max:100', 'required_if:visa_type,other'],
-            'visa_expiry_date' => ['nullable', 'date', 'after:today'],
-            'work_permit_number' => ['nullable', 'string', 'max:50'],
+            'visa_expiry_date' => ['nullable', 'date', 'after:today', 'required_if:immigration_status,visa_holder'],
+            'work_permit_number' => ['nullable', 'string', 'max:100'],
 
-            // Right to Rent
-            'right_to_rent_share_code' => ['nullable', 'string', 'max:20'],
+            // Right to Rent (UK specific, optional)
+            'right_to_rent_share_code' => ['nullable', 'string', 'max:50'],
 
-            // Current Address
-            'current_house_number' => ['nullable', 'string', 'max:20'],
-            'current_address_line_2' => ['nullable', 'string', 'max:255'],
-            'current_street_name' => ['nullable', 'string', 'max:255'],
-            'current_city' => ['nullable', 'string', 'max:100'],
+            // ===== Current Address (matches IdentityStepRequest) =====
+            'current_house_number' => ['required', 'string', 'max:20'],
+            'current_address_line_2' => ['nullable', 'string', 'max:100'],
+            'current_street_name' => ['required', 'string', 'max:255'],
+            'current_city' => ['required', 'string', 'max:100'],
             'current_state_province' => ['nullable', 'string', 'max:100'],
-            'current_postal_code' => ['nullable', 'string', 'max:20'],
-            'current_country' => ['nullable', 'string', 'size:2'],
+            'current_postal_code' => $this->postalCodeRules('current_country'),
+            'current_country' => $this->countryCodeRules(),
 
-            // Employment
-            'employment_status' => ['nullable', Rule::in($this->employmentStatuses())],
-            'income_currency' => ['nullable', Rule::in($this->currencies())],
+            // ===== Employment (matches FinancialStepRequest) =====
+            'employment_status' => ['required', Rule::in($this->employmentStatuses())],
+            'income_currency' => ['required', Rule::in($this->currencies())],
 
-            // Employed fields
+            // Base employment fields (nullable by default)
             'employer_name' => ['nullable', 'string', 'max:255'],
             'job_title' => ['nullable', 'string', 'max:255'],
             'employment_type' => ['nullable', Rule::in(['full_time', 'part_time', 'contract', 'temporary'])],
@@ -119,7 +129,85 @@ class ValidateProfileRequest extends FormRequest
             'has_additional_income' => ['nullable', 'boolean'],
         ];
 
+        // ===== Conditional Employment Rules (matches FinancialStepRequest) =====
+
+        // Employed/Self-Employed: Require core employment fields
+        if (in_array($employmentStatus, ['employed', 'self_employed'])) {
+            $rules['employer_name'] = ['required', 'string', 'max:255'];
+            $rules['job_title'] = ['required', 'string', 'max:255'];
+            $rules['monthly_income'] = ['required', 'numeric', 'min:0'];
+        }
+
+        // Student: Require student fields
+        if ($employmentStatus === 'student') {
+            $rules['university_name'] = ['required', 'string', 'max:255'];
+            $rules['program_of_study'] = ['required', 'string', 'max:255'];
+        }
+
+        // ===== Conditional Address Rules (matches IdentityStepRequest) =====
+
+        // State/province required for certain countries
+        if ($countryCode && in_array(strtoupper($countryCode), $this->countriesRequiringState())) {
+            $rules['current_state_province'] = ['required', 'string', 'max:100'];
+        }
+
         return $rules;
+    }
+
+    /**
+     * Get custom error messages matching the wizard's messages.
+     */
+    public function messages(): array
+    {
+        return [
+            // Personal info
+            'date_of_birth.required' => 'Date of birth is required',
+            'date_of_birth.before' => 'You must be at least 18 years old',
+            'nationality.required' => 'Nationality is required',
+            'phone_country_code.required' => 'Country code is required',
+            'phone_number.required' => 'Phone number is required',
+
+            // ID Document
+            'id_document_type.required' => 'ID document type is required',
+            'id_number.required' => 'ID number is required',
+            'id_issuing_country.required' => 'ID issuing country is required',
+            'id_expiry_date.required' => 'ID expiry date is required',
+            'id_expiry_date.after' => 'ID document must not be expired',
+
+            // Address
+            'current_house_number.required' => 'House number is required',
+            'current_street_name.required' => 'Street name is required',
+            'current_city.required' => 'City is required',
+            'current_postal_code.required' => 'Postal code is required',
+            'current_country.required' => 'Country is required',
+            'current_state_province.required' => 'State/Province is required for this country',
+
+            // Immigration
+            'immigration_status_other.required_if' => 'Please specify your immigration status',
+            'visa_type.required_if' => 'Visa type is required for visa holders',
+            'visa_expiry_date.required_if' => 'Visa expiry date is required',
+            'visa_expiry_date.after' => 'Visa must not be expired',
+
+            // Employment
+            'employment_status.required' => 'Please select your employment status',
+            'income_currency.required' => 'Please select your income currency',
+            'employer_name.required' => 'Employer name is required',
+            'job_title.required' => 'Job title is required',
+            'monthly_income.required' => 'Monthly income is required',
+            'monthly_income.min' => 'Income must be a positive number',
+
+            // Student
+            'university_name.required' => 'University name is required',
+            'program_of_study.required' => 'Program of study is required',
+            'expected_graduation_date.after' => 'Graduation date must be in the future',
+
+            // General numeric
+            'gross_annual_income.min' => 'Income must be a positive number',
+            'net_monthly_income.min' => 'Income must be a positive number',
+            'student_monthly_income.min' => 'Income must be a positive number',
+            'pension_monthly_income.min' => 'Income must be a positive number',
+            'unemployment_benefits_amount.min' => 'Amount must be a positive number',
+        ];
     }
 
     /**
@@ -133,21 +221,6 @@ class ValidateProfileRequest extends FormRequest
             'visa_holder',
             'refugee',
             'asylum_seeker',
-            'other',
-        ];
-    }
-
-    /**
-     * Get the visa type options.
-     */
-    protected function visaTypes(): array
-    {
-        return [
-            'work',
-            'student',
-            'family',
-            'tourist',
-            'business',
             'other',
         ];
     }
