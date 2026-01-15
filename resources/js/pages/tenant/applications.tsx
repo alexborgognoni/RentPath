@@ -141,7 +141,7 @@ export default function ApplicationsPage({ applications, filters }: Applications
                             label: t(opt.labelKey) || opt.fallback,
                         }))}
                         placeholder={t('tenant.applications.filter.all') || 'All Statuses'}
-                        className="w-full sm:w-[200px]"
+                        className="w-full sm:w-52"
                     />
                 </div>
 

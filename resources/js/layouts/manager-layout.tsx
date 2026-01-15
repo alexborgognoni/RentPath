@@ -10,8 +10,11 @@ interface ManagerLayoutProps extends PropsWithChildren {
     breadcrumbs?: BreadcrumbItem[];
 }
 
-const SIDEBAR_EXPANDED = 256;
-const SIDEBAR_COLLAPSED = 64;
+// Sidebar widths in rem (converted from px for consistency with Tailwind scale)
+// Expanded: 16rem = 256px = w-64
+// Collapsed: 4rem = 64px = w-16
+const SIDEBAR_EXPANDED = '16rem';
+const SIDEBAR_COLLAPSED = '4rem';
 
 function getInitialCollapsedState(): boolean {
     if (typeof document === 'undefined') return false;

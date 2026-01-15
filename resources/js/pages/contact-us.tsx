@@ -181,7 +181,7 @@ export default function ContactUs() {
                                                 id="message"
                                                 name="message"
                                                 placeholder={translate(translations.public.contactUs, 'form.fields.message.placeholder')}
-                                                className="min-h-[120px] flex-1 resize-none"
+                                                className="min-h-32 flex-1 resize-none"
                                                 value={formData.message}
                                                 onChange={handleChange}
                                                 required

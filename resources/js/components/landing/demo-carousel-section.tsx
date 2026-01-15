@@ -367,7 +367,7 @@ export function DemoCarouselSection() {
                                                                 <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary sm:h-6 sm:w-6 md:h-7 md:w-7 md:transition-transform md:duration-300 md:group-hover:scale-110">
                                                                     <Check className="h-3.5 w-3.5 text-white sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
                                                                 </div>
-                                                                <span className="text-left text-[15px] leading-relaxed font-medium text-foreground sm:text-[15px] md:text-base">
+                                                                <span className="text-left text-sm leading-relaxed font-medium text-foreground sm:text-sm md:text-base">
                                                                     {feature}
                                                                 </span>
                                                             </div>

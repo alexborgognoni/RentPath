@@ -84,13 +84,13 @@ export function HeroSection() {
                     >
                         <a
                             href={route('register')}
-                            className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center text-base font-semibold whitespace-nowrap shadow-lg xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:scale-105"
+                            className="text-text-primary min-w-48 rounded-lg bg-gradient-to-r from-primary to-secondary px-6 py-3 text-center text-base font-semibold whitespace-nowrap shadow-lg xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:scale-105"
                         >
                             {translate(translations.public.landing, 'hero.ctaPrimaryGuest')}
                         </a>
                         <a
                             href="#problems"
-                            className="min-w-[200px] rounded-lg border border-border bg-surface px-6 py-3 text-center text-base font-semibold whitespace-nowrap text-foreground xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:bg-surface/80"
+                            className="min-w-48 rounded-lg border border-border bg-surface px-6 py-3 text-center text-base font-semibold whitespace-nowrap text-foreground xs:px-8 xs:py-4 xs:text-lg md:transition-all md:hover:bg-surface/80"
                         >
                             {translate(translations.public.landing, 'hero.ctaSecondary')}
                         </a>
@@ -135,7 +135,7 @@ export function HeroSection() {
                         <div className="flex flex-col gap-4 xl:gap-6">
                             <a
                                 href={route('register')}
-                                className="text-text-primary min-w-[200px] rounded-lg bg-gradient-to-r from-primary to-secondary text-center font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
+                                className="text-text-primary min-w-48 rounded-lg bg-gradient-to-r from-primary to-secondary text-center font-semibold whitespace-nowrap shadow-lg md:transition-all md:hover:scale-105 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
                             >
                                 {translate(translations.public.landing, 'hero.ctaPrimaryGuest')}
                             </a>
@@ -169,7 +169,7 @@ export function HeroSection() {
 
                             <a
                                 href="#problems"
-                                className="min-w-[200px] rounded-lg border border-border bg-surface text-center font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
+                                className="min-w-48 rounded-lg border border-border bg-surface text-center font-semibold whitespace-nowrap text-foreground md:transition-all md:hover:bg-surface/80 lg:px-5 lg:py-3 lg:text-lg xl:px-6 xl:py-3 xl:text-xl"
                             >
                                 {translate(translations.public.landing, 'hero.ctaSecondary')}
                             </a>
