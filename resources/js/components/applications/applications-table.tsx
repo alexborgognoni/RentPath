@@ -75,7 +75,7 @@ export function ApplicationsTable({ applications, onRowClick }: ApplicationsTabl
                 cell: ({ row }) => {
                     const property = row.original.property;
                     return (
-                        <div className="max-w-[200px]">
+                        <div className="max-w-48">
                             <p className="truncate font-medium text-foreground">{property?.title || '-'}</p>
                             <p className="truncate text-xs text-muted-foreground">
                                 {property?.street_name} {property?.house_number}, {property?.city}
@@ -93,7 +93,7 @@ export function ApplicationsTable({ applications, onRowClick }: ApplicationsTabl
                     const user = row.original.tenant_profile?.user;
                     const name = user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : '-';
                     return (
-                        <div className="max-w-[180px]">
+                        <div className="max-w-44">
                             <p className="truncate font-medium text-foreground">{name || '-'}</p>
                             <p className="truncate text-xs text-muted-foreground">{user?.email || '-'}</p>
                         </div>

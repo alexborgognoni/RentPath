@@ -119,7 +119,7 @@ export function WizardNavigation({
                         type="button"
                         onClick={handleNext}
                         disabled={isSubmitting}
-                        className="min-w-[140px] gap-2 bg-gradient-to-r from-primary to-primary/90 shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30"
+                        className="min-w-36 gap-2 bg-gradient-to-r from-primary to-primary/90 shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30"
                         size="lg"
                     >
                         {isSubmitting ? (

@@ -106,7 +106,7 @@ export function ProfileCompleteness({ completeness, sections, onSectionClick, tr
                         type="button"
                         onClick={() => onSectionClick?.(section.id)}
                         className={cn(
-                            'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
+                            'flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors',
                             section.isComplete ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'bg-muted/50 text-muted-foreground hover:bg-muted',
                         )}
                     >

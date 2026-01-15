@@ -43,7 +43,10 @@ export function ProfileSection({
                 <CollapsibleTrigger asChild>
                     <button
                         type="button"
-                        className="flex w-full cursor-pointer items-center justify-between rounded-xl p-4 text-left transition-colors hover:bg-muted/50"
+                        className={cn(
+                            'flex w-full cursor-pointer items-center justify-between p-4 text-left transition-colors hover:bg-muted/50',
+                            isExpanded ? 'rounded-t-xl' : 'rounded-xl',
+                        )}
                     >
                         <div className="flex items-center gap-3">
                             <div

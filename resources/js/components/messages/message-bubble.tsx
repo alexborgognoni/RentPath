@@ -49,7 +49,7 @@ export function MessageBubble({ body, senderName, createdAt, attachments, isOwnM
                             )}
                         >
                             {attachment.mime_type.startsWith('image/') ? <ImageIcon className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
-                            <span className="max-w-[200px] truncate">{attachment.original_name}</span>
+                            <span className="max-w-48 truncate">{attachment.original_name}</span>
                             <span className="text-xs text-muted-foreground">({attachment.formatted_size})</span>
                         </a>
                     ))}

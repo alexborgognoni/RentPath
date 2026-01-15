@@ -61,7 +61,7 @@ export function MessageInput({ storeRoute }: MessageInputProps) {
                 <div className="mb-3 flex flex-wrap gap-2">
                     {files.map((file, index) => (
                         <div key={index} className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5 text-sm">
-                            <span className="max-w-[150px] truncate">{file.name}</span>
+                            <span className="max-w-36 truncate">{file.name}</span>
                             <button type="button" onClick={() => removeFile(index)} className="text-muted-foreground hover:text-foreground">
                                 <X className="h-4 w-4" />
                             </button>
@@ -89,7 +89,7 @@ export function MessageInput({ storeRoute }: MessageInputProps) {
                     onChange={(e) => setData('body', e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type a message..."
-                    className="max-h-[120px] min-h-[44px] resize-none"
+                    className="max-h-32 min-h-11 resize-none"
                     rows={1}
                 />
 
