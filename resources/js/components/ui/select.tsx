@@ -1,7 +1,33 @@
 import { cn } from '@/lib/utils';
 import * as Popover from '@radix-ui/react-popover';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { ChevronDown, Search } from 'lucide-react';
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+/**
+ * Select size scale (matches input/button heights):
+ * - sm: 32px height, compact forms
+ * - md: 36px height, default
+ * - lg: 44px height, prominent selects
+ *
+ * Note: rounded-md is in base styles so it can be overridden by className
+ * for attached inputs (e.g., phone-input with country selector)
+ */
+const selectTriggerVariants = cva(
+    'flex cursor-pointer items-center justify-between rounded-md border bg-background focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
+    {
+        variants: {
+            size: {
+                sm: 'h-8 gap-1 px-3 text-sm [&_svg]:size-3',
+                md: 'h-9 gap-2 px-3 text-sm [&_svg]:size-4',
+                lg: 'h-11 gap-2 px-4 text-base [&_svg]:size-4',
+            },
+        },
+        defaultVariants: {
+            size: 'md',
+        },
+    },
+);
 
 /** Standard option shape for simple selects */
 export interface SelectOption {
@@ -78,8 +104,10 @@ export interface SelectProps<T> {
     error?: string;
     /** Close on scroll (default: true) */
     closeOnScroll?: boolean;
-    /** Compact mode - for inline use */
-    compact?: boolean;
+    /** Size variant */
+    size?: VariantProps<typeof selectTriggerVariants>['size'];
+    /** Take full width of container (default: true) */
+    fullWidth?: boolean;
     /** Min width for dropdown */
     minWidth?: string;
     /** Hide native scrollbar (default: true) */
@@ -106,7 +134,8 @@ export function Select<T>({
     'aria-invalid': ariaInvalid,
     error,
     closeOnScroll = true,
-    compact = false,
+    size,
+    fullWidth = true,
     minWidth = '200px',
     hideScrollbar = true,
 }: SelectProps<T>) {
@@ -248,7 +277,7 @@ export function Select<T>({
     const hasError = ariaInvalid || !!error;
 
     return (
-        <div className={cn(!compact && 'w-full')}>
+        <div className={cn(fullWidth && 'w-full')}>
             <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
                 <Popover.Trigger asChild>
                     <button
@@ -258,17 +287,15 @@ export function Select<T>({
                         disabled={disabled}
                         onKeyDown={handleKeyDown}
                         className={cn(
-                            'flex cursor-pointer items-center justify-between gap-1 border bg-background',
-                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                            'disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
+                            selectTriggerVariants({ size }),
+                            fullWidth && 'w-full',
                             !currentOption && 'text-muted-foreground',
                             hasError ? 'border-destructive bg-destructive/5' : 'border-border',
-                            compact ? 'rounded-l-lg rounded-r-none border-r-0 px-3 py-2' : 'w-full rounded-lg px-4 py-2 gap-2',
                             className,
                         )}
                     >
-                        {renderTrigger(currentOption, placeholder)}
-                        <ChevronDown className={cn('shrink-0 opacity-50', compact ? 'size-3' : 'size-4')} />
+                        <span className="truncate">{renderTrigger(currentOption, placeholder)}</span>
+                        <ChevronDown className="shrink-0 opacity-50" />
                     </button>
                 </Popover.Trigger>
 
@@ -276,8 +303,7 @@ export function Select<T>({
                     <Popover.Content
                         ref={contentRef}
                         className={cn(
-                            'bg-background text-foreground z-50 rounded-lg border border-border shadow-md',
-                            compact ? '' : 'w-[var(--radix-popover-trigger-width)]',
+                            'bg-background text-foreground z-50 w-[var(--radix-popover-trigger-width)] rounded-md border border-border shadow-md',
                             'data-[state=open]:animate-in data-[state=closed]:animate-out',
                             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
                             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -336,7 +362,9 @@ export function Select<T>({
                     </Popover.Content>
                 </Popover.Portal>
             </Popover.Root>
-            {error && !compact && <p className="mt-1 text-sm text-destructive">{error}</p>}
+            {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
         </div>
     );
 }
+
+export { selectTriggerVariants }

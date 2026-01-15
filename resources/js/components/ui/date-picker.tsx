@@ -5,6 +5,7 @@ import {
     parseDate as parseISODate,
     today,
 } from '@internationalized/date';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -24,10 +25,32 @@ import {
     Popover,
 } from 'react-aria-components';
 
+/**
+ * DatePicker size scale (matches input heights):
+ * - sm: 32px height, compact forms
+ * - md: 36px height, default
+ * - lg: 44px height, prominent inputs
+ */
+const datePickerVariants = cva(
+    'flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-border bg-background focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] data-[disabled]:cursor-not-allowed data-[disabled]:bg-muted data-[disabled]:text-muted-foreground',
+    {
+        variants: {
+            size: {
+                sm: 'h-8 px-3 text-sm [&_svg]:size-3',
+                md: 'h-9 px-3 text-sm [&_svg]:size-4',
+                lg: 'h-11 px-4 text-base [&_svg]:size-4',
+            },
+        },
+        defaultVariants: {
+            size: 'md',
+        },
+    },
+);
+
 /** Date restriction presets */
 export type DateRestriction = 'past' | 'future' | 'strictFuture' | 'any';
 
-export interface DatePickerProps {
+export interface DatePickerProps extends VariantProps<typeof datePickerVariants> {
     /** Current value (ISO date string: yyyy-MM-dd) */
     value: string;
     /** Called when date changes (returns ISO date string) */
@@ -59,7 +82,10 @@ function toCalendarDate(value: Date | string | undefined): CalendarDate | undefi
         return new CalendarDate(value.getFullYear(), value.getMonth() + 1, value.getDate());
     }
     try {
-        return parseISODate(value);
+        // Handle ISO datetime strings by extracting just the date part
+        // Laravel might return dates like "2024-01-15T00:00:00.000000Z" or "2024-01-15 00:00:00"
+        const dateOnly = value.split(/[T\s]/)[0];
+        return parseISODate(dateOnly);
     } catch {
         return undefined;
     }
@@ -158,6 +184,7 @@ export function DatePicker({
     className,
     'aria-invalid': ariaInvalid,
     error,
+    size,
 }: DatePickerProps) {
     const [isOpen, setIsOpen] = useState(false);
     const wasOpenRef = useRef(false);
@@ -240,9 +267,7 @@ export function DatePicker({
         >
             <Group
                 className={cn(
-                    'flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-border bg-background px-4 py-2',
-                    'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
-                    'data-[disabled]:cursor-not-allowed data-[disabled]:bg-muted data-[disabled]:text-muted-foreground',
+                    datePickerVariants({ size }),
                     hasError && 'border-destructive bg-destructive/5',
                 )}
             >
@@ -275,7 +300,7 @@ export function DatePicker({
                 offset={4}
             >
                 <Dialog className="outline-none">
-                    <Calendar className="w-[280px]">
+                    <Calendar className="w-72">
                         {/* Header with month/year dropdowns and nav buttons */}
                         <header className="mb-4 flex items-center justify-between gap-1">
                             <Button

@@ -145,7 +145,7 @@ export function FinancialInfoSection({
 
     const getFieldClass = (field: string) => {
         const hasError = isTouched(f(field)) && getError(f(field));
-        return `w-full rounded-lg border px-4 py-2 ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
+        return `w-full h-9 rounded-md border px-3 text-sm ${hasError ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
 
     // Check if field has error and was touched (for document fields)

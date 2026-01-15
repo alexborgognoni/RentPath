@@ -224,6 +224,70 @@
     --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
     --shadow-xl: 0 20px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
     --shadow-2xl: 0 25px 50px -12px var(--shadow-color);
+
+    /* ==========================================================================
+       COMPONENT SIZE SCALE
+       Based on 8px grid system with 3 standard sizes (sm, md, lg)
+       ========================================================================== */
+
+    /* Component Heights - 8px grid aligned
+       sm: 32px (compact UIs, toolbars)
+       md: 36px (default forms, buttons)
+       lg: 44px (hero CTAs, touch targets) */
+    --height-sm: 2rem;
+    --height-md: 2.25rem;
+    --height-lg: 2.75rem;
+
+    /* Icon Sizes - paired with typography scale
+       xs: 12px (badges, compact)
+       sm: 16px (default buttons, inputs)
+       md: 20px (large buttons)
+       lg: 24px (headers, hero) */
+    --icon-xs: 0.75rem;
+    --icon-sm: 1rem;
+    --icon-md: 1.25rem;
+    --icon-lg: 1.5rem;
+
+    /* Icon Container Sizes - for icon-only buttons
+       Matches component heights for alignment */
+    --icon-container-sm: 2rem;
+    --icon-container-md: 2.25rem;
+    --icon-container-lg: 2.75rem;
+
+    /* Button Padding Scale
+       Horizontal padding increases with size for visual balance */
+    --button-padding-x-sm: 0.75rem;
+    --button-padding-x-md: 1rem;
+    --button-padding-x-lg: 1.5rem;
+    --button-padding-y-sm: 0.375rem;
+    --button-padding-y-md: 0.5rem;
+    --button-padding-y-lg: 0.625rem;
+
+    /* Input Padding - consistent across sizes
+       Only height changes, padding stays uniform */
+    --input-padding-x: 0.75rem;
+    --input-padding-y: 0.5rem;
+
+    /* Container/Card Padding Scale */
+    --container-padding-xs: 0.75rem;
+    --container-padding-sm: 1rem;
+    --container-padding-md: 1.25rem;
+    --container-padding-lg: 1.5rem;
+
+    /* Section/Layout Gaps */
+    --section-gap-xs: 0.5rem;
+    --section-gap-sm: 1rem;
+    --section-gap-md: 1.5rem;
+    --section-gap-lg: 2rem;
+    --section-gap-xl: 3rem;
+
+    /* Semantic Border Radius - component-specific aliases */
+    --radius-button: 0.5rem;
+    --radius-input: 0.375rem;
+    --radius-card: 0.75rem;
+    --radius-badge: 0.375rem;
+    --radius-modal: 0.75rem;
+    --radius-switch: 9999px;
 }
 
 /* =============================================================================

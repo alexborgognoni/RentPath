@@ -11,6 +11,8 @@ import {
 import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { Select } from './select';
 
+export type PhoneInputSize = 'sm' | 'md' | 'lg';
+
 export interface PhoneInputProps {
     /** Current phone number value (national format without country code) */
     value: string;
@@ -34,11 +36,20 @@ export interface PhoneInputProps {
     'aria-invalid'?: boolean;
     /** Close on scroll (default: true) */
     closeOnScroll?: boolean;
+    /** Size variant - matches form input sizes (default: md) */
+    size?: PhoneInputSize;
 }
 
 function filterCountries(countries: CountryInfo[], query: string): CountryInfo[] {
     return searchCountries(query, true);
 }
+
+// Size-specific styles for the phone input
+const sizeStyles = {
+    sm: { height: 'h-8', padding: 'px-3', text: 'text-sm' },
+    md: { height: 'h-9', padding: 'px-3', text: 'text-sm' },
+    lg: { height: 'h-11', padding: 'px-4', text: 'text-base' },
+} as const;
 
 export function PhoneInput({
     value,
@@ -52,6 +63,7 @@ export function PhoneInput({
     className,
     'aria-invalid': ariaInvalid,
     closeOnScroll = true,
+    size = 'md',
 }: PhoneInputProps) {
     const phoneInputRef = useRef<HTMLInputElement>(null);
     const [internalCountryIso, setInternalCountryIso] = useState<string>('');
@@ -95,6 +107,8 @@ export function PhoneInput({
 
     const hasError = ariaInvalid || !!error;
 
+    const styles = sizeStyles[size];
+
     return (
         <div className={cn('w-full', className)}>
             <div className="flex">
@@ -124,7 +138,9 @@ export function PhoneInput({
                     disabled={disabled}
                     closeOnScroll={closeOnScroll}
                     minWidth="288px"
-                    compact
+                    size={size}
+                    fullWidth={false}
+                    className="rounded-r-none border-r-0"
                 />
 
                 {/* Phone Number Input */}
@@ -139,7 +155,10 @@ export function PhoneInput({
                     placeholder={placeholder}
                     aria-invalid={hasError}
                     className={cn(
-                        'w-full min-w-0 flex-1 rounded-l-none rounded-r-lg border bg-background px-4 py-2',
+                        'min-w-0 flex-1 rounded-l-none rounded-r-md border bg-background',
+                        styles.height,
+                        styles.padding,
+                        styles.text,
                         'border-border placeholder:text-muted-foreground',
                         'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                         'disabled:cursor-not-allowed disabled:opacity-50',

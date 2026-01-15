@@ -132,7 +132,7 @@ export function CurrencySelect({
                     <span className="font-medium">{currency?.symbol || '?'}</span>
                 ) : currency ? (
                     <span className="flex items-center gap-2 truncate">
-                        <span className="min-w-[1.5rem] text-muted-foreground">{currency.symbol}</span>
+                        <span className="min-w-6 text-muted-foreground">{currency.symbol}</span>
                         <span>{currency.name}</span>
                     </span>
                 ) : (
@@ -141,7 +141,7 @@ export function CurrencySelect({
             }
             renderOption={(c) => (
                 <>
-                    <span className="min-w-[1.5rem] text-muted-foreground">{c.symbol}</span>
+                    <span className="min-w-6 text-muted-foreground">{c.symbol}</span>
                     <span className="flex-1 truncate text-left">{c.name}</span>
                 </>
             )}
@@ -150,11 +150,12 @@ export function CurrencySelect({
             emptyText="No currencies found"
             onBlur={onBlur}
             disabled={disabled}
-            className={className}
+            className={compact ? 'rounded-r-none border-r-0' : className}
             aria-invalid={ariaInvalid}
             error={error}
             closeOnScroll={closeOnScroll}
-            compact={compact}
+            size="md"
+            fullWidth={!compact}
             minWidth="280px"
         />
     );

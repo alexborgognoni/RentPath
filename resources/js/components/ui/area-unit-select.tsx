@@ -80,7 +80,7 @@ export function AreaUnitSelect({
                     <span className="font-medium">{unit?.symbol || '?'}</span>
                 ) : unit ? (
                     <span className="flex items-center gap-2 truncate">
-                        <span className="min-w-[2rem] text-muted-foreground">{unit.symbol}</span>
+                        <span className="min-w-8 text-muted-foreground">{unit.symbol}</span>
                         <span>{unit.name}</span>
                     </span>
                 ) : (
@@ -89,7 +89,7 @@ export function AreaUnitSelect({
             }
             renderOption={(u) => (
                 <>
-                    <span className="min-w-[2rem] text-muted-foreground">{u.symbol}</span>
+                    <span className="min-w-8 text-muted-foreground">{u.symbol}</span>
                     <span className="flex-1 truncate text-left">{u.name}</span>
                 </>
             )}
@@ -98,11 +98,12 @@ export function AreaUnitSelect({
             emptyText="No units found"
             onBlur={onBlur}
             disabled={disabled}
-            className={className}
+            className={compact ? 'rounded-l-none border-l-0' : className}
             aria-invalid={ariaInvalid}
             error={error}
             closeOnScroll={closeOnScroll}
-            compact={compact}
+            size={compact ? 'sm' : 'md'}
+            fullWidth={!compact}
             minWidth="180px"
         />
     );

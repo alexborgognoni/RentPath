@@ -62,10 +62,10 @@ export function PersonalDetailsSection({
     // Get field styling based on error state and disabled state
     const getFieldClass = (field: string, isDisabled = false) => {
         if (isDisabled) {
-            return 'w-full cursor-not-allowed rounded-lg border border-border bg-muted px-4 py-2 text-muted-foreground';
+            return 'w-full h-9 cursor-not-allowed rounded-md border border-border bg-muted px-3 text-sm text-muted-foreground';
         }
         const error = hasError(field);
-        return `w-full rounded-lg border px-4 py-2 ${error ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
+        return `w-full h-9 rounded-md border px-3 text-sm ${error ? 'border-destructive bg-destructive/5' : 'border-border bg-background'}`;
     };
 
     const handlePhoneChange = (phoneNumber: string, countryCode: string) => {
@@ -174,7 +174,7 @@ export function PersonalDetailsSection({
                     rows={4}
                     maxLength={1000}
                     placeholder={t('placeholders.bio') || 'Tell us a bit about yourself...'}
-                    className="w-full rounded-lg border border-border bg-background px-4 py-2"
+                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
                     {(t('bioCharacters') || ':count/:max characters').replace(':count', data.bio.length.toString()).replace(':max', '1000')}
